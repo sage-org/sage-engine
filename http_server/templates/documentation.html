@@ -1,0 +1,79 @@
+{% extends "main.html" %}
+
+{% block title %}API Documentation - SaGe{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <h1>API documentation</h1>
+
+    <h2 id="#sage">SaGe interface</h2>
+    <h3><strong>POST</strong> <span class="text-primary">/bgp/&lt;dataset_name&gt;</span></h3>
+    <p><strong>Example:</strong> {{ url_for('bgp-ldf.get_nlj_fragment', dataset_name="watdiv10m") }}</p>
+
+    <h4>Accepted media types</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Accept</th>
+          <th>Description</th>
+          <th>Specification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>application/json</code></td>
+          <td>JSON</td>
+          <td><a href="https://www.json.org/">https://www.json.org/</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>JSON POST parameters</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>bgp</code></td>
+          <td>Array of JSON Objects</td>
+          <td>yes</td>
+          <td></td>
+          <td>An Array of JSON objects that contains the triple patterns of the BGP</td>
+        </tr>
+        <tr>
+          <td><code>controls</code></td>
+          <td>JSON Object</td>
+          <td>no</td>
+          <td><code>{}</code></td>
+          <td>JSON serialization of a saved query execution plan, used to resume query processing</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Example:</strong></p>
+    <pre>
+      http://example.org/bgp/watdiv10m
+      {
+        "bgp:": [
+          {
+            "subject": "?v0",
+            "predicate": "http://purl.org/goodrelations/description",
+            "object": "?v1"
+          },
+          {
+            "subject": "?v0",
+            "predicate": "http://purl.org/goodrelations/offers",
+            "object": "http://db.uwaterloo.ca/~galuc/wsdbm/Offer29628"
+          }
+        ]
+      }
+    </pre>
+</div>
+{% endblock %}

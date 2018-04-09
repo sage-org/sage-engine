@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+
+{% block title %}SaGe interface{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <h1>SaGe interface</h1>
+    <h2>Available datasets</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dataset in datasets %}
+        <tr>
+          <td>
+            <a href="{{ url_for('bgp-ldf.get_nlj_fragment', dataset_name=dataset["name"]) }}">
+              {{ dataset["name"] }}
+            </a>
+          </td>
+          <td>{{dataset['description']}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

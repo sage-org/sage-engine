@@ -1,0 +1,43 @@
+{% extends "main.html" %}
+
+{% block title %}SaGe query engine{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <h1>SaGe query engine</h1>
+    <h2>Available datasets</h2>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Description</th>
+          <th>Backend</th>
+          <th>Interfaces</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dataset in datasets %}
+        <tr>
+          <td>
+              {{ dataset["name"] }}
+          </td>
+          <td>{{dataset['description']}}</td>
+          <td>{{ dataset['backend'] }}</td>
+          <td>
+            <ul>
+              <li>
+                <a href="{{ url_for('bgp-ldf.get_nlj_fragment', dataset_name=dataset["name"]) }}">
+                  SaGe interface
+                </a>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

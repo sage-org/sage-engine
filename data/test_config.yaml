@@ -1,0 +1,9 @@
+name: SaGe Test server
+maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
+quota: 75
+datasets:
+-
+  name: testdata
+  description: Sample dataset in HDT format, used for testing
+  backend: hdt-file
+  file: data/test.hdt
