@@ -6,14 +6,8 @@ from abc import ABC, abstractmethod
 class PreemptableIterator(ABC):
     """An abstract class for a preemptable iterator"""
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return self.next()
-
     @abstractmethod
-    def next(self):
+    async def next(self):
         """
         Get the next item from the iterator, following the iterator protocol.
         Raise `StopIteration` is the iterator cannot peoduce more items.
@@ -23,13 +17,8 @@ class PreemptableIterator(ABC):
 
     @property
     @abstractmethod
-    def is_closed(self):
-        """Return True if the iterator will yield no more items"""
-        pass
-
-    @abstractmethod
-    def stop(self):
-        """Stop the iterator from producing items"""
+    def has_next(self):
+        """Return True if the iterator has more item to yield"""
         pass
 
     @abstractmethod
@@ -37,7 +26,7 @@ class PreemptableIterator(ABC):
         """Save and serialize the iterator as a machine-readable format"""
         pass
 
-    @abstractmethod
-    def load(self, state=None):
-        """Reload the state of an iterator from a saved tstate (as produced by a call to iter.save())"""
-        pass
+    # @abstractmethod
+    # def load(self, state=None):
+    #     """Reload the state of an iterator from a saved tstate (as produced by a call to iter.save())"""
+    #     pass

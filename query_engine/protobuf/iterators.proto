@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package iterators;
+
+message TriplePattern {
+  string subject = 1;
+  string predicate = 2;
+  string object = 3;
+}
+
+message SavedScanIterator {
+  TriplePattern triple = 1;
+  uint64 offset = 2;
+  int64 cardinality = 3;
+}
+
+message SavedSelectionIterator {
+  repeated string values = 1;
+  oneof source {
+    SavedScanIterator scan_source = 2;
+    SavedNestedLoopJoinIterator nlj_source = 3;
+  }
+}
+
+message SavedNestedLoopJoinIterator {
+  oneof source {
+    SavedScanIterator scan_source = 1;
+    SavedNestedLoopJoinIterator nlj_source = 2;
+  }
+  TriplePattern inner = 4;
+  map<string, string> mappings = 5;
+  uint64 offset = 6;
+}
