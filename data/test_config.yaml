@@ -7,3 +7,8 @@ datasets:
   description: Sample dataset in HDT format, used for testing
   backend: hdt-file
   file: data/test.hdt
+-
+  name: watdiv100
+  description: Watdiv dataset
+  backend: hdt-file
+  file: data/watdiv.10M.hdt

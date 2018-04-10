@@ -1,10 +1,10 @@
 # bgp_interface.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from flask import Blueprint, request, Response, render_template, abort, json
+from query_engine.sage_engine import SageEngine
 from query_engine.optimizer.plan_builder import build_left_plan
-from query_engine.iterators.utils import itimeout
 from http_server.bgp.schemas import BGPQuery
-from http_server.utils import secure_url, format_marshmallow_errors
+from http_server.utils import encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors
 from time import time
 
 
@@ -27,7 +27,8 @@ def bgp_blueprint(datasets):
             abort(404)
         mimetype = request.accept_mimetypes.best_match(['application/trig', 'text/html'])
         url = secure_url(request.url)
-        # process GET request as regular TPF queries
+        engine = SageEngine()
+        # process GET request as a Triple Pattern query
         if request.method == "GET" or (not request.is_json):
             (subject, predicate, obj, offset, limit) = (
                 request.args.get("subject", ""),
@@ -45,21 +46,18 @@ def bgp_blueprint(datasets):
         post_query, errors = BGPQuery().load(request.get_json())
         if len(errors) > 0:
             return Response(status="400", response=format_marshmallow_errors(errors), content_type='text/plain')
-        quota = int(request.args.get("quota", dataset.deadline()))
+        quota = int(request.args.get("quota", dataset.deadline())) / 1000
         bgp = post_query['bgp']
-        controls = post_query['controls']
+        next = decode_saved_plan(post_query['next']) if post_query['next'] is not None else None
         # build physical query plan, then execute it with the given number of tickets
         start = time()
-        join = build_left_plan(bgp, dataset._factory, controls=controls)
+        plan = build_left_plan(bgp, dataset._factory, next)
         loadingTime = (time() - start) * 1000
-        bindings = list(itimeout(join, quota))
+        bindings, savedPlan, isDone = engine.execute(plan, quota)
         # compute controls for the next page
-        hasNext = join.has_next()
         start = time()
-        controls = join.export() if hasNext else None
+        nextPage = encode_saved_plan(savedPlan) if not isDone else None
         exportTime = (time() - start) * 1000
         stats = {'import': loadingTime, 'export': exportTime}
-        # if controls is not None:
-        #     controls['hash'] = hash_controls(controls)
-        return json.jsonify(bindings=bindings, cardinality=len(bindings), next=hasNext, controls=controls, stats=stats)
+        return json.jsonify(bindings=bindings, pageSize=len(bindings), hasNext=not isDone, next=nextPage, stats=stats)
     return bgp_blueprint

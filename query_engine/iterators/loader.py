@@ -10,7 +10,7 @@ def load(protoMsg, hdtDocument):
     """Load a preemptable physical query execution plan from a saved state"""
     savedPlan = protoMsg
     if isinstance(protoMsg, bytes):
-        savedPlan = SavedSelectionIterator()
+        savedPlan = SavedNestedLoopJoinIterator()
         savedPlan.ParseFromString(protoMsg)
     if type(savedPlan) is SavedSelectionIterator:
         if savedPlan.HasField('nlj_source'):
