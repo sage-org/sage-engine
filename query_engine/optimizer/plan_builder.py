@@ -7,25 +7,24 @@ from query_engine.iterators.loader import load
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
 
 
-def build_left_plan(bgp, hdtDocument, controls=None, source=None, sourceVars=None, queryVariables=None):
+def build_left_plan(bgp, hdtDocument, savedPlan=None):
     """Build a Left-linear tree of joins from a BGP"""
-    if controls is not None and len(controls) > 0:
-        return load(controls, hdtDocument)
+    if savedPlan is not None:
+        return load(savedPlan, hdtDocument)
     # gather metadata about triple patterns
     triples = []
-    for name, triple in bgp.items():
+    for triple in bgp:
         it, c = hdtDocument.search_triples(triple['subject'], triple['predicate'], triple['object'])
-        triples += [{'name': name, 'triple': triple, 'cardinality': c, 'iterator': it}]
+        triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
+    # a pattern with no matching triples => no results for this BGP
+    if triples[0]['cardinality'] == 0:
+        return EmptyIterator()
     # build the left linear tree
-    acc = source
-    if acc is None and sourceVars is None:
-        pattern = triples.pop(0)
-        acc = ScanIterator(pattern['iterator'], pattern['triple'], pattern['name'])
-        queryVariables = get_vars(pattern['triple'])
-    else:
-        queryVariables = sourceVars
+    pattern = triples.pop(0)
+    acc = ScanIterator(pattern['iterator'], pattern['triple'], pattern['cardinality'])
+    queryVariables = get_vars(pattern['triple'])
     while len(triples) > 0:
         pattern, pos, queryVariables = find_connected_pattern(queryVariables, triples)
         # no connected pattern = disconnected BGP => no results for this BGP
