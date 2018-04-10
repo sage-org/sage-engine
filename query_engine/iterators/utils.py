@@ -8,6 +8,10 @@ from time import time
 NotYet = 'Not Yet'
 
 
+class IteratorExhausted(Exception):
+    pass
+
+
 class EmptyIterator(object):
     """An Iterator that yields nothing"""
     def __init__(self):

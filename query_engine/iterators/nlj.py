@@ -1,12 +1,15 @@
 # nlj.py
 # Author: Thomas MINIER - MIT License 2017-2018
+from query_engine.iterators.preemptable_iterator import PreemptableIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.utils import apply_bindings, NotYet
+from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedNestedLoopJoinIterator
+from query_engine.iterators.utils import IteratorExhausted
+from asyncio import coroutine, shield
 
 
-class NestedLoopJoinIterator(object):
+class NestedLoopJoinIterator(PreemptableIterator):
     """A NestedLoopJoinIterator is an iterator over a nested loop join between an iterator, which yields mappings, and a triple pattern.
-    It is implemented as a Snapshot Operator, so it can be halted and resumed at any time.
 
     Constructor args:
         - source [ScanIterator|NestedLoopJoinIterator] - The outer relation of the join: an iterator that yields solution mappings.
@@ -22,6 +25,7 @@ class NestedLoopJoinIterator(object):
         self._currentBinding = currentBinding
         self._hdtDocument = hdtDocument
         self._iterOffset = iterOffset
+        self._mu = None
         self._currentIter = None
         if self._currentBinding is not None:
             self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding, offset=iterOffset)
@@ -44,50 +48,60 @@ class NestedLoopJoinIterator(object):
         return self._iterOffset
 
     def has_next(self):
-        return self._source.has_next() or self._currentBinding is not None or self._currentIter is not None
+        return self._source.has_next() or self._currentIter is not None or self._currentIter.has_next()
 
     def _initInnerLoop(self, triple, mappings, offset=0):
         (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))
-        iterator, c = self._hdtDocument.search_triples(s, p, o, offset=offset)
-        return ScanIterator(iterator, triple, 'anonymous')
+        if o.startswith('?'):
+            o = ""
+        iterator, card = self._hdtDocument.search_triples(s, p, o, offset=offset)
+        if card == 0:
+            return None
+        return ScanIterator(iterator, triple, card)
 
-    def next(self):
-        if not self.has_next():
-            raise StopIteration()
-
-        # read another set of mappings from the outer loop and init a new innner loop
-        if self._currentBinding is None:
-            self._currentBinding = next(self._source, None)
-
-            if self._currentBinding is NotYet:
-                self._currentBinding = None
-                return NotYet
-            elif self._currentBinding is None and self._currentIter is None:
-                raise StopIteration()
-
-        # initalize a new inner loop
-        if self._currentIter is None:
+    async def outerLoop(self):
+        while self._currentIter is None or (not self._currentIter.has_next()):
+            self._currentBinding = await self._source.next()
+            if self._currentBinding is None:
+                return None
             self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
-        try:
-            # read from the inner loop
-            value = next(self._currentIter)
-            self._iterOffset += 1
-            return {**self._currentBinding, **value}
-        except StopIteration as e:
-            if not self.has_next():
-                raise StopIteration()
-            # try to schedule a new inner loop using remaining tickets
-            self._currentBinding = None
-            self._iterOffset = 0
-            self._currentIter = None
-            return NotYet
 
-    def export(self):
-        """Export a snaphost of the operator"""
-        return {
-            'type': 'NestedLoopJoinIterator',
-            'source': self._source.export(),
-            'inner': self._innerTriple,
-            'mappings': self.currentBinding,
-            'offset': self._iterOffset
-        }
+    async def innerLoop(self):
+        """Execute one loop of the inner loop"""
+        self._mu = await self._currentIter.next()
+        return {**self._currentBinding, **self._mu}
+
+    @coroutine
+    async def next(self):
+        """Get the next element from the join"""
+        if not self.has_next():
+            raise IteratorExhausted()
+        while self._currentIter is None or (not self._currentIter.has_next()):
+            self._currentBinding = await self._source.next()
+            if self._currentBinding is None:
+                return None
+            self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
+        return await shield(self.innerLoop())
+
+    def save(self):
+        """Save the operator using protobuf"""
+        savedJoin = SavedNestedLoopJoinIterator()
+        if type(self._source).__name__ == 'ScanIterator':
+            savedJoin.scan_source.CopyFrom(self._source.save())
+        elif type(self._source).__name__ == 'NestedLoopJoinIterator':
+            savedJoin.nlj_source.CopyFrom(self._source.save())
+        inner = TriplePattern()
+        inner.subject = self._innerTriple['subject']
+        inner.predicate = self._innerTriple['predicate']
+        inner.object = self._innerTriple['object']
+        savedJoin.inner.CopyFrom(inner)
+        if self._mu is not None:
+            for key in self._mu:
+                savedJoin.mu[key] = self._mu[key]
+        # savedJoin.mu
+        if self._currentBinding is not None:
+            for key in self._currentBinding:
+                savedJoin.muc[key] = self._mu[key]
+        if self._currentIter is not None:
+            savedJoin.offset = self._currentIter.offset + self._currentIter.nb_reads
+        return savedJoin

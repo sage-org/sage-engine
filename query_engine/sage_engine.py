@@ -1,14 +1,19 @@
 # sage_engine.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from asyncio import Queue, get_event_loop, shield, wait_for
+from asyncio import Queue, coroutine, get_event_loop, shield, wait_for
 from asyncio import TimeoutError as asyncTimeoutError
+from query_engine.iterators.utils import IteratorExhausted
 
 
+@coroutine
 async def executor(plan, queue):
     """Executor used to evaluated a plan under a time quota"""
-    while plan.has_next():
-        value = await plan.next()
-        await shield(queue.put(value))
+    try:
+        while plan.has_next():
+            value = await plan.next()
+            await shield(queue.put(value))
+    except IteratorExhausted as e:
+        pass
 
 
 class SageEngine(object):

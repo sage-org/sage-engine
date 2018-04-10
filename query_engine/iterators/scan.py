@@ -3,6 +3,8 @@
 from query_engine.iterators.preemptable_iterator import PreemptableIterator
 from query_engine.iterators.utils import apply_bindings, vars_positions, selection
 from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedScanIterator
+from query_engine.iterators.utils import IteratorExhausted
+from asyncio import coroutine
 
 
 class ScanIterator(PreemptableIterator):
@@ -38,8 +40,11 @@ class ScanIterator(PreemptableIterator):
     def has_next(self):
         return self._source.has_next()
 
+    @coroutine
     async def next(self):
         """Scan the relation and return the next set of solution mappings"""
+        if not self.has_next():
+            raise IteratorExhausted()
         mappings = dict(selection(next(self._source), self._variables))
         return mappings
 
