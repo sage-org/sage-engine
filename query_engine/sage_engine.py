@@ -5,7 +5,6 @@ from asyncio import TimeoutError as asyncTimeoutError
 from query_engine.iterators.utils import IteratorExhausted
 
 
-@coroutine
 async def executor(plan, queue):
     """Executor used to evaluated a plan under a time quota"""
     try:
@@ -22,15 +21,30 @@ class SageEngine(object):
         super(SageEngine, self).__init__()
 
     def execute(self, plan, quota):
+        """
+            Execute a preemptable physical query execution plan under a time quota.
+
+            Args:
+                - plan [PreemptableIterator] - The root of the plan, i.e., a preemptable iterator
+                - quota [float] - The time quota used for query execution
+
+            Returns:
+                A tuple (results, saved_plan, is_done) where:
+                - results is a list of solution mappings found during query execution
+                - saved_plan is the state of the plan saved using protocol-buffers
+                - is_done is bolean set to True when the plan has completed query evalution, False otherwise
+        """
         results = list()
         queue = Queue()
         loop = get_event_loop()
+        done = False
         try:
             task = wait_for(executor(plan, queue), timeout=quota)
             loop.run_until_complete(task)
+            done = True
         except asyncTimeoutError as e:
             pass
         finally:
             while not queue.empty():
                 results.append(queue.get_nowait())
-        return (results, plan.save())
+        return (results, plan.save(), done)

@@ -1,7 +1,7 @@
 # scan.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.preemptable_iterator import PreemptableIterator
-from query_engine.iterators.utils import apply_bindings, vars_positions, selection
+from query_engine.iterators.utils import vars_positions, selection
 from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedScanIterator
 from query_engine.iterators.utils import IteratorExhausted
 from asyncio import coroutine
@@ -13,8 +13,7 @@ class ScanIterator(PreemptableIterator):
     Constructor args:
         - source [hdt.TripleIterator] - An HDT iterator that yields RDF triple in string format.
         - triple [TriplePattern] - The triple pattern corresponding to the source iterator.
-        - tripleName [string] - A key to identify the triple pattern.
-        - cardinality [integer, default=None] - The cardinality of the triple pattern.
+        - cardinality [integer, default=0] - The cardinality of the triple pattern.
     """
     def __init__(self, source, triple, cardinality=0):
         super(ScanIterator, self).__init__()

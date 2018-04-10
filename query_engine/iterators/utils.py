@@ -1,14 +1,9 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from collections import OrderedDict
-from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
-from json import dumps
-from time import time
-
-NotYet = 'Not Yet'
 
 
 class IteratorExhausted(Exception):
+    """Exception raised when a closed iterator was requested to produce a value"""
     pass
 
 
@@ -17,17 +12,11 @@ class EmptyIterator(object):
     def __init__(self):
         super(EmptyIterator, self).__init__()
 
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return self.next()
-
     def __len__(self):
         return 0
 
-    def next(self):
-        raise StopIteration()
+    async def next(self):
+        raise IteratorExhausted()
 
     def peek(self):
         return self.next()
@@ -66,24 +55,6 @@ def vars_positions(subject, predicate, obj):
     return [var if var.startswith('?') else None for var in [subject, predicate, obj]]
 
 
-def itimeout(iterator, timeout=20):
-    """Apply a timeout on an iterator: after `timeout`ms, no more read are allowed."""
-    startTime = time()
-    for v in iterator:
-        elapsedTime = (time() - startTime) * 1000
-        if v is NotYet and elapsedTime >= timeout:
-            break
-        elif v is not NotYet:
-            yield v
-            if elapsedTime >= timeout:
-                break
-
-
-def cleaniterator(iterator):
-    """Build a clean iterator, i.e., filter out None values"""
-    return filter(lambda v: v is not None, iterator)
-
-
 def flattenValue(value):
     if type(value[1]) is list:
         return [(value[0], subval) for subval in value[1]]
@@ -113,3 +84,11 @@ def collect_while(relation, predicate, firstVal=None):
         res += flattenValue(relation.next())
         v = relation.peek(None)
     return res
+
+
+def tuple_to_triple(s, p, o):
+    return {
+        'subject': s,
+        'predicate': p,
+        'object': o
+    }

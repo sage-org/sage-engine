@@ -27,8 +27,7 @@ message SavedNestedLoopJoinIterator {
     SavedScanIterator scan_source = 1;
     SavedNestedLoopJoinIterator nlj_source = 2;
   }
-  map<string, string> mu = 3;
-  TriplePattern inner = 4;
-  map<string, string> muc = 5;
-  uint64 offset = 6;
+  TriplePattern inner = 3;
+  map<string, string> muc = 4;
+  uint64 offset = 5;
 }
