@@ -35,19 +35,15 @@ class BagUnionIterator(PreemptableIterator):
         savedLeft = self._left.save()
         savedRight = self._right.save()
         # export left source
-        if type(self._left).__name__ == 'ScanIterator':
-            savedUnion.scan_left.CopyFrom(savedLeft)
-        elif type(self._left).__name__ == 'NestedLoopJoinIterator':
-            savedUnion.nlj_left.CopyFrom(savedLeft)
+        if type(self._left).__name__ == 'ProjectionIterator':
+            savedUnion.proj_left.CopyFrom(savedLeft)
         elif type(self._left).__name__ == 'BagUnionIterator':
             savedUnion.union_left.CopyFrom(savedLeft)
         else:
             raise Exception("Unknown left source type for BagUnion")
         # export right source
-        if type(self._right).__name__ == 'ScanIterator':
-            savedUnion.scan_right.CopyFrom(savedRight)
-        elif type(self._right).__name__ == 'NestedLoopJoinIterator':
-            savedUnion.nlj_right.CopyFrom(savedRight)
+        if type(self._right).__name__ == 'ProjectionIterator':
+            savedUnion.proj_right.CopyFrom(savedRight)
         elif type(self._right).__name__ == 'BagUnionIterator':
             savedUnion.union_right.CopyFrom(savedRight)
         else:

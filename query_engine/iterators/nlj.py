@@ -42,7 +42,7 @@ class NestedLoopJoinIterator(PreemptableIterator):
         return self._iterOffset
 
     def has_next(self):
-        return self._source.has_next() or self._currentBinding is not None or self._currentIter is not None
+        return self._source.has_next() or (self._currentIter is not None and self._currentIter.has_next())
 
     def _initInnerLoop(self, triple, mappings, offset=0):
         (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))

@@ -35,14 +35,12 @@ message SavedNestedLoopJoinIterator {
 
 message SavedBagUnionIterator {
   oneof left {
-    SavedScanIterator scan_left = 1;
-    SavedNestedLoopJoinIterator nlj_left = 2;
-    SavedBagUnionIterator union_left = 3;
+    SavedProjectionIterator proj_left = 1;
+    SavedBagUnionIterator union_left = 2;
   }
   oneof right {
-    SavedScanIterator scan_right = 4;
-    SavedNestedLoopJoinIterator nlj_right = 5;
-    SavedBagUnionIterator union_right = 6;
+    SavedProjectionIterator proj_right = 3;
+    SavedBagUnionIterator union_right = 4;
   }
 }
 

@@ -57,8 +57,8 @@ def load_nlj(savedPlan, hdtDocument):
 
 def load_union(savedPlan, hdtDocument):
     """Load a BagUnionIterator from a protobuf serialization"""
-    leftField = savedPlan.WhichOneof('left_source')
+    leftField = savedPlan.WhichOneof('left')
     left = load(getattr(savedPlan, leftField), hdtDocument)
-    rightField = savedPlan.WhichOneof('right_source')
+    rightField = savedPlan.WhichOneof('right')
     right = load(getattr(savedPlan, rightField), hdtDocument)
     return BagUnionIterator(left, right)
