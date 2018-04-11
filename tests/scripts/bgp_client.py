@@ -1,8 +1,12 @@
 from requests import post
 from time import time
-from pprint import pprint
+import argparse
 
-body = {
+parser = argparse.ArgumentParser(description='Evaluate a BGP query over a SaGe server')
+parser.add_argument('query', metavar='Q', help='query name')
+args = parser.parse_args()
+
+q1 = {
     'query': {
         'type': 'bgp',
         'bgp': [
@@ -25,72 +29,90 @@ body = {
     }
 }
 
-# body = {
-#     'bgp': {
-#         'tp1': {
-#             'subject': '?v0',
-#             'predicate': 'http://schema.org/eligibleRegion',
-#             'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
-#         },
-#         'tp2': {
-#             'subject': '?v0',
-#             'predicate': 'http://purl.org/goodrelations/includes',
-#             'object': '?v1'
-#         },
-#         'tp3': {
-#             'subject': '?v1',
-#             'predicate': 'http://schema.org/contentSize',
-#             'object': '?v3'
-#         }
-#     }
-# }
+q2 = {
+    'query': {
+        'type': 'bgp',
+        'bgp': [
+            {
+                'subject': '?v0',
+                'predicate': 'http://schema.org/eligibleRegion',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
+            },
+            {
+                'subject': '?v0',
+                'predicate': 'http://purl.org/goodrelations/includes',
+                'object': '?v1'
+            },
+            {
+                'subject': '?v1',
+                'predicate': 'http://schema.org/contentSize',
+                'object': '?v3'
+            }
+        ]
+    }
+}
 
-# body = {
-#     'bgp': {
-#         'tp1': {
-#             'subject': '?s',
-#             'predicate': 'http://xmlns.com/foaf/age',
-#             'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup3'
-#         },
-#         'tp2': {
-#             'subject': '?s',
-#             'predicate': 'http://schema.org/nationality',
-#             'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country1'
-#         },
-#         'tp3': {
-#             'subject': '?s',
-#             'predicate': 'http://db.uwaterloo.ca/~galuc/wsdbm/gender',
-#             'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Gender1'
-#         }
-#     }
-# }
+q3 = {
+    'query': {
+        'type': 'bgp',
+        'bgp': [
+            {
+                'subject': '?s',
+                'predicate': 'http://xmlns.com/foaf/age',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup3'
+            },
+            {
+                'subject': '?s',
+                'predicate': 'http://schema.org/nationality',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country1'
+            },
+            {
+                'subject': '?s',
+                'predicate': 'http://db.uwaterloo.ca/~galuc/wsdbm/gender',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Gender1'
+            }
+        ]
+    }
+}
 
-# body = {
-#     'bgp': {
-#         'tp1': {
-#             'subject': '?s',
-#             'predicate': 'http://xmlns.com/foaf/age',
-#             'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup3'
-#         },
-#         'tp2': {
-#             'subject': '?s',
-#             'predicate': 'http://schema.org/nationality',
-#             'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country1'
-#         },
-#         'tp3': {
-#             'subject': '?s',
-#             'predicate': 'http://db.uwaterloo.ca/~galuc/wsdbm/gender',
-#             'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Gender1'
-#         },
-#         'tp4': {
-#             'subject': '?s',
-#             'predicate': 'http://schema.org/nationality',
-#             'object': '?nat'
-#         }
-#     }
-# }
+q4 = {
+    'query': {
+        'type': 'bgp',
+        'bgp': [
+            {
+                'subject': '?s',
+                'predicate': 'http://xmlns.com/foaf/age',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup3'
+            },
+            {
+                'subject': '?s',
+                'predicate': 'http://schema.org/nationality',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country1'
+            },
+            {
+                'subject': '?s',
+                'predicate': 'http://db.uwaterloo.ca/~galuc/wsdbm/gender',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Gender1'
+            },
+            {
+                'subject': '?s',
+                'predicate': 'http://schema.org/nationality',
+                'object': '?nat'
+            }
+        ]
+    }
+}
+
+queries = {
+    'q1': q1,
+    'q2': q2,
+    'q3': q3,
+    'q4': q4
+}
 
 url = "http://localhost:8000/bgp/watdiv100"
+
+body = queries[args.query]
 
 bindings = []
 nbCalls = 0
@@ -115,4 +137,3 @@ while hasNext:
 
 print('nb HTTP requests', nbCalls)
 print('nb results', len(bindings))
-# pprint(bindings)
