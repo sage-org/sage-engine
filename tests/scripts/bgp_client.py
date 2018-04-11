@@ -3,23 +3,26 @@ from time import time
 from pprint import pprint
 
 body = {
-    'bgp': [
-        {
-            'subject': '?s',
-            'predicate': 'http://schema.org/eligibleRegion',
-            'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
-        },
-        {
-            'subject': '?s',
-            'predicate': 'http://purl.org/goodrelations/includes',
-            'object': '?includes'
-        },
-        {
-            'subject': '?s',
-            'predicate': 'http://purl.org/goodrelations/validThrough',
-            'object': '?validity'
-        }
-    ]
+    'query': {
+        'type': 'bgp',
+        'bgp': [
+            {
+                'subject': '?s',
+                'predicate': 'http://schema.org/eligibleRegion',
+                'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
+            },
+            {
+                'subject': '?s',
+                'predicate': 'http://purl.org/goodrelations/includes',
+                'object': '?includes'
+            },
+            {
+                'subject': '?s',
+                'predicate': 'http://purl.org/goodrelations/validThrough',
+                'object': '?validity'
+            }
+        ]
+    }
 }
 
 # body = {

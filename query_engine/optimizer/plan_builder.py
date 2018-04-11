@@ -9,10 +9,20 @@ from query_engine.iterators.loader import load
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
 
 
-def build_union_plan(union, hdtDocument, savedPlan=None, projection=None):
-    """Build a Bushy tree of Unions, where leaves are BGPs, from a list of BGPS"""
+def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
     if savedPlan is not None:
         return load(savedPlan, hdtDocument)
+
+    if query['type'] == 'union':
+        return build_union_plan(query['patterns'], hdtDocument, projection)
+    elif query['type'] == 'bgp':
+        return build_left_plan(query['bgp'], hdtDocument, projection)
+    else:
+        raise Exception('Unkown query type found during query optimization')
+
+
+def build_union_plan(union, hdtDocument, projection=None):
+    """Build a Bushy tree of Unions, where leaves are BGPs, from a list of BGPS"""
 
     def chunks(l, n):
         """Yield successive n-sized chunks from l."""
@@ -27,15 +37,13 @@ def build_union_plan(union, hdtDocument, savedPlan=None, projection=None):
     sources = [build_left_plan(bgp, hdtDocument) for bgp in union]
     if len(sources) == 1:
         return sources[0]
-    while len(bgps) > 1:
-        bgps = list(map(mapper, chunks(sources, 2)))
+    while len(sources) > 1:
+        sources = list(map(mapper, chunks(sources, 2)))
     return sources[0]
 
 
-def build_left_plan(bgp, hdtDocument, savedPlan=None, projection=None):
+def build_left_plan(bgp, hdtDocument, projection=None):
     """Build a Left-linear tree of joins from a BGP"""
-    if savedPlan is not None:
-        return load(savedPlan, hdtDocument)
     # gather metadata about triple patterns
     triples = []
     for triple in bgp:

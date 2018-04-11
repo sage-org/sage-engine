@@ -6,8 +6,8 @@ from marshmallow import Schema, fields, post_load, validates, validates_schema, 
 class BGPQuery(Schema):
     """Validation schema for POST query with the BGP interface"""
     class Meta:
-        fields = ("bgp", "next")
-    bgp = fields.List(fields.Dict(key=fields.Str(), values=fields.Str()), required=True)
+        fields = ("query", "next")
+    query = fields.List(fields.Dict(key=fields.Str(), values=fields.Str()), required=True)
     next = fields.String()
 
     @post_load
@@ -16,9 +16,9 @@ class BGPQuery(Schema):
             item['next'] = None
         return item
 
-    @validates('bgp')
-    def validate_bgp(self, bgp):
-        for triple in bgp:
+    @validates('query')
+    def validate_query(self, query):
+        for triple in query:
             if 'subject' not in triple or 'predicate' not in triple or 'object' not in triple:
                 raise ValidationError('In a BGP, each triple pattern must have a subject, a predicate and an object.')
 

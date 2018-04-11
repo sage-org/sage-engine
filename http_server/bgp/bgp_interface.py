@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from flask import Blueprint, request, Response, render_template, abort, json
 from query_engine.sage_engine import SageEngine
-from query_engine.optimizer.plan_builder import build_left_plan
+from query_engine.optimizer.plan_builder import build_query_plan
 from http_server.bgp.schemas import BGPQuery
 from http_server.utils import encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors
 from time import time
@@ -43,15 +43,12 @@ def bgp_blueprint(datasets):
             return json.jsonify(triples=triples, cardinality=cardinality)
 
         # else, process POST requests as NLJ requests
-        post_query, errors = BGPQuery().load(request.get_json())
-        if len(errors) > 0:
-            return Response(status="400", response=format_marshmallow_errors(errors), content_type='text/plain')
+        post_query = request.get_json()
         quota = int(request.args.get("quota", dataset.deadline())) / 1000
-        bgp = post_query['bgp']
-        next = decode_saved_plan(post_query['next']) if post_query['next'] is not None else None
+        next = decode_saved_plan(post_query['next']) if 'next' in post_query else None
         # build physical query plan, then execute it with the given number of tickets
         start = time()
-        plan = build_left_plan(bgp, dataset._factory, next)
+        plan = build_query_plan(post_query['query'], dataset._factory, next)
         loadingTime = (time() - start) * 1000
         bindings, savedPlan, isDone = engine.execute(plan, quota)
         # compute controls for the next page

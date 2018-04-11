@@ -12,6 +12,9 @@ class BagUnionIterator(PreemptableIterator):
         self._left = left
         self._right = right
 
+    def __repr__(self):
+        return '<BagUnionIterator {%s} UNION {%s}>' % (self._left, self._right)
+
     def has_next(self):
         return self._left.has_next() or self._right.has_next()
 
