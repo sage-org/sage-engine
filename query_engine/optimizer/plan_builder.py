@@ -1,5 +1,6 @@
 # plan_builder.py
 # Author: Thomas MINIER - MIT License 2017-2018
+from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import NestedLoopJoinIterator
 from query_engine.iterators.utils import EmptyIterator
@@ -7,7 +8,7 @@ from query_engine.iterators.loader import load
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
 
 
-def build_left_plan(bgp, hdtDocument, savedPlan=None):
+def build_left_plan(bgp, hdtDocument, savedPlan=None, projection=None):
     """Build a Left-linear tree of joins from a BGP"""
     if savedPlan is not None:
         return load(savedPlan, hdtDocument)
@@ -32,4 +33,5 @@ def build_left_plan(bgp, hdtDocument, savedPlan=None):
             return EmptyIterator()
         acc = NestedLoopJoinIterator(acc, pattern['triple'], hdtDocument)
         triples.pop(pos)
-    return acc
+    values = projection if projection is not None else queryVariables
+    return ProjectionIterator(acc, values)

@@ -2,6 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.optimizer.plan_builder import build_left_plan
 from datasets.hdt_file_factory import HDTFileFactory
+from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import NestedLoopJoinIterator
 from query_engine.iterators.utils import EmptyIterator
@@ -40,10 +41,11 @@ def test_build_left_linear_plan():
         }
     ]
     plan = build_left_plan(bgp, hdtDoc)
-    assert type(plan) is NestedLoopJoinIterator
-    assert plan._innerTriple == bgp[1]
-    assert type(plan._source) is ScanIterator
-    assert plan._source._triple == bgp[0]
+    assert type(plan) is ProjectionIterator
+    assert type(plan._source) is NestedLoopJoinIterator
+    assert plan._source._innerTriple == bgp[1]
+    assert type(plan._source._source) is ScanIterator
+    assert plan._source._source._triple == bgp[0]
 
 
 def test_load_from_savedPlan():
@@ -61,7 +63,8 @@ def test_load_from_savedPlan():
     ]
     savedPlan = build_left_plan(bgp, hdtDoc).save()
     plan = build_left_plan(None, hdtDoc, savedPlan)
-    assert type(plan) is NestedLoopJoinIterator
-    assert plan._innerTriple == bgp[1]
-    assert type(plan._source) is ScanIterator
-    assert plan._source._triple == bgp[0]
+    assert type(plan) is ProjectionIterator
+    assert type(plan._source) is NestedLoopJoinIterator
+    assert plan._source._innerTriple == bgp[1]
+    assert type(plan._source._source) is ScanIterator
+    assert plan._source._source._triple == bgp[0]

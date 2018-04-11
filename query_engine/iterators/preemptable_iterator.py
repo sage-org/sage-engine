@@ -15,7 +15,6 @@ class PreemptableIterator(ABC):
         """
         pass
 
-    @property
     @abstractmethod
     def has_next(self):
         """Return True if the iterator has more item to yield"""

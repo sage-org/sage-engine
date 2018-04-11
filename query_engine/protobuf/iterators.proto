@@ -14,11 +14,12 @@ message SavedScanIterator {
   int64 cardinality = 3;
 }
 
-message SavedSelectionIterator {
+message SavedProjectionIterator {
   repeated string values = 1;
   oneof source {
     SavedScanIterator scan_source = 2;
     SavedNestedLoopJoinIterator nlj_source = 3;
+    SavedBagUnionIterator union_source = 4;
   }
 }
 
@@ -30,4 +31,17 @@ message SavedNestedLoopJoinIterator {
   TriplePattern inner = 3;
   map<string, string> muc = 4;
   uint64 offset = 5;
+}
+
+message SavedBagUnionIterator {
+  oneof left {
+    SavedScanIterator scan_left = 1;
+    SavedNestedLoopJoinIterator nlj_left = 2;
+    SavedBagUnionIterator union_left = 3;
+  }
+  oneof right {
+    SavedScanIterator scan_right = 4;
+    SavedNestedLoopJoinIterator nlj_right = 5;
+    SavedBagUnionIterator union_right = 6;
+  }
 }
