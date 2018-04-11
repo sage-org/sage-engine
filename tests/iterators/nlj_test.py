@@ -37,10 +37,3 @@ def test_nlj_interrupt():
     (results, saved, done) = engine.execute(join, 10e-5)
     assert len(results) < 20
     assert not done
-    assert saved.scan_source.triple.subject == triple['subject']
-    assert saved.scan_source.triple.predicate == triple['predicate']
-    assert saved.scan_source.triple.object == triple['object']
-    assert saved.scan_source.cardinality == card
-    assert saved.inner.subject == innerTriple['subject']
-    assert saved.inner.predicate == innerTriple['predicate']
-    assert saved.inner.object == innerTriple['object']

@@ -45,3 +45,10 @@ message SavedBagUnionIterator {
     SavedBagUnionIterator union_right = 6;
   }
 }
+
+message RootTree {
+  oneof source {
+    SavedProjectionIterator proj_source = 1;
+    SavedBagUnionIterator union_source = 2;
+  }
+}

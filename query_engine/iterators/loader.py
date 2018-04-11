@@ -5,15 +5,17 @@ from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import NestedLoopJoinIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.protobuf.utils import protoTriple_to_dict
-from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedProjectionIterator, SavedScanIterator, SavedNestedLoopJoinIterator, SavedBagUnionIterator
+from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedNestedLoopJoinIterator, SavedBagUnionIterator
 
 
 def load(protoMsg, hdtDocument):
     """Load a preemptable physical query execution plan from a saved state"""
     savedPlan = protoMsg
     if isinstance(protoMsg, bytes):
-        savedPlan = SavedProjectionIterator()
-        savedPlan.ParseFromString(protoMsg)
+        root = RootTree()
+        root.ParseFromString(protoMsg)
+        sourceField = root.WhichOneof('source')
+        savedPlan = getattr(root, sourceField)
     if type(savedPlan) is SavedProjectionIterator:
         return load_projection(savedPlan, hdtDocument)
     elif type(savedPlan) is SavedScanIterator:

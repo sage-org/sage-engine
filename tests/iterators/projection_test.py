@@ -34,8 +34,3 @@ def test_projection_read():
     for res in results:
         assert '?common' in res and '?s1' not in res
     assert not done
-    assert saved.scan_source.triple.subject == triple['subject']
-    assert saved.scan_source.triple.predicate == triple['predicate']
-    assert saved.scan_source.triple.object == triple['object']
-    assert saved.scan_source.cardinality == card
-    assert saved.values == ['?common']

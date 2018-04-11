@@ -2,7 +2,10 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from asyncio import Queue, coroutine, get_event_loop, shield, wait_for
 from asyncio import TimeoutError as asyncTimeoutError
+from query_engine.iterators.projection import ProjectionIterator
+from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.utils import IteratorExhausted
+from query_engine.protobuf.iterators_pb2 import RootTree
 
 
 async def executor(plan, queue):
@@ -47,4 +50,9 @@ class SageEngine(object):
         finally:
             while not queue.empty():
                 results.append(queue.get_nowait())
-        return (results, plan.save(), done)
+        root = RootTree()
+        if type(plan) is ProjectionIterator:
+            root.proj_source.CopyFrom(plan.save())
+        elif type(plan) is BagUnionIterator:
+            root.union_source.CopyFrom(plan.save())
+        return (results, root, done)

@@ -37,16 +37,8 @@ def test_bag_union_interrupt():
     right = ScanIterator(iterator2, triple2, card2)
     union = BagUnionIterator(left, right)
     (results, saved, done) = engine.execute(union, 10e-4)
-    assert len(results) == saved.scan_left.offset + saved.scan_right.offset
+    assert len(results) < card1 + card2
     assert not done
-    assert saved.scan_left.triple.subject == triple1['subject']
-    assert saved.scan_left.triple.predicate == triple1['predicate']
-    assert saved.scan_left.triple.object == triple1['object']
-    assert saved.scan_left.cardinality == card1
-    assert saved.scan_right.triple.subject == triple2['subject']
-    assert saved.scan_right.triple.predicate == triple2['predicate']
-    assert saved.scan_right.triple.object == triple2['object']
-    assert saved.scan_right.cardinality == card2
 
 
 def test_random_union_read():
@@ -67,13 +59,5 @@ def test_random_union_interrupt():
     right = ScanIterator(iterator2, triple2, card2)
     union = RandomBagUnionIterator(left, right)
     (results, saved, done) = engine.execute(union, 10e-4)
-    assert len(results) == saved.scan_left.offset + saved.scan_right.offset
+    assert len(results) < card1 + card2
     assert not done
-    assert saved.scan_left.triple.subject == triple1['subject']
-    assert saved.scan_left.triple.predicate == triple1['predicate']
-    assert saved.scan_left.triple.object == triple1['object']
-    assert saved.scan_left.cardinality == card1
-    assert saved.scan_right.triple.subject == triple2['subject']
-    assert saved.scan_right.triple.predicate == triple2['predicate']
-    assert saved.scan_right.triple.object == triple2['object']
-    assert saved.scan_right.cardinality == card2

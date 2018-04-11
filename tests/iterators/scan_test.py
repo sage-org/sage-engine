@@ -25,11 +25,6 @@ def test_scan_save_nointerrupt():
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     (results, saved, done) = engine.execute(scan, 10e7)
-    assert saved.triple.subject == triple['subject']
-    assert saved.triple.predicate == triple['predicate']
-    assert saved.triple.object == triple['object']
-    assert saved.cardinality == card
-    assert saved.offset == card
 
 
 def test_scan_save_interrupt():
@@ -38,8 +33,3 @@ def test_scan_save_interrupt():
     (results, saved, done) = engine.execute(scan, 1e-3)
     assert len(results) < card
     assert not done
-    assert saved.triple.subject == triple['subject']
-    assert saved.triple.predicate == triple['predicate']
-    assert saved.triple.object == triple['object']
-    assert saved.cardinality == card
-    assert saved.offset < card

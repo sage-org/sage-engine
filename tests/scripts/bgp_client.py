@@ -103,6 +103,7 @@ while hasNext:
     stop = time() - start
     print("HTTP request executed in %f ms" % (stop * 1000))
     json_results = req.json()
+    print('overhead', json_results['stats'])
     print('page size', json_results['pageSize'])
     bindings += json_results['bindings']
     hasNext = json_results['hasNext']

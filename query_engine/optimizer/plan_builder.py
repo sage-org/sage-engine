@@ -3,9 +3,33 @@
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import NestedLoopJoinIterator
+from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.utils import EmptyIterator
 from query_engine.iterators.loader import load
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
+
+
+def build_union_plan(union, hdtDocument, savedPlan=None, projection=None):
+    """Build a Bushy tree of Unions, where leaves are BGPs, from a list of BGPS"""
+    if savedPlan is not None:
+        return load(savedPlan, hdtDocument)
+
+    def chunks(l, n):
+        """Yield successive n-sized chunks from l."""
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+
+    def mapper(duo):
+        """Build a join between two source iterators"""
+        if len(duo) == 1:
+            return duo[0]
+        return BagUnionIterator(duo[0], duo[1])
+    sources = [build_left_plan(bgp, hdtDocument) for bgp in union]
+    if len(sources) == 1:
+        return sources[0]
+    while len(bgps) > 1:
+        bgps = list(map(mapper, chunks(sources, 2)))
+    return sources[0]
 
 
 def build_left_plan(bgp, hdtDocument, savedPlan=None, projection=None):
