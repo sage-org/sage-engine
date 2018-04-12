@@ -6,7 +6,7 @@ from os import environ
 from datasets.datasets import DatasetCollection
 from http_server.bgp.bgp_interface import bgp_blueprint
 
-config_file = "tests/data/default_config.yaml"
+config_file = "data/test_config.yaml"
 if 'YALDF_CONFIG' in environ:
     config_file = environ['YALDF_CONFIG']
 
