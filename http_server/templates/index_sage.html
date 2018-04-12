@@ -18,7 +18,7 @@
         {% for dataset in datasets %}
         <tr>
           <td>
-            <a href="{{ url_for('bgp-ldf.get_nlj_fragment', dataset_name=dataset["name"]) }}">
+            <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["name"]) }}">
               {{ dataset["name"] }}
             </a>
           </td>

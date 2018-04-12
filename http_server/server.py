@@ -4,7 +4,7 @@ from flask import Flask, render_template
 from flask_cors import CORS
 from os import environ
 from datasets.datasets import DatasetCollection
-from http_server.bgp.bgp_interface import bgp_blueprint
+from http_server.sparql_interface import sparql_blueprint
 
 config_file = "data/test_config.yaml"
 if 'YALDF_CONFIG' in environ:
@@ -30,4 +30,4 @@ def doc():
 
 # Register Blueprints which implement all available LDF interfaces
 # For example, http_server.tpf contains the blueprint for TPF interface
-app.register_blueprint(bgp_blueprint(datasets))
+app.register_blueprint(sparql_blueprint(datasets))

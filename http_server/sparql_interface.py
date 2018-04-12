@@ -3,32 +3,28 @@
 from flask import Blueprint, request, Response, render_template, abort, json
 from query_engine.sage_engine import SageEngine
 from query_engine.optimizer.plan_builder import build_query_plan
-from http_server.bgp.schemas import BGPQuery
 from http_server.utils import encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors
 from time import time
 
 
-def bgp_blueprint(datasets):
-    """Get a Blueprint that implement a Nested Loop Join interface with deadlines on /nlj/<dataset-name>"""
-    bgp_blueprint = Blueprint('bgp-ldf', __name__)
+def sparql_blueprint(datasets):
+    """Get a Blueprint that implement a SPARQL interface with quota on /sparql/<dataset-name>"""
+    sparql_blueprint = Blueprint('sparql-interface', __name__)
 
-    @bgp_blueprint.route('/bgp/', methods=["GET"])
-    def nlj_index():
-        mimetype = request.accept_mimetypes.best_match(['application/trig', 'text/html'])
+    @sparql_blueprint.route('/sparql/', methods=["GET"])
+    def sparql_index():
         datasets_infos = datasets._config["datasets"]
-        if mimetype is 'text/html':
-            return render_template("index_sage.html", datasets=datasets_infos)
-        return Response(response="", content_type="application/trig")
+        return render_template("index_sage.html", datasets=datasets_infos)
 
-    @bgp_blueprint.route('/bgp/<dataset_name>', methods=['GET', 'POST'])
-    def get_nlj_fragment(dataset_name):
+    @sparql_blueprint.route('/sparql/<dataset_name>', methods=['GET', 'POST'])
+    def sparql_query(dataset_name):
         dataset = datasets.get_dataset(dataset_name)
         if dataset is None:
             abort(404)
-        mimetype = request.accept_mimetypes.best_match(['application/trig', 'text/html'])
+        mimetype = request.accept_mimetypes.best_match(['application/json', 'text/html'])
         url = secure_url(request.url)
         engine = SageEngine()
-        # process GET request as a Triple Pattern query
+        # process GET request as a single Triple Pattern BGP
         if request.method == "GET" or (not request.is_json):
             (subject, predicate, obj, offset, limit) = (
                 request.args.get("subject", ""),
@@ -42,7 +38,7 @@ def bgp_blueprint(datasets):
                 return render_template("sage.html", triples=triples, cardinality=cardinality)
             return json.jsonify(triples=triples, cardinality=cardinality)
 
-        # else, process POST requests as NLJ requests
+        # else, process POST requests as SPARQL requests
         post_query = request.get_json()
         quota = int(request.args.get("quota", dataset.deadline())) / 1000
         next = decode_saved_plan(post_query['next']) if 'next' in post_query else None
@@ -57,4 +53,4 @@ def bgp_blueprint(datasets):
         exportTime = (time() - start) * 1000
         stats = {'import': loadingTime, 'export': exportTime}
         return json.jsonify(bindings=bindings, pageSize=len(bindings), hasNext=not isDone, next=nextPage, stats=stats)
-    return bgp_blueprint
+    return sparql_blueprint
