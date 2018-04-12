@@ -29,6 +29,21 @@ class EmptyIterator(object):
         return 0
 
 
+class SingletonIterator(object):
+    """An iterator that yields one element"""
+    def __init__(self, value):
+        super(SingletonIterator, self).__init__()
+        self._value = value
+        self._closed = False
+
+    async def next(self):
+        self._closed = True
+        return self._value
+
+    def has_next(self):
+        return not self._closed
+
+
 def selection(triple, variables, formatter=None):
     """Apply selection on a RDF triple"""
     bindings = set()

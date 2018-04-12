@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import NestedLoopJoinIterator
+from query_engine.iterators.nlj import NestedLoopJoinIterator, LeftNLJIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.protobuf.utils import protoTriple_to_dict
 from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedNestedLoopJoinIterator, SavedBagUnionIterator
@@ -52,6 +52,8 @@ def load_nlj(savedPlan, hdtDocument):
     if len(savedPlan.muc) > 0:
         currentBinding = savedPlan.muc
     iterOffset = savedPlan.offset
+    if savedPlan.optional:
+        return LeftNLJIterator(source, innerTriple, hdtDocument, currentBinding=currentBinding, iterOffset=iterOffset)
     return NestedLoopJoinIterator(source, innerTriple, hdtDocument, currentBinding=currentBinding, iterOffset=iterOffset)
 
 

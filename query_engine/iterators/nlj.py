@@ -5,7 +5,7 @@ from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.utils import apply_bindings, tuple_to_triple
 from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedNestedLoopJoinIterator
 from query_engine.protobuf.utils import pyDict_to_protoDict
-from query_engine.iterators.utils import IteratorExhausted
+from query_engine.iterators.utils import IteratorExhausted, SingletonIterator
 from asyncio import coroutine
 
 
@@ -84,4 +84,20 @@ class NestedLoopJoinIterator(PreemptableIterator):
             savedJoin.offset = self._currentIter.offset + self._currentIter.nb_reads
         else:
             savedJoin.offset = 0
+        return savedJoin
+
+
+class LeftNLJIterator(NestedLoopJoinIterator):
+    """A NestedLoopJoinIterator which implements a left-join"""
+
+    def _initInnerLoop(self, triple, mappings, offset=0):
+        (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))
+        iterator, card = self._hdtDocument.search_triples(s, p, o, offset=offset)
+        if card == 0:
+            return SingletonIterator(dict())
+        return ScanIterator(iterator, tuple_to_triple(s, p, o), card)
+
+    def save(self):
+        savedJoin = super().save()
+        savedJoin.optional = True
         return savedJoin

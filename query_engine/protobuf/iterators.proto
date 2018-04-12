@@ -31,6 +31,7 @@ message SavedNestedLoopJoinIterator {
   TriplePattern inner = 3;
   map<string, string> muc = 4;
   uint64 offset = 5;
+  bool optional = 6;
 }
 
 message SavedBagUnionIterator {
