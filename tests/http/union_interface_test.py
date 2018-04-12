@@ -33,7 +33,7 @@ bgp_queries = [
                     {
                         'subject': '?s',
                         'predicate': 'http://schema.org/eligibleRegion',
-                        'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
+                        'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country10'
                     },
                     {
                         'subject': '?s',
@@ -48,7 +48,7 @@ bgp_queries = [
                 ]
             ]
         }
-    }, 4360, 9)
+    }, 4206, 9)
 ]
 
 

@@ -34,9 +34,11 @@ def format_marshmallow_errors(errors):
 
 
 def encode_saved_plan(savedPlan):
+    if savedPlan is None:
+        return None
     bytes = savedPlan.SerializeToString()
     return b64encode(bytes).decode('utf-8')
 
 
 def decode_saved_plan(bytes):
-    return b64decode(bytes)
+    return b64decode(bytes) if bytes is not None else None
