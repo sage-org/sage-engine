@@ -21,7 +21,9 @@ bgp_queries = [
                     'subject': '?s',
                     'predicate': 'http://purl.org/goodrelations/includes',
                     'object': '?includes'
-                },
+                }
+            ],
+            'optional': [
                 {
                     'subject': '?s',
                     'predicate': 'http://purl.org/goodrelations/validThrough',
@@ -29,51 +31,7 @@ bgp_queries = [
                 }
             ]
         }
-    }, 2180, 6),
-    ({
-        'query': {
-            'type': 'bgp',
-            'bgp': [
-                {
-                    'subject': '?v0',
-                    'predicate': 'http://schema.org/eligibleRegion',
-                    'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
-                },
-                {
-                    'subject': '?v0',
-                    'predicate': 'http://purl.org/goodrelations/includes',
-                    'object': '?v1'
-                },
-                {
-                    'subject': '?v1',
-                    'predicate': 'http://schema.org/contentSize',
-                    'object': '?v3'
-                }
-            ]
-        }
-    }, 531, 5),
-    ({
-        'query': {
-            'type': 'bgp',
-            'bgp': [
-                {
-                    'subject': '?s',
-                    'predicate': 'http://xmlns.com/foaf/age',
-                    'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup3'
-                },
-                {
-                    'subject': '?s',
-                    'predicate': 'http://schema.org/nationality',
-                    'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country1'
-                },
-                {
-                    'subject': '?s',
-                    'predicate': 'http://db.uwaterloo.ca/~galuc/wsdbm/gender',
-                    'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Gender1'
-                }
-            ]
-        }
-    }, 93, 3)
+    }, 5518, 9)
 ]
 
 

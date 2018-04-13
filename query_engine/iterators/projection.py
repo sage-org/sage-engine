@@ -33,7 +33,7 @@ class ProjectionIterator(PreemptableIterator):
         source = self._source.save()
         if type(self._source).__name__ == 'ScanIterator':
             savedOp.scan_source.CopyFrom(source)
-        elif type(self._source).__name__ == 'NestedLoopJoinIterator':
+        elif type(self._source).__name__ == 'NestedLoopJoinIterator' or type(self._source).__name__ == 'LeftNLJIterator':
             savedOp.nlj_source.CopyFrom(source)
         elif type(self._source).__name__ == 'BagUnionIterator':
             savedOp.union_source.CopyFrom(source)

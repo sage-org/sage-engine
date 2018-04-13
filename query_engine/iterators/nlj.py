@@ -5,7 +5,7 @@ from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.utils import apply_bindings, tuple_to_triple
 from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedNestedLoopJoinIterator
 from query_engine.protobuf.utils import pyDict_to_protoDict
-from query_engine.iterators.utils import IteratorExhausted, SingletonIterator
+from query_engine.iterators.utils import IteratorExhausted
 from asyncio import coroutine
 
 
@@ -90,12 +90,22 @@ class NestedLoopJoinIterator(PreemptableIterator):
 class LeftNLJIterator(NestedLoopJoinIterator):
     """A NestedLoopJoinIterator which implements a left-join"""
 
-    def _initInnerLoop(self, triple, mappings, offset=0):
-        (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))
-        iterator, card = self._hdtDocument.search_triples(s, p, o, offset=offset)
-        if card == 0:
-            return SingletonIterator(dict())
-        return ScanIterator(iterator, tuple_to_triple(s, p, o), card)
+    @coroutine
+    async def next(self):
+        """Get the next element from the join"""
+        if not self.has_next():
+            raise IteratorExhausted()
+        if self._currentIter is None or (not self._currentIter.has_next()):
+            self._currentBinding = await self._source.next()
+            self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
+        return await self._innerLoop()
+
+    async def _innerLoop(self):
+        """Execute one loop of the inner loop"""
+        if self._currentIter is None:
+            return self._currentBinding
+        mu = await self._currentIter.next()
+        return {**self._currentBinding, **mu}
 
     def save(self):
         savedJoin = super().save()

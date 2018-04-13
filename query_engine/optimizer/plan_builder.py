@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import NestedLoopJoinIterator
+from query_engine.iterators.nlj import NestedLoopJoinIterator, LeftNLJIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.utils import EmptyIterator
 from query_engine.iterators.loader import load
@@ -13,10 +13,12 @@ def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
     if savedPlan is not None:
         return load(savedPlan, hdtDocument)
 
+    optional = query['optional'] if 'optional' in query else None
+
     if query['type'] == 'union':
         return build_union_plan(query['patterns'], hdtDocument, projection)
     elif query['type'] == 'bgp':
-        return build_left_plan(query['bgp'], hdtDocument, projection)
+        return build_join_plan(query['bgp'], hdtDocument, optional=optional, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
 
@@ -42,10 +44,24 @@ def build_union_plan(union, hdtDocument, projection=None):
     return sources[0]
 
 
-def build_left_plan(bgp, hdtDocument, projection=None):
-    """Build a Left-linear tree of joins from a BGP"""
+def build_join_plan(bgp, hdtDocument, optional=None, projection=None):
+    """Build a join plan between a BGP and a possible OPTIONAL clause"""
+    iterator, qVars = build_left_plan(bgp, hdtDocument)
+    if type(iterator) is EmptyIterator:
+        return iterator
+    if optional is not None:
+        iterator, qVars = build_left_plan(optional, hdtDocument, source=iterator, sourceVars=qVars, optional=True)
+    if type(iterator) is EmptyIterator:
+        return iterator
+    values = projection if projection is not None else qVars
+    return ProjectionIterator(iterator, values)
+
+
+def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=False):
+    """Build a Left-linear tree of joins/left-joins from a BGP/OPTIONAL BGP"""
     # gather metadata about triple patterns
     triples = []
+    iteratorConstructor = LeftNLJIterator if optional else NestedLoopJoinIterator
     for triple in bgp:
         it, c = hdtDocument.search_triples(triple['subject'], triple['predicate'], triple['object'])
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
@@ -53,17 +69,22 @@ def build_left_plan(bgp, hdtDocument, projection=None):
     triples = sorted(triples, key=lambda v: v['cardinality'])
     # a pattern with no matching triples => no results for this BGP
     if triples[0]['cardinality'] == 0:
-        return EmptyIterator()
+        return EmptyIterator(), []
+    # if no input iterator provided, build a Scan with the most selective pattern
+    if source is None:
+        pattern = triples.pop(0)
+        acc = ScanIterator(pattern['iterator'], pattern['triple'], pattern['cardinality'])
+        queryVariables = get_vars(pattern['triple'])
+    else:
+        pattern = None
+        acc = source
+        queryVariables = sourceVars
     # build the left linear tree
-    pattern = triples.pop(0)
-    acc = ScanIterator(pattern['iterator'], pattern['triple'], pattern['cardinality'])
-    queryVariables = get_vars(pattern['triple'])
     while len(triples) > 0:
         pattern, pos, queryVariables = find_connected_pattern(queryVariables, triples)
         # no connected pattern = disconnected BGP => no results for this BGP
         if pattern is None:
-            return EmptyIterator()
-        acc = NestedLoopJoinIterator(acc, pattern['triple'], hdtDocument)
+            return EmptyIterator(), []
+        acc = iteratorConstructor(acc, pattern['triple'], hdtDocument)
         triples.pop(pos)
-    values = projection if projection is not None else queryVariables
-    return ProjectionIterator(acc, values)
+    return acc, queryVariables
