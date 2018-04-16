@@ -13,7 +13,7 @@ def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
     if savedPlan is not None:
         return load(savedPlan, hdtDocument)
 
-    optional = query['optional'] if 'optional' in query else None
+    optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
 
     if query['type'] == 'union':
         return build_union_plan(query['patterns'], hdtDocument, projection)
@@ -47,12 +47,8 @@ def build_union_plan(union, hdtDocument, projection=None):
 def build_join_plan(bgp, hdtDocument, optional=None, projection=None):
     """Build a join plan between a BGP and a possible OPTIONAL clause"""
     iterator, qVars = build_left_plan(bgp, hdtDocument)
-    if type(iterator) is EmptyIterator:
-        return iterator
     if optional is not None:
         iterator, qVars = build_left_plan(optional, hdtDocument, source=iterator, sourceVars=qVars, optional=True)
-    if type(iterator) is EmptyIterator:
-        return iterator
     values = projection if projection is not None else qVars
     return ProjectionIterator(iterator, values)
 
@@ -67,9 +63,6 @@ def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=Fal
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
-    # a pattern with no matching triples => no results for this BGP
-    if triples[0]['cardinality'] == 0:
-        return EmptyIterator(), []
     # if no input iterator provided, build a Scan with the most selective pattern
     if source is None:
         pattern = triples.pop(0)
@@ -81,10 +74,8 @@ def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=Fal
         queryVariables = sourceVars
     # build the left linear tree
     while len(triples) > 0:
-        pattern, pos, queryVariables = find_connected_pattern(queryVariables, triples)
-        # no connected pattern = disconnected BGP => no results for this BGP
-        if pattern is None:
-            return EmptyIterator(), []
+        pattern = triples[0]
+        queryVariables = queryVariables | get_vars(pattern['triple'])
         acc = iteratorConstructor(acc, pattern['triple'], hdtDocument)
-        triples.pop(pos)
+        triples.pop(0)
     return acc, queryVariables

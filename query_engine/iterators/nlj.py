@@ -71,7 +71,7 @@ class NestedLoopJoinIterator(PreemptableIterator):
         savedJoin = SavedNestedLoopJoinIterator()
         if type(self._source).__name__ == 'ScanIterator':
             savedJoin.scan_source.CopyFrom(self._source.save())
-        elif type(self._source).__name__ == 'NestedLoopJoinIterator':
+        elif type(self._source).__name__ == 'NestedLoopJoinIterator' or type(self._source).__name__ == 'LeftNLJIterator':
             savedJoin.nlj_source.CopyFrom(self._source.save())
         inner = TriplePattern()
         inner.subject = self._innerTriple['subject']
