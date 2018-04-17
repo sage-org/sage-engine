@@ -1,14 +1,15 @@
 # filter.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.preemptable_iterator import PreemptableIterator
-from query_engine.filter.utils import string_to_rdf
+from query_engine.filter.utils import compile_literal
 from query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from query_engine.iterators.utils import IteratorExhausted
 from string import Template
-from time import strptime
+from rdflib import Literal, URIRef
 
 eval_globals = {
-    "strptime": strptime
+    "URIRef": URIRef,
+    "Literal": Literal
 }
 
 
@@ -27,7 +28,7 @@ class FilterIterator(object):
     def _evaluate(self, bindings):
         b = dict()
         for key, value in bindings.items():
-            b[key[1:]] = string_to_rdf(value)
+            b[key[1:]] = compile_literal(value)
         return eval(self._template.substitute(b), eval_globals)
 
     async def next(self):

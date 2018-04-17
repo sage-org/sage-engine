@@ -17,7 +17,7 @@ triple = {
 
 
 def test_simple_filter_iterator():
-    expression = "($s == 'http://example.org/s1') and ($p == 'http://example.org/p1')"
+    expression = "($s == URIRef(\"http://example.org/s1\")) and ($p == URIRef(\"http://example.org/p1\"))"
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression, set(["?s", "?p"]))
@@ -28,8 +28,8 @@ def test_simple_filter_iterator():
 
 
 def test_composed_filter_iterator():
-    expression1 = "$s == 'http://example.org/s1'"
-    expression2 = "$p == 'http://example.org/p1'"
+    expression1 = "$s == URIRef(\"http://example.org/s1\")"
+    expression2 = "$p == URIRef(\"http://example.org/p1\")"
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     it1 = FilterIterator(scan, expression1, set(["?s"]))
@@ -41,7 +41,7 @@ def test_composed_filter_iterator():
 
 
 def test_filter_iterator_interrupt():
-    expression = "($s == 'http://example.org/s1') and ($p == 'http://example.org/p1')"
+    expression = "($s == URIRef(\"http://example.org/s1\")) and ($p == URIRef(\"http://example.org/p1\"))"
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression, set(["?s", "?p"]))
@@ -58,8 +58,8 @@ def test_filter_iterator_interrupt():
 
 
 def test_composed_filter_iterator_interrupt():
-    expression1 = "$s == 'http://example.org/s1'"
-    expression2 = "$p == 'http://example.org/p1'"
+    expression1 = "$s == URIRef(\"http://example.org/s1\")"
+    expression2 = "$p == URIRef(\"http://example.org/p1\")"
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     it1 = FilterIterator(scan, expression1, set(["?s"]))

@@ -3,29 +3,33 @@
 import pytest
 from query_engine.filter.compiler import compile_filter
 
+xsd_number = "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"
+literal_120_int = '120'
+
 simple_operations = [
     # tests all simple binary operands
-    ("==", ['?s', "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s == 120', set(["?s"])),
-    ("!=", ['?s', "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s != 120', set(["?s"])),
-    ("<", ['?s', "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s < 120', set(["?s"])),
-    ("<=", ['?s', "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s <= 120', set(["?s"])),
-    (">", ['?s', "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s > 120', set(["?s"])),
-    (">=", ['?s', "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s >= 120', set(["?s"])),
-    # check for substitution
-    ("==", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s"], '120 == $s', set(["?s"])),
-    ("!=", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s"], '120 != $s', set(["?s"])),
-    ("<", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s"], '120 < $s', set(["?s"])),
-    ("<=", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s"], '120 <= $s', set(["?s"])),
-    (">", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s"], '120 > $s', set(["?s"])),
-    (">=", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s"], '120 >= $s', set(["?s"])),
-    # check all couples of arguments
+    ("==", ['?s', xsd_number], '$s == {}'.format(literal_120_int), set(["?s"])),
+    ("!=", ['?s', xsd_number], '$s != {}'.format(literal_120_int), set(["?s"])),
+    ("<", ['?s', xsd_number], '$s < {}'.format(literal_120_int), set(["?s"])),
+    ("<=", ['?s', xsd_number], '$s <= {}'.format(literal_120_int), set(["?s"])),
+    (">", ['?s', xsd_number], '$s > {}'.format(literal_120_int), set(["?s"])),
+    (">=", ['?s', xsd_number], '$s >= {}'.format(literal_120_int), set(["?s"])),
+    # # check for substitution
+    ("==", [xsd_number, "?s"], '{} == $s'.format(literal_120_int), set(["?s"])),
+    ("!=", [xsd_number, "?s"], '{} != $s'.format(literal_120_int), set(["?s"])),
+    ("<", [xsd_number, "?s"], '{} < $s'.format(literal_120_int), set(["?s"])),
+    ("<=", [xsd_number, "?s"], '{} <= $s'.format(literal_120_int), set(["?s"])),
+    (">", [xsd_number, "?s"], '{} > $s'.format(literal_120_int), set(["?s"])),
+    (">=", [xsd_number, "?s"], '{} >= $s'.format(literal_120_int), set(["?s"])),
+    # # check all couples of arguments
     ("==", ["?s1", "?s2"], '$s1 == $s2', set(["?s1", "?s2"])),
-    ("==", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s2"], '120 == $s2', set(["?s2"])),
-    ("==", ["?s1", "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s1 == 120', set(["?s1"])),
-    ("==", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '120 == 120', set()),
-    # test complex XML datatype
-    ("==", ["\"120\"", "?s2"], '"120" == $s2', set(["?s2"])),
-    ("==", ["\"2008-06-20T00:00:00\"^^<http://www.w3.org/2001/XMLSchema#dateTime>", "?s2"], 'strptime("2008-06-20T00:00:00", "%Y-%m-%dT%H:%M:%S") == $s2', set(["?s2"])),
+    ("==", [xsd_number, "?s2"], '{} == $s2'.format(literal_120_int), set(["?s2"])),
+    ("==", ["?s1", xsd_number], '$s1 == {}'.format(literal_120_int), set(["?s1"])),
+    ("==", [xsd_number, xsd_number], '{} == {}'.format(literal_120_int, literal_120_int), set()),
+    # # test complex XML datatype
+    ("==", ["\"120\"", "?s2"], 'Literal("120", datatype=None, lang=None) == $s2', set(["?s2"])),
+    ("==", ["http://example.org#toto", "?s2"], 'URIRef("http://example.org#toto") == $s2', set(["?s2"])),
+    ("==", ["\"2008-06-20T00:00:00\"^^http://www.w3.org/2001/XMLSchema#dateTime", "?s2"], 'Literal("2008-06-20T00:00:00", datatype="http://www.w3.org/2001/XMLSchema#dateTime", lang=None) == $s2', set(["?s2"])),
 ]
 
 
@@ -59,7 +63,7 @@ def test_logical_operations():
         ]
     }
     compiled, vars = compile_filter(and_filter)
-    assert compiled == "($s1 == 120) and ($s2 <= 120)"
+    assert compiled == "($s1 == {}) and ($s2 <= {})".format(literal_120_int, literal_120_int)
     assert vars == set(["?s1", "?s2"])
 
 
@@ -101,5 +105,5 @@ def test_complex_compile():
         ]
     }
     compiled, vars = compile_filter(complex_filter)
-    assert compiled == '($simProperty1 < ($origProperty1 + 120)) and ($simProperty1 > ($origProperty1 - 120))'
+    assert compiled == '($simProperty1 < ($origProperty1 + {})) and ($simProperty1 > ($origProperty1 - {}))'.format(literal_120_int, literal_120_int)
     assert vars == set(["?simProperty1", "?origProperty1"])

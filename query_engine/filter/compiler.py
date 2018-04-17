@@ -1,7 +1,7 @@
 # expr_builder.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import query_engine.filter.expressions as expressions
-from query_engine.filter.utils import string_to_rdf
+from query_engine.filter.utils import compile_literal
 
 
 def fargs_to_expression(fargs, expr):
@@ -20,7 +20,7 @@ def compile_filter(f):
                 - vars (type=set of string) is the set of all SPARQL variables in the compiled expression
     """
     if type(f) is str:
-        value = string_to_rdf(f)
+        value = compile_literal(f)
         if value.startswith('?'):
             return ('$' + value[1:], set([value]))
         return (value, set())
