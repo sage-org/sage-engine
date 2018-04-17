@@ -45,9 +45,19 @@ message SavedBagUnionIterator {
   }
 }
 
+message SavedFilterIterator {
+  oneof source {
+    SavedProjectionIterator proj_source = 1;
+    SavedFilterIterator filter_source = 2;
+  }
+  string expression = 3;
+  repeated string variables = 4;
+}
+
 message RootTree {
   oneof source {
     SavedProjectionIterator proj_source = 1;
     SavedBagUnionIterator union_source = 2;
+    SavedFilterIterator filter_source = 3;
   }
 }

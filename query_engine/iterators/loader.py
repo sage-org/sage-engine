@@ -3,9 +3,10 @@
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import NestedLoopJoinIterator, LeftNLJIterator
+from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.protobuf.utils import protoTriple_to_dict
-from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedNestedLoopJoinIterator, SavedBagUnionIterator
+from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedNestedLoopJoinIterator, SavedBagUnionIterator, SavedFilterIterator
 
 
 def load(protoMsg, hdtDocument):
@@ -16,6 +17,8 @@ def load(protoMsg, hdtDocument):
         root.ParseFromString(protoMsg)
         sourceField = root.WhichOneof('source')
         savedPlan = getattr(root, sourceField)
+    if type(savedPlan) is SavedFilterIterator:
+        return load_filter(savedPlan, hdtDocument)
     if type(savedPlan) is SavedProjectionIterator:
         return load_projection(savedPlan, hdtDocument)
     elif type(savedPlan) is SavedScanIterator:
@@ -32,7 +35,15 @@ def load_projection(savedPlan, hdtDocument):
     """Load a ProjectionIterator from a protobuf serialization"""
     sourceField = savedPlan.WhichOneof('source')
     source = load(getattr(savedPlan, sourceField), hdtDocument)
-    return ProjectionIterator(source, savedPlan.values)
+    values = savedPlan.values if len(savedPlan.values) > 0 else None
+    return ProjectionIterator(source, values)
+
+
+def load_filter(savedPlan, hdtDocument):
+    """Load a FilterIterator from a protobuf serialization"""
+    sourceField = savedPlan.WhichOneof('source')
+    source = load(getattr(savedPlan, sourceField), hdtDocument)
+    return FilterIterator(source, savedPlan.expression, savedPlan.variables)
 
 
 def load_scan(savedPlan, hdtDocument):

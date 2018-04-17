@@ -2,14 +2,16 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.preemptable_iterator import PreemptableIterator
 from query_engine.protobuf.iterators_pb2 import SavedProjectionIterator
+from query_engine.iterators.utils import IteratorExhausted
 
 
 class ProjectionIterator(PreemptableIterator):
     """A ProjectionIterator performa projection over solution mappings"""
-    def __init__(self, source, values):
+    def __init__(self, source, values=None):
         super(ProjectionIterator, self).__init__()
         self._source = source
         self._values = values
+        print(self._values)
 
     def __repr__(self):
         return '<ProjectionIterator SELECT %s FROM { %s }>' % (self._values, self._source)
@@ -22,8 +24,10 @@ class ProjectionIterator(PreemptableIterator):
         Get the next item from the iterator, reading from the left source and then the right source
         """
         if not self.has_next():
-            raise StopIteration()
+            raise IteratorExhausted()
         value = await self._source.next()
+        if self._values is None:
+            return value
         return {k: v for k, v in value.items() if k in self._values}
 
     def save(self):

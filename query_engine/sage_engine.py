@@ -4,6 +4,7 @@ from asyncio import Queue, coroutine, get_event_loop, shield, wait_for
 from asyncio import TimeoutError as asyncTimeoutError
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.union import BagUnionIterator
+from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.utils import IteratorExhausted
 from query_engine.protobuf.iterators_pb2 import RootTree
 
@@ -23,7 +24,7 @@ class SageEngine(object):
     def __init__(self):
         super(SageEngine, self).__init__()
 
-    def execute(self, plan, quota):
+    def execute(self, plan, quota, filters=[]):
         """
             Execute a preemptable physical query execution plan under a time quota.
 
@@ -55,4 +56,6 @@ class SageEngine(object):
             root.proj_source.CopyFrom(plan.save())
         elif type(plan) is BagUnionIterator:
             root.union_source.CopyFrom(plan.save())
+        elif type(plan) is FilterIterator:
+            root.filter_source.CopyFrom(plan.save())
         return (results, root, done)

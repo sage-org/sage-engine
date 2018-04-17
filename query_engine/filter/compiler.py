@@ -47,6 +47,3 @@ def compile_filter(f):
         return fargs_to_expression(fargs, expressions.or_expr)
     else:
         raise Exception("Unsupported filter type found during filter compilation: '{}'".format(f['operator']))
-
-# s = Template('${} > 120'.format('s'))
-# print(s.substitute({"s": 1000}))

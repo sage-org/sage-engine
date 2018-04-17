@@ -14,13 +14,17 @@ def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
         return load(savedPlan, hdtDocument)
 
     optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
+    filters = query['filters'] if 'filters' in query and len(query['filters']) > 0 else None
+    root = None
 
     if query['type'] == 'union':
-        return build_union_plan(query['patterns'], hdtDocument, projection)
+        root = build_union_plan(query['patterns'], hdtDocument, projection)
     elif query['type'] == 'bgp':
-        return build_join_plan(query['bgp'], hdtDocument, optional=optional, projection=projection)
+        root = build_join_plan(query['bgp'], hdtDocument, optional=optional, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
+
+    return root
 
 
 def build_union_plan(union, hdtDocument, projection=None):
