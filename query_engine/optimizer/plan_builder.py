@@ -74,8 +74,12 @@ def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=Fal
         queryVariables = sourceVars
     # build the left linear tree
     while len(triples) > 0:
-        pattern = triples[0]
-        queryVariables = queryVariables | get_vars(pattern['triple'])
+        pattern, pos, queryVariables = find_connected_pattern(queryVariables, triples)
+        # no connected pattern = disconnected BGP => pick the first remaining pattern in the BGP
+        if pattern is None:
+            pattern = triples[0]
+            queryVariables = queryVariables | get_vars(pattern['triple'])
+            pos = 0
         acc = iteratorConstructor(acc, pattern['triple'], hdtDocument)
-        triples.pop(0)
+        triples.pop(pos)
     return acc, queryVariables

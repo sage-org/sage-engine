@@ -29,7 +29,7 @@ def test_empty_patterns():
         'bgp': bgp
     }
     plan = build_query_plan(query, hdtDoc)
-    assert type(plan) is EmptyIterator
+    assert not plan.has_next()
 
 
 def test_build_left_linear_plan():

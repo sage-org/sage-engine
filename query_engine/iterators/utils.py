@@ -29,6 +29,21 @@ class EmptyIterator(object):
         return 0
 
 
+class ArrayIterator(object):
+    def __init__(self, array):
+        super(ArrayIterator, self).__init__()
+        self._array = array
+
+    def has_next(self):
+        return len(self._array) > 0
+
+    def next(self):
+        if not self.has_next():
+            raise StopIteration()
+        mu = self._array.pop(0)
+        return mu
+
+
 def selection(triple, variables, formatter=None):
     """Apply selection on a RDF triple"""
     bindings = set()
