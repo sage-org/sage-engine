@@ -5,6 +5,11 @@ from query_engine.filter.utils import string_to_rdf
 from query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from query_engine.iterators.utils import IteratorExhausted
 from string import Template
+from time import strptime
+
+eval_globals = {
+    "strptime": strptime
+}
 
 
 class FilterIterator(object):
@@ -23,7 +28,7 @@ class FilterIterator(object):
         b = dict()
         for key, value in bindings.items():
             b[key[1:]] = string_to_rdf(value)
-        return eval(self._template.substitute(b))
+        return eval(self._template.substitute(b), eval_globals)
 
     async def next(self):
         if not self.has_next():

@@ -22,7 +22,10 @@ simple_operations = [
     ("==", ["?s1", "?s2"], '$s1 == $s2', set(["?s1", "?s2"])),
     ("==", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "?s2"], '120 == $s2', set(["?s2"])),
     ("==", ["?s1", "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '$s1 == 120', set(["?s1"])),
-    ("==", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '120 == 120', set())
+    ("==", ["\"120\"^^http://www.w3.org/2001/XMLSchema#integer", "\"120\"^^http://www.w3.org/2001/XMLSchema#integer"], '120 == 120', set()),
+    # test complex XML datatype
+    ("==", ["\"120\"", "?s2"], '"120" == $s2', set(["?s2"])),
+    ("==", ["\"2008-06-20T00:00:00\"^^<http://www.w3.org/2001/XMLSchema#dateTime>", "?s2"], 'strptime("2008-06-20T00:00:00", "%Y-%m-%dT%H:%M:%S") == $s2', set(["?s2"])),
 ]
 
 
