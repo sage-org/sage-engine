@@ -11,7 +11,6 @@ class ProjectionIterator(PreemptableIterator):
         super(ProjectionIterator, self).__init__()
         self._source = source
         self._values = values
-        print(self._values)
 
     def __repr__(self):
         return '<ProjectionIterator SELECT %s FROM { %s }>' % (self._values, self._source)

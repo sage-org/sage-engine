@@ -51,7 +51,6 @@ def test_filter_iterator_interrupt():
     for b in results:
         assert b['?s'] == 'http://example.org/s1' and b['?p'] == 'http://example.org/p1'
     reloaded = load(saved.SerializeToString(), hdtDoc)
-    print(reloaded)
     (results, saved, done) = engine.execute(reloaded, 10e7)
     assert len(results) + tmp == 100
     for b in results:
@@ -71,7 +70,6 @@ def test_composed_filter_iterator_interrupt():
     for b in results:
         assert b['?s'] == 'http://example.org/s1' and b['?p'] == 'http://example.org/p1'
     reloaded = load(saved.SerializeToString(), hdtDoc)
-    print(reloaded)
     (results, saved, done) = engine.execute(reloaded, 10e7)
     assert len(results) + tmp == 100
     for b in results:

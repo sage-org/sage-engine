@@ -29,10 +29,8 @@ class FilterIterator(object):
         if not self.has_next():
             raise IteratorExhausted()
         mu = await self._source.next()
-        print(mu)
         while not self._evaluate(mu):
             mu = await self._source.next()
-            print(mu)
         return mu
 
     def has_next(self):

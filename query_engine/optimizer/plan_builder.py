@@ -3,10 +3,12 @@
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import NestedLoopJoinIterator, LeftNLJIterator
+from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.utils import EmptyIterator
 from query_engine.iterators.loader import load
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
+from query_engine.filter.compiler import compile_filter
 
 
 def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
@@ -14,7 +16,7 @@ def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
         return load(savedPlan, hdtDocument)
 
     optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
-    filters = query['filters'] if 'filters' in query and len(query['filters']) > 0 else None
+    filters = query['filters'] if 'filters' in query else []
     root = None
 
     if query['type'] == 'union':
@@ -23,7 +25,9 @@ def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
         root = build_join_plan(query['bgp'], hdtDocument, optional=optional, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
-
+    for f in filters:
+        expr, filterVars = compile_filter(f)
+        root = FilterIterator(root, expr, filterVars)
     return root
 
 
