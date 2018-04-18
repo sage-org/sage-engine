@@ -25,6 +25,8 @@ mul_expr = binary_expression("({} * {})")
 
 div_expr = binary_expression("({} / {})")
 
+not_expr = unary_expression("(not {})")
+
 and_expr = binary_expression("({}) and ({})")
 
 or_expr = binary_expression("({}) or ({})")
@@ -41,11 +43,11 @@ gt_expr = binary_expression("{} > {}")
 
 gteq_expr = binary_expression("{} >= {}")
 
-bind_expr = unary_expression("sparql_bind({})")
+bound_expr = unary_expression("sparql_bound({})")
 
 sameTerm_expr = unary_expression("sameTerm({})")
 
-in_expr = unary_expression("({} in {})")
+in_expr = binary_expression("({} in {})")
 
 not_in_expr = binary_expression("({} not in {})")
 
@@ -59,6 +61,6 @@ lang_expr = unary_expression("sparql_lang({})")
 
 datatype_expr = unary_expression("sparql_datatype({})")
 
-STRUUID_expr = unary_expression("sparql_STRUUID({})")
+STRUUID_expr = unary_expression("sparql_STRUUID()")
 
-UUID_expr = unary_expression("sparql_UUID({})")
+UUID_expr = unary_expression("sparql_UUID()")

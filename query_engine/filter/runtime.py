@@ -5,8 +5,8 @@ from numbers import Number
 from uuid import uuid4
 
 
-def sparql_bind(b):
-    """Return True if the binding is bound, False otherwise"""
+def sparql_bound(b):
+    """Return True if the binding is bounded, False otherwise"""
     return b is not None
 
 
@@ -53,7 +53,7 @@ FILTER_RUNTIME = {
     "URIRef": URIRef,
     "isIRI": isIRI,
     "isLiteral": isLiteral,
-    "sparql_bind": sparql_bind,
+    "sparql_bound": sparql_bound,
     "sparql_lang": sparql_lang,
     "sparql_STRUUID": sparql_STRUUID,
     "sparql_UUID": sparql_UUID,
