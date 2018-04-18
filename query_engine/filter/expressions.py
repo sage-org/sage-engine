@@ -40,3 +40,25 @@ leq_expr = binary_expression("{} <= {}")
 gt_expr = binary_expression("{} > {}")
 
 gteq_expr = binary_expression("{} >= {}")
+
+bind_expr = unary_expression("sparql_bind({})")
+
+sameTerm_expr = unary_expression("sameTerm({})")
+
+in_expr = unary_expression("({} in {})")
+
+not_in_expr = binary_expression("({} not in {})")
+
+is_iri_expr = unary_expression("isIRI({})")
+
+is_literal_expr = unary_expression("isLiteral({})")
+
+is_numeric_expr = unary_expression("isNumeric({})")
+
+lang_expr = unary_expression("sparql_lang({})")
+
+datatype_expr = unary_expression("sparql_datatype({})")
+
+STRUUID_expr = unary_expression("sparql_STRUUID({})")
+
+UUID_expr = unary_expression("sparql_UUID({})")

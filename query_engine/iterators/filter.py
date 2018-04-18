@@ -1,16 +1,11 @@
 # filter.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.preemptable_iterator import PreemptableIterator
+from query_engine.filter.runtime import FILTER_RUNTIME
 from query_engine.filter.utils import compile_literal
 from query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from query_engine.iterators.utils import IteratorExhausted
 from string import Template
-from rdflib import Literal, URIRef
-
-eval_globals = {
-    "URIRef": URIRef,
-    "Literal": Literal
-}
 
 
 class FilterIterator(object):
@@ -21,15 +16,16 @@ class FilterIterator(object):
         self._expression = expression
         self._template = Template(expression)
         self._variables = variables
+        self._baseBindings = {key: None for key in self._variables}
 
     def __repr__(self):
         return "<FilterIterator '{}' (variables: {}) on {}>".format(self._expression, self._variables, self._source)
 
     def _evaluate(self, bindings):
-        b = dict()
+        b = dict(self._baseBindings)
         for key, value in bindings.items():
             b[key[1:]] = compile_literal(value)
-        return eval(self._template.substitute(b), eval_globals)
+        return eval(self._template.substitute(b), FILTER_RUNTIME)
 
     async def next(self):
         if not self.has_next():

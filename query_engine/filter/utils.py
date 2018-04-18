@@ -5,7 +5,10 @@
 def compile_literal(literal):
     """Turn a string into a RDFlib URI or Literal.
     Returns the original string if the string is a SPARQL variable"""
-    if literal.startswith('?'):
+    if type(literal) is list:
+        """For some op. like IN, the right operand is a list of RDF term"""
+        return "[{}]".format(', '.join(map(compile_literal, literal)))
+    elif literal.startswith('?'):
         return literal
     elif literal.startswith('http'):
         return "URIRef(\"{}\")".format(literal)
