@@ -13,7 +13,6 @@ def fargs_to_empty_expression(expr):
 
 
 def fargs_to_binary_expression(fargs, expr):
-    print(fargs)
     return (expr(fargs[0][0], fargs[1][0]), fargs[0][1] | fargs[1][1])
 
 
