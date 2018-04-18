@@ -25,11 +25,6 @@ def isLiteral(x):
     return type(x) is Literal
 
 
-def isNumeric(x):
-    """Return True if the term is an integer/float/double/etc"""
-    return isinstance(x, Number)
-
-
 def sparql_lang(x):
     """Return the LANG of a RDF Literal, or an empty string if it does not exists"""
     return x.lang if type(x) is Literal else ""
@@ -58,7 +53,6 @@ FILTER_RUNTIME = {
     "URIRef": URIRef,
     "isIRI": isIRI,
     "isLiteral": isLiteral,
-    "isNumeric": isNumeric,
     "sparql_bind": sparql_bind,
     "sparql_lang": sparql_lang,
     "sparql_STRUUID": sparql_STRUUID,

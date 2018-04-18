@@ -53,7 +53,7 @@ is_iri_expr = unary_expression("isIRI({})")
 
 is_literal_expr = unary_expression("isLiteral({})")
 
-is_numeric_expr = unary_expression("isNumeric({})")
+is_numeric_expr = unary_expression("isinstance({}, Number)")
 
 lang_expr = unary_expression("sparql_lang({})")
 
