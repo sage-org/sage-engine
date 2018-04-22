@@ -1,25 +1,56 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from rdflib import Namespace, URIRef, Literal
-
-# Commonly used namepsaces
-RDF = Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-HYDRA = Namespace("http://www.w3.org/ns/hydra/core#")
-VOID = Namespace("http://rdfs.org/ns/void#")
-FOAF = Namespace("http://xmlns.com/foaf/0.1/")
-DCTERMS = Namespace("http://purl.org/dc/terms/")
 
 
-def string_to_literal(literal):
-    if literal.startswith('"'):
-        splited_literal = literal.split('"')
-        value = splited_literal[1]
-        right_part = splited_literal[2] if len(splited_literal) >= 2 else None
-        datatype = None
-        lang = None
-        if right_part is not None and right_part.startswith("^^"):
-            datatype = right_part.split("^^")[1].strip("<>")
-        elif right_part is not None and right_part.startswith("@"):
-            lang = right_part.split("@")[1]
-        return Literal(value, datatype=datatype, lang=lang)
-    return URIRef(literal)
+class DoubleDict(object):
+    """A DoubleDict is a two-way dictionnary"""
+    def __init__(self):
+        super(DoubleDict, self).__init__()
+        self._keys_to_values = dict()
+        self._values_to_keys = dict()
+
+    def insert(self, k, v):
+        self._keys_to_values[k] = v
+        self._values_to_keys[v] = k
+
+    def key_get(self, k):
+        return self._keys_to_values[k]
+
+    def value_get(self, v):
+        return self._values_to_keys[v]
+
+    def has_key(self, k):
+        return k in self._keys_to_values
+
+    def has_value(self, v):
+        return v in self._values_to_keys
+
+
+class TripleDictionnary(object):
+    """docstring for TripleDictionnary."""
+    def __init__(self):
+        super(TripleDictionnary, self).__init__()
+        self._subjectDict = DoubleDict()
+        self._predicateDict = DoubleDict()
+        self._objectDict = DoubleDict()
+        self._bitSubjectValue = 1
+        self._bitPredicateValue = 1
+        self._bitObjectValue = 1
+
+    def insert_triple(self, s, p, o):
+        if not self._subjectDict.has_value(s):
+            self._subjectDict.insert(self._bitSubjectValue, s)
+            self._bitSubjectValue += 1
+        if not self._predicateDict.has_value(p):
+            self._predicateDict.insert(self._bitPredicateValue, p)
+            self._bitPredicateValue += 1
+        if not self._objectDict.has_value(o):
+            self._objectDict.insert(self._bitObjectValue, o)
+            self._bitObjectValue += 1
+        return self.triple_to_bit(s, p, o)
+
+    def triple_to_bit(self, s, p, o):
+        return (self._subjectDict.value_get(s), self._predicateDict.value_get(p), self._objectDict.value_get(o))
+
+    def bit_to_triple(self, s, p, o):
+        return (self._subjectDict.key_get(s), self._predicateDict.key_get(p), self._objectDict.key_get(o))
