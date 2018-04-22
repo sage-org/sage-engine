@@ -5,9 +5,9 @@ from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.loader import load
-from database.hdt_file_factory import HDTFileFactory
+from database.hdt_file_connector import HDTFileConnector
 
-hdtDoc = HDTFileFactory('data/test.hdt')
+hdtDoc = HDTFileConnector('data/test.hdt')
 engine = SageEngine()
 triple = {
     'subject': '?s',

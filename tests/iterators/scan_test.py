@@ -2,9 +2,9 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.sage_engine import SageEngine
 from query_engine.iterators.scan import ScanIterator
-from database.hdt_file_factory import HDTFileFactory
+from database.hdt_file_connector import HDTFileConnector
 
-hdtDoc = HDTFileFactory('data/test.hdt')
+hdtDoc = HDTFileConnector('data/test.hdt')
 engine = SageEngine()
 triple = {
     'subject': '?s',

@@ -40,11 +40,11 @@ def sparql_blueprint(datasets):
 
         # else, process POST requests as SPARQL requests
         post_query = request.get_json()
-        quota = int(request.args.get("quota", dataset.deadline())) / 1000
+        quota = int(request.args.get("quota", dataset.quota())) / 1000
         next = decode_saved_plan(post_query['next']) if 'next' in post_query else None
         # build physical query plan, then execute it with the given number of tickets
         start = time()
-        plan = build_query_plan(post_query['query'], dataset._factory, next)
+        plan = build_query_plan(post_query['query'], dataset, next)
         loadingTime = (time() - start) * 1000
         bindings, savedPlan, isDone = engine.execute(plan, quota)
         # compute controls for the next page

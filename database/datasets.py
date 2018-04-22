@@ -1,14 +1,14 @@
-# database.py
+# datasets.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from yaml import load
-# from database.raw_file_factory import RawFileFactory
-from database.hdt_file_factory import HDTFileFactory
+from database.rdf_file_connector import RDFFileConnector
+from database.hdt_file_connector import HDTFileConnector
 # from database.hdt_server_factory import HDTServerFactory
 
-factories = {
-    # 'rdf-file': RawFileFactory,
+DB_CONNECTORS = {
+    'rdf-file': RDFFileConnector,
     # 'hdt-server': HDTServerFactory,
-    'hdt-file': HDTFileFactory
+    'hdt-file': HDTFileConnector
 }
 
 
@@ -17,23 +17,32 @@ class Dataset(object):
     def __init__(self, config):
         super(Dataset, self).__init__()
         self._config = config
-        factory = factories[self._config['backend']] if self._config['backend'] in factories else None
-        self._factory = factory.from_config(self._config)
+        connectorClass = DB_CONNECTORS[self._config['backend']] if self._config['backend'] in DB_CONNECTORS else None
+        self._connector = connectorClass.from_config(self._config)
 
     def config(self):
         return self._config
 
-    def page_size(self):
-        return self._config["pageSize"]
+    def quota(self):
+        return self._config['quota']
 
-    def deadline(self):
-        return self._config['deadline']
-
-    def factory(self):
-        return self._factory
+    def connector(self):
+        """Get the underlying DatabaseConnector for this dataset"""
+        return self._connector
 
     def search_triples(self, subject, predicate, obj, limit=0, offset=0):
-        return self._factory.search_triples(subject, predicate, obj, limit, offset)
+        """
+            Get an iterator over all RDF triples matching a triple pattern.
+            Args:
+                - subject [string] - Subject of the triple pattern
+                - predicate [string] - Preicate of the triple pattern
+                - object [string] - Object of the triple pattern
+                - limit [int=0] - (Optional) LIMIT modifier, i.e., maximum number of RDF triples to read
+                - offset [int=0] - (Optional) OFFSET modifier, i.e., number of RDF triples to skip
+            Returns:
+                A Python iterator over RDF triples matching the given triples pattern
+        """
+        return self._connector.search_triples(subject, predicate, obj, limit, offset)
 
 
 def load_config(config_file="config.yaml"):
@@ -60,15 +69,11 @@ def load_config(config_file="config.yaml"):
     """
     config = load(open(config_file))
     # set page size, i.e. the number of triples per page
-    page_size = config['pageSize'] if 'pageSize' in config else 100
-    deadline = config['quota'] if 'quota' in config else 20
-    config['pageSize'] = page_size
-    config['deadline'] = deadline
+    quota = config['quota'] if 'quota' in config else 20
+    config['quota'] = quota
     for c in config["datasets"]:
-        if 'pageSize' not in c:
-            c["pageSize"] = page_size
-        if 'deadline' not in c:
-            c['deadline'] = deadline
+        if 'quota' not in c:
+            c['quota'] = quota
     # build datasets
     datasets = {c["name"]: Dataset(c) for c in config["datasets"]}
     return (config, datasets)
