@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from hdt import HDTDocument
 from rdflib import URIRef
-from datasets.fragment_factory import FragmentFactory
+from database.fragment_factory import FragmentFactory
 
 
 class HDTFileFactory(FragmentFactory):

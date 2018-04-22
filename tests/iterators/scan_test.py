@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.sage_engine import SageEngine
 from query_engine.iterators.scan import ScanIterator
-from datasets.hdt_file_factory import HDTFileFactory
+from database.hdt_file_factory import HDTFileFactory
 
 hdtDoc = HDTFileFactory('data/test.hdt')
 engine = SageEngine()

@@ -1,9 +1,9 @@
-# datasets.py
+# database.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from yaml import load
-# from datasets.raw_file_factory import RawFileFactory
-from datasets.hdt_file_factory import HDTFileFactory
-# from datasets.hdt_server_factory import HDTServerFactory
+# from database.raw_file_factory import RawFileFactory
+from database.hdt_file_factory import HDTFileFactory
+# from database.hdt_server_factory import HDTServerFactory
 
 factories = {
     # 'rdf-file': RawFileFactory,

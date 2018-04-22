@@ -5,7 +5,7 @@ from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.loader import load
-from datasets.hdt_file_factory import HDTFileFactory
+from database.hdt_file_factory import HDTFileFactory
 
 hdtDoc = HDTFileFactory('data/test.hdt')
 engine = SageEngine()

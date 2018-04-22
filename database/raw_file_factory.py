@@ -1,7 +1,7 @@
 # fragment_factory.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from rdflib import Graph, URIRef
-from datasets.fragment_factory import FragmentFactory
+from database.fragment_factory import FragmentFactory
 from ldf.utils import string_to_literal
 
 

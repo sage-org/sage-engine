@@ -1,6 +1,6 @@
 # fragment_factory.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from datasets.fragment_factory import FragmentFactory
+from database.fragment_factory import FragmentFactory
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from rdflib import Graph
 from requests import Session

@@ -3,7 +3,7 @@
 from flask import Flask, render_template
 from flask_cors import CORS
 from os import environ
-from datasets.datasets import DatasetCollection
+from database.datasets import DatasetCollection
 from http_server.sparql_interface import sparql_blueprint
 
 config_file = "data/test_config.yaml"

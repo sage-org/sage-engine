@@ -1,7 +1,7 @@
 # optimizer_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.optimizer.plan_builder import build_query_plan
-from datasets.hdt_file_factory import HDTFileFactory
+from database.hdt_file_factory import HDTFileFactory
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import NestedLoopJoinIterator
