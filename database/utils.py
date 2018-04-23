@@ -13,11 +13,11 @@ class DoubleDict(object):
         self._keys_to_values[k] = v
         self._values_to_keys[v] = k
 
-    def key_get(self, k):
-        return self._keys_to_values[k]
+    def key_get(self, k, default=None):
+        return self._keys_to_values[k] if k in self._keys_to_values else default
 
-    def value_get(self, v):
-        return self._values_to_keys[v]
+    def value_get(self, v, default=None):
+        return self._values_to_keys[v] if v in self._values_to_keys else default
 
     def has_key(self, k):
         return k in self._keys_to_values
@@ -50,7 +50,7 @@ class TripleDictionnary(object):
         return self.triple_to_bit(s, p, o)
 
     def triple_to_bit(self, s, p, o):
-        return (self._subjectDict.value_get(s), self._predicateDict.value_get(p), self._objectDict.value_get(o))
+        return (self._subjectDict.value_get(s, 0), self._predicateDict.value_get(p, 0), self._objectDict.value_get(o, 0))
 
     def bit_to_triple(self, s, p, o):
         return (self._subjectDict.key_get(s), self._predicateDict.key_get(p), self._objectDict.key_get(o))
