@@ -27,7 +27,7 @@ class DoubleDict(object):
 
 
 class TripleDictionnary(object):
-    """docstring for TripleDictionnary."""
+    """A TripleDictionnary stores RDF triples in bitmap format"""
     def __init__(self):
         super(TripleDictionnary, self).__init__()
         self._subjectDict = DoubleDict()

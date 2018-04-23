@@ -31,6 +31,7 @@ class RDFFileConnector(DatabaseConnector):
     """
 
     def __init__(self, file, format=None, useCache=False):
+        super(RDFFileConnector, self).__init__()
         file = os.path.abspath(file)
         self._dictionnary = TripleDictionnary()
         self._triples = []

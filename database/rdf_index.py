@@ -5,7 +5,7 @@ from math import inf
 
 
 class TripleIndex(object):
-    """docstring for TripleIndex."""
+    """A TripleIndex is B-trre index for Bitmap RDf Triples"""
     def __init__(self):
         super(TripleIndex, self).__init__()
         self._keys = []

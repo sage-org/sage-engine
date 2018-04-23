@@ -9,6 +9,7 @@ class HDTFileConnector(DatabaseConnector):
     """A HDTFileConnector search for RDF triples in a HDT file"""
 
     def __init__(self, file):
+        super(HDTFileConnector, self).__init__()
         self._hdt = HDTDocument(file)
 
     def search_triples(self, subject, predicate, obj, limit=0, offset=0):
