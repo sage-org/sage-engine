@@ -14,11 +14,47 @@ def test_triple_index():
     for v in index.search_pattern((0, 1, 2)):
         assert v in [(1, 1, 2), (2, 1, 2), (3, 1, 2)]
 
-def test_rdf_file():
-    # "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer13/Product593"
+
+def test_containment_search_rdf_file():
+    expected = ('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer13/Product593', 'http://www.w3.org/2000/01/rdf-schema#label', '"byplay"')
+    iterator, card = db.search_triples(
+        "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer13/Product593",
+        "http://www.w3.org/2000/01/rdf-schema#label",
+        '"byplay"')
+    nb = 0
+    for v in iterator:
+        assert v == expected
+        nb += 1
+    assert nb == 1
+
+
+def test_subject_search_rdf_file():
+    iterator, card = db.search_triples(
+        "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer13/Product593",
+        None, None)
+    for v in iterator:
+        assert v[0] == "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer13/Product593"
+
+
+def test_predicate_search_rdf_file():
+    iterator, card = db.search_triples(
+        None, "http://www.w3.org/2000/01/rdf-schema#label", None)
+    for v in iterator:
+        assert v[1] == "http://www.w3.org/2000/01/rdf-schema#label"
+
+
+def test_object_search_rdf_file():
+    iterator, card = db.search_triples(
+        None, "http://www.w3.org/2000/01/rdf-schema#label", None)
+    for v in iterator:
+        assert v[1] == "http://www.w3.org/2000/01/rdf-schema#label"
+
+
+def test_mixed_search_rdf_file():
+    expected = ('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/dataFromProducer13/Product593', 'http://www.w3.org/2000/01/rdf-schema#label', '"byplay"')
     iterator, card = db.search_triples(
         None,
         "http://www.w3.org/2000/01/rdf-schema#label",
         '"byplay"')
     for v in iterator:
-        print(v)
+        assert v == expected

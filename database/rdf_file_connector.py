@@ -1,48 +1,12 @@
 # rdf_file_factory.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from rdflib import Graph, URIRef, Literal
+from rdflib import Graph
+from rdflib.util import guess_format
 from database.db_connector import DatabaseConnector
+from database.rdf_index import TripleIndex
 from database.utils import TripleDictionnary
-import os.path
-from bisect import bisect_left, bisect_right
 from math import inf
-
-
-class TripleIndex(object):
-    """docstring for TripleIndex."""
-    def __init__(self):
-        super(TripleIndex, self).__init__()
-        self._keys = []
-        self._values = []
-
-    def insert(self, key, value):
-        index = bisect_left(self._keys, key)
-        self._keys.insert(index, key)
-        self._values.insert(index, value)
-        return index
-
-    def index(self, key):
-        return bisect_left(self._keys, key)
-
-    def search_pattern(self, pattern, offset=0, limit=inf):
-        def predicate(value):
-            # TODO this thing is buggy :-p
-            if (pattern[0] > 0 and value[0] == pattern[0]):
-                return True
-            if (pattern[1] > 0 and value[1] == pattern[1]):
-                return True
-            if (pattern[2] > 0 and value[2] == pattern[2]):
-                return True
-            return False
-
-        def generator(startIndex):
-            i = startIndex + offset
-            nbRead = 0
-            while i < len(self._keys) and nbRead <= limit and predicate(self._keys[i]):
-                yield self._values[i]
-                i += 1
-                nbRead += 1
-        return generator(self.index(pattern))
+from os.path import isfile
 
 
 def strip_uri(v):
@@ -52,39 +16,69 @@ def strip_uri(v):
 class RDFFileConnector(DatabaseConnector):
     """
         A RDFFileConnector search for RDF triples in a RDF file (N-triples, Turtle, N3, etc).
+        Internally, it uses an Hexastore[1] based approach, with 6 B-tree indexes on SPO, SOP, PSO, POS, OSP and OPS.
+
+
+        Reference:
+            [1] Weiss, Cathrin, Panagiotis Karras, and Abraham Bernstein. "Hexastore: sextuple indexing for semantic web data management." Proceedings of the VLDB Endowment 1.1 (2008): 1008-1019.
     """
 
-    def __init__(self, file, format='nt'):
+    def __init__(self, file, format=None):
         self._dictionnary = TripleDictionnary()
-        g = Graph()
-        g.parse(file, format=format)
         self._triples = []
-        self._spo_index = TripleIndex()
-        self._ops_index = TripleIndex()
-        self._pso_index = TripleIndex()
-        for s, p, o in g.triples((None, None, None)):
-            triple = self._dictionnary.insert_triple(strip_uri(s.n3()), strip_uri(p.n3()), strip_uri(o.n3()))
-            self._spo_index.insert(triple, len(self._triples))
-            self._ops_index.insert((triple[2], triple[1], triple[0]), len(self._triples))
-            self._pso_index.insert((triple[1], triple[0], triple[1]), len(self._triples))
-            self._triples.append(triple)
+        self._indexes = {
+            "spo": TripleIndex(),
+            "sop": TripleIndex(),
+            "osp": TripleIndex(),
+            "ops": TripleIndex(),
+            "pso": TripleIndex(),
+            "pos": TripleIndex()
+        }
+        self.__loadFromFile(file, format)
 
-    def search_triples(self, subject, predicate, obj, limit=0, offset=0):
+    def search_triples(self, subject, predicate, obj, limit=inf, offset=0):
         def processor(i):
             s, p, o = self._triples[i]
             return self._dictionnary.bit_to_triple(s, p, o)
         btriple = self._dictionnary.triple_to_bit(subject, predicate, obj)
         iterator = None
-        if subject is None:
-            iterator = self._spo_index.search_pattern(btriple)
-        elif predicate is None:
-            iterator = self._ops_index.search_pattern((btriple[2], btriple[1], btriple[0]))
+        if subject is not None and predicate is not None:
+            iterator = self._indexes["spo"].search_pattern(btriple, limit=limit, offset=offset)
+        elif subject is not None and object is not None:
+            iterator = self._indexes["sop"].search_pattern((btriple[0], btriple[2], btriple[1]), limit=limit, offset=offset)
+        elif object is not None and subject is not None:
+            iterator = self._indexes["osp"].search_pattern((btriple[2], btriple[0], btriple[1]), limit=limit, offset=offset)
+        elif object is not None and predicate is not None:
+            iterator = self._indexes["ops"].search_pattern((btriple[2], btriple[1], btriple[0]), limit=limit, offset=offset)
+        elif predicate is not None and subject is not None:
+            iterator = self._indexes["pso"].search_pattern((btriple[1], btriple[0], btriple[2]), limit=limit, offset=offset)
+        elif predicate is not None and object is not None:
+            iterator = self._indexes["pos"].search_pattern((btriple[1], btriple[2], btriple[0]), limit=limit, offset=offset)
         else:
-            iterator = self._spo_index.search_pattern(btriple)
+            iterator = self._indexes["spo"].search_pattern((0, 0, 0), limit=limit, offset=offset)
         return map(processor, iterator), None
 
     def from_config(config):
-        """Build a RawFileFactory from a config file"""
-        if not os.path.isfile(config["file"]):
+        """Build a RDFFileConnector from a config file"""
+        if not isfile(config["file"]):
             raise Error("Configuration file not found: {}".format(config["file"]))
         return RDFFileConnector(config['file'], config['format'])
+
+    def __loadFromFile(self, file, format=None):
+        if not isfile(file):
+            raise Error("Cannot find RDF file to load: {}".format(file))
+        if format is None:
+            format = guess_format(file)
+        # use a temporary graph to load from a RDF file
+        g = Graph()
+        g.parse(file, format=format)
+        for s, p, o in g.triples((None, None, None)):
+            # load RDF triples in the dictionnary, then index it
+            triple = self._dictionnary.insert_triple(strip_uri(s.n3()), strip_uri(p.n3()), strip_uri(o.n3()))
+            self._indexes["spo"].insert(triple, len(self._triples))
+            self._indexes["sop"].insert((triple[0], triple[2], triple[1]), len(self._triples))
+            self._indexes["osp"].insert((triple[2], triple[0], triple[1]), len(self._triples))
+            self._indexes["ops"].insert((triple[2], triple[1], triple[0]), len(self._triples))
+            self._indexes["pso"].insert((triple[1], triple[0], triple[2]), len(self._triples))
+            self._indexes["pos"].insert((triple[1], triple[2], triple[0]), len(self._triples))
+            self._triples.append(triple)
