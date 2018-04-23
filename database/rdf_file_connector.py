@@ -6,7 +6,9 @@ from database.db_connector import DatabaseConnector
 from database.rdf_index import TripleIndex
 from database.utils import TripleDictionnary
 from math import inf
-from os.path import isfile
+import os
+import fnmatch
+import pickle
 
 
 def strip_uri(v):
@@ -17,13 +19,19 @@ class RDFFileConnector(DatabaseConnector):
     """
         A RDFFileConnector search for RDF triples in a RDF file (N-triples, Turtle, N3, etc).
         Internally, it uses an Hexastore[1] based approach, with 6 B-tree indexes on SPO, SOP, PSO, POS, OSP and OPS.
+        It also support caching, using the pickle protocol.
 
+        Args:
+            - file [string] - Path to the RDF file to load
+            - format [string=None] - (Optional) Format of the RDF file ("ttl", "nt", "trig", etc)
+            - useCache [boolean=False] (Optional) True if the cache should be used, False otherwise
 
         Reference:
             [1] Weiss, Cathrin, Panagiotis Karras, and Abraham Bernstein. "Hexastore: sextuple indexing for semantic web data management." Proceedings of the VLDB Endowment 1.1 (2008): 1008-1019.
     """
 
-    def __init__(self, file, format=None):
+    def __init__(self, file, format=None, useCache=False):
+        file = os.path.abspath(file)
         self._dictionnary = TripleDictionnary()
         self._triples = []
         self._indexes = {
@@ -34,7 +42,17 @@ class RDFFileConnector(DatabaseConnector):
             "pso": TripleIndex(),
             "pos": TripleIndex()
         }
-        self.__loadFromFile(file, format)
+        if not useCache:
+            self.__loadFromFile(file, format)
+        else:
+            # compute chache fingerprint
+            cacheFile = "{}.v{}.cache".format(file, hash(os.path.getmtime(file)))
+            if os.path.isfile(cacheFile):
+                self.__loadFromCache(cacheFile)
+            else:
+                self.__loadFromFile(file, format)
+                self.__purgeCache(file)
+                self.__saveToCache(cacheFile)
 
     def search_triples(self, subject, predicate, obj, limit=inf, offset=0):
         def processor(i):
@@ -60,12 +78,16 @@ class RDFFileConnector(DatabaseConnector):
 
     def from_config(config):
         """Build a RDFFileConnector from a config file"""
-        if not isfile(config["file"]):
+        if not os.path.isfile(config["file"]):
             raise Error("Configuration file not found: {}".format(config["file"]))
         return RDFFileConnector(config['file'], config['format'])
 
     def __loadFromFile(self, file, format=None):
-        if not isfile(file):
+        """
+            Load the datastructure from a RDF file.
+            If not format is provided, then rdflib is used to guess the format.
+        """
+        if not os.path.isfile(file):
             raise Error("Cannot find RDF file to load: {}".format(file))
         if format is None:
             format = guess_format(file)
@@ -82,3 +104,25 @@ class RDFFileConnector(DatabaseConnector):
             self._indexes["pso"].insert((triple[1], triple[0], triple[2]), len(self._triples))
             self._indexes["pos"].insert((triple[1], triple[2], triple[0]), len(self._triples))
             self._triples.append(triple)
+
+    def __loadFromCache(self, file):
+        """Load the datastructure from a serialized cache"""
+        with open(file, 'rb') as f:
+            data = pickle.load(f)
+            self._dictionnary = data["dictionnary"]
+            self._triples = data["triples"]
+            self._indexes = data["indexes"]
+
+    def __saveToCache(self, path):
+        """Save the datastructure using the pickle protocol"""
+        with open(path, 'wb') as f:
+            savedData = {"dictionnary": self._dictionnary, "indexes": self._indexes, "triples": self._triples}
+            pickle.dump(savedData, f, pickle.HIGHEST_PROTOCOL)
+
+    def __purgeCache(self, filename):
+        """Purge a previous version of the cache"""
+        fpattern = "{}.v*.cache".format(os.path.basename(filename))
+        dir = os.path.dirname(filename)
+        for file in os.listdir(dir):
+            if fnmatch.fnmatch(file, fpattern):
+                os.remove("{}/{}".format(dir, file))

@@ -22,7 +22,6 @@ class TripleIndex(object):
 
     def search_pattern(self, pattern, limit=inf, offset=0):
         def predicate(value):
-            # TODO this thing is buggy :-p
             if (pattern[0] > 0 and value[0] != pattern[0]):
                 return False
             if (pattern[1] > 0 and value[1] != pattern[1]):
