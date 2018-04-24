@@ -3,6 +3,7 @@
 from flask import Blueprint, request, Response, render_template, abort, json
 from query_engine.sage_engine import SageEngine
 from query_engine.optimizer.plan_builder import build_query_plan
+from http_server.schema import QueryRequest
 from http_server.utils import encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors
 from time import time
 
@@ -65,7 +66,9 @@ def sparql_blueprint(datasets):
             return json.jsonify(triples=triples, cardinality=cardinality)
 
         # else, process POST requests as SPARQL requests
-        post_query = request.get_json()
+        post_query, err = QueryRequest().load(request.get_json())
+        if err is not None and len(err) > 0:
+            return Response(data=format_marshmallow_errors(err), status=400)
         quota = int(request.args.get("quota", dataset.quota())) / 1000
         next = decode_saved_plan(post_query['next']) if 'next' in post_query else None
         # build physical query plan, then execute it with the given number of tickets
