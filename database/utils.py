@@ -1,5 +1,6 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2018
+from database.db_iterator import DBIterator
 
 
 class DoubleDict(object):
@@ -54,3 +55,24 @@ class TripleDictionnary(object):
 
     def bit_to_triple(self, s, p, o):
         return (self._subjectDict.key_get(s), self._predicateDict.key_get(p), self._objectDict.key_get(o))
+
+
+class ArrayTripleIterator(DBIterator):
+    """A ArrayTripleIterator iterates over a list of RDF triples"""
+    def __init__(self, triples, pattern, limit=0, offset=0):
+        super(ArrayTripleIterator, self).__init__(pattern, limit, offset)
+        self._triples = triples
+        self._nbReads = 0
+
+    @property
+    def nb_reads(self):
+        return self._nbReads
+
+    def next(self):
+        if len(self._triples) == 0:
+            raise StopIteration()
+        self._nbReads += 1
+        return self._triples.pop(0)
+
+    def has_next(self):
+        return len(self._triples) > 0

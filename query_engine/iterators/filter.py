@@ -8,7 +8,7 @@ from query_engine.iterators.utils import IteratorExhausted
 from string import Template
 
 
-class FilterIterator(object):
+class FilterIterator(PreemptableIterator):
     """A FilterIterator evaluates a FILTER clause on set of mappings"""
     def __init__(self, source, expression, variables):
         super(FilterIterator, self).__init__()

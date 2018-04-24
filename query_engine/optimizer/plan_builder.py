@@ -12,8 +12,9 @@ from query_engine.filter.compiler import compile_filter
 
 
 def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
+    cardinalities = []
     if savedPlan is not None:
-        return load(savedPlan, hdtDocument)
+        return load(savedPlan, hdtDocument), []
 
     optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
     filters = query['filters'] if 'filters' in query else []
@@ -22,13 +23,13 @@ def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
     if query['type'] == 'union':
         root = build_union_plan(query['patterns'], hdtDocument, projection)
     elif query['type'] == 'bgp':
-        root = build_join_plan(query['bgp'], hdtDocument, optional=optional, projection=projection)
+        root, cardinalities = build_join_plan(query['bgp'], hdtDocument, optional=optional, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
     for f in filters:
         expr, filterVars = compile_filter(f)
         root = FilterIterator(root, expr, filterVars)
-    return root
+    return root, cardinalities
 
 
 def build_union_plan(union, hdtDocument, projection=None):
@@ -54,21 +55,24 @@ def build_union_plan(union, hdtDocument, projection=None):
 
 def build_join_plan(bgp, hdtDocument, optional=None, projection=None):
     """Build a join plan between a BGP and a possible OPTIONAL clause"""
-    iterator, qVars = build_left_plan(bgp, hdtDocument)
+    iterator, qVars, cardinalities = build_left_plan(bgp, hdtDocument)
     if optional is not None:
-        iterator, qVars = build_left_plan(optional, hdtDocument, source=iterator, sourceVars=qVars, optional=True)
+        iterator, qVars, c = build_left_plan(optional, hdtDocument, source=iterator, sourceVars=qVars, optional=True)
+        cardinalities += c
     values = projection if projection is not None else qVars
-    return ProjectionIterator(iterator, values)
+    return ProjectionIterator(iterator, values), cardinalities
 
 
 def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=False):
     """Build a Left-linear tree of joins/left-joins from a BGP/OPTIONAL BGP"""
     # gather metadata about triple patterns
     triples = []
+    cardinalities = []
     iteratorConstructor = LeftNLJIterator if optional else NestedLoopJoinIterator
     for triple in bgp:
         it, c = hdtDocument.search_triples(triple['subject'], triple['predicate'], triple['object'])
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
+        cardinalities += [{'triple': triple, 'cardinality': c}]
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
     # if no input iterator provided, build a Scan with the most selective pattern
@@ -90,4 +94,4 @@ def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=Fal
             pos = 0
         acc = iteratorConstructor(acc, pattern['triple'], hdtDocument)
         triples.pop(pos)
-    return acc, queryVariables
+    return acc, queryVariables, cardinalities

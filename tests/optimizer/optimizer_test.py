@@ -28,7 +28,7 @@ def test_empty_patterns():
         'type': 'bgp',
         'bgp': bgp
     }
-    plan = build_query_plan(query, hdtDoc)
+    plan, c = build_query_plan(query, hdtDoc)
     assert not plan.has_next()
 
 
@@ -49,7 +49,7 @@ def test_build_left_linear_plan():
         'type': 'bgp',
         'bgp': bgp
     }
-    plan = build_query_plan(query, hdtDoc)
+    plan, c = build_query_plan(query, hdtDoc)
     assert type(plan) is ProjectionIterator
     assert type(plan._source) is NestedLoopJoinIterator
     assert plan._source._innerTriple == bgp[1]
@@ -77,7 +77,7 @@ def test_build_union():
             ]
         ]
     }
-    plan = build_query_plan(query, hdtDoc)
+    plan, c = build_query_plan(query, hdtDoc)
     assert type(plan) is BagUnionIterator
 
 
@@ -98,8 +98,9 @@ def test_load_from_savedPlan():
         'type': 'bgp',
         'bgp': bgp
     }
-    savedPlan = build_query_plan(query, hdtDoc).save()
-    plan = build_query_plan(None, hdtDoc, savedPlan)
+    plan, c = build_query_plan(query, hdtDoc)
+    savedPlan = plan.save()
+    plan, c = build_query_plan(None, hdtDoc, savedPlan)
     assert type(plan) is ProjectionIterator
     assert type(plan._source) is NestedLoopJoinIterator
     assert plan._source._innerTriple == bgp[1]

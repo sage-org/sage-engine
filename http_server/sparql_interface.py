@@ -44,13 +44,13 @@ def sparql_blueprint(datasets):
         next = decode_saved_plan(post_query['next']) if 'next' in post_query else None
         # build physical query plan, then execute it with the given number of tickets
         start = time()
-        plan = build_query_plan(post_query['query'], dataset, next)
+        plan, cardinalities = build_query_plan(post_query['query'], dataset, next)
         loadingTime = (time() - start) * 1000
         bindings, savedPlan, isDone = engine.execute(plan, quota)
         # compute controls for the next page
         start = time()
         nextPage = encode_saved_plan(savedPlan) if not isDone else None
         exportTime = (time() - start) * 1000
-        stats = {'import': loadingTime, 'export': exportTime}
+        stats = {'cardinalities': cardinalities, 'import': loadingTime, 'export': exportTime}
         return json.jsonify(bindings=bindings, pageSize=len(bindings), hasNext=not isDone, next=nextPage, stats=stats)
     return sparql_blueprint

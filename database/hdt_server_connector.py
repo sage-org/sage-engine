@@ -1,33 +1,35 @@
 # fragment_factory.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from database.fragment_factory import FragmentFactory
+from database.db_connector import DatabaseConnector
+from database.utils import ArrayTripleIterator
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from rdflib import Graph
 from requests import Session
 
 
-class HDTServerFactory(FragmentFactory):
-    """A HDTServerFactory builds LDF fragments from a remote HDT server.
+class HDTServerConnector(DatabaseConnector):
+    """A HDTServerConnector evaluates triple patterns using a remote HDT server
     HDT-server: https://github.com/MaestroGraph/HDT-Server
     Example live server: http://hdt.lod.labs.vu.nl with 2 graphs (Wikidata and LOD-a-lot)
     """
 
-    def __init__(self, url, graph, triplesPerPage=100):
+    def __init__(self, url, graph, pageSize=500):
+        super(HDTServerConnector, self).__init__()
         # use a Session for HTTP polling
         self._session = Session()
         self._session.headers.update({
-            'user-agent': 'YALDF (Yet Another LDF Server)/1.0.0',
+            'user-agent': 'SaGe query engine/HDTServerConnector/1.0.0',
             'accept_encoding': 'gzip, deflate',
             'accept': 'application/n-triples'
         })
         self._url = url
         self._parsed_url = urlparse(url)
         self._graph = graph
-        self._triplesPerPage = triplesPerPage
-        self._baseQueryParams = dict(graph=self._graph, page_size=self._triplesPerPage)
+        self._pageSize = pageSize
+        self._baseQueryParams = dict(graph=self._graph, page_size=self._pageSize)
 
     def get_triples(self, subject, predicate, obj, page=1):
-        graph = Graph()
+        g = Graph()
         # build query params (subject, predicate, object, graph and page)
         queryParams = dict(page=page)
         if subject is not None:
@@ -48,11 +50,14 @@ class HDTServerFactory(FragmentFactory):
         countRequest = self._session.get(countURL, headers={'accept': 'application/json'})
         # load data fetched throught HTTP requests
         cardinality = int(countRequest.content)
+        print(tripleRequest.content)
         # WARNING: http://hdt.lod.labs.vu.nl returns invalid URI, like <AO-00023>, which breaks rdflib parser
-        graph.parse(data=tripleRequest.content, format="nt")
-        return (graph, cardinality)
+        return (None, cardinality)
+        # graph.parse(data=tripleRequest.content, format="nt")
+        # return (sorted(list(graph.triples())), cardinality)
 
     def from_config(config):
-        """Build a HDTServerFactory from a config file"""
+        """Build a HDTServerConnector from a config file"""
         # TODO add safeguard
-        return HDTServerFactory(config['url'], config['graph'], config['pageSize'])
+        pageSize = config['pageSize'] if 'pageSize' in config else 500
+        return HDTServerConnector(config['url'], config['graph'], pageSize=pageSize)
