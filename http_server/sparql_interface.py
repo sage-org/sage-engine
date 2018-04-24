@@ -7,6 +7,17 @@ from http_server.utils import encode_saved_plan, decode_saved_plan, secure_url, 
 from time import time
 
 
+def make_response(bindings, pageSize, nextLink, stats):
+    res = {
+        "bindings": bindings,
+        "pageSize": pageSize,
+        "hasNext": nextLink is not None,
+        "next": nextLink,
+        "stats": stats
+    }
+    return res
+
+
 def sparql_blueprint(datasets):
     """Get a Blueprint that implement a SPARQL interface with quota on /sparql/<dataset-name>"""
     sparql_blueprint = Blueprint('sparql-interface', __name__)
@@ -52,5 +63,5 @@ def sparql_blueprint(datasets):
         nextPage = encode_saved_plan(savedPlan) if not isDone else None
         exportTime = (time() - start) * 1000
         stats = {'cardinalities': cardinalities, 'import': loadingTime, 'export': exportTime}
-        return json.jsonify(bindings=bindings, pageSize=len(bindings), hasNext=not isDone, next=nextPage, stats=stats)
+        return json.jsonify(make_response(bindings, len(bindings), nextPage, stats))
     return sparql_blueprint
