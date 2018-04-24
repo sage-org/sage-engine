@@ -12,17 +12,21 @@
         <tr>
           <th>Dataset</th>
           <th>Description</th>
+          <th>Time quota (ms)</th>
+          <th>SPARQL interface</th>
         </tr>
       </thead>
       <tbody>
-        {% for dataset in datasets %}
+        {% for dataset in api["supportedClass"] %}
         <tr>
           <td>
             <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["name"]) }}">
-              {{ dataset["name"] }}
+              {{ dataset["title"] }}
             </a>
           </td>
-          <td>{{dataset['description']}}</td>
+          <td>{{dataset["description"]}}</td>
+          <td>{{dataset["timeQuota"]}}</td>
+          <td><a href="{{ dataset['@id'] }}">{{ dataset['@id'] }}</a></td>
         </tr>
         {% endfor %}
       </tbody>

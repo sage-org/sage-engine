@@ -44,6 +44,40 @@ class Dataset(object):
         """
         return self._connector.search_triples(subject, predicate, obj, limit, offset)
 
+    def describe(self, url):
+        """Describe the Dataset API using the Hydra spec"""
+        description = {
+            "@type": "Class",
+            "@id": "{}sparql/{}".format(url, self._config["name"]),
+            "title": self._config["name"],
+            "description": self._config["description"],
+            "timeQuota": self.quota(),
+            "supportedOperation": [
+                {
+                    "@type": "Operation",
+                    "title": "Evaluate a SPARQL query",
+                    "method": "POST"
+                }
+            ],
+            "supportedProperty": [
+                {
+                    "@type": "SupportedProperty",
+                    "property": "#query",
+                    "required": True,
+                    "readable": True,
+                    "writable": True
+                },
+                {
+                    "@type": "SupportedProperty",
+                    "property": "#next",
+                    "required": False,
+                    "readable": True,
+                    "writable": True
+                }
+            ]
+        }
+        return description
+
 
 def load_config(config_file="config.yaml"):
     """Load config file to initialize fragment factories.
@@ -85,6 +119,11 @@ class DatasetCollection(object):
         super(DatasetCollection, self).__init__()
         self._config_file = config_file
         (self._config, self._datasets) = load_config(self._config_file)
+
+    def describe(self, url):
+        """Gives a generator over dataset descriptions"""
+        for name, dataset in self._datasets.items():
+            yield dataset.describe(url)
 
     def get_dataset(self, dataset_name):
         """Get a dataset given its name"""

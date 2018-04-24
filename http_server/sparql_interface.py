@@ -24,8 +24,23 @@ def sparql_blueprint(datasets):
 
     @sparql_blueprint.route('/sparql/', methods=["GET"])
     def sparql_index():
+        mimetype = request.accept_mimetypes.best_match(['application/json', 'text/html'])
         datasets_infos = datasets._config["datasets"]
-        return render_template("index_sage.html", datasets=datasets_infos)
+        url = secure_url(request.url_root)
+        apiDescription = {
+            "@context": "http://www.w3.org/ns/hydra/context.jsonld",
+            "@id": url,
+            "@type": "ApiDocumentation",
+            "title": "SaGe SPARQL API",
+            "description": "A SaGe interface which allow evaluation of SPARQL queries over RDF datasets",
+            "entrypoint": "{}sparql".format(url),
+            "supportedClass": []
+        }
+        for dinfo in datasets.describe(url):
+            apiDescription["supportedClass"].append(dinfo)
+        if mimetype is 'text/html':
+            return render_template("index_sage.html", api=apiDescription)
+        return json.jsonify(apiDescription)
 
     @sparql_blueprint.route('/sparql/<dataset_name>', methods=['GET', 'POST'])
     def sparql_query(dataset_name):
