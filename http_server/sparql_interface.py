@@ -68,7 +68,7 @@ def sparql_blueprint(datasets):
         # else, process POST requests as SPARQL requests
         post_query, err = QueryRequest().load(request.get_json())
         if err is not None and len(err) > 0:
-            return Response(data=format_marshmallow_errors(err), status=400)
+            return Response(format_marshmallow_errors(err), status=400)
         quota = int(request.args.get("quota", dataset.quota())) / 1000
         next = decode_saved_plan(post_query['next']) if 'next' in post_query else None
         # build physical query plan, then execute it with the given number of tickets

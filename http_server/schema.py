@@ -50,4 +50,4 @@ class SparqlQuerySchema(Schema):
 class QueryRequest(Schema):
     """Marshmallow schema for a query to SaGe SPARQL API"""
     query = fields.Nested(SparqlQuerySchema, required=True)
-    next = fields.Str(required=False)
+    next = fields.Str(required=False, allow_none=True)
