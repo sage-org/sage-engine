@@ -46,6 +46,7 @@ class TestBGPInterface(object):
         pass
 
     @pytest.mark.parametrize("body,cardinality,calls", bgp_queries)
+    @pytest.mark.skip(reason="Optional support is currently disabled")
     def test_bgp_interface(self, body, cardinality, calls):
         query = body
         nbResults = 0

@@ -16,14 +16,14 @@ def build_query_plan(query, db_connector, saved_plan=None, projection=None):
     if saved_plan is not None:
         return load(saved_plan, db_connector), []
 
-    optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
+    # optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
     filters = query['filters'] if 'filters' in query else []
     root = None
 
     if query['type'] == 'union':
         root = build_union_plan(query['patterns'], db_connector, projection)
     elif query['type'] == 'bgp':
-        root, cardinalities = build_join_plan(query['bgp'], db_connector, optional=optional, projection=projection)
+        root, cardinalities = build_join_plan(query['bgp'], db_connector, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
     for f in filters:
@@ -53,22 +53,21 @@ def build_union_plan(union, db_connector, projection=None):
     return sources[0]
 
 
-def build_join_plan(bgp, db_connector, optional=None, projection=None):
+def build_join_plan(bgp, db_connector, projection=None):
     """Build a join plan between a BGP and a possible OPTIONAL clause"""
     iterator, query_vars, cardinalities = build_left_plan(bgp, db_connector)
-    if optional is not None:
-        iterator, query_vars, c = build_left_plan(optional, db_connector, source=iterator, base_vars=query_vars, optional=True)
-        cardinalities += c
+    # if optional is not None:
+    #     iterator, query_vars, c = build_left_plan(optional, db_connector, source=iterator, base_vars=query_vars, optional=True)
+    #     cardinalities += c
     values = projection if projection is not None else query_vars
     return ProjectionIterator(iterator, values), cardinalities
 
 
-def build_left_plan(bgp, db_connector, source=None, base_vars=None, optional=False):
+def build_left_plan(bgp, db_connector, source=None, base_vars=None):
     """Build a Left-linear tree of joins/left-joins from a BGP/OPTIONAL BGP"""
     # gather metadata about triple patterns
     triples = []
     cardinalities = []
-    iter_constructor = LeftNLJIterator if optional else NestedLoopJoinIterator
     for triple in bgp:
         it, c = db_connector.search_triples(triple['subject'], triple['predicate'], triple['object'])
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
@@ -92,6 +91,6 @@ def build_left_plan(bgp, db_connector, source=None, base_vars=None, optional=Fal
             pattern = triples[0]
             query_vars = query_vars | get_vars(pattern['triple'])
             pos = 0
-        acc = iter_constructor(acc, pattern['triple'], db_connector)
+        acc = NestedLoopJoinIterator(acc, pattern['triple'], db_connector)
         triples.pop(pos)
     return acc, query_vars, cardinalities
