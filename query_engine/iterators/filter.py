@@ -21,6 +21,9 @@ class FilterIterator(PreemptableIterator):
     def __repr__(self):
         return "<FilterIterator '{}' (variables: {}) on {}>".format(self._expression, self._variables, self._source)
 
+    def serialized_name(self):
+        return "filter"
+
     def _evaluate(self, bindings):
         b = dict(self._baseBindings)
         for key, value in bindings.items():
@@ -41,11 +44,9 @@ class FilterIterator(PreemptableIterator):
 
     def save(self):
         """Save and serialize the iterator as a machine-readable format"""
-        savedFilter = SavedFilterIterator()
-        if type(self._source) is FilterIterator:
-            savedFilter.filter_source.CopyFrom(self._source.save())
-        else:
-            savedFilter.proj_source.CopyFrom(self._source.save())
-        savedFilter.expression = self._expression
-        savedFilter.variables.extend(self._variables)
-        return savedFilter
+        saved_filter = SavedFilterIterator()
+        source_field = self._source.serialized_name() + '_source'
+        getattr(saved_filter, source_field).CopyFrom(self._source.save())
+        saved_filter.expression = self._expression
+        saved_filter.variables.extend(self._variables)
+        return saved_filter

@@ -28,6 +28,9 @@ class ScanIterator(PreemptableIterator):
     def __repr__(self):
         return "<ScanIterator { %s %s %s } OFFSET %i>" % (self._triple['subject'], self._triple['predicate'], self._triple['object'], self._source.offset)
 
+    def serialized_name(self):
+        return "scan"
+
     @property
     def nb_reads(self):
         return self._source.nb_reads

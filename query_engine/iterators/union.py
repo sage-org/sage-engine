@@ -15,6 +15,9 @@ class BagUnionIterator(PreemptableIterator):
     def __repr__(self):
         return '<BagUnionIterator {%s} UNION {%s}>' % (self._left, self._right)
 
+    def serialized_name(self):
+        return "union"
+
     def has_next(self):
         return self._left.has_next() or self._right.has_next()
 
@@ -32,22 +35,12 @@ class BagUnionIterator(PreemptableIterator):
     def save(self):
         """Save and serialize the iterator as a machine-readable format"""
         savedUnion = SavedBagUnionIterator()
-        savedLeft = self._left.save()
-        savedRight = self._right.save()
         # export left source
-        if type(self._left).__name__ == 'ProjectionIterator':
-            savedUnion.proj_left.CopyFrom(savedLeft)
-        elif type(self._left).__name__ == 'BagUnionIterator':
-            savedUnion.union_left.CopyFrom(savedLeft)
-        else:
-            raise Exception("Unknown left source type for BagUnion")
+        left_field = self._source.serialized_name() + '_left'
+        getattr(savedUnion, left_field).CopyFrom(self._left.save())
         # export right source
-        if type(self._right).__name__ == 'ProjectionIterator':
-            savedUnion.proj_right.CopyFrom(savedRight)
-        elif type(self._right).__name__ == 'BagUnionIterator':
-            savedUnion.union_right.CopyFrom(savedRight)
-        else:
-            raise Exception("Unknown right source type for BagUnion")
+        right_field = self._source.serialized_name() + '_right'
+        getattr(savedUnion, right_field).CopyFrom(self._right.save())
         return savedUnion
 
 

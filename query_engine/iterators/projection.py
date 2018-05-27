@@ -15,6 +15,9 @@ class ProjectionIterator(PreemptableIterator):
     def __repr__(self):
         return '<ProjectionIterator SELECT %s FROM { %s }>' % (self._values, self._source)
 
+    def serialized_name(self):
+        return "proj"
+
     def has_next(self):
         return self._source.has_next()
 
@@ -31,15 +34,17 @@ class ProjectionIterator(PreemptableIterator):
 
     def save(self):
         """Save and serialize the iterator as a machine-readable format"""
-        savedOp = SavedProjectionIterator()
-        savedOp.values.extend(self._values)
+        saved_proj = SavedProjectionIterator()
+        saved_proj.values.extend(self._values)
         source = self._source.save()
-        if type(self._source).__name__ == 'ScanIterator':
-            savedOp.scan_source.CopyFrom(source)
-        elif type(self._source).__name__ == 'NestedLoopJoinIterator' or type(self._source).__name__ == 'LeftNLJIterator':
-            savedOp.nlj_source.CopyFrom(source)
-        elif type(self._source).__name__ == 'BagUnionIterator':
-            savedOp.union_source.CopyFrom(source)
-        else:
-            raise Exception("Unknown source type for ProjectionIterator")
-        return savedOp
+        source_field = self._source.serialized_name() + '_source'
+        getattr(saved_proj, source_field).CopyFrom(self._source.save())
+        # if type(self._source).__name__ == 'ScanIterator':
+        #     saved_proj.scan_source.CopyFrom(source)
+        # elif type(self._source).__name__ == 'NestedLoopJoinIterator' or type(self._source).__name__ == 'LeftNLJIterator':
+        #     saved_proj.nlj_source.CopyFrom(source)
+        # elif type(self._source).__name__ == 'BagUnionIterator':
+        #     saved_proj.union_source.CopyFrom(source)
+        # else:
+        #     raise Exception("Unknown source type for ProjectionIterator")
+        return saved_proj

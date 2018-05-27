@@ -33,6 +33,9 @@ class NestedLoopJoinIterator(PreemptableIterator):
     def __repr__(self):
         return "<NestedLoopJoinIterator (%s JOIN {%s %s %s})>" % (str(self._source), self._innerTriple['subject'], self._innerTriple['predicate'], self._innerTriple['object'])
 
+    def serialized_name(self):
+        return "nlj"
+
     @property
     def currentBinding(self):
         return self._currentBinding
@@ -69,10 +72,10 @@ class NestedLoopJoinIterator(PreemptableIterator):
     def save(self):
         """Save the operator using protobuf"""
         savedJoin = SavedNestedLoopJoinIterator()
-        if type(self._source).__name__ == 'ScanIterator':
-            savedJoin.scan_source.CopyFrom(self._source.save())
-        elif type(self._source).__name__ == 'NestedLoopJoinIterator' or type(self._source).__name__ == 'LeftNLJIterator':
-            savedJoin.nlj_source.CopyFrom(self._source.save())
+        # save source operator
+        source_field = self._source.serialized_name() + '_source'
+        getattr(savedJoin, source_field).CopyFrom(self._source.save())
+        # save inner join
         inner = TriplePattern()
         inner.subject = self._innerTriple['subject']
         inner.predicate = self._innerTriple['predicate']
