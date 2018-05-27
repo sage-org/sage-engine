@@ -44,16 +44,16 @@ class RDFFileConnector(DatabaseConnector):
             "pos": TripleIndex()
         }
         if not useCache:
-            self.__loadFromFile(file, format)
+            self.__load_from_file(file, format)
         else:
             # compute chache fingerprint
             cacheFile = "{}.v{}.cache".format(file, hash(os.path.getmtime(file)))
             if os.path.isfile(cacheFile):
-                self.__loadFromCache(cacheFile)
+                self.__load_from_cache(cacheFile)
             else:
-                self.__loadFromFile(file, format)
-                self.__purgeCache(file)
-                self.__saveToCache(cacheFile)
+                self.__load_from_file(file, format)
+                self.__purge_cache(file)
+                self.__save_to_cache(cacheFile)
 
     def search_triples(self, subject, predicate, obj, limit=inf, offset=0):
         def processor(i):
@@ -83,7 +83,7 @@ class RDFFileConnector(DatabaseConnector):
             raise Error("Configuration file not found: {}".format(config["file"]))
         return RDFFileConnector(config['file'], config['format'])
 
-    def __loadFromFile(self, file, format=None):
+    def __load_from_file(self, file, format=None):
         """
             Load the datastructure from a RDF file.
             If not format is provided, then rdflib is used to guess the format.
@@ -106,7 +106,7 @@ class RDFFileConnector(DatabaseConnector):
             self._indexes["pos"].insert((triple[1], triple[2], triple[0]), len(self._triples))
             self._triples.append(triple)
 
-    def __loadFromCache(self, file):
+    def __load_from_cache(self, file):
         """Load the datastructure from a serialized cache"""
         with open(file, 'rb') as f:
             data = pickle.load(f)
@@ -114,13 +114,13 @@ class RDFFileConnector(DatabaseConnector):
             self._triples = data["triples"]
             self._indexes = data["indexes"]
 
-    def __saveToCache(self, path):
+    def __save_to_cache(self, path):
         """Save the datastructure using the pickle protocol"""
         with open(path, 'wb') as f:
             savedData = {"dictionary": self._dictionary, "indexes": self._indexes, "triples": self._triples}
             pickle.dump(savedData, f, pickle.HIGHEST_PROTOCOL)
 
-    def __purgeCache(self, filename):
+    def __purge_cache(self, filename):
         """Purge a previous version of the cache"""
         fpattern = "{}.v*.cache".format(os.path.basename(filename))
         dir = os.path.dirname(filename)

@@ -11,19 +11,19 @@ from query_engine.optimizer.utils import find_connected_pattern, get_vars
 from query_engine.filter.compiler import compile_filter
 
 
-def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
+def build_query_plan(query, db_connector, saved_plan=None, projection=None):
     cardinalities = []
-    if savedPlan is not None:
-        return load(savedPlan, hdtDocument), []
+    if saved_plan is not None:
+        return load(saved_plan, db_connector), []
 
     optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
     filters = query['filters'] if 'filters' in query else []
     root = None
 
     if query['type'] == 'union':
-        root = build_union_plan(query['patterns'], hdtDocument, projection)
+        root = build_union_plan(query['patterns'], db_connector, projection)
     elif query['type'] == 'bgp':
-        root, cardinalities = build_join_plan(query['bgp'], hdtDocument, optional=optional, projection=projection)
+        root, cardinalities = build_join_plan(query['bgp'], db_connector, optional=optional, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
     for f in filters:
@@ -32,7 +32,7 @@ def build_query_plan(query, hdtDocument, savedPlan=None, projection=None):
     return root, cardinalities
 
 
-def build_union_plan(union, hdtDocument, projection=None):
+def build_union_plan(union, db_connector, projection=None):
     """Build a Bushy tree of Unions, where leaves are BGPs, from a list of BGPS"""
 
     def chunks(l, n):
@@ -45,7 +45,7 @@ def build_union_plan(union, hdtDocument, projection=None):
         if len(duo) == 1:
             return duo[0]
         return BagUnionIterator(duo[0], duo[1])
-    sources = [build_left_plan(bgp, hdtDocument) for bgp in union]
+    sources = [build_left_plan(bgp, db_connector) for bgp in union]
     if len(sources) == 1:
         return sources[0]
     while len(sources) > 1:
@@ -53,24 +53,24 @@ def build_union_plan(union, hdtDocument, projection=None):
     return sources[0]
 
 
-def build_join_plan(bgp, hdtDocument, optional=None, projection=None):
+def build_join_plan(bgp, db_connector, optional=None, projection=None):
     """Build a join plan between a BGP and a possible OPTIONAL clause"""
-    iterator, qVars, cardinalities = build_left_plan(bgp, hdtDocument)
+    iterator, query_vars, cardinalities = build_left_plan(bgp, db_connector)
     if optional is not None:
-        iterator, qVars, c = build_left_plan(optional, hdtDocument, source=iterator, sourceVars=qVars, optional=True)
+        iterator, query_vars, c = build_left_plan(optional, db_connector, source=iterator, base_vars=query_vars, optional=True)
         cardinalities += c
-    values = projection if projection is not None else qVars
+    values = projection if projection is not None else query_vars
     return ProjectionIterator(iterator, values), cardinalities
 
 
-def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=False):
+def build_left_plan(bgp, db_connector, source=None, base_vars=None, optional=False):
     """Build a Left-linear tree of joins/left-joins from a BGP/OPTIONAL BGP"""
     # gather metadata about triple patterns
     triples = []
     cardinalities = []
-    iteratorConstructor = LeftNLJIterator if optional else NestedLoopJoinIterator
+    iter_constructor = LeftNLJIterator if optional else NestedLoopJoinIterator
     for triple in bgp:
-        it, c = hdtDocument.search_triples(triple['subject'], triple['predicate'], triple['object'])
+        it, c = db_connector.search_triples(triple['subject'], triple['predicate'], triple['object'])
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
         cardinalities += [{'triple': triple, 'cardinality': c}]
     # sort triples by ascending cardinality
@@ -79,19 +79,19 @@ def build_left_plan(bgp, hdtDocument, source=None, sourceVars=None, optional=Fal
     if source is None:
         pattern = triples.pop(0)
         acc = ScanIterator(pattern['iterator'], pattern['triple'], pattern['cardinality'])
-        queryVariables = get_vars(pattern['triple'])
+        query_vars = get_vars(pattern['triple'])
     else:
         pattern = None
         acc = source
-        queryVariables = sourceVars
+        query_vars = base_vars
     # build the left linear tree
     while len(triples) > 0:
-        pattern, pos, queryVariables = find_connected_pattern(queryVariables, triples)
+        pattern, pos, query_vars = find_connected_pattern(query_vars, triples)
         # no connected pattern = disconnected BGP => pick the first remaining pattern in the BGP
         if pattern is None:
             pattern = triples[0]
-            queryVariables = queryVariables | get_vars(pattern['triple'])
+            query_vars = query_vars | get_vars(pattern['triple'])
             pos = 0
-        acc = iteratorConstructor(acc, pattern['triple'], hdtDocument)
+        acc = iter_constructor(acc, pattern['triple'], db_connector)
         triples.pop(pos)
-    return acc, queryVariables, cardinalities
+    return acc, query_vars, cardinalities

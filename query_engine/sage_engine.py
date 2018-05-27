@@ -41,21 +41,23 @@ class SageEngine(object):
         results = list()
         queue = Queue()
         loop = get_event_loop()
-        done = False
+        query_done = False
         try:
             task = wait_for(executor(plan, queue), timeout=quota)
             loop.run_until_complete(task)
-            done = True
+            query_done = True
         except asyncTimeoutError as e:
             pass
         finally:
             while not queue.empty():
                 results.append(queue.get_nowait())
         root = RootTree()
+        # source_field = plan.serialized_name() + '_source'
+        # getattr(root, source_field).CopyFrom(self._source.save())
         if type(plan) is ProjectionIterator:
             root.proj_source.CopyFrom(plan.save())
         elif type(plan) is BagUnionIterator:
             root.union_source.CopyFrom(plan.save())
         elif type(plan) is FilterIterator:
             root.filter_source.CopyFrom(plan.save())
-        return (results, root, done)
+        return (results, root, query_done)

@@ -3,11 +3,11 @@
 from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStatistics, SageResponse
 
 
-def protobuf(bindings, nextPage, stats):
+def protobuf(bindings, next_page, stats):
     sageResponse = SageResponse()
-    sageResponse.hasNext = nextPage is not None
-    if nextPage is not None:
-        sageResponse.next = nextPage
+    sageResponse.hasNext = next_page is not None
+    if next_page is not None:
+        sageResponse.next = next_page
     # register bindings
     for binding in bindings:
         bag = BindingBag()
@@ -25,12 +25,12 @@ def protobuf(bindings, nextPage, stats):
     return sageResponse.SerializeToString()
 
 
-def json(bindings, pageSize, nextLink, stats):
+def json(bindings, page_size, next_link, stats):
     res = {
         "bindings": bindings,
-        "pageSize": pageSize,
-        "hasNext": nextLink is not None,
-        "next": nextLink,
+        "pageSize": page_size,
+        "hasNext": next_link is not None,
+        "next": next_link,
         "stats": stats
     }
     return res

@@ -71,23 +71,23 @@ class NestedLoopJoinIterator(PreemptableIterator):
 
     def save(self):
         """Save the operator using protobuf"""
-        savedJoin = SavedNestedLoopJoinIterator()
+        saved_join = SavedNestedLoopJoinIterator()
         # save source operator
         source_field = self._source.serialized_name() + '_source'
-        getattr(savedJoin, source_field).CopyFrom(self._source.save())
+        getattr(saved_join, source_field).CopyFrom(self._source.save())
         # save inner join
         inner = TriplePattern()
         inner.subject = self._innerTriple['subject']
         inner.predicate = self._innerTriple['predicate']
         inner.object = self._innerTriple['object']
-        savedJoin.inner.CopyFrom(inner)
+        saved_join.inner.CopyFrom(inner)
         if self._currentBinding is not None:
-            pyDict_to_protoDict(self._currentBinding, savedJoin.muc)
+            pyDict_to_protoDict(self._currentBinding, saved_join.muc)
         if self._currentIter is not None:
-            savedJoin.offset = self._currentIter.offset + self._currentIter.nb_reads
+            saved_join.offset = self._currentIter.offset + self._currentIter.nb_reads
         else:
-            savedJoin.offset = 0
-        return savedJoin
+            saved_join.offset = 0
+        return saved_join
 
 
 class LeftNLJIterator(NestedLoopJoinIterator):
@@ -111,6 +111,6 @@ class LeftNLJIterator(NestedLoopJoinIterator):
         return {**self._currentBinding, **mu}
 
     def save(self):
-        savedJoin = super().save()
-        savedJoin.optional = True
-        return savedJoin
+        saved_join = super().save()
+        saved_join.optional = True
+        return saved_join

@@ -18,7 +18,7 @@ def sparql_blueprint(datasets):
         mimetype = request.accept_mimetypes.best_match(["application/octet-stream", "application/json", "text/html"])
         datasets_infos = datasets._config["datasets"]
         url = secure_url(request.url_root)
-        apiDescription = {
+        api_doc = {
             "@context": "http://www.w3.org/ns/hydra/context.jsonld",
             "@id": url,
             "@type": "ApiDocumentation",
@@ -28,10 +28,10 @@ def sparql_blueprint(datasets):
             "supportedClass": []
         }
         for dinfo in datasets.describe(url):
-            apiDescription["supportedClass"].append(dinfo)
+            api_doc["supportedClass"].append(dinfo)
         if mimetype is "text/html":
-            return render_template("index_sage.html", api=apiDescription)
-        return json.jsonify(apiDescription)
+            return render_template("index_sage.html", api=api_doc)
+        return json.jsonify(api_doc)
 
     @sparql_blueprint.route("/sparql/<dataset_name>", methods=["GET", "POST"])
     def sparql_query(dataset_name):
@@ -64,14 +64,14 @@ def sparql_blueprint(datasets):
         # build physical query plan, then execute it with the given number of tickets
         start = time()
         plan, cardinalities = build_query_plan(post_query["query"], dataset, next)
-        loadingTime = (time() - start) * 1000
-        bindings, savedPlan, isDone = engine.execute(plan, quota)
+        loading_time = (time() - start) * 1000
+        bindings, saved_plan, isDone = engine.execute(plan, quota)
         # compute controls for the next page
         start = time()
-        nextPage = encode_saved_plan(savedPlan) if not isDone else None
+        next_page = encode_saved_plan(saved_plan) if not isDone else None
         exportTime = (time() - start) * 1000
-        stats = {"cardinalities": cardinalities, "import": loadingTime, "export": exportTime}
+        stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
         if mimetype == "application/octet-stream":
-            return responses.protobuf(bindings, nextPage, stats)
-        return json.jsonify(responses.json(bindings, len(bindings), nextPage, stats))
+            return responses.protobuf(bindings, next_page, stats)
+        return json.jsonify(responses.json(bindings, len(bindings), next_page, stats))
     return sparql_blueprint
