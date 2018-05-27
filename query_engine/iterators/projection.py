@@ -39,12 +39,4 @@ class ProjectionIterator(PreemptableIterator):
         source = self._source.save()
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_proj, source_field).CopyFrom(self._source.save())
-        # if type(self._source).__name__ == 'ScanIterator':
-        #     saved_proj.scan_source.CopyFrom(source)
-        # elif type(self._source).__name__ == 'NestedLoopJoinIterator' or type(self._source).__name__ == 'LeftNLJIterator':
-        #     saved_proj.nlj_source.CopyFrom(source)
-        # elif type(self._source).__name__ == 'BagUnionIterator':
-        #     saved_proj.union_source.CopyFrom(source)
-        # else:
-        #     raise Exception("Unknown source type for ProjectionIterator")
         return saved_proj

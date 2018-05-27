@@ -9,69 +9,69 @@ from query_engine.protobuf.utils import protoTriple_to_dict
 from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedNestedLoopJoinIterator, SavedBagUnionIterator, SavedFilterIterator
 
 
-def load(protoMsg, hdtDocument):
+def load(protoMsg, db_connector):
     """Load a preemptable physical query execution plan from a saved state"""
-    savedPlan = protoMsg
+    saved_plan = protoMsg
     if isinstance(protoMsg, bytes):
         root = RootTree()
         root.ParseFromString(protoMsg)
         sourceField = root.WhichOneof('source')
-        savedPlan = getattr(root, sourceField)
-    if type(savedPlan) is SavedFilterIterator:
-        return load_filter(savedPlan, hdtDocument)
-    if type(savedPlan) is SavedProjectionIterator:
-        return load_projection(savedPlan, hdtDocument)
-    elif type(savedPlan) is SavedScanIterator:
-        return load_scan(savedPlan, hdtDocument)
-    elif type(savedPlan) is SavedNestedLoopJoinIterator:
-        return load_nlj(savedPlan, hdtDocument)
-    if type(savedPlan) is SavedBagUnionIterator:
-        return load_union(savedPlan, hdtDocument)
+        saved_plan = getattr(root, sourceField)
+    if type(saved_plan) is SavedFilterIterator:
+        return load_filter(saved_plan, db_connector)
+    if type(saved_plan) is SavedProjectionIterator:
+        return load_projection(saved_plan, db_connector)
+    elif type(saved_plan) is SavedScanIterator:
+        return load_scan(saved_plan, db_connector)
+    elif type(saved_plan) is SavedNestedLoopJoinIterator:
+        return load_nlj(saved_plan, db_connector)
+    if type(saved_plan) is SavedBagUnionIterator:
+        return load_union(saved_plan, db_connector)
     else:
-        raise Exception('Unknown iterator type "%s" when loading controls' % type(savedPlan))
+        raise Exception('Unknown iterator type "%s" when loading controls' % type(saved_plan))
 
 
-def load_projection(savedPlan, hdtDocument):
+def load_projection(saved_plan, db_connector):
     """Load a ProjectionIterator from a protobuf serialization"""
-    sourceField = savedPlan.WhichOneof('source')
-    source = load(getattr(savedPlan, sourceField), hdtDocument)
-    values = savedPlan.values if len(savedPlan.values) > 0 else None
+    sourceField = saved_plan.WhichOneof('source')
+    source = load(getattr(saved_plan, sourceField), db_connector)
+    values = saved_plan.values if len(saved_plan.values) > 0 else None
     return ProjectionIterator(source, values)
 
 
-def load_filter(savedPlan, hdtDocument):
+def load_filter(saved_plan, db_connector):
     """Load a FilterIterator from a protobuf serialization"""
-    sourceField = savedPlan.WhichOneof('source')
-    source = load(getattr(savedPlan, sourceField), hdtDocument)
-    return FilterIterator(source, savedPlan.expression, savedPlan.variables)
+    sourceField = saved_plan.WhichOneof('source')
+    source = load(getattr(saved_plan, sourceField), db_connector)
+    return FilterIterator(source, saved_plan.expression, saved_plan.variables)
 
 
-def load_scan(savedPlan, hdtDocument):
+def load_scan(saved_plan, db_connector):
     """Load a ScanIterator from a protobuf serialization"""
-    triple = savedPlan.triple
+    triple = saved_plan.triple
     s, p, o = (triple.subject, triple.predicate, triple.object)
-    iterator, card = hdtDocument.search_triples(s, p, o, offset=int(savedPlan.offset))
-    return ScanIterator(iterator, protoTriple_to_dict(triple), savedPlan.cardinality)
+    iterator, card = db_connector.search_triples(s, p, o, offset=int(saved_plan.offset))
+    return ScanIterator(iterator, protoTriple_to_dict(triple), saved_plan.cardinality)
 
 
-def load_nlj(savedPlan, hdtDocument):
+def load_nlj(saved_plan, db_connector):
     """Load a NestedLoopJoinIterator from a protobuf serialization"""
     currentBinding = None
-    sourceField = savedPlan.WhichOneof('source')
-    source = load(getattr(savedPlan, sourceField), hdtDocument)
-    innerTriple = protoTriple_to_dict(savedPlan.inner)
-    if len(savedPlan.muc) > 0:
-        currentBinding = savedPlan.muc
-    iterOffset = savedPlan.offset
-    if savedPlan.optional:
-        return LeftNLJIterator(source, innerTriple, hdtDocument, currentBinding=currentBinding, iterOffset=iterOffset)
-    return NestedLoopJoinIterator(source, innerTriple, hdtDocument, currentBinding=currentBinding, iterOffset=iterOffset)
+    sourceField = saved_plan.WhichOneof('source')
+    source = load(getattr(saved_plan, sourceField), db_connector)
+    innerTriple = protoTriple_to_dict(saved_plan.inner)
+    if len(saved_plan.muc) > 0:
+        currentBinding = saved_plan.muc
+    iterOffset = saved_plan.offset
+    if saved_plan.optional:
+        return LeftNLJIterator(source, innerTriple, db_connector, currentBinding=currentBinding, iterOffset=iterOffset)
+    return NestedLoopJoinIterator(source, innerTriple, db_connector, currentBinding=currentBinding, iterOffset=iterOffset)
 
 
-def load_union(savedPlan, hdtDocument):
+def load_union(saved_plan, db_connector):
     """Load a BagUnionIterator from a protobuf serialization"""
-    leftField = savedPlan.WhichOneof('left')
-    left = load(getattr(savedPlan, leftField), hdtDocument)
-    rightField = savedPlan.WhichOneof('right')
-    right = load(getattr(savedPlan, rightField), hdtDocument)
+    leftField = saved_plan.WhichOneof('left')
+    left = load(getattr(saved_plan, leftField), db_connector)
+    rightField = saved_plan.WhichOneof('right')
+    right = load(getattr(saved_plan, rightField), db_connector)
     return BagUnionIterator(left, right)

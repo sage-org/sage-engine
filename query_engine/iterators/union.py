@@ -34,14 +34,14 @@ class BagUnionIterator(PreemptableIterator):
 
     def save(self):
         """Save and serialize the iterator as a machine-readable format"""
-        savedUnion = SavedBagUnionIterator()
+        saved_union = SavedBagUnionIterator()
         # export left source
         left_field = self._source.serialized_name() + '_left'
-        getattr(savedUnion, left_field).CopyFrom(self._left.save())
+        getattr(saved_union, left_field).CopyFrom(self._left.save())
         # export right source
         right_field = self._source.serialized_name() + '_right'
-        getattr(savedUnion, right_field).CopyFrom(self._right.save())
-        return savedUnion
+        getattr(saved_union, right_field).CopyFrom(self._right.save())
+        return saved_union
 
 
 class RandomBagUnionIterator(BagUnionIterator):

@@ -52,12 +52,12 @@ class ScanIterator(PreemptableIterator):
 
     def save(self):
         """Save the operator using protocol buffers"""
-        saveScan = SavedScanIterator()
+        saved_scan = SavedScanIterator()
         triple = TriplePattern()
         triple.subject = self._triple['subject']
         triple.predicate = self._triple['predicate']
         triple.object = self._triple['object']
-        saveScan.triple.CopyFrom(triple)
-        saveScan.offset = self.offset + self.nb_reads
-        saveScan.cardinality = self._cardinality
-        return saveScan
+        saved_scan.triple.CopyFrom(triple)
+        saved_scan.offset = self.offset + self.nb_reads
+        saved_scan.cardinality = self._cardinality
+        return saved_scan
