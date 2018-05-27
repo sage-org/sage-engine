@@ -64,3 +64,5 @@ datatype_expr = unary_expression("sparql_datatype({})")
 STRUUID_expr = unary_expression("sparql_STRUUID()")
 
 UUID_expr = unary_expression("sparql_UUID()")
+
+langmatches_expr = binary_expression("sparql_langmatches({}, {})")

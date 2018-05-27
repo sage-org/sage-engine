@@ -71,6 +71,8 @@ def compile_filter(f):
         return fargs_to_unary_expression(fargs, expressions.is_numeric_expr)
     elif f['operator'] == 'lang':
         return fargs_to_unary_expression(fargs, expressions.lang_expr)
+    elif f['operator'] == 'langmatches':
+        return fargs_to_binary_expression(fargs, expressions.langmatches_expr)
     elif f['operator'] == 'datatype':
         return fargs_to_unary_expression(fargs, expressions.datatype_expr)
     elif f['operator'] == 'struuid':

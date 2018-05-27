@@ -27,13 +27,13 @@ def isLiteral(x):
 
 def sparql_lang(x):
     """Return the LANG of a RDF Literal, or an empty string if it does not exists"""
-    return x.lang if type(x) is Literal else ""
+    return x.language if type(x) is Literal else ""
 
 
 def sparql_datatype(x):
     """Return the Datatype of a typed RDF Literal, or an empty string if it does not exists"""
     # TODO complete this method for integer and float
-    return x.datatype if type(x) is Literal else ""
+    return x.datatype() if type(x) is Literal else ""
 
 
 def sparql_STRUUID():
@@ -46,6 +46,14 @@ def sparql_UUID():
     return "\"urn:uuid:{}\"".format(uuid4())
 
 
+def sparql_langmatches(x, y):
+    if type(y) is Literal:
+        y = y.language
+    if x is None or y is None:
+        return False
+    return y.lower() in x.lower()
+
+
 FILTER_RUNTIME = {
     "uuid4": uuid4,
     "Number": Number,
@@ -55,6 +63,7 @@ FILTER_RUNTIME = {
     "isLiteral": isLiteral,
     "sparql_bound": sparql_bound,
     "sparql_lang": sparql_lang,
+    "sparql_langmatches": sparql_langmatches,
     "sparql_STRUUID": sparql_STRUUID,
     "sparql_UUID": sparql_UUID,
     "sameTerm": sameTerm
