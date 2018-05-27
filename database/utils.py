@@ -27,10 +27,10 @@ class DoubleDict(object):
         return v in self._values_to_keys
 
 
-class TripleDictionnary(object):
-    """A TripleDictionnary stores RDF triples in bitmap format"""
+class TripleDictionary(object):
+    """A TripleDictionary stores RDF triples in bitmap format"""
     def __init__(self):
-        super(TripleDictionnary, self).__init__()
+        super(TripleDictionary, self).__init__()
         self._subjectDict = DoubleDict()
         self._predicateDict = DoubleDict()
         self._objectDict = DoubleDict()

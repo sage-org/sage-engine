@@ -4,7 +4,7 @@ from rdflib import Graph
 from rdflib.util import guess_format
 from database.db_connector import DatabaseConnector
 from database.rdf_index import TripleIndex
-from database.utils import TripleDictionnary
+from database.utils import TripleDictionary
 from math import inf
 import os
 import fnmatch
@@ -33,7 +33,7 @@ class RDFFileConnector(DatabaseConnector):
     def __init__(self, file, format=None, useCache=False):
         super(RDFFileConnector, self).__init__()
         file = os.path.abspath(file)
-        self._dictionnary = TripleDictionnary()
+        self._dictionary = TripleDictionary()
         self._triples = []
         self._indexes = {
             "spo": TripleIndex(),
@@ -58,8 +58,8 @@ class RDFFileConnector(DatabaseConnector):
     def search_triples(self, subject, predicate, obj, limit=inf, offset=0):
         def processor(i):
             s, p, o = self._triples[i]
-            return self._dictionnary.bit_to_triple(s, p, o)
-        btriple = self._dictionnary.triple_to_bit(subject, predicate, obj)
+            return self._dictionary.bit_to_triple(s, p, o)
+        btriple = self._dictionary.triple_to_bit(subject, predicate, obj)
         iterator = None
         if subject is not None and predicate is not None:
             iterator = self._indexes["spo"].search_pattern(btriple, limit=limit, offset=offset)
@@ -96,8 +96,8 @@ class RDFFileConnector(DatabaseConnector):
         g = Graph()
         g.parse(file, format=format)
         for s, p, o in g.triples((None, None, None)):
-            # load RDF triples in the dictionnary, then index it
-            triple = self._dictionnary.insert_triple(strip_uri(s.n3()), strip_uri(p.n3()), strip_uri(o.n3()))
+            # load RDF triples in the dictionary, then index it
+            triple = self._dictionary.insert_triple(strip_uri(s.n3()), strip_uri(p.n3()), strip_uri(o.n3()))
             self._indexes["spo"].insert(triple, len(self._triples))
             self._indexes["sop"].insert((triple[0], triple[2], triple[1]), len(self._triples))
             self._indexes["osp"].insert((triple[2], triple[0], triple[1]), len(self._triples))
@@ -110,14 +110,14 @@ class RDFFileConnector(DatabaseConnector):
         """Load the datastructure from a serialized cache"""
         with open(file, 'rb') as f:
             data = pickle.load(f)
-            self._dictionnary = data["dictionnary"]
+            self._dictionary = data["dictionary"]
             self._triples = data["triples"]
             self._indexes = data["indexes"]
 
     def __saveToCache(self, path):
         """Save the datastructure using the pickle protocol"""
         with open(path, 'wb') as f:
-            savedData = {"dictionnary": self._dictionnary, "indexes": self._indexes, "triples": self._triples}
+            savedData = {"dictionary": self._dictionary, "indexes": self._indexes, "triples": self._triples}
             pickle.dump(savedData, f, pickle.HIGHEST_PROTOCOL)
 
     def __purgeCache(self, filename):
