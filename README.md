@@ -14,11 +14,11 @@ Requirements:
 
 ```
 git clone https://github.com/Callidon/sage-bgp
-cd sage-bgp/server/
+cd sage-engine/
 pip install -r requirements.txt
 ```
 
-# Reproducing SaGe experimental setup
+# Launch server
 
 The configuration file for the SaGe experimental setup is `data/watdiv_config.yaml`.
 
@@ -32,4 +32,18 @@ The configuration file for the SaGe experimental setup is `data/watdiv_config.ya
 ```
 docker build -t sage .
 docker run -p 8000:8000 sage:latest sh run.sh data/watdiv_config.yaml
+```
+
+# Documentation
+
+To generate the documentation, you must install the following dependencies
+```
+pip install sphinx sphinx_rtd_theme sphinxcontrib-httpdomain
+```
+
+Then, navigate in the `docs` directory and generate the documentation
+```
+cd docs/
+make html
+open build/html/index.html
 ```
