@@ -29,14 +29,14 @@ class SageEngine(object):
             Execute a preemptable physical query execution plan under a time quota.
 
             Args:
-                - plan [PreemptableIterator] - The root of the plan, i.e., a preemptable iterator
-                - quota [float] - The time quota used for query execution
+                - plan :class:`.PreemptableIterator` - The root of the plan
+                - quota ``float`` - The time quota used for query execution
 
             Returns:
-                A tuple (results, saved_plan, is_done) where:
-                - results is a list of solution mappings found during query execution
-                - saved_plan is the state of the plan saved using protocol-buffers
-                - is_done is bolean set to True when the plan has completed query evalution, False otherwise
+                A tuple (``results``, ``saved_plan``, ``is_done``) where:
+                - ``results`` is a list of solution mappings found during query execution
+                - ``saved_plan`` is the state of the plan saved using protocol-buffers
+                - ``is_done`` is True when the plan has completed query evalution, False otherwise
         """
         results = list()
         queue = Queue()

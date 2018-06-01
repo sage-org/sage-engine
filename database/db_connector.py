@@ -10,12 +10,14 @@ class DatabaseConnector(ABC):
     def search_triples(self, subject, predicate, obj, limit=0, offset=0):
         """
             Get an iterator over all RDF triples matching a triple pattern.
+
             Args:
-                - subject [string] - Subject of the triple pattern
-                - predicate [string] - Preicate of the triple pattern
-                - object [string] - Object of the triple pattern
-                - limit [int=0] - (Optional) LIMIT modifier, i.e., maximum number of RDF triples to read
-                - offset [int=0] - (Optional) OFFSET modifier, i.e., number of RDF triples to skip
+                - subject ``string`` - Subject of the triple pattern
+                - predicate ``string`` - Predicate of the triple pattern
+                - object ``string`` - Object of the triple pattern
+                - limit ``int=0`` ``optional`` -  LIMIT modifier, i.e., maximum number of RDF triples to read
+                - offset ``int=0`` ``optional`` -  OFFSET modifier, i.e., number of RDF triples to skip
+
             Returns:
                 A Python iterator over RDF triples matching the given triples pattern
         """

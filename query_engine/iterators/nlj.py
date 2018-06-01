@@ -13,11 +13,11 @@ class NestedLoopJoinIterator(PreemptableIterator):
     """A NestedLoopJoinIterator is an iterator over a nested loop join between an iterator, which yields mappings, and a triple pattern.
 
     Args:
-        - source [ScanIterator|NestedLoopJoinIterator] - The outer relation of the join: an iterator that yields solution mappings.
-        - innerTriple [TriplePattern] - The inner relation, i.e., a triple pattern.
-        - hdtDocument [hdt.HDTDocument] - An HDT document scanned by inner loops.
-        - currentBinding [Dict, default=None] - A set of solution mappings used to resume join processing.
-        - iterOffset [integer, default=0] - An offset used to resume processing of an inner loop.
+        - source :class:`.ScanIterator` | :class:`.NestedLoopJoinIterator` - The outer relation of the join: an iterator that yields solution mappings.
+        - innerTriple ``dict``- The inner relation, i.e., a triple pattern.
+        - hdtDocument :class:`.DatabaseConnector` - The document scanned by inner loops.
+        - currentBinding ``dict=None`` - A set of solution mappings used to resume join processing.
+        - iterOffset ``integer=0]`` - An offset used to resume processing of an inner loop.
     """
     def __init__(self, source, innerTriple, hdtDocument, currentBinding=None, iterOffset=0):
         super(NestedLoopJoinIterator, self).__init__()

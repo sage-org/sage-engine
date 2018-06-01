@@ -39,6 +39,7 @@ class TripleDictionary(object):
         self._bitObjectValue = 1
 
     def insert_triple(self, s, p, o):
+        """Insert a triple ``(s, p, o)`` in the dictionnary"""
         if not self._subjectDict.has_value(s):
             self._subjectDict.insert(self._bitSubjectValue, s)
             self._bitSubjectValue += 1
@@ -51,9 +52,11 @@ class TripleDictionary(object):
         return self.triple_to_bit(s, p, o)
 
     def triple_to_bit(self, s, p, o):
+        """Convert a triple pattern from str to bitmap format"""
         return (self._subjectDict.value_get(s, 0), self._predicateDict.value_get(p, 0), self._objectDict.value_get(o, 0))
 
     def bit_to_triple(self, s, p, o):
+        """Convert a triple pattern from bitmap to str format"""
         return (self._subjectDict.key_get(s), self._predicateDict.key_get(p), self._objectDict.key_get(o))
 
 

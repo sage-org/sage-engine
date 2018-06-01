@@ -12,8 +12,8 @@ class ScanIterator(PreemptableIterator):
 
     Constructor args:
         - source [hdt.TripleIterator] - An HDT iterator that yields RDF triple in string format.
-        - triple [TriplePattern] - The triple pattern corresponding to the source iterator.
-        - cardinality [integer, default=0] - The cardinality of the triple pattern.
+        - triple ``dict`` - The triple pattern corresponding to the source iterator.
+        - cardinality ``integer=0]`` - The cardinality of the triple pattern.
     """
     def __init__(self, source, triple, cardinality=0):
         super(ScanIterator, self).__init__()

@@ -18,13 +18,14 @@ def strip_uri(v):
 class RDFFileConnector(DatabaseConnector):
     """
         A RDFFileConnector search for RDF triples in a RDF file (N-triples, Turtle, N3, etc).
-        Internally, it uses an Hexastore[1] based approach, with 6 B-tree indexes on SPO, SOP, PSO, POS, OSP and OPS.
+
+        Internally, it uses an Hexastore [1] based approach, with 6 B-tree indexes on SPO, SOP, PSO, POS, OSP and OPS.
         It also support caching, using the pickle protocol.
 
         Args:
-            - file [string] - Path to the RDF file to load
-            - format [string=None] - (Optional) Format of the RDF file ("ttl", "nt", "trig", etc)
-            - useCache [boolean=False] (Optional) True if the cache should be used, False otherwise
+            - file ``string`` - Path to the RDF file to load
+            - format ``string=None`` ``optional`` -  Format of the RDF file ("ttl", "nt", "trig", etc)
+            - useCache ``boolean=False`` ``optional`` - True if the cache should be used, False otherwise
 
         Reference:
             [1] Weiss, Cathrin, Panagiotis Karras, and Abraham Bernstein. "Hexastore: sextuple indexing for semantic web data management." Proceedings of the VLDB Endowment 1.1 (2008): 1008-1019.
@@ -56,6 +57,19 @@ class RDFFileConnector(DatabaseConnector):
                 self.__save_to_cache(cacheFile)
 
     def search_triples(self, subject, predicate, obj, limit=inf, offset=0):
+        """
+            Get an iterator over all RDF triples matching a triple pattern.
+
+            Args:
+                - subject ``string`` - Subject of the triple pattern
+                - predicate ``string`` - Predicate of the triple pattern
+                - object ``string`` - Object of the triple pattern
+                - limit ``int=0`` ``optional`` -  LIMIT modifier, i.e., maximum number of RDF triples to read
+                - offset ``int=0`` ``optional`` -  OFFSET modifier, i.e., number of RDF triples to skip
+
+            Returns:
+                A Python iterator over RDF triples matching the given triples pattern
+        """
         def processor(i):
             s, p, o = self._triples[i]
             return self._dictionary.bit_to_triple(s, p, o)

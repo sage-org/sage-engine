@@ -4,10 +4,12 @@ Installation
 Installation in a `virtualenv <https://virtualenv.pypa.io/en/stable/>`__
 is **strongly advised!**
 
-| Requirements: \* `pip <https://pip.pypa.io/en/stable/>`__ \*
-  **gcc/clang** with **c++11 support** \* **Python Development headers**
-  > You should have the ``Python.h`` header available on your system.
-| > For example, for Python 3.6, install the ``python3.6-dev`` package
+Requirements:
+  * `pip <https://pip.pypa.io/en/stable/>`__
+  * **gcc/clang** with **c++11 support** \* **Python Development headers**
+  * You should have the ``Python.h`` header available on your system.
+
+  For example, for Python 3.6, install the ``python3.6-dev`` package
   on Debian/Ubuntu systems.
 
 ::
