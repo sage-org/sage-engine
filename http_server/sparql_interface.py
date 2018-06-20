@@ -46,7 +46,9 @@ def sparql_blueprint(datasets, logger):
 
         # process GET request as a single Triple Pattern BGP
         if request.method == "GET" or (not request.is_json):
-            return render_template("sage.html", dataset_info=dataset.describe(url))
+            dinfo = dataset.describe(url)
+            dinfo['@id'] = url
+            return render_template("sage.html", dataset_info=dinfo)
 
         engine = SageEngine()
         post_query, err = QueryRequest().load(request.get_json())
