@@ -52,7 +52,7 @@ class Dataset(object):
         """Describe the Dataset API using the Hydra spec"""
         description = {
             "@type": "Class",
-            "@id": "{}sparql/{}".format(url, self._config["name"]),
+            "@id": "{}/{}".format(url, self._config["name"]),
             "title": self._config["name"],
             "description": self._config["description"],
             "timeQuota": self.quota(),

@@ -23,8 +23,8 @@ def index():
     return render_template("index_sage.html", datasets=datasets_infos)
 
 
-@app.route('/clients')
-def clients():
+@app.route('/software')
+def software():
     return render_template("clients.html")
 
 

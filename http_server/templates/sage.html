@@ -6,45 +6,37 @@
 <div class="container">
   <div class="row">
     <div class="col-lg">
-      <h1>How to use SaGe</h1>
+      <h1>{{ dataset_info['title'] }} Dataset</h1>
 
-      <div class="row">
-        <div class="col">
-          <div class="card">
-            <center class="card-img-top"><i class="fab fa-7x fa-chrome"></i> <i class="fab fa-7x fa-firefox"></i></center>
-            <div class="card-body">
-              <h5 class="card-title">Web client</h5>
-              <p class="card-text">Available soon</p>
-              <a href="#" class="btn btn-warning">Coming soon...</a>
-            </div>
-          </div>
-        </div>
+      <h3><i class="fas fa-pencil-alt"></i> Description</h3>
+      <p>{{ dataset_info['description'] }}</p>
 
-      <div class="row">
-        <div class="col">
-          <div class="card">
-            <center><i class="card-img-top fab fa-8x fa-java"></i></center>
-            <div class="card-body">
-              <h5 class="card-title">Java client</h5>
-              <p class="card-text">Based on Apache jena, this client supports all SPARQL 1.1</p>
-              <a href="https://github.com/Callidon/sage-jena" class="btn btn-primary">Install</a>
-            </div>
-          </div>
-        </div>
+      <h3><i class="fab fa-hubspot"></i> Query this dataset</h3>
+      <p><strong>URL:</strong> <a href="{{ dataset_info['@id'] }}">{{ dataset_info['@id'] }}</a></p>
+      <p>Take a look at <a href="{{ url_for('software') }}">exisiting Sage clients</a></p>
 
-        <div class="col">
-          <div class="card">
-            <center><i class="card-img-top fab fa-8x fa-js"></i></center>
-            <div class="card-body">
-              <h5 class="card-title">Javascript client</h5>
-              <p class="card-text">Available soon</p>
-              <a href="#" class="btn btn-warning">Coming soon...</a>
-            </div>
-          </div>
-        </div>
+      <h3><i class="fas fa-clipboard-list"></i> Statistics</h3>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Time quota</th>
+              <th>Max results per request</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{dataset_info["timeQuota"]}}ms</td>
+              {%- if dataset_info["maxResults"] == 'inf' -%}
+                <td>No limit</td>
+              {%- else -%}
+                <td>{{dataset_info["maxResults"]}} bindings</td>
+              {%- endif -%}
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
   </div>
 </div>
 {% endblock %}
