@@ -1,39 +1,31 @@
 {% extends "main.html" %}
 
-{% block title %}SaGe query engine{% endblock %}
+{% block title %}SaGe interface{% endblock %}
 
 {% block body %}
 <div class="container">
   <div class="row">
-    <h1>SaGe query engine</h1>
-    <h2>Available datasets</h2>
-
+    <h1>RDF datasets</h1>
     <table class="table">
       <thead>
         <tr>
           <th>Dataset</th>
           <th>Description</th>
-          <th>Backend</th>
-          <th>Interfaces</th>
+          <th>Time quota (ms)</th>
+          <th>Sage interface</th>
         </tr>
       </thead>
       <tbody>
-        {% for dataset in datasets %}
+        {% for dataset in api["supportedClass"] %}
         <tr>
           <td>
-              {{ dataset["name"] }}
+            <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">
+              {{ dataset["title"] }}
+            </a>
           </td>
-          <td>{{dataset['description']}}</td>
-          <td>{{ dataset['backend'] }}</td>
-          <td>
-            <ul>
-              <li>
-                <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["name"]) }}">
-                  SaGe interface
-                </a>
-              </li>
-            </ul>
-          </td>
+          <td>{{dataset["description"]}}</td>
+          <td>{{dataset["timeQuota"]}}</td>
+          <td><a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">{{ dataset['@id'] }}</a></td>
         </tr>
         {% endfor %}
       </tbody>

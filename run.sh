@@ -12,4 +12,4 @@ fi
 
 export YALDF_CONFIG="${CONFIG_FILE}"
 
-gunicorn -w $NB_WORKERS -b 0.0.0.0:$PORT http_server.server:app
+gunicorn -w $NB_WORKERS -b 0.0.0.0:$PORT --log-level info http_server.server:app

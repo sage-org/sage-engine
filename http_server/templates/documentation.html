@@ -5,75 +5,146 @@
 {% block body %}
 <div class="container">
   <div class="row">
-    <h1>API documentation</h1>
+    <div class="col">
+      <h1>API documentation</h1>
 
-    <h2 id="#sage">SaGe interface</h2>
-    <h3><strong>POST</strong> <span class="text-primary">/bgp/&lt;dataset_name&gt;</span></h3>
-    <p><strong>Example:</strong> {{ url_for('sparql-interface.sparql_query', dataset_name="watdiv10m") }}</p>
+      <h3><strong>POST</strong> <span class="text-primary">/bgp/&lt;dataset_name&gt;</span></h3>
+      <p><strong>Example:</strong> {{ url_for('sparql-interface.sparql_query', dataset_name="watdiv10m") }}</p>
 
-    <h4>Accepted media types</h4>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Accept</th>
-          <th>Description</th>
-          <th>Specification</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>application/json</code></td>
-          <td>JSON</td>
-          <td><a href="https://www.json.org/">https://www.json.org/</a></td>
-        </tr>
-      </tbody>
-    </table>
+      <h4>Accepted media types</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Accept</th>
+            <th>Description</th>
+            <th>Specification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>application/json</code></td>
+            <td>Javascript Object Notation</td>
+            <td><a href="https://www.json.org/">https://www.json.org/</a></td>
+          </tr>
+        </tbody>
+      </table>
 
-    <h4>JSON POST parameters</h4>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Required</th>
-          <th>Default</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>bgp</code></td>
-          <td>Array of JSON Objects</td>
-          <td>yes</td>
-          <td></td>
-          <td>An Array of JSON objects that contains the triple patterns of the BGP</td>
-        </tr>
-        <tr>
-          <td><code>controls</code></td>
-          <td>JSON Object</td>
-          <td>no</td>
-          <td><code>{}</code></td>
-          <td>JSON serialization of a saved query execution plan, used to resume query processing</td>
-        </tr>
-      </tbody>
-    </table>
-    <p><strong>Example:</strong></p>
-    <pre>
-      http://example.org/bgp/watdiv10m
-      {
-        "bgp:": [
-          {
-            "subject": "?v0",
-            "predicate": "http://purl.org/goodrelations/description",
-            "object": "?v1"
+      <h4>JSON POST parameters</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>query</code></td>
+            <td>JSON Object</td>
+            <td>yes</td>
+            <td></td>
+            <td>Content of the query to be evaluated</td>
+          </tr>
+          <tr>
+            <td><code>next</code></td>
+            <td>string</td>
+            <td>no</td>
+            <td><code>null</code></td>
+            <td>A link used to resume query exection from a saved state</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Example request</strong></p>
+      <pre>
+        POST /sparql/dbpedia-3.5 HTTP/1.1
+        Host: example.com
+        Accept: application/json
+        Content-Type: application/json
+
+        {
+          "query": {
+            "type": "bgp",
+            "bgp": [
+              {
+                "subject": "http://dbpedia.org/resource/Burn_After_Reading",
+                "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                "object": "?o"
+              }
+            ]
           },
-          {
-            "subject": "?v0",
-            "predicate": "http://purl.org/goodrelations/offers",
-            "object": "http://db.uwaterloo.ca/~galuc/wsdbm/Offer29628"
+          "next": null
+        }
+      </pre>
+
+      <h4>Response content</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>bindings</code></td>
+            <td>Array of JSON Objects</td>
+            <td>Solution bindings</td>
+          </tr>
+          <tr>
+            <td><code>pageSize</code></td>
+            <td>integer</td>
+            <td>Number of solution bindings in this page</td>
+          </tr>
+          <tr>
+            <td><code>hasNext</code></td>
+            <td>boolean</td>
+            <td><code>True</code> if there is a next page after this one, <code>False</code> otherwise</td>
+          </tr>
+          <tr>
+            <td><code>next</code></td>
+            <td>string</td>
+            <td>'Next' link that can be used to fetch the next page of solution bindings</td>
+          </tr>
+          <tr>
+            <td><code>stats</code></td>
+            <td>JSON Object</td>
+            <td>Some statistics about query execution</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><strong>Example response</strong></p>
+      <pre>
+        HTTP/1.1 200 OK
+        Vary: Accept
+        Content-Type: application/json
+
+        {
+          "bindings": [
+            {
+              "?o": "http://dbpedia.org/ontology/Film"
+            },
+            {
+              "?o": "http://schema.org/CreativeWork"
+            }
+          ],
+          "pageSize": 2,
+          "hasNext": true,
+          "next": "link to the next page",
+          "stats": {
+            "import": 0.02,
+            "export": 0.05,
+            "cardinalities": [
+
+            ]
           }
-        ]
-      }
-    </pre>
+        }
+      </pre>
+    </div>
+  </div>
 </div>
 {% endblock %}

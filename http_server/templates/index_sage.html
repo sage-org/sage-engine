@@ -5,32 +5,8 @@
 {% block body %}
 <div class="container">
   <div class="row">
-    <h1>SaGe interface</h1>
-    <h2>Available datasets</h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Dataset</th>
-          <th>Description</th>
-          <th>Time quota (ms)</th>
-          <th>SPARQL interface</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for dataset in api["supportedClass"] %}
-        <tr>
-          <td>
-            <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["name"]) }}">
-              {{ dataset["title"] }}
-            </a>
-          </td>
-          <td>{{dataset["description"]}}</td>
-          <td>{{dataset["timeQuota"]}}</td>
-          <td><a href="{{ dataset['@id'] }}">{{ dataset['@id'] }}</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <h1>Sage query engine</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
   </div>
 </div>
 {% endblock %}

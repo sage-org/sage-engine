@@ -20,7 +20,7 @@ CORS(app)
 @app.route('/')
 def index():
     datasets_infos = datasets._config["datasets"]
-    return render_template("interfaces.html", datasets=datasets_infos)
+    return render_template("index_sage.html", datasets=datasets_infos)
 
 
 @app.route('/documentation')
@@ -30,4 +30,4 @@ def doc():
 
 # Register Blueprints which implement all available LDF interfaces
 # For example, http_server.tpf contains the blueprint for TPF interface
-app.register_blueprint(sparql_blueprint(datasets))
+app.register_blueprint(sparql_blueprint(datasets, app.logger))
