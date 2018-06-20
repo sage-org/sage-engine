@@ -7,14 +7,21 @@ from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.utils import IteratorExhausted
 from query_engine.protobuf.iterators_pb2 import RootTree
+from math import inf
 
 
-async def executor(plan, queue):
+class TooManyResults(Exception):
+    pass
+
+
+async def executor(plan, queue, limit):
     """Executor used to evaluated a plan under a time quota"""
     try:
         while plan.has_next():
             value = await plan.next()
             await shield(queue.put(value))
+            if queue.qsize() >= limit:
+                raise TooManyResults()
     except IteratorExhausted as e:
         pass
 
@@ -24,7 +31,7 @@ class SageEngine(object):
     def __init__(self):
         super(SageEngine, self).__init__()
 
-    def execute(self, plan, quota, filters=[]):
+    def execute(self, plan, quota, limit=inf):
         """
             Execute a preemptable physical query execution plan under a time quota.
 
@@ -43,10 +50,12 @@ class SageEngine(object):
         loop = get_event_loop()
         query_done = False
         try:
-            task = wait_for(executor(plan, queue), timeout=quota)
+            task = wait_for(executor(plan, queue, limit), timeout=quota)
             loop.run_until_complete(task)
             query_done = True
         except asyncTimeoutError as e:
+            pass
+        except TooManyResults as e:
             pass
         finally:
             while not queue.empty():

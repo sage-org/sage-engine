@@ -53,6 +53,7 @@ def sparql_blueprint(datasets, logger):
         if err is not None and len(err) > 0:
             return Response(format_marshmallow_errors(err), status=400)
         quota = int(request.args.get("quota", dataset.quota())) / 1000
+        max_results = dataset.maxResults()
         # Load next link
         next_link = None
         if 'next' in post_query:
@@ -65,7 +66,7 @@ def sparql_blueprint(datasets, logger):
         start = time()
         plan, cardinalities = build_query_plan(post_query["query"], dataset, next_link)
         loading_time = (time() - start) * 1000
-        bindings, saved_plan, is_done = engine.execute(plan, quota)
+        bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
         logger.info('[/sparql/{}] Query evaluation completed'.format(dataset_name))
         # compute controls for the next page
         start = time()

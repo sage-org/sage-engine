@@ -3,6 +3,7 @@
 from yaml import load
 from database.rdf_file_connector import RDFFileConnector
 from database.hdt_file_connector import HDTFileConnector
+from math import inf
 # from database.hdt_server_factory import HDTServerFactory
 
 DB_CONNECTORS = {
@@ -25,6 +26,9 @@ class Dataset(object):
 
     def quota(self):
         return self._config['quota']
+
+    def maxResults(self):
+        return self._config['maxResults']
 
     def connector(self):
         """Get the underlying DatabaseConnector for this dataset"""
@@ -104,10 +108,13 @@ def load_config(config_file="config.yaml"):
     config = load(open(config_file))
     # set page size, i.e. the number of triples per page
     quota = config['quota'] if 'quota' in config else 20
+    maxResults = config['maxResults'] if 'maxResults' in config else inf
     config['quota'] = quota
     for c in config["datasets"]:
         if 'quota' not in c:
             c['quota'] = quota
+        if 'maxResults' not in c:
+            c['maxResults'] = maxResults
     # build datasets
     datasets = {c["name"]: Dataset(c) for c in config["datasets"]}
     return (config, datasets)
