@@ -1,0 +1,55 @@
+{% extends "main.html" %}
+
+{% block title%}Software - Sage{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg">
+      <h1>How to use SaGe</h1>
+
+      <div class="row">
+        <!-- <div class="col">
+          <div class="card">
+            <center class="card-img-top"><i class="fab fa-7x fa-chrome"></i> <i class="fab fa-7x fa-firefox"></i></center>
+            <div class="card-body">
+              <h5 class="card-title">Web client</h5>
+              <p class="card-text">Available soon</p>
+              <a href="#" class="btn btn-warning">Coming soon...</a>
+            </div>
+          </div>
+        </div> -->
+
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <center><i class="card-img-top fab fa-8x fa-java"></i></center>
+            <div class="card-body">
+              <h5 class="card-title">Java client</h5>
+              <p class="card-text">Based on <a href="https://jena.apache.org/">Apache jena</a>, this client supports the full SPARQL 1.1 syntax</p>
+              <a href="https://github.com/Callidon/sage-jena/releases/tag/1.0-SNAPSHOT" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download
+              </a>
+              <a href="https://github.com/Callidon/sage-jena" class="btn btn-primary">
+                <i class="fab fa-github"></i> See on Github
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <center><i class="card-img-top fab fa-8x fa-js"></i></center>
+            <div class="card-body">
+              <h5 class="card-title">Javascript client</h5>
+              <p class="card-text">Evaluate SPARQL queries from any modern Web browsers</p>
+              <a href="#" class="btn btn-warning">Coming soon...</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

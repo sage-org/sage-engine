@@ -56,6 +56,7 @@ class Dataset(object):
             "title": self._config["name"],
             "description": self._config["description"],
             "timeQuota": self.quota(),
+            "maxResults": self.maxResults() if self.maxResults() is not inf else 'inf',
             "supportedOperation": [
                 {
                     "@type": "Operation",

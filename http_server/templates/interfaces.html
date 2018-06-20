@@ -1,6 +1,6 @@
 {% extends "main.html" %}
 
-{% block title %}SaGe interface{% endblock %}
+{% block title %}Datasets - Sage{% endblock %}
 
 {% block body %}
 <div class="container">
@@ -11,8 +11,9 @@
         <tr>
           <th>Dataset</th>
           <th>Description</th>
-          <th>Time quota (ms)</th>
-          <th>Sage interface</th>
+          <th>Time quota</th>
+          <th>Max results per request</th>
+          <th>Interface URL</th>
         </tr>
       </thead>
       <tbody>
@@ -24,8 +25,13 @@
             </a>
           </td>
           <td>{{dataset["description"]}}</td>
-          <td>{{dataset["timeQuota"]}}</td>
-          <td><a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">{{ dataset['@id'] }}</a></td>
+          <td>{{dataset["timeQuota"]}}ms</td>
+          {%- if dataset["maxResults"] == 'inf' -%}
+            <td>No limit</td>
+          {%- else -%}
+            <td>{{dataset["maxResults"]}} bindings</td>
+          {%- endif -%}
+          <td><a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}</a></td>
         </tr>
         {% endfor %}
       </tbody>
