@@ -11,6 +11,10 @@ from math import inf
 
 
 class TooManyResults(Exception):
+    """
+        Exception raised when the max. number of results for a query execution
+        has been exceeded
+    """
     pass
 
 
