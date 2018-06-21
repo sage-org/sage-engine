@@ -7,6 +7,7 @@ Installation in a [virtualenv](https://virtualenv.pypa.io/en/stable/) is **stron
 
 Requirements:
 * [pip](https://pip.pypa.io/en/stable/)
+* [npm](https://nodejs.org/en/) (shipped with Node.js on most systems)
 * **gcc/clang** with **c++11 support**
 * **Python Development headers**
 > You should have the `Python.h` header available on your system.   
@@ -15,7 +16,7 @@ Requirements:
 ```
 git clone https://github.com/Callidon/sage-bgp
 cd sage-engine/
-pip install -r requirements.txt
+make install
 ```
 
 # Launch server
