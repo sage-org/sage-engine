@@ -6,6 +6,9 @@ __pycache__/
 watdiv.10M.hdt
 watdiv.10M.hdt.index.v1-1
 
+# frontend related
+node_modules/
+
 # C extensions
 *.so
 

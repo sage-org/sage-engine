@@ -1,0 +1,19 @@
+{
+  "name": "sage-engine",
+  "version": "1.0.0",
+  "description": "Frontend website for the sage-engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sage",
+    "frontend"
+  ],
+  "author": "Thomas Minier <thomas.minier@univ-nantes.fr>",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^4.1.1",
+    "jquery": "^3.3.1"
+  }
+}
