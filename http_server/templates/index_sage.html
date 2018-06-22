@@ -3,60 +3,47 @@
 {% block title %}Home - Sage{% endblock %}
 
 {% block body %}
-        <script type='text/javascript' src="https://unpkg.com/popper.js"></script>
-        <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}" charset="utf-8"></script>
-        <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}" charset="utf-8"></script>
-        <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.tmpl.min.js') }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/client.css') }}">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-        <script type='text/javascript' src="{{ url_for('static', filename='js/rdfstore.js') }}"></script>
-        <script type='text/javascript' src="{{ url_for('static', filename='js/knockout-3.4.2.js') }}"></script>
-        <script type='text/javascript' src="{{ url_for('static', filename='js/client_frontend.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/client.css') }}">
+  <div id='target'></div>
 
-        <script type='text/javascript'>
-          jQuery(document).ready(function(){
-          frontend = null;
-            rdfstore.create({"communication": {
-                               "parsers": {
-                                 "text/html" :           ClientFrontend.rdfaParser,
-                                 "application/rdf+xml":  ClientFrontend.rdfParser
-                               },
-                              "precedences": ["text/n3", "text/turtle", "application/rdf+xml", "text/html", "application/json"] }
-                            },
-                            function(err, store) {
-                              frontend = new client_frontend('#target',store);
-                              {% for dinfo in datasets %}
-                                var ds = "{{ dinfo }}";
-                                var parser = new DOMParser;
-                                var dom = parser.parseFromString(
-                                    '<!doctype html><body>' + ds,
-                                    'text/html');
-                                var decodedString = dom.body.textContent;
-                                var toParse = decodedString.replace(/\'/g,"\"");
-                                var dataset = JSON.parse(toParse);
-                                var html = '<a class="dropdown-item" href="#" title="https://sage.univ-nantes.fr/sparql/'+dataset.name+'">'+dataset.name+'</a>'
-                                jQuery('#datasetList').append(html);
-                              {% endfor %}
-                              var btns = jQuery('#datasetList')[0].children;
-                              jQuery('#sparql-server-text').val(btns[0].title);
-                              for (var i = 0; i < btns.length; i++) {
-                                btns[i].onclick = function(sender){
-                                  jQuery('#sparql-server-text').val(sender.target.title);
-                                };
-                              }
-                            });
+  <script type='text/javascript' src="{{ url_for('static', filename='node_modules/popper.js/dist/umd/popper.min.js') }}"></script>
+  <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.tmpl.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/knockout/build/output/knockout-latest.js') }}" charset="utf-8"></script>
+  <script type='text/javascript' src="{{ url_for('static', filename='js/rdfstore.js') }}"></script>
+  <script type='text/javascript' src="{{ url_for('static', filename='js/client_frontend.js') }}"></script>
+  <script type='text/javascript'>
+    jQuery(document).ready(function(){
+    frontend = null;
+      rdfstore.create({"communication": {
+                         "parsers": {
+                           "text/html" :           ClientFrontend.rdfaParser,
+                           "application/rdf+xml":  ClientFrontend.rdfParser
+                         },
+                        "precedences": ["text/n3", "text/turtle", "application/rdf+xml", "text/html", "application/json"] }
+                      },
+                      function(err, store) {
+                        frontend = new client_frontend('#target',store);
+                        {% for dinfo in datasets %}
+                          var ds = "{{ dinfo }}";
+                          var parser = new DOMParser;
+                          var dom = parser.parseFromString(
+                              '<!doctype html><body>' + ds,
+                              'text/html');
+                          var decodedString = dom.body.textContent;
+                          var toParse = decodedString.replace(/\'/g,"\"");
+                          var dataset = JSON.parse(toParse);
+                          var html = '<a class="dropdown-item" href="#" title="https://sage.univ-nantes.fr/sparql/'+dataset.name+'">'+dataset.name+'</a>'
+                          jQuery('#datasetList').append(html);
+                        {% endfor %}
+                        var btns = jQuery('#datasetList')[0].children;
+                        jQuery('#sparql-server-text').val(btns[0].title);
+                        for (var i = 0; i < btns.length; i++) {
+                          btns[i].onclick = function(sender){
+                            jQuery('#sparql-server-text').val(sender.target.title);
+                          };
+                        }
+                      });
 
-          });
-        </script>
-
-        <div id='target'>
-        </div>
-
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-
-
-
-
+    });
+  </script>
 {% endblock %}

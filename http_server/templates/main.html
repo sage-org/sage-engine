@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}" charset="utf-8"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -34,7 +35,6 @@
       </div>
     </nav>
     {% block body %}{% endblock %}
-    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}" charset="utf-8"></script>
   </body>
 </html>
