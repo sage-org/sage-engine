@@ -1,10 +1,9 @@
-FROM python:3.6.4-alpine3.7
+FROM python:3.6.5-alpine3.7
 
 RUN apk add --no-cache git make g++ nodejs
 
-WORKDIR /opt/yaldf-server/
+WORKDIR /opt/sage-engine/
 
-# install yaldf-server
 COPY . .
 RUN make install
 
