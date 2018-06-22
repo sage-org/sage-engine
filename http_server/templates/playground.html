@@ -30,7 +30,15 @@
                               var decodedString = dom.body.textContent;
                               var toParse = decodedString.replace(/\'/g,"\"");
                               var dataset = JSON.parse(toParse);
-                              var html = '<a class="dropdown-item" href="#" title="https://sage.univ-nantes.fr/sparql/'+dataset.name+'">'+dataset.name+'</a>'
+                              var hostname = window.location.href;
+                              if (hostname.substr(hostname.length - 1) === "#") {
+                                hostname = hostname.slice(0,-2);
+                              }
+                              else {
+                                hostname = hostname.slice(0,-1);
+                              }
+                              var urlDS = hostname + "{{ url_for('sparql-interface.sparql_query', dataset_name=dinfo["name"]) }}";
+                              var html = '<a class="dropdown-item" href="#" title="' + urlDS + '">'+dataset.name+'</a>'
                               jQuery('#datasetList').append(html);
                             {% endfor %}
                             var btns = jQuery('#datasetList')[0].children;
