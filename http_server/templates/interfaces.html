@@ -1,37 +1,40 @@
 <div class="container" id="datasets">
   <div class="row">
-    <h1>RDF datasets</h1>
-    <div class="table-responsive">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Dataset</th>
-            <th>Description</th>
-            <th>Time quota</th>
-            <th>Max results per request</th>
-            <th>Interface URL</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for dataset in api["supportedClass"] %}
-          <tr>
-            <td>
-              <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">
-                {{ dataset["title"] }}
-              </a>
-            </td>
-            <td>{{dataset["description"]}}</td>
-            <td>{{dataset["timeQuota"]}}ms</td>
-            {%- if dataset["maxResults"] == 'inf' -%}
-            <td>No limit</td>
-            {%- else -%}
-            <td>{{dataset["maxResults"]}} bindings</td>
-            {%- endif -%}
-            <td><a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}</a></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="col">
+      <h2><i class="fas fa-database"></i> RDF datasets</h2>
+      <p>Query these RDF datasets using the <a href="#playground">Sage playground</a> or using <a href="#software">a Sage client</a></p>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Dataset</th>
+              <th>Description</th>
+              <th>Time quota</th>
+              <th>Max results per request</th>
+              <th>Interface URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for dataset in api["supportedClass"] %}
+            <tr>
+              <td>
+                <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">
+                  {{ dataset["title"] }}
+                </a>
+              </td>
+              <td>{{dataset["description"]}}</td>
+              <td>{{dataset["timeQuota"]}}ms</td>
+              {%- if dataset["maxResults"] == 'inf' -%}
+              <td>No limit</td>
+              {%- else -%}
+              <td>{{dataset["maxResults"]}} bindings</td>
+              {%- endif -%}
+              <td><a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"], _external=True) }}</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
     </div>
   </div>
 </div>

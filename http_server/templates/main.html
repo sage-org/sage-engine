@@ -10,23 +10,26 @@
   </head>
   <body>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="{{ url_for('index') }}">Sage</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}#">Sage</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a>
+            <a class="nav-link" href="{{ url_for('index') }}#"><i class="fas fa-home"></i> Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#playground"><i class="fab fa-hubspot"></i> Playground</a>
+            <a class="nav-link" href="{{ url_for('index') }}#"><i class="fas fa-lightbulb"></i> Concept</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#datasets"><i class="fas fa-database"></i> Datasets</a>
+            <a class="nav-link" href="{{ url_for('index') }}#playground"><i class="fab fa-hubspot"></i> Playground</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#software"><i class="fas fa-wrench"></i> Software</a>
+            <a class="nav-link" href="{{ url_for('index') }}#datasets"><i class="fas fa-database"></i> Datasets</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}#software"><i class="fas fa-wrench"></i> Software</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('doc') }}"><i class="fas fa-book"></i> Documentation</a>
@@ -37,9 +40,15 @@
         </ul>
       </div>
     </nav>
-    <div>
+    <div id="home">
       {% block body %}{% endblock %}
     </div>
+    <hr>
+    <footer class="footer">
+      <div class="container">
+        <p class="text-center">&#9400;2017–2018 <a href="https://sites.google.com/site/gddlina/">GDD Team</a>, <a href="https://www.ls2n.fr/">LS2N</a>, <a href="http://www.univ-nantes.fr/">University of Nantes</a></p>
+      </div>
+    </footer>
     <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}" charset="utf-8"></script>
   </body>
 </html>

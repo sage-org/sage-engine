@@ -1,27 +1,36 @@
-<div class="container" id="#software">
+<div class="container" id="software">
   <div class="row">
     <div class="col-lg">
-      <h2>Software</h2>
-
+      <h2><i class="fas fa-wrench"></i> Software</h2>
+      <p>Query and publish RDF datasets using Sage servers using these client or server implementations.</p>
       <div class="row">
-        <!-- <div class="col">
+        <div class="col">
           <div class="card">
-            <center class="card-img-top"><i class="fab fa-7x fa-chrome"></i> <i class="fab fa-7x fa-firefox"></i></center>
+            <center class="card-img-top"><i class="fa-8x fas fa-server"></i></center>
             <div class="card-body">
-              <h5 class="card-title">Web client</h5>
-              <p class="card-text">Available soon</p>
-              <a href="#" class="btn btn-warning">Coming soon...</a>
+              <h5 class="card-title">Sage server (python)</h5>
+              <div class="card-text">
+                <p>
+                  Publish your own datasets using the reference Sage implementation in Python.
+                  Currenlty supports only datasets in the <a href="http://www.rdfhdt.org/">HDT format</a>.
+              </p>
+              </div>
+              <a href="https://github.com/Callidon/sage-engine" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download
+              </a>
+              <a href="https://github.com/Callidon/sage-engine" class="btn btn-primary">
+                <i class="fab fa-github"></i> See on Github
+              </a>
             </div>
           </div>
-        </div> -->
+        </div>
 
-      <div class="row">
         <div class="col">
           <div class="card">
             <center><i class="card-img-top fab fa-8x fa-java"></i></center>
             <div class="card-body">
-              <h5 class="card-title">Java client</h5>
-              <p class="card-text">Based on <a href="https://jena.apache.org/">Apache jena</a>, this client supports the full SPARQL 1.1 syntax</p>
+              <h5 class="card-title">Sage client - Apache Jena</h5>
+              <p class="card-text">Based on <a href="https://jena.apache.org/">Apache jena</a>, this client supports the full SPARQL 1.1 syntax, including federated SPARQL queries.</p>
               <a href="https://github.com/Callidon/sage-jena/releases/tag/1.0-SNAPSHOT" class="btn btn-primary">
                 <i class="fas fa-download"></i> Download
               </a>
@@ -36,8 +45,8 @@
           <div class="card">
             <center><i class="card-img-top fab fa-8x fa-js"></i></center>
             <div class="card-body">
-              <h5 class="card-title">Javascript client</h5>
-              <p class="card-text">Evaluate SPARQL queries from any modern Web browsers</p>
+              <h5 class="card-title">Sage client - Javascript</h5>
+              <p class="card-text">Based on <a href="https://github.com/antoniogarrote/rdfstore-js">RDFStore.js</a>, this javascript client allow yout to execute SPARQL queries in the browser.</p>
               <a href="#" class="btn btn-warning">Coming soon...</a>
             </div>
           </div>
