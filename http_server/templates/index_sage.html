@@ -3,6 +3,11 @@
 {% block title %}Home - Sage{% endblock %}
 
 {% block body %}
+  {% include 'intro.html' %}
+  <hr>
   {% include 'playground.html' %}
+  <hr>
   {% include 'interfaces.html' %}
+  <hr>
+  {% include 'software.html' %}
 {% endblock %}
