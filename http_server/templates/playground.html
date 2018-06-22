@@ -1,14 +1,18 @@
 <div class="container" id="playground">
   <div class="row">
     <div class="col-md-12">
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/client.css') }}">
+      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/sage-client/css/client.css') }}">
+      <link href="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.css') }}" rel='stylesheet' type='text/css'/>
+      <link href="{{ url_for('static', filename='node_modules/yasgui-yasqe/dist/yasqe.css') }}" rel='stylesheet' type='text/css'/>
       <div id='target'></div>
 
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/popper.js/dist/umd/popper.min.js') }}"></script>
-      <script type='text/javascript' src="{{ url_for('static', filename='js/jquery.tmpl.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='node_modules/knockout/build/output/knockout-latest.js') }}" charset="utf-8"></script>
-      <script type='text/javascript' src="{{ url_for('static', filename='js/rdfstore.js') }}"></script>
-      <script type='text/javascript' src="{{ url_for('static', filename='js/client_frontend.js') }}"></script>
+      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/sage-client/js/jquery.tmpl.min.js') }}"></script>
+      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/knockout/build/output/knockout-latest.js') }}" charset="utf-8"></script>
+      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.js') }}"></script>
+      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/yasgui-yasqe/dist/yasqe.js') }}"></script>
+      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/sage-client/js/rdfstore.js') }}"></script>
+      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/sage-client/js/client_frontend.js') }}"></script>
       <script type='text/javascript'>
         jQuery(document).ready(function(){
         frontend = null;

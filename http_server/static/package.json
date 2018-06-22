@@ -17,6 +17,8 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "knockout": "^3.4.2",
-    "popper.js": "^1.14.3"
+    "popper.js": "^1.14.3",
+    "yasgui-yasqe": "^2.11.18",
+    "sage-client": "slaanaroth/sage-client"
   }
 }
