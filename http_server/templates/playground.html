@@ -35,8 +35,9 @@
                               var toParse = decodedString.replace(/\'/g,"\"");
                               var dataset = JSON.parse(toParse);
                               var hostname = window.location.href;
-                              if (hostname.substr(hostname.length - 1) === "#") {
-                                hostname = hostname.slice(0,-2);
+                              if (hostname.indexOf("#") > -1) {
+
+                                hostname = hostname.slice(0,hostname.indexOf('#') - 1);
                               }
                               else {
                                 hostname = hostname.slice(0,-1);
