@@ -133,6 +133,9 @@
                                 jQuery('#sparql-server-text').val(sender.target.title);
                               };
                             }
+                            frontend.yasqe.on("inputRead",function(){
+                              jQuery('#sparql-query-desc-text').val("Custom Query");
+                            })
                           });
 
         });
