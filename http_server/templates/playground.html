@@ -16,6 +16,42 @@
       <script type='text/javascript'>
         jQuery(document).ready(function(){
         frontend = null;
+        var queryList = [
+          {
+            code : "q1",
+            dataset : "dbpedia",
+            description : "Directors of movies starring Brad Pitt",
+            query : "prefix dbpedia-owl: <http://dbpedia.org/ontology/>\nprefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT ?movie ?title ?name\nWHERE {\n ?movie dbpedia-owl:starring [ rdfs:label \"Brad Pitt\"@en ];\n\t\trdfs:label ?title;\n\t\tdbpedia-owl:director [ rdfs:label ?name ].\n FILTER LANGMATCHES(LANG(?title), \"EN\")\n FILTER LANGMATCHES(LANG(?name),  \"EN\")\n}"
+          },
+          {
+            code : "q2",
+            dataset : "watdiv",
+            description : "WatDiv Query #37",
+            query : "SELECT ?v0 ?v1 ?v3 WHERE {\n\t?v0 <http://purl.org/goodrelations/includes> ?v1 .\n\t?v1 <http://schema.org/contentSize> ?v3 .\n\t?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9>.\n}"
+          }
+        ];
+
+        findQuery = function(code){
+          for (var i = 0; i < queryList.length; i++) {
+            var query = queryList[i];
+            if (query.code === code) {
+              return query;
+            }
+          }
+          return null;
+        };
+
+        findServ = function(dataset){
+          var btns = jQuery('#datasetList')[0].children;
+          for (var i = 0; i < btns.length; i++) {
+            var btn = btns[i];
+            if (btn.title.includes(dataset)) {
+              return btn.title;
+            }
+          }
+          return null;
+        }
+
           rdfstore.create({"communication": {
                              "parsers": {
                                "text/html" :           ClientFrontend.rdfaParser,
@@ -35,7 +71,7 @@
                               var toParse = decodedString.replace(/\'/g,"\"");
                               var dataset = JSON.parse(toParse);
                               var hostname = window.location.href;
-                              if (hostname.indexOf("#") > -1) {
+                              if (hostname.indexOf("#") > -1  ) {
 
                                 hostname = hostname.slice(0,hostname.indexOf('#') - 1);
                               }
@@ -43,11 +79,55 @@
                                 hostname = hostname.slice(0,-1);
                               }
                               var urlDS = hostname + "{{ url_for('sparql-interface.sparql_query', dataset_name=dinfo["name"]) }}";
-                              var html = '<a class="dropdown-item" href="#" title="' + urlDS + '">'+dataset.name+'</a>'
+                              var html = '<a class="dropdown-item" title="' + urlDS + '">'+dataset.name+'</a>'
                               jQuery('#datasetList').append(html);
                             {% endfor %}
+
+                            for (var i = 0; i < queryList.length; i++) {
+                              var query = queryList[i];
+                              var html = '<a class="dropdown-item" title="' + query.code + '">'+query.description+'</a>';
+                              jQuery('#queryList').append(html);
+                            }
+
+                            var btnsQueries = jQuery('#queryList')[0].children;
+
+                            var foundDefault = false;
+                            var cpt = 0;
+                            while (!foundDefault) {
+                              var defQuery = findQuery(btnsQueries[cpt].title);
+                              if (defQuery != null) {
+                                var serv = findServ(defQuery.dataset);
+                                if (serv != null) {
+                                  jQuery('#sparql-query-desc-text').val(defQuery.description);
+                                  frontend.yasqe.setValue(defQuery.query);
+                                  jQuery('#sparql-server-text').val(serv);
+                                  foundDefault = true;
+                                }
+                                else {
+                                  cpt++;
+                                }
+                              }
+                              else {
+                                cpt++;
+                              }
+                            }
+
+                            for (var i = 0; i < btnsQueries.length; i++) {
+                              btnsQueries[i].onclick = function(sender){
+                                var query = findQuery(sender.target.title);
+                                if (query != null) {
+                                  var serv = findServ(query.dataset);
+                                  if (serv != null) {
+                                    jQuery('#sparql-query-desc-text').val(query.description);
+                                    frontend.yasqe.setValue(query.query);
+                                    jQuery('#sparql-server-text').val(serv);
+                                  }
+                                }
+                              };
+                            }
+
                             var btns = jQuery('#datasetList')[0].children;
-                            jQuery('#sparql-server-text').val(btns[0].title);
+                            // jQuery('#sparql-server-text').val(btns[0].title);
                             for (var i = 0; i < btns.length; i++) {
                               btns[i].onclick = function(sender){
                                 jQuery('#sparql-server-text').val(sender.target.title);

@@ -18,7 +18,7 @@
     "jquery": "^3.3.1",
     "knockout": "^3.4.2",
     "popper.js": "^1.14.3",
-    "yasgui-yasqe": "^2.11.18",
-    "sage-client": "slaanaroth/sage-client"
+    "sage-client": "github:slaanaroth/sage-client",
+    "yasgui-yasqe": "^2.11.18"
   }
 }
