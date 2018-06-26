@@ -43,7 +43,7 @@ except SubprocessError as e:
     exit(1)
 
 setup(
-    name="sage-engine",
+    name="sage",
     version=__version__,
     author="Thomas Minier",
     author_email="thomas.minier@univ-nantes.fr",
