@@ -72,7 +72,7 @@ Sage is also available through a Docker image
 
 ```
 docker pull Callidon/sage
-docker run -p 8000:8000 sage:latest sh run.sh data/watdiv_config.yaml
+docker run -p 8000:8000 sage:latest python sage.py config.yaml
 ```
 
 # Documentation

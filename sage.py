@@ -1,7 +1,7 @@
 # sage.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import argparse
-import os
+from os.path import isfile
 from http_server.server import sage_app
 from gunicorn.app.base import BaseApplication
 from gunicorn.six import iteritems
@@ -28,15 +28,17 @@ def start_sage():
     parser.add_argument('config', metavar='config', help='Path to the Sage configuration file to use')
     parser.add_argument('-p', '--port', metavar='P', type=int, help='The port to bind (default: 8000)', default=8000)
     parser.add_argument('-w', '--workers', metavar='W', type=int, help='The number of server workers (default: 4)', default=4)
+    parser.add_argument('--log-level', metavar='LEVEL', dest='log_level', help='The granularity of Error log outputs (default: info)', default='info')
     args = parser.parse_args()
     # check if config file exists
-    if not os.path.isfile(args.config):
+    if not isfile(args.config):
         print("Error: Configuration file not found: '{}'".format(args.config))
         print("Error: Sage server could not start, aborting...")
     else:
         options = {
             'bind': '%s:%s' % ('0.0.0.0', args.port),
             'workers': args.workers,
+            'log-level': args.log_level
         }
         StandaloneApplication(sage_app(args.config), options).run()
 

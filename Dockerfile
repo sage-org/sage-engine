@@ -9,4 +9,4 @@ RUN make install
 
 EXPOSE 8000
 
-CMD [ "sh", "run.sh" ]
+CMD [ "python", "sage.py" ]
