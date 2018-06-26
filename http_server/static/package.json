@@ -1,17 +1,21 @@
 {
   "name": "sage-engine",
   "version": "1.0.0",
-  "description": "Frontend website for the sage-engine",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "Frontend website for the Sage server",
   "keywords": [
     "sage",
     "frontend"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Callidon/sage-engine.git"
+  },
   "author": "Thomas Minier <thomas.minier@univ-nantes.fr>",
   "license": "MIT",
+  "homepage": "https://github.com/Callidon/sage-engine#readme",
+  "bugs": {
+    "url": "https://github.com/Callidon/sage-engine/issues"
+  },
   "dependencies": {
     "bootstrap": "^4.1.1",
     "font-awesome": "^4.7.0",

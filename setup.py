@@ -1,7 +1,16 @@
 # setup.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from setuptools import setup
-from subprocess import call
+from subprocess import run
+from os import getcwd
+from sys import exit
+
+
+def install_web_deps():
+    """Install Sage web interface dependencies using npm"""
+    path = "{}/http_server/static".format(getcwd())
+    run(["npm", "install", "--production"], cwd=path)
+
 
 __version__ = "1.0.0"
 
@@ -30,8 +39,14 @@ install_requires = [
 with open('README.rst') as file:
     long_description = file.read()
 
-# run npm install before
-call(["make", "install-web"])
+try:
+    print('Installing Sage Web interface dependencies using npm...')
+    install_web_deps()
+    print('Sage Web interface successfully installed')
+except SubprocessError as e:
+    print('Error: cannot install Sage Web interface successfully installed')
+    print('Error: {}'.format(e))
+    exit(1)
 
 setup(
     name="sage-engine",
