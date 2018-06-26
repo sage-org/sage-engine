@@ -1,4 +1,5 @@
 include requirements.txt
 include README.md
+include http_server/static/package.json
+include http_server/static/package-lock.json
 recursive-include http_server/templates *
-recursive-include http_server/static *

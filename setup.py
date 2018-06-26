@@ -1,6 +1,6 @@
 # setup.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from setuptools import setup
+from setuptools import setup, find_packages
 from subprocess import run
 from os import getcwd
 from sys import exit
@@ -16,12 +16,6 @@ __version__ = "1.0.0"
 
 console_scripts = [
     'sage = http_server.cli:cli_sage'
-]
-
-packages = [
-    "database",
-    "http_server",
-    "query_engine"
 ]
 
 install_requires = [
@@ -61,7 +55,7 @@ setup(
     install_requires=install_requires,
     include_package_data=True,
     zip_safe=False,
-    packages=packages,
+    packages=find_packages(exclude=["tests", "tests.*"]),
     entry_points={
         'console_scripts': console_scripts
     }
