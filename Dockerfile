@@ -5,8 +5,8 @@ RUN apk add --no-cache git make g++ nodejs
 WORKDIR /opt/sage-engine/
 
 COPY . .
-RUN make install
+RUN python setup.py install
 
 EXPOSE 8000
 
-CMD [ "python", "sage.py" ]
+CMD [ "sage" ]
