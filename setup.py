@@ -20,6 +20,7 @@ console_scripts = [
 
 install_requires = [
     "Flask==0.12.2",
+    "pybind11==2.2.1",
     "hdt==1.1.0",
     "marshmallow==2.15.0",
     "PyYAML==3.12",
