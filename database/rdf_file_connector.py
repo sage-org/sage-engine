@@ -94,7 +94,7 @@ class RDFFileConnector(DatabaseConnector):
     def from_config(config):
         """Build a RDFFileConnector from a config file"""
         if not os.path.isfile(config["file"]):
-            raise Error("Configuration file not found: {}".format(config["file"]))
+            raise Exception("Configuration file not found: {}".format(config["file"]))
         return RDFFileConnector(config['file'], config['format'])
 
     def __load_from_file(self, file, format=None):
@@ -103,7 +103,7 @@ class RDFFileConnector(DatabaseConnector):
             If not format is provided, then rdflib is used to guess the format.
         """
         if not os.path.isfile(file):
-            raise Error("Cannot find RDF file to load: {}".format(file))
+            raise Exception("Cannot find RDF file to load: {}".format(file))
         if format is None:
             format = guess_format(file)
         # use a temporary graph to load from a RDF file

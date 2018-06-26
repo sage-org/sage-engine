@@ -1,11 +1,19 @@
 # SaGe server
 Python implementation of SaGe, a preemptive query engine for Basic Graph pattern evaluation.
 
+# Table of contents
+
+* [Installation](#installation)
+* [Getting started](#getting-started)
+* [Sage Docker image](#sage-docker-image)
+* [Documentation](#documentation)
+
 # Installation
 
 Installation in a [virtualenv](https://virtualenv.pypa.io/en/stable/) is **strongly advised!**
 
 Requirements:
+* [git](https://git-scm.com/)
 * [pip](https://pip.pypa.io/en/stable/)
 * [npm](https://nodejs.org/en/) (shipped with Node.js on most systems)
 * **gcc/clang** with **c++11 support**
@@ -19,19 +27,51 @@ cd sage-engine/
 make install
 ```
 
-# Launch server
+# Getting started
 
-The configuration file for the SaGe experimental setup is `data/watdiv_config.yaml`.
+## Server configuration
+
+A Sage server is configured using a configuration file in [YAML syntax](http://yaml.org/).
+
+```yaml
+name: SaGe Test server
+maintainer: Chuck Norris
+quota: 75
+maxResults: 500
+datasets:
+-
+  name: dbpedia-2016
+  description: DBPedia v2016
+  backend: hdt-file
+  file: datasets/dbpedia.2016.hdt
+-
+  name: geonames
+  description: Geonames dataset
+  backend: hdt-file
+  file: datasets/geonames.hdt
+```
+
+The `quota` and `maxResults` fields are used to set the maximum query execution time and the maximum nuber of results
+per request, respectively.
+
+Each entry in the `datasets` field declare a RDF dataset with a name, description, backend and options specific to this backend.
+Currently, only the `hdt-file` backend is supported, which allow a Sage server to load RDF datasets from [HDT files](http://www.rdfhdt.org/). Sage uses [pyHDT](https://github.com/Callidon/pyHDT) to load an query HDT files.
+
+## Launch the Sage server
+
+The script `run.sh` allow to easily start a sage server from a configuration file, using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
 
 ```
-# launch server with 1 worker on port 8000 using Gunicorn
-./run.sh data/watdiv_config.yaml 1 8000
+# launch server with 4 workers on port 8000
+./run.sh data/watdiv_config.yaml 4 8000
 ```
 
-# Run with Docker
+# Sage Docker image
+
+Sage is also available through a Docker image
 
 ```
-docker build -t sage .
+docker pull Callidon/sage
 docker run -p 8000:8000 sage:latest sh run.sh data/watdiv_config.yaml
 ```
 

@@ -34,5 +34,5 @@ class HDTFileConnector(DatabaseConnector):
     def from_config(config):
         """Build a HDTFileFactory from a config file"""
         if not os.path.isfile(config["file"]):
-            raise Error("Configuration file not found: {}".format(config["file"]))
+            raise Exception("Configuration file not found: {}".format(config["file"]))
         return HDTFileConnector(config["file"])
