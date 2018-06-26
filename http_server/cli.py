@@ -1,4 +1,4 @@
-# sage.py
+# cli.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import argparse
 from os.path import isfile
@@ -23,7 +23,7 @@ class StandaloneApplication(BaseApplication):
         return self.application
 
 
-def start_sage():
+def cli_sage():
     parser = argparse.ArgumentParser(description='Launch the Sage server')
     parser.add_argument('config', metavar='config', help='Path to the Sage configuration file to use')
     parser.add_argument('-p', '--port', metavar='P', type=int, help='The port to bind (default: 8000)', default=8000)
@@ -41,7 +41,3 @@ def start_sage():
             'log-level': args.log_level
         }
         StandaloneApplication(sage_app(args.config), options).run()
-
-
-if __name__ == '__main__':
-    start_sage()

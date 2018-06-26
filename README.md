@@ -24,7 +24,7 @@ Requirements:
 ```
 git clone https://github.com/Callidon/sage-bgp
 cd sage-engine/
-make install
+python setup.py install
 ```
 
 # Getting started
@@ -59,11 +59,11 @@ Currently, only the `hdt-file` backend is supported, which allow a Sage server t
 
 ## Launch the Sage server
 
-The script `run.sh` allow to easily start a sage server from a configuration file, using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
+The executable `sage`, installed alongside the Sage server, allows to easily start a sage server from a configuration file, using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
 
 ```
 # launch server with 4 workers on port 8000
-./run.sh data/watdiv_config.yaml 4 8000
+sage data/watdiv_config.yaml -w 4 -p 8000
 ```
 
 # Sage Docker image
