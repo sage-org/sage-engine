@@ -5,6 +5,7 @@ RUN apk add --no-cache git make g++ nodejs
 WORKDIR /opt/sage-engine/
 
 COPY . .
+RUN pip install pybind11
 RUN pip install -r requirements.txt
 RUN python setup.py install
 
