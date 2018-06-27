@@ -1,11 +1,11 @@
 # bgp_interface_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
-from http_server.server import app
+from http_server.server import sage_app
 from tests.http.utils import jsonPost
 from os import environ
 
-environ['YALDF_CONFIG'] = 'data/test_config.yaml'
+app = sage_app('data/test_config.yaml')
 
 bgp_queries = [
     ({

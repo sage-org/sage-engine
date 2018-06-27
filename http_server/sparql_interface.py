@@ -54,8 +54,8 @@ def sparql_blueprint(datasets, logger):
         post_query, err = QueryRequest().load(request.get_json())
         if err is not None and len(err) > 0:
             return Response(format_marshmallow_errors(err), status=400)
-        quota = int(dataset.quota()) / 1000
-        max_results = dataset.maxResults()
+        quota = dataset.quota / 1000
+        max_results = dataset.maxResults
         # Load next link
         next_link = None
         if 'next' in post_query:

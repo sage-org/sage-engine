@@ -25,7 +25,6 @@ install_requires = [
     "marshmallow==2.15.0",
     "PyYAML==3.12",
     "rdflib==4.2.2",
-    "requests==2.18.4",
     "gunicorn==19.7.1",
     "flask-cors==3.0.3",
     "protobuf==3.5.2"

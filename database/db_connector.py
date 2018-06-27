@@ -27,3 +27,8 @@ class DatabaseConnector(ABC):
     def from_config(config):
         """Build a DatabaseConnector from a dictionnary"""
         pass
+
+    @property
+    def nb_triples(self):
+        """Get the number of RDF triples in the database"""
+        return None

@@ -4,11 +4,9 @@ from yaml import load
 from database.rdf_file_connector import RDFFileConnector
 from database.hdt_file_connector import HDTFileConnector
 from math import inf
-# from database.hdt_server_factory import HDTServerFactory
 
 DB_CONNECTORS = {
     'rdf-file': RDFFileConnector,
-    # 'hdt-server': HDTServerFactory,
     'hdt-file': HDTFileConnector
 }
 
@@ -24,11 +22,17 @@ class Dataset(object):
     def config(self):
         return self._config
 
+    @property
     def quota(self):
         return self._config['quota']
 
+    @property
     def maxResults(self):
         return self._config['maxResults']
+
+    @property
+    def nb_triples(self):
+        return self._connector.nb_triples
 
     def connector(self):
         """Get the underlying DatabaseConnector for this dataset"""
@@ -55,8 +59,8 @@ class Dataset(object):
             "@id": "{}/{}".format(url, self._config["name"]),
             "title": self._config["name"],
             "description": self._config["description"],
-            "timeQuota": self.quota(),
-            "maxResults": self.maxResults() if self.maxResults() is not inf else 'inf',
+            "timeQuota": self.quota,
+            "maxResults": self.maxResults if self.maxResults is not inf else 'inf',
             "supportedOperation": [
                 {
                     "@type": "Operation",

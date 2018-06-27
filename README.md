@@ -24,6 +24,7 @@ Requirements:
 ```bash
 git clone https://github.com/Callidon/sage-bgp
 cd sage-engine/
+pip -r requirements.txt
 python setup.py install
 ```
 
