@@ -12,6 +12,7 @@
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.js') }}"></script>
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/yasgui-yasqe/dist/yasqe.js') }}"></script>
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/sage-client/js/rdfstore.js') }}"></script>
+      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/sage-client/js/sage-client-browser.js') }}"></script>
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/sage-client/js/client_frontend.js') }}"></script>
       <script type='text/javascript'>
         jQuery(document).ready(function(){
@@ -60,7 +61,7 @@
                             "precedences": ["text/n3", "text/turtle", "application/rdf+xml", "text/html", "application/json"] }
                           },
                           function(err, store) {
-                            frontend = new client_frontend('#target',store);
+                            frontend = new client_frontend('#target',store,sage);
                             {% for dinfo in datasets %}
                               var ds = "{{ dinfo }}";
                               var parser = new DOMParser;
