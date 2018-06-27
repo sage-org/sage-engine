@@ -1,12 +1,12 @@
 {% extends "main.html" %}
 
-{% block title%}SaGe interface{% endblock %}
+{% block title%}{{ dataset_info['title'] }} dataset - Sage{% endblock %}
 
 {% block body %}
 <div class="container">
   <div class="row">
     <div class="col-lg">
-      <h1>{{ dataset_info['title'] }} Dataset</h1>
+      <h1>{{ dataset_info['title'] }} dataset</h1>
 
       <h3><i class="fas fa-pencil-alt"></i> Description</h3>
       <p>{{ dataset_info['description'] }}</p>
@@ -20,13 +20,21 @@
         <table class="table">
           <thead>
             <tr>
+              <th>RDF triples</th>
+              <th>Subjects</th>
+              <th>Predicates</th>
+              <th>Objects</th>
               <th>Time quota</th>
               <th>Max results per request</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>{{dataset_info["timeQuota"]}}ms</td>
+              <td>{{ "{:,}".format(dataset_info["stats"]["size"]) }} triples</td>
+              <td>{{ "{:,}".format(dataset_info["stats"]["nb_subjects"]) }}</td>
+              <td>{{ "{:,}".format(dataset_info["stats"]["nb_predicates"]) }}</td>
+              <td>{{ "{:,}".format(dataset_info["stats"]["nb_objects"]) }}</td>
+              <td>{{ dataset_info["timeQuota"] }}ms</td>
               {%- if dataset_info["maxResults"] == 'inf' -%}
                 <td>No limit</td>
               {%- else -%}

@@ -32,3 +32,18 @@ class DatabaseConnector(ABC):
     def nb_triples(self):
         """Get the number of RDF triples in the database"""
         return None
+
+    @property
+    def nb_subjects(self):
+        """Get the number of subjects in the database"""
+        return None
+
+    @property
+    def nb_predicates(self):
+        """Get the number of predicates in the database"""
+        return None
+
+    @property
+    def nb_objects(self):
+        """Get the number of objects in the database"""
+        return None

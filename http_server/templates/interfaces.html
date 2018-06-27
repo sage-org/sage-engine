@@ -9,6 +9,7 @@
             <tr>
               <th>Dataset</th>
               <th>Description</th>
+              <th>RDF triples</th>
               <th>Time quota</th>
               <th>Max results per request</th>
               <th>Interface URL</th>
@@ -22,7 +23,8 @@
                   {{ dataset["title"] }}
                 </a>
               </td>
-              <td>{{dataset["description"]}}</td>
+              <td>{{ dataset["description"] }}</td>
+              <td>{{ "{:,}".format(dataset["stats"]["size"]) }} triples</td>
               <td>{{dataset["timeQuota"]}}ms</td>
               {%- if dataset["maxResults"] == 'inf' -%}
               <td>No limit</td>

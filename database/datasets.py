@@ -59,6 +59,12 @@ class Dataset(object):
             "@id": "{}/{}".format(url, self._config["name"]),
             "title": self._config["name"],
             "description": self._config["description"],
+            "stats": {
+                "size": self.nb_triples,
+                "nb_subjects": self._connector.nb_subjects if self._connector.nb_subjects is not None else 'unknown',
+                "nb_predicates": self._connector.nb_predicates if self._connector.nb_predicates is not None else 'unknown',
+                "nb_objects": self._connector.nb_objects if self._connector.nb_objects is not None else 'unknown'
+            },
             "timeQuota": self.quota,
             "maxResults": self.maxResults if self.maxResults is not inf else 'inf',
             "supportedOperation": [

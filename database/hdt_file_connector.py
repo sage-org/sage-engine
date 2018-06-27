@@ -31,6 +31,25 @@ class HDTFileConnector(DatabaseConnector):
         obj = obj if (obj is not None) and (not obj.startswith('?')) else ""
         return self._hdt.search_triples(subject, predicate, obj, offset=offset, limit=limit)
 
+    @property
+    def nb_triples(self):
+        return self._hdt.total_triples
+
+    @property
+    def nb_subjects(self):
+        """Get the number of subjects in the database"""
+        return self._hdt.nb_subjects
+
+    @property
+    def nb_predicates(self):
+        """Get the number of predicates in the database"""
+        return self._hdt.nb_predicates
+
+    @property
+    def nb_objects(self):
+        """Get the number of objects in the database"""
+        return self._hdt.nb_objects
+
     def from_config(config):
         """Build a HDTFileFactory from a config file"""
         if not os.path.isfile(config["file"]):
