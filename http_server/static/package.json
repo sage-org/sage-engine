@@ -22,7 +22,7 @@
     "jquery": "^3.3.1",
     "knockout": "^3.4.2",
     "popper.js": "^1.14.3",
-    "sage-client": "github:slaanaroth/sage-client",
+    "sage-client": "git+https://github.com/slaanaroth/sage-client",
     "yasgui-yasqe": "^2.11.18"
   }
 }
