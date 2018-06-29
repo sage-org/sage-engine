@@ -52,7 +52,7 @@ def build_union_plan(union, db_connector, projection=None):
         sources.append(iterator)
         cardinalities += cards
     if len(sources) == 1:
-        return sources[0]
+        return sources[0], cardinalities
     while len(sources) > 1:
         sources = list(map(mapper, chunks(sources, 2)))
     return sources[0], cardinalities

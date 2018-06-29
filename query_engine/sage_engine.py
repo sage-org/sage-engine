@@ -8,6 +8,7 @@ from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.utils import IteratorExhausted
 from query_engine.protobuf.iterators_pb2 import RootTree
 from math import inf
+from time import time
 
 
 class TooManyResults(Exception):
