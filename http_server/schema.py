@@ -1,6 +1,6 @@
 # schema.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validates, ValidationError
 
 
 class ManyNested(fields.Nested):
@@ -42,7 +42,8 @@ class FilterSchema(Schema):
 class SparqlQuerySchema(Schema):
     """Marshmallow schema for a SPARQL query"""
     type = fields.Str(required=True)
-    bgp = fields.Nested(TriplePatternSchema, required=True, many=True)
+    bgp = fields.Nested(TriplePatternSchema, required=False, many=True)
+    union = fields.List(fields.Nested(TriplePatternSchema, many=True), many=True)
     optional = fields.Nested(TriplePatternSchema, required=False, many=True)
     filters = fields.Nested(FilterSchema, required=False, many=True)
 
@@ -51,3 +52,12 @@ class QueryRequest(Schema):
     """Marshmallow schema for a query to SaGe SPARQL API"""
     query = fields.Nested(SparqlQuerySchema, required=True)
     next = fields.Str(required=False, allow_none=True)
+
+    @validates("query")
+    def validate_query(self, query):
+        if 'bgp' not in query and 'union' not in query:
+            raise ValidationError('A valid query must contains a field "bgp" or "union"')
+        elif query['type'] == 'bgp' and 'bgp' not in query:
+            raise ValidationError('A valid BGP query must contains the "bgp" field')
+        elif query['type'] == 'union' and 'union' not in query:
+            raise ValidationError('A valid Union query must contains the "union" field')

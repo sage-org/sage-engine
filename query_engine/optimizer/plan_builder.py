@@ -21,7 +21,7 @@ def build_query_plan(query, db_connector, saved_plan=None, projection=None):
     root = None
 
     if query['type'] == 'union':
-        root = build_union_plan(query['patterns'], db_connector, projection)
+        root, cardinalities = build_union_plan(query['union'], db_connector, projection)
     elif query['type'] == 'bgp':
         root, cardinalities = build_join_plan(query['bgp'], db_connector, projection=projection)
     else:
@@ -45,12 +45,17 @@ def build_union_plan(union, db_connector, projection=None):
         if len(duo) == 1:
             return duo[0]
         return BagUnionIterator(duo[0], duo[1])
-    sources = [build_left_plan(bgp, db_connector) for bgp in union]
+    sources = []
+    cardinalities = []
+    for bgp in union:
+        iterator, cards = build_join_plan(bgp, db_connector, projection=projection)
+        sources.append(iterator)
+        cardinalities += cards
     if len(sources) == 1:
         return sources[0]
     while len(sources) > 1:
         sources = list(map(mapper, chunks(sources, 2)))
-    return sources[0]
+    return sources[0], cardinalities
 
 
 def build_join_plan(bgp, db_connector, projection=None):

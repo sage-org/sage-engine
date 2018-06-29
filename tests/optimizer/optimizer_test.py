@@ -60,7 +60,7 @@ def test_build_left_linear_plan():
 def test_build_union():
     query = {
         'type': 'union',
-        'patterns': [
+        'union': [
             [
                 {
                     'subject': '?s',

@@ -11,7 +11,7 @@ bgp_queries = [
     ({
         'query': {
             'type': 'union',
-            'patterns': [
+            'union': [
                 [
                     {
                         'subject': '?s',
@@ -63,7 +63,6 @@ class TestUnionInterface(object):
         pass
 
     @pytest.mark.parametrize("body,cardinality,calls", bgp_queries)
-    @pytest.mark.skip(reason="UNIOn support is currently disabled")
     def test_bgp_interface(self, body, cardinality, calls):
         query = body
         nbResults = 0

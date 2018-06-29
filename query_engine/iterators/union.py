@@ -36,10 +36,10 @@ class BagUnionIterator(PreemptableIterator):
         """Save and serialize the iterator as a machine-readable format"""
         saved_union = SavedBagUnionIterator()
         # export left source
-        left_field = self._source.serialized_name() + '_left'
+        left_field = self._left.serialized_name() + '_left'
         getattr(saved_union, left_field).CopyFrom(self._left.save())
         # export right source
-        right_field = self._source.serialized_name() + '_right'
+        right_field = self._right.serialized_name() + '_right'
         getattr(saved_union, right_field).CopyFrom(self._right.save())
         return saved_union
 
