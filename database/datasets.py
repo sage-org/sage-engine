@@ -34,6 +34,10 @@ class Dataset(object):
     def nb_triples(self):
         return self._connector.nb_triples
 
+    @property
+    def example_queries(self):
+        return self._config['queries']
+
     def connector(self):
         """Get the underlying DatabaseConnector for this dataset"""
         return self._connector
@@ -67,6 +71,7 @@ class Dataset(object):
             },
             "timeQuota": self.quota,
             "maxResults": self.maxResults if self.maxResults is not inf else 'inf',
+            "examples": self.example_queries,
             "supportedOperation": [
                 {
                     "@type": "Operation",
@@ -126,6 +131,8 @@ def load_config(config_file="config.yaml"):
             c['quota'] = quota
         if 'maxResults' not in c:
             c['maxResults'] = maxResults
+        if 'queries' not in c:
+            c['queries'] = []
     # build datasets
     datasets = {c["name"]: Dataset(c) for c in config["datasets"]}
     return (config, datasets)
