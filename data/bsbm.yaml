@@ -1,0 +1,32 @@
+name: SaGe Test server
+maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
+quota: 75
+datasets:
+-
+  name: bsbm1M
+  description: BSBM 1M triples
+  version: 2018
+  backend: hdt-file
+  file: data/bsbm1M.hdt
+  queries:
+    - name: "Example query 1"
+      value: |
+        SELECT * WHERE {
+          ?s ?p ?o.
+        }
+    - name: "Example query 2"
+      value: |
+        SELECT * WHERE {
+          ?s rdf:type dbo:Actor.
+        }
+
+-
+  name: bsbm1k
+  description: BSBM 1k triples
+  backend: hdt-file
+  file: data/bsbm1k.hdt
+-
+  name: watdiv
+  description: watdiv 10M triples
+  backend: hdt-file
+  file: data/watdiv.10M.hdt
