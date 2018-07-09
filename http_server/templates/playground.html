@@ -16,260 +16,7 @@
       <script type='text/javascript'>
         jQuery(document).ready(function(){
         frontend = null;
-        var queryList = [
-          {
-            code : "q1",
-            dataset : "dbpedia",
-            description : "Directors of movies starring Brad Pitt",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT ?movie ?title ?name WHERE {
-  ?movie dbo:starring [ rdfs:label \"Brad Pitt\"@en ];
-    rdfs:label ?title;
-    dbo:director [ rdfs:label ?name ].
-  FILTER LANGMATCHES(LANG(?title), "EN")
-  FILTER LANGMATCHES(LANG(?name),  "EN")
-}`
-          },
-          {
-            code : "q2",
-            dataset : "watdiv",
-            description : "WatDiv Query #37",
-            query :
-`SELECT ?v0 ?v1 ?v3 WHERE {
-  ?v0 <http://purl.org/goodrelations/includes> ?v1 .
-  ?v1 <http://schema.org/contentSize> ?v3 .
-  ?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9>.
-}`
-          },
-          {
-            code : "q3",
-            dataset : "watdiv",
-            description : "WatDiv Query #10230",
-            query :
-`SELECT * WHERE {
-  ?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country14> .
-  ?v0 <http://purl.org/goodrelations/includes> ?v1 .
-  ?v0 <http://purl.org/goodrelations/price> ?v2 .
-  ?v0 <http://purl.org/goodrelations/validThrough> ?v3 .
-  ?v0 <http://schema.org/eligibleQuantity> ?v4 .
-  ?v1 <http://schema.org/text> ?v6 .
-}`
-          },
-          {
-            code : "q4",
-            dataset : "dbpedia",
-            description : "Airports in Italy",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix dbp: <http://dbpedia.org/property/>
-prefix dbr: <http://dbpedia.org/resource/>
-
-SELECT DISTINCT ?entity WHERE {
-  ?entity a dbo:Airport;
-  dbp:cityServed dbr:Italy.
-}`
-          },
-          {
-            code : "q5",
-            dataset : "dbpedia",
-            description : "Artists born in York",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix dbp: <http://dbpedia.org/property/>
-
-SELECT ?name ?deathDate WHERE {
-  ?person a dbo:Artist;
-          rdfs:label ?name;
-          dbo:birthPlace [ rdfs:label "York"@en ].
-  FILTER LANGMATCHES(LANG(?name),  "EN")
-  OPTIONAL { ?person dbp:dateOfDeath ?deathDate. }
-}`
-          },
-          {
-            code : "q6",
-            dataset : "dbpedia",
-            description : "Artists influenced by Picasso",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix dbr: <http://dbpedia.org/resource/>
-
-CONSTRUCT {
-  ?artist a dbo:Artist.
-  ?artist dbo:birthDate ?date.
-}
-WHERE {
-  ?artist dbo:influencedBy dbr:Pablo_Picasso.
-  ?artist a dbo:Artist.
-  ?artist dbo:birthDate ?date.
-}
-`
-          },
-          {
-            code : "q7",
-            dataset : "dbpedia",
-            description : "Authors of books",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-
-SELECT DISTINCT ?book ?author
-WHERE {
-  ?book rdf:type dbo:Book;
-        dbo:author ?author.
-}
-LIMIT 100
-`
-          },
-          {
-            code : "q8",
-            dataset : "dbpedia",
-            description : "Award ceremonies in Dutch speaking countries",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix dbp: <http://dbpedia.org/property/>
-prefix dbr: <http://dbpedia.org/resource/>
-
-SELECT ?award WHERE {
-  ?award a dbo:Award;
-         dbp:country [ dbo:language dbr:Dutch_language ].
-}
-`
-          },
-          {
-            code : "q9",
-            dataset : "dbpedia",
-            description : "Bands Michael Jackson wrote a song for",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix dbr: <http://dbpedia.org/resource/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT DISTINCT ?performer ?name WHERE {
-  ?work dbo:writer dbr:Michael_Jackson;
-        dbo:musicalArtist ?performer.
-  OPTIONAL {
-    ?performer rdfs:label ?name.
-    FILTER LANGMATCHES(LANG(?name), "EN")
-  }
-}
-`
-          },
-          {
-            code : "q10",
-            dataset : "dbpedia",
-            description : "Belgian Software",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT ?software ?company WHERE {
-  ?software dbo:developer ?company.
-  ?company dbo:locationCountry [ rdfs:label "Belgium"@en ].
-}
-`
-          },
-          {
-            code : "q11",
-            dataset : "dbpedia",
-            description : "Carpenters killed by crucifixion",
-            query :
-`prefix yago: <http://dbpedia.org/class/yago/>
-SELECT ?person
-WHERE {
-  ?person a yago:Carpenters, yago:PeopleExecutedByCrucifixion.
-}
-`
-          },
-          {
-            code : "q12",
-            dataset : "dbpedia",
-            description : "Death causes of male American actors",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix dc: <http://purl.org/dc/terms/>
-
-SELECT ?actor ?cause
-WHERE {
-  ?actor dbo:deathCause ?cause.
-  ?actor dc:subject <http://dbpedia.org/resource/Category:American_male_film_actors>
-}
-`
-          },
-          {
-            code : "q13",
-            dataset : "dbpedia",
-            description : "Desserts made with plants",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-
-SELECT ?dessert ?fruit
-WHERE {
-  ?dessert dbo:type <http://dbpedia.org/resource/Dessert>;
-           dbo:ingredient ?fruit.
-  ?fruit dbo:kingdom <http://dbpedia.org/resource/Plant>.
-}
-`
-          },
-          {
-            code : "q14",
-            dataset : "dbpedia",
-            description : "Devices with the same OS as the Raspberry Pi",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix dbp: <http://dbpedia.org/property/>
-prefix dbr: <http://dbpedia.org/resource/>
-
-SELECT DISTINCT ?device WHERE {
-  dbr:Raspberry_Pi dbp:os ?operatingSystem.
-  ?device a dbo:Device;
-          dbp:os ?operatingSystem.
-  FILTER (!(?device = dbr:Raspberry_Pi))
-}
-`
-          },
-          {
-            code : "q15",
-            dataset : "dbpedia",
-            description : "Events that took place in the Trentino region",
-            query :
-`prefix dbo: <http://dbpedia.org/ontology/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT DISTINCT ?entity ?event
-WHERE {
-  ?entity a dbo:Event;
-          rdfs:label ?event;
-          ?predicate <http://dbpedia.org/resource/Trentino> .
-  FILTER(langMatches(lang(?event), "EN"))
-}
-`
-          },
-          {
-            code : "q16",
-            dataset : "dbpedia",
-            description : "Foreign titles of Natalie Portman movies",
-            query :
-`PREFIX dbp: <http://dbpedia.org/property/>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT ?titleEng ?title
-WHERE {
-  ?movie dbp:starring [ rdfs:label "Natalie Portman"@en ].
-  	SERVICE <http://sage.univ-nantes.fr/sparql/dbpedia-2015-10> {
-      ?movie rdfs:label ?titleEng, ?title.
-	}
-    FILTER LANGMATCHES(LANG(?titleEng), "EN")
-    FILTER (!LANGMATCHES(LANG(?title), "EN"))
-}
-
-`
-          },
-
-        ];
+        var queryList = [];
 
         findQuery = function(code){
           for (var i = 0; i < queryList.length; i++) {
@@ -300,7 +47,22 @@ WHERE {
               'text/html');
           var decodedString = dom.body.textContent;
           var toParse = decodedString.replace(/\'/g,"\"");
+          toParse = toParse.replace(/\\"/g,"'");
+          toParse = toParse.replace(/("maxResults": inf,)/g,"")
+          toParse = toParse.replace(/("value": "(\n|.)*?(?="))/g,function (match){
+            var ret = match.replace(/\n/g,"\\n");
+            return ret.replace(/\t/g,"\\t");
+          })
           var dataset = JSON.parse(toParse);
+          var qIndex;
+          if (dataset.queries != null) {
+            for (var i = 0; i < dataset.queries.length; i++) {
+              var currQuery = dataset.queries[i];
+              qIndex = queryList.length + 1;
+              var toAdd = {code:("q"+qIndex), dataset: dataset.name, description : currQuery.name, query: currQuery.value};
+              queryList.push(toAdd);
+            }
+          }
           var hostname = window.location.href;
           if (hostname.indexOf("#") > -1  ) {
 
