@@ -1,7 +1,7 @@
 # setup.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from setuptools import setup, find_packages
-from subprocess import run
+from subprocess import run, SubprocessError
 from os import getcwd
 from sys import exit
 

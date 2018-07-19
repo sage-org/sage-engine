@@ -24,7 +24,7 @@ Requirements:
 ```bash
 git clone https://github.com/Callidon/sage-bgp
 cd sage-engine/
-pip -r requirements.txt
+pip install -r requirements.txt
 python setup.py install
 ```
 
@@ -73,7 +73,7 @@ The Sage server is also available through a [Docker image](https://hub.docker.co
 
 ```bash
 docker pull callidon/sage
-docker run -p 8000:8000 sage:latest python sage.py config.yaml
+docker run -p 8000:8000 callidon/sage sage config.yaml -w 4 -p 8000
 ```
 
 # Documentation
