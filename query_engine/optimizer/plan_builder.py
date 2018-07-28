@@ -2,10 +2,9 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import NestedLoopJoinIterator, LeftNLJIterator
+from query_engine.iterators.nlj import NestedLoopJoinIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.union import BagUnionIterator
-from query_engine.iterators.utils import EmptyIterator
 from query_engine.iterators.loader import load
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
 from query_engine.filter.compiler import compile_filter

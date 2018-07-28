@@ -25,7 +25,7 @@ def test_projection_read():
     assert done
 
 
-def test_projection_read():
+def test_projection_read_stopped():
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     proj = ProjectionIterator(scan, ['?common'])

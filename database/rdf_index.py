@@ -6,6 +6,7 @@ from math import inf
 
 class TripleIndex(object):
     """A TripleIndex is a B+ tree index for Bitmap RDF Triples"""
+
     def __init__(self):
         super(TripleIndex, self).__init__()
         self._keys = []

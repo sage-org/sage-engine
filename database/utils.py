@@ -5,6 +5,7 @@ from database.db_iterator import DBIterator
 
 class DoubleDict(object):
     """A DoubleDict is a two-way dictionnary"""
+
     def __init__(self):
         super(DoubleDict, self).__init__()
         self._keys_to_values = dict()
@@ -29,6 +30,7 @@ class DoubleDict(object):
 
 class TripleDictionary(object):
     """A TripleDictionary stores RDF triples in bitmap format"""
+
     def __init__(self):
         super(TripleDictionary, self).__init__()
         self._subjectDict = DoubleDict()
@@ -62,6 +64,7 @@ class TripleDictionary(object):
 
 class ArrayTripleIterator(DBIterator):
     """A ArrayTripleIterator iterates over a list of RDF triples"""
+
     def __init__(self, triples, pattern, limit=0, offset=0):
         super(ArrayTripleIterator, self).__init__(pattern, limit, offset)
         self._triples = triples

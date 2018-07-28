@@ -1,7 +1,7 @@
 # void_interface.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from flask import Blueprint, request, Response, abort
-from database.descriptors import VoidDescriptor
+from database.descriptors import VoidDescriptor, many_void
 from http_server.utils import secure_url
 
 
@@ -25,10 +25,20 @@ def void_blueprint(datasets, logger):
 
     @void_blueprint.route("/void/", methods=["GET"])
     def void_all():
+        """Describe all RDF datasets hosted by the Sage endpoint"""
+        mimetype = request.accept_mimetypes.best_match([
+            "application/n-triples", "text/turtle", "application/xml",
+            "application/n-quads", "application/trig",
+            "application/json", "application/json+ld"
+        ])
         url = secure_url(request.url_root)
+        format, mimetype = choose_format(mimetype)
+        description = many_void(url, datasets)
+        return Response(description, content_type=mimetype)
 
     @void_blueprint.route("/void/<dataset_name>", methods=["GET"])
     def void_dataset(dataset_name):
+        """Describe one RDF dataset"""
         logger.info('[/void/] Loading dataset {}'.format(dataset_name))
         dataset = datasets.get_dataset(dataset_name)
         if dataset is None:

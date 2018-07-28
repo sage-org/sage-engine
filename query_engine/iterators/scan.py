@@ -15,6 +15,7 @@ class ScanIterator(PreemptableIterator):
         - triple ``dict`` - The triple pattern corresponding to the source iterator.
         - cardinality ``integer=0]`` - The cardinality of the triple pattern.
     """
+
     def __init__(self, source, triple, cardinality=0):
         super(ScanIterator, self).__init__()
         self._source = source

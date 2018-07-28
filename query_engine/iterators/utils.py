@@ -9,6 +9,7 @@ class IteratorExhausted(Exception):
 
 class EmptyIterator(object):
     """An Iterator that yields nothing"""
+
     def __init__(self):
         super(EmptyIterator, self).__init__()
 

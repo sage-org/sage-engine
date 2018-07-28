@@ -7,6 +7,7 @@ from query_engine.iterators.utils import IteratorExhausted
 
 class ProjectionIterator(PreemptableIterator):
     """A ProjectionIterator performa projection over solution mappings"""
+
     def __init__(self, source, values=None):
         super(ProjectionIterator, self).__init__()
         self._source = source
@@ -36,7 +37,6 @@ class ProjectionIterator(PreemptableIterator):
         """Save and serialize the iterator as a machine-readable format"""
         saved_proj = SavedProjectionIterator()
         saved_proj.values.extend(self._values)
-        source = self._source.save()
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_proj, source_field).CopyFrom(self._source.save())
         return saved_proj

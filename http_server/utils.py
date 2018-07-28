@@ -3,7 +3,6 @@
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from base64 import b64encode, b64decode
 from json import dumps
-from time import time
 
 
 def sort_qparams(v):
@@ -29,7 +28,6 @@ def secure_url(url):
 
 def format_marshmallow_errors(errors):
     """Format mashmallow validation errors in string format"""
-    res = "ERROR 400 Bad Request: Errors when validating query schema"
     return dumps(errors, indent=2)
 
 

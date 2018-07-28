@@ -3,7 +3,6 @@
 import pytest
 from http_server.server import sage_app
 from tests.http.utils import jsonPost
-from os import environ
 
 app = sage_app('data/test_config.yaml')
 

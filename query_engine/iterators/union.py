@@ -7,6 +7,7 @@ from random import random
 
 class BagUnionIterator(PreemptableIterator):
     """BagUnionIterator performs a Bag Union between two input iterators"""
+
     def __init__(self, left, right):
         super(BagUnionIterator, self).__init__()
         self._left = left
@@ -48,6 +49,7 @@ class RandomBagUnionIterator(BagUnionIterator):
     """RandomBagUnionIterator performs a Bag Union between two input iterators,
     and randomly select the iterator to read at each call to next()
     """
+
     def __init__(self, left, right):
         super(BagUnionIterator, self).__init__()
         self._left = left

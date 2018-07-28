@@ -19,6 +19,7 @@ class NestedLoopJoinIterator(PreemptableIterator):
         - currentBinding ``dict=None`` - A set of solution mappings used to resume join processing.
         - iterOffset ``integer=0]`` - An offset used to resume processing of an inner loop.
     """
+
     def __init__(self, source, innerTriple, hdtDocument, currentBinding=None, iterOffset=0):
         super(NestedLoopJoinIterator, self).__init__()
         self._source = source

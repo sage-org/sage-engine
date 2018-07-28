@@ -10,6 +10,7 @@ from string import Template
 
 class FilterIterator(PreemptableIterator):
     """A FilterIterator evaluates a FILTER clause on set of mappings"""
+
     def __init__(self, source, expression, variables):
         super(FilterIterator, self).__init__()
         self._source = source
