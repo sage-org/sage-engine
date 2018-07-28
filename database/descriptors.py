@@ -10,6 +10,10 @@ SD = Namespace("http://www.w3.org/ns/sparql-service-description#")
 
 
 def bind_prefixes(graph):
+    """
+        Bind commodity prefixes to a rdflib Graph.
+        Generate readable prefixes when serializing the graph to turtle.
+    """
     graph.bind("dcterms", "http://purl.org/dc/terms/")
     graph.bind("foaf", "http://xmlns.com/foaf/0.1/")
     graph.bind("hydra", "http://www.w3.org/ns/hydra/core#")
@@ -18,9 +22,18 @@ def bind_prefixes(graph):
     graph.bind("void", "http://rdfs.org/ns/void#")
 
 
-def many_void(root_url, datasets, format):
-    """Describe a collection of RDF datasets using VOID + SPARQL Description languages"""
-    sage_uri = URIRef(root_url)
+def many_void(endpoint_uri, datasets, format, encoding="utf-8"):
+    """
+        Describe a collection of RDF datasets using VOID + SPARQL Description languages.
+        Supported formats: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
+
+        Args:
+            - endpoint_uri [string] - URI used to describe the endpoint
+            - datasets [DatasetCollection] - Collection of datasets to describe
+            - format [string] - RDF serialization format of the description
+            - encoding [string="utf-8"] - String encoding (default to utf-8)
+    """
+    sage_uri = URIRef(endpoint_uri)
     graph_collec = BNode()
     g = Graph()
     bind_prefixes(g)
@@ -37,14 +50,14 @@ def many_void(root_url, datasets, format):
     # describe each dataset available
     for d_name, dataset in datasets._datasets.items():
         d_node = BNode()
-        u = "{}/sparql/{}".format(root_url, d_name)
+        u = "{}/sparql/{}".format(endpoint_uri, d_name)
         # add relation between datasets collection and the current dataset
         g.add((graph_collec, SD["namedGraph"], d_node))
         g.add((d_node, SD["name"], URIRef(u)))
         g.add((d_node, SD["graph"], URIRef(u)))
         # add all triples from the dataset's description itself
         g += VoidDescriptor(u, dataset)._graph
-    return g.serialize(format=format)
+    return g.serialize(format=format).decode(encoding)
 
 
 class AbstractDescriptor(ABC):
@@ -54,8 +67,14 @@ class AbstractDescriptor(ABC):
         super(AbstractDescriptor, self).__init__()
 
     @abstractmethod
-    def describe(self, format):
-        """Describe the dataset using the given format, and returns the description as a string."""
+    def describe(self, format, encoding="utf-8"):
+        """
+            Describe the dataset using the given format, and returns the description as a string.
+
+            Args:
+                - format [string] - RDF serialization format of the description
+                - encoding [string="utf-8"] - String encoding (default to utf-8)
+        """
         pass
 
 
@@ -70,12 +89,16 @@ class VoidDescriptor(AbstractDescriptor):
         bind_prefixes(self._graph)
         self.__populate_graph()
 
-    def describe(self, format):
+    def describe(self, format, encoding="utf-8"):
         """
             Describe the dataset using the given format, and returns the description as a string.
-            Supported formats: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'
+            Supported formats: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
+
+            Args:
+                - format [string] - RDF serialization format of the description
+                - encoding [string="utf-8"] - String encoding (default to utf-8)
         """
-        return self._graph.serialize(format=format)
+        return self._graph.serialize(format=format).decode(encoding)
 
     def __populate_graph(self):
         """Fill the local triple store with dataset's metadata"""
