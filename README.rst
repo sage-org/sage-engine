@@ -29,7 +29,7 @@ is **strongly advised!**
 
 .. code:: bash
 
-    git clone https://github.com/Callidon/sage-bgp
+    git clone https://github.com/sage-org/sage-bgp
     cd sage-engine/
     pip install -r requirements.txt
     python setup.py install

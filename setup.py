@@ -47,7 +47,7 @@ setup(
     version=__version__,
     author="Thomas Minier",
     author_email="thomas.minier@univ-nantes.fr",
-    url="https://github.com/Callidon/sage-engine",
+    url="https://github.com/sage-org/sage-engine",
     description="...",
     long_description=long_description,
     keywords=["rdf", "sparql", "query engine"],

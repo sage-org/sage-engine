@@ -22,7 +22,7 @@ Requirements:
 > For example, for Python 3.6, install the `python3.6-dev` package on Debian/Ubuntu systems.
 
 ```bash
-git clone https://github.com/Callidon/sage-bgp
+git clone https://github.com/sage-org/sage-bgp
 cd sage-engine/
 pip install -r requirements.txt
 python setup.py install
