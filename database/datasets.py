@@ -13,6 +13,7 @@ DB_CONNECTORS = {
 
 class Dataset(object):
     """A RDF Dataset with a dedicated backend"""
+
     def __init__(self, config):
         super(Dataset, self).__init__()
         self._config = config
@@ -123,7 +124,7 @@ def load_config(config_file="config.yaml"):
     """
     config = load(open(config_file))
     # set page size, i.e. the number of triples per page
-    quota = config['quota'] if 'quota' in config else 20
+    quota = config['quota'] if 'quota' in config else 75
     maxResults = config['maxResults'] if 'maxResults' in config else inf
     config['quota'] = quota
     for c in config["datasets"]:
@@ -140,10 +141,19 @@ def load_config(config_file="config.yaml"):
 
 class DatasetCollection(object):
     """A collection of RDF datasets, served as a Singleton"""
+
     def __init__(self, config_file):
         super(DatasetCollection, self).__init__()
         self._config_file = config_file
         (self._config, self._datasets) = load_config(self._config_file)
+
+    @property
+    def name(self):
+        return self._config["name"] if "name" in self._config else None
+
+    @property
+    def maintainer(self):
+        return self._config["maintainer"] if "maintainer" in self._config else None
 
     def describe(self, url):
         """Gives a generator over dataset descriptions"""

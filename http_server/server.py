@@ -4,6 +4,7 @@ from flask import Flask, render_template, request
 from flask_cors import CORS
 from database.datasets import DatasetCollection
 from http_server.sparql_interface import sparql_blueprint
+from http_server.void_interface import void_blueprint
 from http_server.utils import secure_url
 
 
@@ -39,4 +40,5 @@ def sage_app(config_file):
         return render_template("documentation.html")
 
     app.register_blueprint(sparql_blueprint(datasets, app.logger))
+    app.register_blueprint(void_blueprint(datasets, app.logger))
     return app

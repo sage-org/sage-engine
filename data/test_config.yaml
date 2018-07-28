@@ -10,6 +10,6 @@ datasets:
   file: data/test.hdt
 -
   name: watdiv100
-  description: Watdiv dataset
+  description: Sample dataset in HDT format, used for testing
   backend: hdt-file
-  file: data/watdiv.10M.hdt
+  file: /Users/minier-t/Documents/hdt-files/watdiv.10M.hdt

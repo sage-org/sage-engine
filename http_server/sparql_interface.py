@@ -16,7 +16,6 @@ def sparql_blueprint(datasets, logger):
     @sparql_blueprint.route("/sparql/", methods=["GET"])
     def sparql_index():
         mimetype = request.accept_mimetypes.best_match(["application/json", "text/html"])
-        datasets_infos = datasets._config["datasets"]
         url = secure_url(request.url)
         api_doc = {
             "@context": "http://www.w3.org/ns/hydra/context.jsonld",
