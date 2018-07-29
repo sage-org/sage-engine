@@ -95,8 +95,8 @@ class TestBGPInterface(object):
         while hasNext:
             response = jsonPost(self.app, '/sparql/watdiv100', query)
             nbResults += len(response['results']['bindings'])
-            hasNext = response['hasNext']
-            query['next'] = response['next']
+            hasNext = response['head']['controls']['hasNext']
+            query['next'] = response['head']['controls']['next']
             nbCalls += 1
         assert nbResults == cardinality
         assert nbCalls <= calls
