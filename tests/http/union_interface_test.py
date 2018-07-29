@@ -69,7 +69,7 @@ class TestUnionInterface(object):
         hasNext = True
         while hasNext:
             response = jsonPost(self.app, '/sparql/watdiv100', query)
-            nbResults += len(response['bindings'])
+            nbResults += len(response['results']['bindings'])
             hasNext = response['hasNext']
             query['next'] = response['next']
             nbCalls += 1

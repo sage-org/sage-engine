@@ -1,6 +1,7 @@
 # responses.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStatistics, SageResponse
+from query_engine.formatters import sparql_json
 
 
 def protobuf(bindings, next_page, stats):
@@ -25,12 +26,9 @@ def protobuf(bindings, next_page, stats):
     return sageResponse.SerializeToString()
 
 
-def json(bindings, page_size, next_link, stats):
-    res = {
-        "bindings": bindings,
-        "pageSize": page_size,
-        "hasNext": next_link is not None,
-        "next": next_link,
-        "stats": stats
-    }
-    return res
+def json(bindings, next_link, stats):
+    page = sparql_json(bindings)
+    page["hasNext"] = next_link is not None
+    page["next"] = next_link
+    page["stats"] = stats
+    return page

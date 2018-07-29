@@ -40,49 +40,54 @@ def sparql_blueprint(datasets, logger):
             abort(404)
 
         logger.info('[/sparql/] Corresponding dataset found')
-        mimetype = request.accept_mimetypes.best_match(["application/json", "text/html"])
+        # mimetype = request.accept_mimetypes.best_match(["application/json", "application/xml"])
         url = secure_url(request.url)
 
-        # process GET request as a single Triple Pattern BGP
+        # A GET request always returns the homepage of the dataset
         if request.method == "GET" or (not request.is_json):
             dinfo = dataset.describe(url)
             dinfo['@id'] = url
             return render_template("sage.html", dataset_info=dinfo)
 
-        engine = SageEngine()
-        post_query, err = QueryRequest().load(request.get_json())
-        if err is not None and len(err) > 0:
-            return Response(format_marshmallow_errors(err), status=400)
-        quota = dataset.quota / 1000
-        max_results = dataset.maxResults
-        # Load next link
-        next_link = None
-        if 'next' in post_query:
-            logger.info('[/sparql/{}] Saved plan found, decoding "next" link'.format(dataset_name))
-            next_link = decode_saved_plan(post_query["next"])
-        else:
-            logger.info('[/sparql/{}] Query to evaluate: {}'.format(dataset_name, post_query))
-        # build physical query plan, then execute it with the given number of tickets
-        logger.info('[/sparql/{}] Starting query evaluation...')
-        start = time()
-        plan, cardinalities = build_query_plan(post_query["query"], dataset, next_link)
-        loading_time = (time() - start) * 1000
-        bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
-        logger.info('[/sparql/{}] Query evaluation completed'.format(dataset_name))
-        # compute controls for the next page
-        start = time()
-        next_page = None
-        if is_done:
-            logger.info('[/sparql/{}] Query completed under the time quota'.format(dataset_name))
-        else:
-            logger.info('[/sparql/{}] The query was not completed under the time quota...'.format(dataset_name))
-            logger.info('[/sparql/{}] Saving the execution to plan to generate a "next" link'.format(dataset_name))
-            next_page = encode_saved_plan(saved_plan)
-            logger.info('[/sparql/{}] "next" link successfully generated'.format(dataset_name))
-        exportTime = (time() - start) * 1000
-        stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
+        try:
+            engine = SageEngine()
+            post_query, err = QueryRequest().load(request.get_json())
+            if err is not None and len(err) > 0:
+                return Response(format_marshmallow_errors(err), status=400)
+            quota = dataset.quota / 1000
+            max_results = dataset.maxResults
 
-        if mimetype == "application/octet-stream":
-            return responses.protobuf(bindings, next_page, stats)
-        return json.jsonify(responses.json(bindings, len(bindings), next_page, stats))
+            # Load next link
+            next_link = None
+            if 'next' in post_query:
+                logger.info('[/sparql/{}] Saved plan found, decoding "next" link'.format(dataset_name))
+                next_link = decode_saved_plan(post_query["next"])
+            else:
+                logger.info('[/sparql/{}] Query to evaluate: {}'.format(dataset_name, post_query))
+
+            # build physical query plan, then execute it with the given quota
+            logger.info('[/sparql/{}] Starting query evaluation...')
+            start = time()
+            plan, cardinalities = build_query_plan(post_query["query"], dataset, next_link)
+            loading_time = (time() - start) * 1000
+            bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
+            logger.info('[/sparql/{}] Query evaluation completed'.format(dataset_name))
+
+            # compute controls for the next page
+            start = time()
+            next_page = None
+            if is_done:
+                logger.info('[/sparql/{}] Query completed under the time quota'.format(dataset_name))
+            else:
+                logger.info('[/sparql/{}] The query was not completed under the time quota...'.format(dataset_name))
+                logger.info('[/sparql/{}] Saving the execution to plan to generate a "next" link'.format(dataset_name))
+                next_page = encode_saved_plan(saved_plan)
+                logger.info('[/sparql/{}] "next" link successfully generated'.format(dataset_name))
+            exportTime = (time() - start) * 1000
+            stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
+
+            # TODO add option to choose between JSON and XML responses through request 'Accept' header
+            return json.jsonify(responses.json(bindings, next_page, stats))
+        except Exception:
+            abort(500)
     return sparql_blueprint
