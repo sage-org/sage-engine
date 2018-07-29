@@ -5,6 +5,7 @@ from query_engine.sage_engine import SageEngine
 from query_engine.optimizer.plan_builder import build_query_plan
 from http_server.schema import QueryRequest
 from http_server.utils import encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors
+from database.descriptors import VoidDescriptor
 import http_server.responses as responses
 from time import time
 
@@ -53,7 +54,12 @@ def sparql_blueprint(datasets, logger):
             if request.method == "GET" or (not request.is_json):
                 dinfo = dataset.describe(url)
                 dinfo['@id'] = url
-                return render_template("sage.html", dataset_info=dinfo)
+                void_desc = {
+                    "nt": VoidDescriptor(url, dataset).describe("ntriples"),
+                    "ttl": VoidDescriptor(url, dataset).describe("turtle"),
+                    "xml": VoidDescriptor(url, dataset).describe("xml")
+                }
+                return render_template("sage.html", dataset_info=dinfo, void_desc=void_desc)
 
             engine = SageEngine()
             post_query, err = QueryRequest().load(request.get_json())

@@ -13,8 +13,46 @@
 
       <h3><i class="fab fa-hubspot"></i> Query this dataset</h3>
       <p><strong>URL:</strong> <a href="{{ dataset_info['@id'] }}">{{ dataset_info['@id'] }}</a></p>
-      <p>Take a look at <a href="{{ url_for('index') }}#software">existing Sage clients</a></p>
+      <p>
+        Take a look at <a href="{{ url_for('index') }}#software">existing Sage clients</a>
+        for evaluating SPARQL queries against this dataset.
+    </p>
 
+      <h3><i class="fas fa-sitemap"></i> VOID description</h3>
+      <p>Access the <a href="https://www.w3.org/TR/void/">VoID description</a> of the dataset at
+        <a href="{{ url_for('void-interface.void_dataset', dataset_name=dataset_info["title"]) }}">
+          {{ url_for('void-interface.void_dataset', dataset_name=dataset_info['title'], _external=True) }}
+        </a>.
+      </p>
+      <!-- VoID descriptions -->
+      <p>
+        <a class="btn btn-primary" data-toggle="collapse" href="#voidNTriples" role="button" aria-expanded="false" aria-controls="voidNTriples">
+          View in N-Triples
+        </a>
+        <a class="btn btn-primary" data-toggle="collapse" href="#voidTurtle" role="button" aria-expanded="false" aria-controls="voidTurtle">
+          View in Turtle
+        </a>
+        <a class="btn btn-primary" data-toggle="collapse" href="#voidXML" role="button" aria-expanded="false" aria-controls="voidXML">
+          View in XML
+        </a>
+      </p>
+      <div class="collapse" id="voidNTriples">
+        <div class="card card-body">
+          <pre>{{ void_desc["nt"] }}</pre>
+        </div>
+      </div>
+      <div class="collapse" id="voidTurtle">
+        <div class="card card-body">
+          <pre>{{ void_desc["ttl"] }}</pre>
+        </div>
+      </div>
+      <div class="collapse" id="voidXML">
+        <div class="card card-body">
+          <pre>{{ void_desc["xml"] }}</pre>
+        </div>
+      </div>
+
+      <!-- Statistics -->
       <h3><i class="fas fa-clipboard-list"></i> Statistics</h3>
       <div class="table-responsive">
         <table class="table">

@@ -117,7 +117,6 @@ class VoidDescriptor(AbstractDescriptor):
         self._graph.add((self._dataset_url, HYDRA["entrypoint"], self._dataset_url))
         self._graph.add((self._dataset_url, SAGE["quota"], Literal(self._dataset.quota, datatype=XSD.integer)))
         self._graph.add((self._dataset_url, HYDRA["itemsPerPage"], Literal(self._dataset.maxResults, datatype=XSD.integer)))
-        self._graph.add((self._dataset_url, VOID["feature"], SAGE["SageResultsPage"]))
         # HDT statistics
         self._graph.add((self._dataset_url, VOID["triples"], Literal(self._dataset.nb_triples, datatype=XSD.integer)))
         self._graph.add((self._dataset_url, VOID["distinctSubjects"], Literal(self._dataset._connector.nb_subjects, datatype=XSD.integer)))

@@ -12,6 +12,7 @@
               <th>RDF triples</th>
               <th>Time quota</th>
               <th>Max results per request</th>
+              <th>VoID description</th>
               <th>Interface URL</th>
             </tr>
           </thead>
@@ -31,6 +32,7 @@
               {%- else -%}
               <td>{{dataset["maxResults"]}} bindings</td>
               {%- endif -%}
+              <td><a href="{{ url_for('void-interface.void_dataset', dataset_name=dataset["title"]) }}">{{ url_for('void-interface.void_dataset', dataset_name=dataset["title"], _external=True) }}</a></td>
               <td><a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"], _external=True) }}</a></td>
             </tr>
             {% endfor %}
