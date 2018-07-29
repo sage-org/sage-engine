@@ -43,7 +43,10 @@ def sparql_blueprint(datasets, logger):
             abort(404)
 
         logger.info('[/sparql/] Corresponding dataset found')
-        # mimetype = request.accept_mimetypes.best_match(["application/json", "application/xml"])
+        mimetype = request.accept_mimetypes.best_match([
+            "application/json", "application/xml",
+            "application/sparql-results+json", "application/sparql-results+xml"
+        ])
         url = secure_url(request.url)
         try:
             # A GET request always returns the homepage of the dataset
@@ -88,7 +91,8 @@ def sparql_blueprint(datasets, logger):
             exportTime = (time() - start) * 1000
             stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
-            # TODO add option to choose between JSON and XML responses through request 'Accept' header
+            if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
+                return Response(responses.xml(bindings, next_page, stats), content_type="application/xml")
             return json.jsonify(responses.json(bindings, next_page, stats))
         except Exception:
             abort(500)
