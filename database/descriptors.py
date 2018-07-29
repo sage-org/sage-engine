@@ -7,6 +7,7 @@ from rdflib.namespace import DCTERMS, FOAF, RDF, VOID, XSD
 HYDRA = Namespace("http://www.w3.org/ns/hydra/core#")
 SAGE = Namespace("http://sage.univ-nantes.fr/owl#")
 SD = Namespace("http://www.w3.org/ns/sparql-service-description#")
+W3C_FORMATS = Namespace("http://www.w3.org/ns/formats/")
 
 
 def bind_prefixes(graph):
@@ -110,6 +111,7 @@ class VoidDescriptor(AbstractDescriptor):
         self._graph.add((self._dataset_url, DCTERMS["title"], Literal(d_config["name"])))
         self._graph.add((self._dataset_url, DCTERMS["description"], Literal(d_config["description"])))
         # sage specific metadata (access endpoint, quota, max results per page, etc)
+        self._graph.add((self._dataset_url, VOID["feature"], W3C_FORMATS["SPARQL_Results_JSON"]))
         self._graph.add((self._dataset_url, SD["endpoint"], self._dataset_url))
         self._graph.add((self._dataset_url, HYDRA["entrypoint"], self._dataset_url))
         self._graph.add((self._dataset_url, SAGE["quota"], Literal(self._dataset.quota, datatype=XSD.integer)))
