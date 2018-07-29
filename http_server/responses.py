@@ -28,7 +28,8 @@ def protobuf(bindings, next_page, stats):
 
 def json(bindings, next_link, stats):
     page = sparql_json(bindings)
-    page["hasNext"] = next_link is not None
-    page["next"] = next_link
-    page["stats"] = stats
+    page["head"]["controls"] = dict()
+    page["head"]["controls"]["hasNext"] = next_link is not None
+    page["head"]["controls"]["next"] = next_link
+    page["head"]["stats"] = stats
     return page

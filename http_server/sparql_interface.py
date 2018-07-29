@@ -15,22 +15,25 @@ def sparql_blueprint(datasets, logger):
 
     @sparql_blueprint.route("/sparql/", methods=["GET"])
     def sparql_index():
-        mimetype = request.accept_mimetypes.best_match(["application/json", "text/html"])
-        url = secure_url(request.url)
-        api_doc = {
-            "@context": "http://www.w3.org/ns/hydra/context.jsonld",
-            "@id": url,
-            "@type": "ApiDocumentation",
-            "title": "SaGe SPARQL API",
-            "description": "A SaGe interface which allow evaluation of SPARQL queries over RDF datasets",
-            "entrypoint": "{}sparql".format(url),
-            "supportedClass": []
-        }
-        for dinfo in datasets.describe(url):
-            api_doc["supportedClass"].append(dinfo)
-        if mimetype is "text/html":
-            return render_template("interfaces.html", api=api_doc)
-        return json.jsonify(api_doc)
+        try:
+            mimetype = request.accept_mimetypes.best_match(["application/json", "text/html"])
+            url = secure_url(request.url)
+            api_doc = {
+                "@context": "http://www.w3.org/ns/hydra/context.jsonld",
+                "@id": url,
+                "@type": "ApiDocumentation",
+                "title": "SaGe SPARQL API",
+                "description": "A SaGe interface which allow evaluation of SPARQL queries over RDF datasets",
+                "entrypoint": "{}sparql".format(url),
+                "supportedClass": []
+            }
+            for dinfo in datasets.describe(url):
+                api_doc["supportedClass"].append(dinfo)
+            if mimetype is "text/html":
+                return render_template("interfaces.html", api=api_doc)
+            return json.jsonify(api_doc)
+        except Exception:
+            abort(500)
 
     @sparql_blueprint.route("/sparql/<dataset_name>", methods=["GET", "POST"])
     def sparql_query(dataset_name):
@@ -42,14 +45,13 @@ def sparql_blueprint(datasets, logger):
         logger.info('[/sparql/] Corresponding dataset found')
         # mimetype = request.accept_mimetypes.best_match(["application/json", "application/xml"])
         url = secure_url(request.url)
-
-        # A GET request always returns the homepage of the dataset
-        if request.method == "GET" or (not request.is_json):
-            dinfo = dataset.describe(url)
-            dinfo['@id'] = url
-            return render_template("sage.html", dataset_info=dinfo)
-
         try:
+            # A GET request always returns the homepage of the dataset
+            if request.method == "GET" or (not request.is_json):
+                dinfo = dataset.describe(url)
+                dinfo['@id'] = url
+                return render_template("sage.html", dataset_info=dinfo)
+
             engine = SageEngine()
             post_query, err = QueryRequest().load(request.get_json())
             if err is not None and len(err) > 0:

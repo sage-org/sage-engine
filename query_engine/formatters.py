@@ -40,5 +40,5 @@ def sparql_json(bindings_list):
     page["head"]["vars"] = list(map(lambda x: x[1:], bindings_list[0].keys()))
     page["results"] = dict()
     page["results"]["bindings"] = list(map(binding_transformer, bindings_list))
-    page["results"]["cardinality"] = len(bindings_list)
+    page["results"]["size"] = len(bindings_list)
     return page

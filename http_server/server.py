@@ -1,6 +1,6 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, abort
 from flask_cors import CORS
 from database.datasets import DatasetCollection
 from http_server.sparql_interface import sparql_blueprint
@@ -16,20 +16,23 @@ def sage_app(config_file):
 
     @app.route('/')
     def index():
-        datasets_infos = datasets._config["datasets"]
-        url = secure_url(request.url)
-        api_doc = {
-            "@context": "http://www.w3.org/ns/hydra/context.jsonld",
-            "@id": url,
-            "@type": "ApiDocumentation",
-            "title": "SaGe SPARQL API",
-            "description": "A SaGe interface which allow evaluation of SPARQL queries over RDF datasets",
-            "entrypoint": "{}sparql".format(url),
-            "supportedClass": []
-        }
-        for dinfo in datasets.describe(url):
-            api_doc["supportedClass"].append(dinfo)
-        return render_template("index_sage.html", datasets=datasets_infos, api=api_doc)
+        try:
+            datasets_infos = datasets._config["datasets"]
+            url = secure_url(request.url)
+            api_doc = {
+                "@context": "http://www.w3.org/ns/hydra/context.jsonld",
+                "@id": url,
+                "@type": "ApiDocumentation",
+                "title": "SaGe SPARQL API",
+                "description": "A SaGe interface which allow evaluation of SPARQL queries over RDF datasets",
+                "entrypoint": "{}sparql".format(url),
+                "supportedClass": []
+            }
+            for dinfo in datasets.describe(url):
+                api_doc["supportedClass"].append(dinfo)
+            return render_template("index_sage.html", datasets=datasets_infos, api=api_doc)
+        except Exception:
+            abort(500)
 
     @app.route('/software')
     def software():

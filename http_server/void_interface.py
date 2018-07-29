@@ -26,32 +26,38 @@ def void_blueprint(datasets, logger):
     @void_blueprint.route("/void/", methods=["GET"])
     def void_all():
         """Describe all RDF datasets hosted by the Sage endpoint"""
-        mimetype = request.accept_mimetypes.best_match([
-            "application/n-triples", "text/turtle", "application/xml",
-            "application/n-quads", "application/trig",
-            "application/json", "application/json+ld"
-        ])
-        url = secure_url(request.url_root)
-        format, mimetype = choose_format(mimetype)
-        description = many_void(url, datasets)
-        return Response(description, content_type=mimetype)
+        try:
+            mimetype = request.accept_mimetypes.best_match([
+                "application/n-triples", "text/turtle", "application/xml",
+                "application/n-quads", "application/trig",
+                "application/json", "application/json+ld"
+            ])
+            url = secure_url(request.url_root)
+            format, mimetype = choose_format(mimetype)
+            description = many_void(url, datasets, format)
+            return Response(description, content_type=mimetype)
+        except Exception:
+            abort(500)
 
     @void_blueprint.route("/void/<dataset_name>", methods=["GET"])
     def void_dataset(dataset_name):
         """Describe one RDF dataset"""
-        logger.info('[/void/] Loading dataset {}'.format(dataset_name))
-        dataset = datasets.get_dataset(dataset_name)
-        if dataset is None:
-            abort(404)
+        try:
+            logger.info('[/void/] Loading dataset {}'.format(dataset_name))
+            dataset = datasets.get_dataset(dataset_name)
+            if dataset is None:
+                abort(404)
 
-        logger.info('[/void/] Corresponding dataset found')
-        mimetype = request.accept_mimetypes.best_match([
-            "application/n-triples", "text/turtle", "application/xml",
-            "application/n-quads", "application/trig",
-            "application/json", "application/json+ld"
-        ])
-        url = secure_url(request.url_root)
-        descriptor = VoidDescriptor(url, dataset)
-        format, mimetype = choose_format(mimetype)
-        return Response(descriptor.describe(format), content_type=mimetype)
+            logger.info('[/void/] Corresponding dataset found')
+            mimetype = request.accept_mimetypes.best_match([
+                "application/n-triples", "text/turtle", "application/xml",
+                "application/n-quads", "application/trig",
+                "application/json", "application/json+ld"
+            ])
+            url = secure_url(request.url_root)
+            descriptor = VoidDescriptor(url, dataset)
+            format, mimetype = choose_format(mimetype)
+            return Response(descriptor.describe(format), content_type=mimetype)
+        except Exception:
+            abort(500)
     return void_blueprint
