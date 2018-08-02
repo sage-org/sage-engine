@@ -1,37 +1,38 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sage: <http://sage.univ-nantes.fr/sage-voc#> .
 @prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 
 sage:SageEndpoint a rdf:Class ;
   rdfs:subClassOf sd:Service ;
   rdfs:label "Sage endpoint"@en ;
-  rdfs:comment "A Sage endpoint, which hosts several RDF datasets"@en ;
-  rdfs:comment "Un point d'accès Sage, qui héberge plusieurs Datasets RDF"@fr .
+  rdfs:comment "A Sage endpoint, which hosts several RDF datasets"@en ,
+    "Un point d'accès Sage, qui héberge plusieurs Datasets RDF"@fr .
 
 sage:SageDataset a rdf:Class ;
-  rdfs:subClassOf sd:Graph ;
-  rdfs:subClassOf void:Dataset ;
+  rdfs:subClassOf sd:Graph , void:Dataset ;
   rdfs:label "Sage RDF dataset"@en ;
-  rdfs:comment "A RDF dataset that can be queried through a Sage interface"@en ;
-  rdfs:comment "Un Dataset RDF qui peux être interrogé via une interface Sage"@fr .
+  rdfs:comment "A RDF dataset that can be queried through a Sage interface"@en ,
+    "Un Dataset RDF qui peux être interrogé via une interface Sage"@fr .
 
 sage:ExampleQuery a rdf:Class ;
   rdfs:label "Example SPARQL query"@en ;
-  rdfs:comment "A SPARQL query that can be run using a RDF Dataset hostyed by a Sage endpoint"@en ;
-  rdfs:comment "Une requête SPARQL, qui peut être évaluée avec un Dataset RDF hébergé par un point d'accès Sage"@fr .
+  rdfs:comment "A SPARQL query that can be run using a RDF Dataset hosted by a Sage endpoint"@en ,
+    "Une requête SPARQL, qui peut être évaluée avec un Dataset RDF hébergé par un point d'accès Sage"@fr .
 
-sage:exampleQuery a rdf:Property ;
+sage:hasExampleQuery a owl:InverseFunctionalProperty ;
   rdfs:domain sage:SageDataset ;
   rdfs:range sage:ExampleQuery ;
   rdfs:label "has an example query"@en ;
-  rdfs:comment "Link a Sage Dataset to an example query"@en ;
-  rdfs:comment "Relie un Dataset à une requête d'exemple"@fr .
+  rdfs:comment "Link a Dataset to an example query"@en ,
+    "Relie un Dataset à une requête d'exemple"@fr .
 
-sage:quota a rdf:Property ;
+sage:quota a owl:FunctionalProperty ;
   rdfs:domain sage:SageDataset ;
-  rdfs:range rdfs:Literal ;
+  rdfs:range xsd:nonNegativeInteger ;
   rdfs:label "use the time quota"@en ;
-  rdfs:comment "Indicates the time quota used by a Sage Dataset (in milliseconds)"@en ;
-  rdfs:comment "Indique le quota en time utilisé par un Dataset Sage (en millisecondes)"@fr .
+  rdfs:comment "Indicates the time quota (in milliseconds) used by a Sage endpoint to evaluate SPARQL queries against a RDF dataset "@en ,
+    "Indique le quota en temps (en millisecondes) utilisé le point d'accès Sage pour l'évaluation de requêtes SPARQL en utilisant un Dataset RDF"@fr .

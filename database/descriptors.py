@@ -125,7 +125,7 @@ class VoidDescriptor(AbstractDescriptor):
         # add example queries
         for query in self._dataset.example_queries:
             q_node = BNode()
-            self._graph.add((self._dataset_url, SAGE["exampleQuery"], q_node))
+            self._graph.add((self._dataset_url, SAGE["hasExampleQuery"], q_node))
             self._graph.add((q_node, RDF["type"], SAGE["ExampleQuery"]))
             self._graph.add((q_node, RDFS["label"], Literal(query["name"])))
             self._graph.add((q_node, RDF["value"], Literal(query["value"])))
