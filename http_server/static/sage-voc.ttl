@@ -6,22 +6,32 @@
 
 sage:SageEndpoint a rdf:Class ;
   rdfs:subClassOf sd:Service ;
-  rdfs:label "A Sage endpoint, which hosts several RDF datasets" .
+  rdfs:label "Sage endpoint"@en ;
+  rdfs:comment "A Sage endpoint, which hosts several RDF datasets"@en ;
+  rdfs:comment "Un point d'accès Sage, qui héberge plusieurs Datasets RDF"@fr .
 
 sage:SageDataset a rdf:Class ;
   rdfs:subClassOf sd:Graph ;
   rdfs:subClassOf void:Dataset ;
-  rdfs:label "A Sage dataset, i.e., a RDF dataset that can be queried through a Sage interface" .
+  rdfs:label "Sage RDF dataset"@en ;
+  rdfs:comment "A RDF dataset that can be queried through a Sage interface"@en ;
+  rdfs:comment "Un Dataset RDF qui peux être interrogé via une interface Sage"@fr .
 
 sage:ExampleQuery a rdf:Class ;
-  rdfs:label "A SPARQL query that can be run using a Sage Dataset" .
+  rdfs:label "Example SPARQL query"@en ;
+  rdfs:comment "A SPARQL query that can be run using a RDF Dataset hostyed by a Sage endpoint"@en ;
+  rdfs:comment "Une requête SPARQL, qui peut être évaluée avec un Dataset RDF hébergé par un point d'accès Sage"@fr .
 
 sage:exampleQuery a rdf:Property ;
   rdfs:domain sage:SageDataset ;
   rdfs:range sage:ExampleQuery ;
-  rdfs:label "Link a Sage Dataset to an example query" .
+  rdfs:label "has an example query"@en ;
+  rdfs:comment "Link a Sage Dataset to an example query"@en ;
+  rdfs:comment "Relie un Dataset à une requête d'exemple"@fr .
 
 sage:quota a rdf:Property ;
   rdfs:domain sage:SageDataset ;
   rdfs:range rdfs:Literal ;
-  rdfs:label "Indicates the time quota used by a Sage Dataset (in milliseconds)" .
+  rdfs:label "use the time quota"@en ;
+  rdfs:comment "Indicates the time quota used by a Sage Dataset (in milliseconds)"@en ;
+  rdfs:comment "Indique le quota en time utilisé par un Dataset Sage (en millisecondes)"@fr .
