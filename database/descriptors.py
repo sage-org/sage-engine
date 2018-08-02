@@ -2,10 +2,10 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from abc import ABC, abstractmethod
 from rdflib import Graph, BNode, URIRef, Literal, Namespace
-from rdflib.namespace import DCTERMS, FOAF, RDF, VOID, XSD
+from rdflib.namespace import DCTERMS, FOAF, RDF, RDFS, VOID, XSD
 
 HYDRA = Namespace("http://www.w3.org/ns/hydra/core#")
-SAGE = Namespace("http://sage.univ-nantes.fr/owl#")
+SAGE = Namespace("http://sage.univ-nantes.fr/sage-voc#")
 SD = Namespace("http://www.w3.org/ns/sparql-service-description#")
 W3C_FORMATS = Namespace("http://www.w3.org/ns/formats/")
 
@@ -40,7 +40,6 @@ def many_void(endpoint_uri, datasets, format, encoding="utf-8"):
     bind_prefixes(g)
     # description of the sage endpoint itself
     g.add((sage_uri, RDF["type"], SAGE["SageEndpoint"]))
-    g.add((sage_uri, RDF["type"], SD["Service"]))
     g.add((sage_uri, FOAF["homepage"], sage_uri))
     if datasets.name is not None:
         g.add((sage_uri, DCTERMS["title"], Literal(datasets.name)))
@@ -105,8 +104,7 @@ class VoidDescriptor(AbstractDescriptor):
         """Fill the local triple store with dataset's metadata"""
         d_config = self._dataset.config()
         # main metadata
-        self._graph.add((self._dataset_url, RDF["type"], VOID["Dataset"]))
-        self._graph.add((self._dataset_url, RDF["type"], SD["Graph"]))
+        self._graph.add((self._dataset_url, RDF["type"], SAGE["SageDataset"]))
         self._graph.add((self._dataset_url, FOAF["homepage"], self._dataset_url))
         self._graph.add((self._dataset_url, DCTERMS["title"], Literal(d_config["name"])))
         self._graph.add((self._dataset_url, DCTERMS["description"], Literal(d_config["description"])))
@@ -124,3 +122,10 @@ class VoidDescriptor(AbstractDescriptor):
         self._graph.add((self._dataset_url, VOID["distinctObjects"], Literal(self._dataset._connector.nb_objects, datatype=XSD.integer)))
         if "license" in d_config:
             self._graph.add((self._dataset_url, DCTERMS["license"], URIRef(d_config["license"])))
+        # add example queries
+        for query in self._dataset.example_queries:
+            q_node = BNode()
+            self._graph.add((self._dataset_url, SAGE["exampleQuery"], q_node))
+            self._graph.add((q_node, RDF["type"], SAGE["ExampleQuery"]))
+            self._graph.add((q_node, RDFS["label"], Literal(query["name"])))
+            self._graph.add((q_node, RDF["value"], Literal(query["value"])))

@@ -97,9 +97,11 @@ def sparql_blueprint(datasets, logger):
             exportTime = (time() - start) * 1000
             stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
+            if mimetype == "application/sparql-results+json":
+                return json.jsonify(responses.json(bindings, next_page, stats))
             if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
                 return Response(responses.xml(bindings, next_page, stats), content_type="application/xml")
-            return json.jsonify(responses.json(bindings, next_page, stats))
+            return json.jsonify(responses.raw_json(bindings, next_page, stats))
         except Exception:
             abort(500)
     return sparql_blueprint

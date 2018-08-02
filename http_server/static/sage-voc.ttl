@@ -1,0 +1,27 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sage: <http://sage.univ-nantes.fr/sage-voc#> .
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+
+sage:SageEndpoint a rdf:Class ;
+  rdfs:subClassOf sd:Service ;
+  rdfs:label "A Sage endpoint, which hosts several RDF datasets" .
+
+sage:SageDataset a rdf:Class ;
+  rdfs:subClassOf sd:Graph ;
+  rdfs:subClassOf void:Dataset ;
+  rdfs:label "A Sage dataset, i.e., a RDF dataset that can be queried through a Sage interface" .
+
+sage:ExampleQuery a rdf:Class ;
+  rdfs:label "A SPARQL query that can be run using a Sage Dataset" .
+
+sage:exampleQuery a rdf:Property ;
+  rdfs:domain sage:SageDataset ;
+  rdfs:range sage:ExampleQuery ;
+  rdfs:label "Link a Sage Dataset to an example query" .
+
+sage:quota a rdf:Property ;
+  rdfs:domain sage:SageDataset ;
+  rdfs:range rdfs:Literal ;
+  rdfs:label "Indicates the time quota used by a Sage Dataset (in milliseconds)" .

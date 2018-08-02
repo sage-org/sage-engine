@@ -3,14 +3,13 @@
 @prefix hydra: <http://www.w3.org/ns/hydra/core#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix sage: <http://sage.univ-nantes.fr/owl#> .
+@prefix sage: <http://sage.univ-nantes.fr/sage-voc#> .
 @prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
 @prefix void: <http://rdfs.org/ns/void#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://localhost:8000> a sage:SageEndpoint,
-        sd:Service ;
+<http://localhost:8000> a sage:SageEndpoint ;
     dcterms:maintainer "Thomas Minier <thomas.minier@univ-nantes.fr>" ;
     dcterms:title "SaGe Test server" ;
     sd:availableGraphs [ a sd:GraphCollection ;
@@ -20,28 +19,43 @@
                     sd:name <http://localhost:8000/sparql/testdata> ] ] ;
     foaf:homepage <http://localhost:8000> .
 
-<http://localhost:8000/sparql/testdata> a void:Dataset,
-        sd:Graph ;
+<http://localhost:8000/sparql/testdata> a sage:SageDataset ;
     dcterms:description "Sample dataset in HDT format, used for testing" ;
     dcterms:title "testdata" ;
     void:distinctObjects 112 ;
     void:distinctSubjects 4 ;
-    void:feature sage:SageResultsPage ;
+    void:feature <http://www.w3.org/ns/formats/SPARQL_Results_JSON>,
+        <http://www.w3.org/ns/formats/SPARQL_Results_XML> ;
     void:properties 3 ;
     void:triples 132 ;
+    sage:exampleQuery [ a sage:ExampleQuery ;
+            rdfs:label "select all triples" ;
+            rdf:value """SELECT *
+WHERE {
+  ?s ?p ?o
+}
+""" ],
+        [   a sage:ExampleQuery ;
+            rdfs:label "Query 37" ;
+            rdf:value """SELECT ?v0 ?v1 ?v3 WHERE {
+  ?v0 <http://purl.org/goodrelations/includes> ?v1 .
+  ?v1 <http://schema.org/contentSize> ?v3 .
+  ?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9>.
+}
+""" ] ;
     sage:quota 75 ;
     hydra:entrypoint <http://localhost:8000/sparql/testdata> ;
     hydra:itemsPerPage 500 ;
     sd:endpoint <http://localhost:8000/sparql/testdata> ;
     foaf:homepage <http://localhost:8000/sparql/testdata> .
 
-<http://localhost:8000/sparql/watdiv100> a void:Dataset,
-        sd:Graph ;
+<http://localhost:8000/sparql/watdiv100> a sage:SageDataset ;
     dcterms:description "Sample dataset in HDT format, used for testing" ;
     dcterms:title "watdiv100" ;
     void:distinctObjects 1005832 ;
     void:distinctSubjects 521585 ;
-    void:feature sage:SageResultsPage ;
+    void:feature <http://www.w3.org/ns/formats/SPARQL_Results_JSON>,
+        <http://www.w3.org/ns/formats/SPARQL_Results_XML> ;
     void:properties 86 ;
     void:triples 10916457 ;
     sage:quota 75 ;
@@ -49,4 +63,3 @@
     hydra:itemsPerPage 500 ;
     sd:endpoint <http://localhost:8000/sparql/watdiv100> ;
     foaf:homepage <http://localhost:8000/sparql/watdiv100> .
-

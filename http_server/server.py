@@ -34,9 +34,9 @@ def sage_app(config_file):
         except Exception:
             abort(500)
 
-    @app.route('/software')
-    def software():
-        return render_template("clients.html")
+    @app.route('/sage-voc')
+    def voc():
+        return app.send_static_file('sage-voc.ttl')
 
     @app.route('/documentation')
     def doc():

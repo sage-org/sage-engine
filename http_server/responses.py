@@ -36,6 +36,17 @@ def json(bindings, next_link, stats):
     return page
 
 
+def raw_json(bindings, next_link, stats):
+    res = {
+        "bindings": bindings,
+        "pageSize": len(bindings),
+        "hasNext": next_link is not None,
+        "next": next_link,
+        "stats": stats
+    }
+    return res
+
+
 def xml(bindings, next_link, stats):
     page = sparql_xml(bindings)
     head = page.find("head")
