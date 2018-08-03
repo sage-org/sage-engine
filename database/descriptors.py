@@ -26,7 +26,7 @@ def bind_prefixes(graph):
 def many_void(endpoint_uri, datasets, format, encoding="utf-8"):
     """
         Describe a collection of RDF datasets using VOID + SPARQL Description languages.
-        Supported formats: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
+        Supported formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
 
         Args:
             - endpoint_uri [string] - URI used to describe the endpoint
@@ -92,7 +92,7 @@ class VoidDescriptor(AbstractDescriptor):
     def describe(self, format, encoding="utf-8"):
         """
             Describe the dataset using the given format, and returns the description as a string.
-            Supported formats: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
+            Supported formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
 
             Args:
                 - format [string] - RDF serialization format of the description

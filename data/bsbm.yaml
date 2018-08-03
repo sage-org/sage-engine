@@ -1,6 +1,7 @@
 name: SaGe Test server
 maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
 quota: 75
+maxResults: 2000
 datasets:
 -
   name: bsbm1M
