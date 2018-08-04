@@ -33,6 +33,8 @@ def void_blueprint(datasets, logger):
                 "application/json", "application/json+ld"
             ])
             url = secure_url(request.url_root)
+            if url.endswith('/'):
+                url = url[0:len(url) - 1]
             format, mimetype = choose_format(mimetype)
             description = many_void(url, datasets, format)
             return Response(description, content_type=mimetype)
@@ -55,6 +57,8 @@ def void_blueprint(datasets, logger):
                 "application/json", "application/json+ld"
             ])
             url = secure_url(request.url_root)
+            if url.endswith('/'):
+                url = url[0:len(url) - 1]
             descriptor = VoidDescriptor(url, dataset)
             format, mimetype = choose_format(mimetype)
             return Response(descriptor.describe(format), content_type=mimetype)

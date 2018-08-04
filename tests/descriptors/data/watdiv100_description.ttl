@@ -18,14 +18,14 @@
         <http://www.w3.org/ns/formats/SPARQL_Results_XML> ;
     void:properties 86 ;
     void:triples 10916457 ;
-    sage:exampleQuery [ a sage:ExampleQuery ;
+    sage:hasExampleQuery [ a sage:hasExampleQuery ;
             rdfs:label "select all triples" ;
             rdf:value """SELECT *
 WHERE {
   ?s ?p ?o
 }
 """ ],
-        [   a sage:ExampleQuery ;
+        [   a sage:hasExampleQuery ;
             rdfs:label "Query 37" ;
             rdf:value """SELECT ?v0 ?v1 ?v3 WHERE {
   ?v0 <http://purl.org/goodrelations/includes> ?v1 .
