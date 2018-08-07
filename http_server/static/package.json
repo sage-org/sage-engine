@@ -17,13 +17,13 @@
     "url": "https://github.com/Callidon/sage-engine/issues"
   },
   "dependencies": {
-    "bootstrap": "^4.1.1",
+    "bootstrap": "^4.1.3",
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "knockout": "^3.4.2",
-    "popper.js": "^1.14.3",
+    "popper.js": "^1.14.4",
     "sage-client": "^1.0.1",
-    "sage-widget": "git+https://github.com/sage-org/sage-widget.git",
-    "yasgui-yasqe": "^2.11.19"
+    "sage-widget": "^1.2.0",
+    "yasgui-yasqe": "^2.11.22"
   }
 }

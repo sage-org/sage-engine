@@ -1,12 +1,14 @@
+{% if server_public_url %}
 <div class="container" id="playground">
   <div class="row">
     <div class="col-md-12">
-      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/sage-widget/css/client.css') }}">
+      <h2><i class="fab fa-hubspot"></i> Playground</h2>
+      <div id="sage-widget" url="{{ server_public_url }}"></div>
+      <!-- <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/sage-widget/css/client.css') }}">
       <link href="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.css') }}" rel='stylesheet' type='text/css'/>
       <link href="{{ url_for('static', filename='node_modules/yasgui-yasqe/dist/yasqe.css') }}" rel='stylesheet' type='text/css'/>
       <div id='target'></div>
 
-      <script type='text/javascript' src="{{ url_for('static', filename='node_modules/popper.js/dist/umd/popper.min.js') }}"></script>
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/sage-widget/js/jquery.tmpl.min.js') }}"></script>
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/knockout/build/output/knockout-latest.js') }}" charset="utf-8"></script>
       <script type='text/javascript' src="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.js') }}"></script>
@@ -130,7 +132,8 @@
           jQuery('#sparql-query-desc-text').val("Custom Query");
         });
       });
-      </script>
+      </script> -->
     </div>
   </div>
 </div>
+{% endif %}

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}" charset="utf-8"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/sage-widget/dist/main.css') }}">
   </head>
   <body>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
@@ -49,6 +49,10 @@
         <p class="text-center">&#9400;2017–2018 <a href="https://sites.google.com/site/gddlina/">GDD Team</a>, <a href="https://www.ls2n.fr/">LS2N</a>, <a href="http://www.univ-nantes.fr/">University of Nantes</a></p>
       </div>
     </footer>
-    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='node_modules/popper.js/dist/umd/popper.min.js') }}" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='node_modules/sage-client/sage-client-browser.js') }}" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='node_modules/sage-widget/dist/sage-widget.bundle.js') }}" type="text/javascript" charset="utf-8"></script>
   </body>
 </html>

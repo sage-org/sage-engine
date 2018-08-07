@@ -1,5 +1,6 @@
 name: SaGe Test server
 maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
+publicUrl: http://localhost:8000
 quota: 75
 maxResults: 2000
 datasets:

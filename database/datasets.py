@@ -152,6 +152,10 @@ class DatasetCollection(object):
         return self._config["name"] if "name" in self._config else None
 
     @property
+    def public_url(self):
+        return self._config["publicUrl"] if "publicUrl" in self._config else None
+
+    @property
     def maintainer(self):
         return self._config["maintainer"] if "maintainer" in self._config else None
 

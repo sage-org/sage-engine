@@ -30,7 +30,7 @@ def sage_app(config_file):
             }
             for dinfo in datasets.describe(url):
                 api_doc["supportedClass"].append(dinfo)
-            return render_template("index_sage.html", datasets=datasets_infos, api=api_doc)
+            return render_template("index_sage.html", datasets=datasets_infos, api=api_doc, server_public_url=datasets.public_url)
         except Exception:
             abort(500)
 
