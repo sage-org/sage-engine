@@ -5,7 +5,7 @@
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/all.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/sage-widget/dist/main.css') }}">
   </head>
   <body>
@@ -52,7 +52,7 @@
     <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}" type="text/javascript" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='node_modules/popper.js/dist/umd/popper.min.js') }}" type="text/javascript" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}" type="text/javascript" charset="utf-8"></script>
-    <script src="{{ url_for('static', filename='node_modules/sage-client/sage-client-browser.js') }}" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='node_modules/sage-client/dist/sage-client.bundle.js') }}" type="text/javascript" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='node_modules/sage-widget/dist/sage-widget.bundle.js') }}" type="text/javascript" charset="utf-8"></script>
   </body>
 </html>
