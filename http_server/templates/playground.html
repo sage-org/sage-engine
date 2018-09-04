@@ -1,8 +1,9 @@
 {% if server_public_url %}
-<div class="container" id="playground">
+<div class="container" id="query">
   <div class="row">
     <div class="col-md-12">
-      <h2><i class="fab fa-hubspot"></i> Query online Linked Data using Sage, live in your browser</h2>
+      <h2><i class="fab fa-hubspot"></i> Query online Linked Data using Sage</h2>
+      <p><em>Running in your Web Browser, powered by the <a href="https://github.com/sage-org/sage-client">Sage Javascript client</a></em></p>
       <p>Execute SPARQL queries against any RDF datasets hosted by the Sage server,
       using a client-server query engine running in your browser</p>
       <p>
@@ -13,8 +14,8 @@
       <div class="collapse" id="supportedFeatures">
         The Sage online client supports all SPARQL 1.1 features <strong>except</strong>:
         <ul>
-          <li>the SPARQL Property Paths</li>
-          <li>the SPARQL UPDATE protocol</li>
+          <li><a href="https://www.w3.org/TR/sparql11-query/#propertypaths">SPARQL Property Paths</a></li>
+          <li><a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">the SPARQL 1.1 UPDATE language</a></li>
         </ul>
       </div>
       <div id="sage-widget" url="{{ server_public_url }}"></div>

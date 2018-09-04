@@ -1,6 +1,7 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from flask import Flask, render_template, request, abort
+from markdown import markdown
+from flask import Flask, Markup, render_template, request, abort
 from flask_cors import CORS
 from database.datasets import DatasetCollection
 from http_server.sparql_interface import sparql_blueprint
@@ -30,8 +31,10 @@ def sage_app(config_file):
             }
             for dinfo in datasets.describe(url):
                 api_doc["supportedClass"].append(dinfo)
-            return render_template("index_sage.html", datasets=datasets_infos, api=api_doc, server_public_url=datasets.public_url)
-        except Exception:
+            long_description = Markup(markdown(datasets.long_description))
+            return render_template("index_sage.html", datasets=datasets_infos, api=api_doc, server_public_url=datasets.public_url, long_description=long_description)
+        except Exception as e:
+            print(e)
             abort(500)
 
     @app.route('/sage-voc')

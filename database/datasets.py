@@ -146,10 +146,19 @@ class DatasetCollection(object):
         super(DatasetCollection, self).__init__()
         self._config_file = config_file
         (self._config, self._datasets) = load_config(self._config_file)
+        if "longDescription" in self._config:
+            with open(self._config["longDescription"], "r") as file:
+                self._long_description = file.read()
+        else:
+            self._long_description = ""
 
     @property
     def name(self):
         return self._config["name"] if "name" in self._config else None
+
+    @property
+    def long_description(self):
+        return self._long_description
 
     @property
     def public_url(self):
