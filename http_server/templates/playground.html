@@ -2,7 +2,21 @@
 <div class="container" id="playground">
   <div class="row">
     <div class="col-md-12">
-      <h2><i class="fab fa-hubspot"></i> Playground</h2>
+      <h2><i class="fab fa-hubspot"></i> Query online Linked Data using Sage, live in your browser</h2>
+      <p>Execute SPARQL queries against any RDF datasets hosted by the Sage server,
+      using a client-server query engine running in your browser</p>
+      <p>
+        <a href="#" data-toggle="collapse" data-target="#supportedFeatures" aria-expanded="false" aria-controls="supportedFeatures">
+          See the supported SPARQL features
+        </a>
+      </p>
+      <div class="collapse" id="supportedFeatures">
+        The Sage online client supports all SPARQL 1.1 features <strong>except</strong>:
+        <ul>
+          <li>the SPARQL Property Paths</li>
+          <li>the SPARQL UPDATE protocol</li>
+        </ul>
+      </div>
       <div id="sage-widget" url="{{ server_public_url }}"></div>
     </div>
   </div>
