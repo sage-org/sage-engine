@@ -27,7 +27,8 @@ install_requires = [
     "rdflib==4.2.2",
     "gunicorn==19.7.1",
     "flask-cors==3.0.3",
-    "protobuf==3.5.2"
+    "protobuf==3.5.2",
+    "markdown==2.6.11"
 ]
 
 with open('README.rst') as file:
