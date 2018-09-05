@@ -37,6 +37,10 @@ def sage_app(config_file):
             print(e)
             abort(500)
 
+    @app.route('/sparql11-compliance')
+    def sparql11_compliance():
+        return render_template('sparql11_compliance.html')
+
     @app.route('/sage-voc')
     def voc():
         return app.send_static_file('sage-voc.ttl')
