@@ -7,17 +7,10 @@
       <p>Execute SPARQL queries against any RDF datasets hosted by the Sage server,
       using a client-server query engine running in your browser</p>
       <p>
-        <a href="#" data-toggle="collapse" data-target="#supportedFeatures" aria-expanded="false" aria-controls="supportedFeatures">
-          See the supported SPARQL features
+        <a href="{{ url_for('sparql11_compliance') }}">
+          See the supported SPARQL 1.1 features
         </a>
       </p>
-      <div class="collapse" id="supportedFeatures">
-        The Sage online client supports all SPARQL 1.1 features <strong>except</strong>:
-        <ul>
-          <li><a href="https://www.w3.org/TR/sparql11-query/#propertypaths">SPARQL Property Paths</a></li>
-          <li><a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">the SPARQL 1.1 UPDATE language</a></li>
-        </ul>
-      </div>
       <div id="sage-widget" url="{{ server_public_url }}"></div>
     </div>
   </div>
