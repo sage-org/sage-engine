@@ -38,12 +38,12 @@ def sparql_blueprint(datasets, logger):
 
     @sparql_blueprint.route("/sparql/<dataset_name>", methods=["GET", "POST"])
     def sparql_query(dataset_name):
-        logger.info('[/sparql/] Loading dataset {}'.format(dataset_name))
+        logger.info('[/sparql/] Querying the dataset "{}"'.format(dataset_name))
         dataset = datasets.get_dataset(dataset_name)
         if dataset is None:
             abort(404)
 
-        logger.info('[/sparql/] Corresponding dataset found')
+        logger.debug('[/sparql/] Corresponding dataset found')
         mimetype = request.accept_mimetypes.best_match([
             "application/json", "application/xml",
             "application/sparql-results+json", "application/sparql-results+xml"
@@ -65,35 +65,36 @@ def sparql_blueprint(datasets, logger):
             post_query, err = QueryRequest().load(request.get_json())
             if err is not None and len(err) > 0:
                 return Response(format_marshmallow_errors(err), status=400)
+            logger.info('[/sparql/] Query: "{}"'.format(post_query))
             quota = dataset.quota / 1000
             max_results = dataset.maxResults
 
             # Load next link
             next_link = None
             if 'next' in post_query:
-                logger.info('[/sparql/{}] Saved plan found, decoding "next" link'.format(dataset_name))
+                logger.debug('[/sparql/{}] Saved plan found, decoding "next" link'.format(dataset_name))
                 next_link = decode_saved_plan(post_query["next"])
             else:
-                logger.info('[/sparql/{}] Query to evaluate: {}'.format(dataset_name, post_query))
+                logger.debug('[/sparql/{}] Query to evaluate: {}'.format(dataset_name, post_query))
 
             # build physical query plan, then execute it with the given quota
-            logger.info('[/sparql/{}] Starting query evaluation...')
+            logger.debug('[/sparql/{}] Starting query evaluation...'.format(dataset_name))
             start = time()
             plan, cardinalities = build_query_plan(post_query["query"], dataset, next_link)
             loading_time = (time() - start) * 1000
             bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
-            logger.info('[/sparql/{}] Query evaluation completed'.format(dataset_name))
+            logger.debug('[/sparql/{}] Query evaluation completed'.format(dataset_name))
 
             # compute controls for the next page
             start = time()
             next_page = None
             if is_done:
-                logger.info('[/sparql/{}] Query completed under the time quota'.format(dataset_name))
+                logger.debug('[/sparql/{}] Query completed under the time quota'.format(dataset_name))
             else:
-                logger.info('[/sparql/{}] The query was not completed under the time quota...'.format(dataset_name))
-                logger.info('[/sparql/{}] Saving the execution to plan to generate a "next" link'.format(dataset_name))
+                logger.debug('[/sparql/{}] The query was not completed under the time quota...'.format(dataset_name))
+                logger.debug('[/sparql/{}] Saving the execution to plan to generate a "next" link'.format(dataset_name))
                 next_page = encode_saved_plan(saved_plan)
-                logger.info('[/sparql/{}] "next" link successfully generated'.format(dataset_name))
+                logger.debug('[/sparql/{}] "next" link successfully generated'.format(dataset_name))
             exportTime = (time() - start) * 1000
             stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 

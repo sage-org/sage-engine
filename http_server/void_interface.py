@@ -45,12 +45,12 @@ def void_blueprint(datasets, logger):
     def void_dataset(dataset_name):
         """Describe one RDF dataset"""
         try:
-            logger.info('[/void/] Loading dataset {}'.format(dataset_name))
+            logger.debug('[/void/] Loading VoID descriptions for dataset {}'.format(dataset_name))
             dataset = datasets.get_dataset(dataset_name)
             if dataset is None:
                 abort(404)
 
-            logger.info('[/void/] Corresponding dataset found')
+            logger.debug('[/void/] Corresponding dataset found')
             mimetype = request.accept_mimetypes.best_match([
                 "application/n-triples", "text/turtle", "application/xml",
                 "application/n-quads", "application/trig",
