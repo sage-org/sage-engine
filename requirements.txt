@@ -1,4 +1,4 @@
-Flask==0.12.2
+Flask==1.0.2
 pybind11==2.2.1
 hdt==1.1.0
 marshmallow==2.15.0
