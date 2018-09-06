@@ -7,6 +7,7 @@ from database.datasets import DatasetCollection
 from http_server.sparql_interface import sparql_blueprint
 from http_server.void_interface import void_blueprint
 from http_server.utils import secure_url
+import logging
 
 
 def sage_app(config_file):
@@ -14,6 +15,10 @@ def sage_app(config_file):
     datasets = DatasetCollection(config_file)
     app = Flask(__name__)
     CORS(app)
+
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
     @app.route('/')
     def index():
@@ -49,6 +54,6 @@ def sage_app(config_file):
     def doc():
         return render_template("documentation.html")
 
-    app.register_blueprint(sparql_blueprint(datasets, app.logger))
-    app.register_blueprint(void_blueprint(datasets, app.logger))
+    app.register_blueprint(sparql_blueprint(datasets, gunicorn_logger))
+    app.register_blueprint(void_blueprint(datasets, gunicorn_logger))
     return app
