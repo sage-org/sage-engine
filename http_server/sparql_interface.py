@@ -38,7 +38,7 @@ def sparql_blueprint(datasets, logger):
 
     @sparql_blueprint.route("/sparql/<dataset_name>", methods=["GET", "POST"])
     def sparql_query(dataset_name):
-        logger.info('[/sparql/] Querying the dataset "{}"'.format(dataset_name))
+        logger.info('[IP: {}] [/sparql/] Querying {}'.format(request.environ['REMOTE_ADDR'], dataset_name))
         dataset = datasets.get_dataset(dataset_name)
         if dataset is None:
             abort(404)
@@ -65,7 +65,7 @@ def sparql_blueprint(datasets, logger):
             post_query, err = QueryRequest().load(request.get_json())
             if err is not None and len(err) > 0:
                 return Response(format_marshmallow_errors(err), status=400)
-            logger.info('[/sparql/] Query: "{}"'.format(post_query))
+            logger.info('[IP: {}] [/sparql/] Query={}'.format(request.environ['REMOTE_ADDR'], post_query))
             quota = dataset.quota / 1000
             max_results = dataset.maxResults
 
