@@ -28,8 +28,8 @@ class Dataset(object):
         return self._config['quota']
 
     @property
-    def maxResults(self):
-        return self._config['maxResults']
+    def max_results(self):
+        return self._config['max_results']
 
     @property
     def nb_triples(self):
@@ -71,7 +71,7 @@ class Dataset(object):
                 "nb_objects": self._connector.nb_objects if self._connector.nb_objects is not None else 'unknown'
             },
             "timeQuota": self.quota,
-            "maxResults": self.maxResults if self.maxResults is not inf else 'inf',
+            "maxResults": self.max_results if self.max_results is not inf else 'inf',
             "examples": self.example_queries,
             "supportedOperation": [
                 {
@@ -125,13 +125,13 @@ def load_config(config_file="config.yaml"):
     config = load(open(config_file))
     # set page size, i.e. the number of triples per page
     quota = config['quota'] if 'quota' in config else 75
-    maxResults = config['maxResults'] if 'maxResults' in config else inf
+    max_results = config['max_results'] if 'max_results' in config else inf
     config['quota'] = quota
     for c in config["datasets"]:
         if 'quota' not in c:
             c['quota'] = quota
-        if 'maxResults' not in c:
-            c['maxResults'] = maxResults
+        if 'max_results' not in c:
+            c['max_results'] = max_results
         if 'queries' not in c:
             c['queries'] = []
     # build datasets
@@ -146,8 +146,8 @@ class DatasetCollection(object):
         super(DatasetCollection, self).__init__()
         self._config_file = config_file
         (self._config, self._datasets) = load_config(self._config_file)
-        if "longDescription" in self._config:
-            with open(self._config["longDescription"], "r") as file:
+        if "long_description" in self._config:
+            with open(self._config["long_description"], "r") as file:
                 self._long_description = file.read()
         else:
             self._long_description = ""
@@ -157,12 +157,20 @@ class DatasetCollection(object):
         return self._config["name"] if "name" in self._config else None
 
     @property
+    def default_query(self):
+        default = {
+            "name": "",
+            "value": ""
+        }
+        return self._config["default_query"] if "default_query" in self._config else default
+
+    @property
     def long_description(self):
         return self._long_description
 
     @property
     def public_url(self):
-        return self._config["publicUrl"] if "publicUrl" in self._config else None
+        return self._config["public_url"] if "public_url" in self._config else None
 
     @property
     def maintainer(self):

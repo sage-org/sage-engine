@@ -67,7 +67,7 @@ def sparql_blueprint(datasets, logger):
                 return Response(format_marshmallow_errors(err), status=400)
             logger.info('[IP: {}] [/sparql/] Query={}'.format(request.environ['REMOTE_ADDR'], post_query))
             quota = dataset.quota / 1000
-            max_results = dataset.maxResults
+            max_results = dataset.max_results
 
             # Load next link
             next_link = None

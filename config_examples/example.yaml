@@ -1,0 +1,51 @@
+# The name of the server
+name: SaGe Example Server
+# Server maintainer(s)
+maintainer: Chuck Norris
+# The public URL used to access the server
+public_url: http://server-url.com
+# Path to a markdown file whose content will be displayed on the server's webpage
+long_description: config_examples/description.md
+# Time quantum used by the server
+quota: 75
+# (Optional) Maximum number of results fetched by HTTP request
+max_results: 2000
+# (Optional) Query selected by default in the "Query" section
+default_query:
+  dataset_name: dbpedia
+  name: Select everything
+  value: |
+    SELECT * WHERE {
+      ?s ?p ?o.
+    }
+# RDF Datasets hosted by the server
+datasets:
+-
+  name: dbpedia
+  description: The DBpedia dataset
+  # Type of backend (only hdt-file is available now)
+  backend: hdt-file
+  # Path to the HDT file
+  file: ./dbpedia.hdt
+  # Example queries that can be executed using this dataset
+  queries:
+    - name: "Every RDF triples"
+      value: |
+        SELECT * WHERE {
+          ?s ?p ?o.
+        }
+    - name: "Airport located in Italy"
+      value: |
+        prefix dbo: <http://dbpedia.org/ontology/>
+        prefix dbp: <http://dbpedia.org/property/>
+        prefix dbr: <http://dbpedia.org/resource/>
+        SELECT DISTINCT ?entity WHERE {
+          ?entity a dbo:Airport;
+            dbp:cityServed dbr:Italy.
+        }
+
+-
+  name: geonames
+  description: The Geonames dataset
+  backend: hdt-file
+  file: ./geonames.hdt

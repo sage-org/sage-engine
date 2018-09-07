@@ -1,6 +1,5 @@
-# HDT datasets
-data/*.hdt
-data/*.hdt.index.v1-1
+data/
+config_examples/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
