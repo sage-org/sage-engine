@@ -24,11 +24,11 @@ class StandaloneApplication(BaseApplication):
 
 
 def cli_sage():
-    parser = argparse.ArgumentParser(description='Launch the Sage server')
-    parser.add_argument('config', metavar='config', help='Path to the Sage configuration file to use')
+    parser = argparse.ArgumentParser(description='Launch the Sage server using a configuration file')
+    parser.add_argument('config', metavar='config', help='Path to the configuration file')
     parser.add_argument('-p', '--port', metavar='P', type=int, help='The port to bind (default: 8000)', default=8000)
     parser.add_argument('-w', '--workers', metavar='W', type=int, help='The number of server workers (default: 4)', default=4)
-    parser.add_argument('--log-level', metavar='LEVEL', dest='log_level', help='The granularity of Error log outputs (default: info)', default='info')
+    parser.add_argument('--log-level', metavar='LEVEL', dest='log_level', help='The granularity of log outputs (default: info)', default='info')
     args = parser.parse_args()
     # check if config file exists
     if not isfile(args.config):

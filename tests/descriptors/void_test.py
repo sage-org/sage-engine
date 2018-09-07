@@ -15,6 +15,7 @@ def test_describe_dataset_void():
     dataset = datasets.get_dataset("watdiv100")
     descriptor = VoidDescriptor(url, dataset)
     desc_graph = Graph()
+    print(descriptor.describe("turtle"))
     desc_graph.parse(data=descriptor.describe("turtle"), format="ttl")
     assert ref_graph.isomorphic(desc_graph)
 

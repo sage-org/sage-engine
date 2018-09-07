@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from rdflib import Graph, BNode, URIRef, Literal, Namespace
 from rdflib.namespace import DCTERMS, FOAF, RDF, RDFS, VOID, XSD
+from math import isinf
 
 HYDRA = Namespace("http://www.w3.org/ns/hydra/core#")
 SAGE = Namespace("http://sage.univ-nantes.fr/sage-voc#")
@@ -114,7 +115,10 @@ class VoidDescriptor(AbstractDescriptor):
         self._graph.add((self._dataset_url, SD["endpoint"], self._dataset_url))
         self._graph.add((self._dataset_url, HYDRA["entrypoint"], self._dataset_url))
         self._graph.add((self._dataset_url, SAGE["quota"], Literal(self._dataset.quota, datatype=XSD.integer)))
-        self._graph.add((self._dataset_url, HYDRA["itemsPerPage"], Literal(self._dataset.max_results, datatype=XSD.integer)))
+        if isinf(self._dataset.max_results):
+            self._graph.add((self._dataset_url, HYDRA["itemsPerPage"], Literal("Infinity")))
+        else:
+            self._graph.add((self._dataset_url, HYDRA["itemsPerPage"], Literal(self._dataset.max_results, datatype=XSD.integer)))
         # HDT statistics
         self._graph.add((self._dataset_url, VOID["triples"], Literal(self._dataset.nb_triples, datatype=XSD.integer)))
         self._graph.add((self._dataset_url, VOID["distinctSubjects"], Literal(self._dataset._connector.nb_subjects, datatype=XSD.integer)))

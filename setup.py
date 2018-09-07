@@ -18,22 +18,11 @@ console_scripts = [
     'sage = http_server.cli:cli_sage'
 ]
 
-install_requires = [
-    "Flask==1.0.2",
-    "pybind11==2.2.1",
-    "hdt==1.1.0",
-    "marshmallow==2.15.0",
-    "PyYAML==3.12",
-    "rdflib==4.2.2",
-    "rdflib-jsonld==0.4.0",
-    "gunicorn==19.7.1",
-    "flask-cors==3.0.3",
-    "protobuf==3.5.2",
-    "markdown==2.6.11"
-]
-
 with open('README.rst') as file:
     long_description = file.read()
+
+with open('requirements.txt') as file:
+    install_requires = file.read().splitlines()
 
 try:
     print('Installing Sage Web interface dependencies using npm...')

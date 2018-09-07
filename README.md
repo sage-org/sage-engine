@@ -33,48 +33,63 @@ python setup.py install
 ## Server configuration
 
 A Sage server is configured using a configuration file in [YAML syntax](http://yaml.org/).
+You will find below a minimal working example of such configuration file.
+A full example is available [in the `config_examples/` directory](https://github.com/sage-org/sage-engine/blob/master/config_examples/example.yaml)
 
 ```yaml
 name: SaGe Test server
 maintainer: Chuck Norris
 quota: 75
-maxResults: 500
+max_results: 2000
 datasets:
 -
-  name: dbpedia-2016
-  description: DBPedia v2016
+  name: dbpedia
+  description: DBPedia
   backend: hdt-file
   file: datasets/dbpedia.2016.hdt
--
-  name: geonames
-  description: Geonames dataset
-  backend: hdt-file
-  file: datasets/geonames.hdt
 ```
 
-The `quota` and `maxResults` fields are used to set the maximum query execution time and the maximum nuber of results
-per request, respectively.
+The `quota` and `max_results` fields are used to set the maximum time quantum and the maximum number of results
+allowed per request, respectively.
 
 Each entry in the `datasets` field declare a RDF dataset with a name, description, backend and options specific to this backend.
-Currently, only the `hdt-file` backend is supported, which allow a Sage server to load RDF datasets from [HDT files](http://www.rdfhdt.org/). Sage uses [pyHDT](https://github.com/Callidon/pyHDT) to load an query HDT files.
+Currently, **only** the `hdt-file` backend is supported, which allow a Sage server to load RDF datasets from [HDT files](http://www.rdfhdt.org/). Sage uses [pyHDT](https://github.com/Callidon/pyHDT) to load and query HDT files.
 
-## Launch a Sage server
+# Start a Sage server
 
-The `sage` executable , installed alongside the Sage server, allows to easily start a sage server from a configuration file, using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
+The `sage` executable, installed alongside the Sage server, allows to easily start a Sage server from a configuration file using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
 
 ```bash
 # launch Sage server with 4 workers on port 8000
-sage data/watdiv_config.yaml -w 4 -p 8000
+sage my_config.yaml -w 4 -p 8000
+```
+
+The full usage of the `sage` executable is detailed below:
+```
+usage: sage [-h] [-p P] [-w W] [--log-level LEVEL] config
+
+Launch the Sage server using a configuration file
+
+positional arguments:
+  config             Path to the configuration file
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -p P, --port P     The port to bind (default: 8000)
+  -w W, --workers W  The number of server workers (default: 4)
+  --log-level LEVEL  The granularity of log outputs (default: info)
 ```
 
 # Sage Docker image
 
-The Sage server is also available through a [Docker image](https://hub.docker.com/r/callidon/sage/)
+The Sage server is also available through a [Docker image](https://hub.docker.com/r/callidon/sage/).
+In order to use it, do not forget to [mount in the container](https://docs.docker.com/storage/volumes/) the directory that contains you configuration file and your datasets.
 
 ```bash
 docker pull callidon/sage
-docker run -p 8000:8000 callidon/sage sage config.yaml -w 4 -p 8000
+docker run -v path/to/config-file:/opt/data/ -p 8000:8000 callidon/sage sage /opt/data/config.yaml -w 4 -p 8000
 ```
+
 
 # Documentation
 

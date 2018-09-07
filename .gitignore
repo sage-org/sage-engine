@@ -6,7 +6,7 @@ __pycache__/
 watdiv.10M.hdt
 watdiv.10M.hdt.index.v1-1
 
-data/
+./data/
 
 # frontend related
 node_modules/
