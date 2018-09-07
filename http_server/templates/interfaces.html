@@ -13,7 +13,7 @@
               <th>Time quantum</th>
               <th>Max results per HTTP request</th>
               <th>VoID description</th>
-              <th>Interface URL</th>
+              <th>More details</th>
             </tr>
           </thead>
           <tbody>
@@ -32,8 +32,8 @@
               {%- else -%}
               <td>{{dataset["maxResults"]}} bindings</td>
               {%- endif -%}
-              <td><a href="{{ url_for('void-interface.void_dataset', dataset_name=dataset["title"]) }}">{{ url_for('void-interface.void_dataset', dataset_name=dataset["title"], _external=True) }}</a></td>
-              <td><a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"], _external=True) }}</a></td>
+              <td><a target="_blank" href="{{ url_for('void-interface.void_dataset', dataset_name=dataset["title"]) }}"><i class="fas fa-external-link-alt"></i> Open</a></td>
+              <td><a target="_blank" href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}"><i class="fas fa-external-link-alt"></i> Open</a></td>
             </tr>
             {% endfor %}
           </tbody>

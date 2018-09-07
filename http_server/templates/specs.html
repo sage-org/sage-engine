@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+
+{% block title %}Server technical specifications - Sage{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Sage server technical specifications</h1>
+      <ul>
+        <li><strong>Average load</strong>, i.e., number of processes in the system run queue averaged over:
+          <ul>
+            <li>Last minute: {{ specs.load_avg[0] }}</li>
+            <li>Last 5 minutes: {{ specs.load_avg[1] }}</li>
+            <li>Last 15 minutes: {{ specs.load_avg[2] }}</li>
+          </ul>
+        </li>
+        <li><strong>Number of CPU cores:</strong> 4 virtual processors</li>
+        <li><strong>RAM:</strong> 32 Go</li>
+        <li><strong>Vendor ID:</strong> GenuineIntel</li>
+        <li><strong>CPU family:</strong> 6</li>
+        <li><strong>Model:</strong> 6</li>
+        <li><strong>Model name:</strong> QEMU Virtual CPU version 2.5+</li>
+        <li><strong>Stepping:</strong> 3</li>
+        <li><strong>CPU MHz:</strong> 2399.996</li>
+        <li><strong>BogoMIPS:</strong> 4799.99</li>
+        <li><strong>Hypervisor vendor:</strong> KVM</li>
+        <li><strong>Virtualization type:</strong> full L1d cache: 32K L1i cache: 32K L2 cache: 4096K L3 cache: 16384K</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

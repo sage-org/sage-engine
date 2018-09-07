@@ -8,6 +8,7 @@ from http_server.sparql_interface import sparql_blueprint
 from http_server.void_interface import void_blueprint
 from http_server.utils import secure_url
 import logging
+import os
 
 
 def sage_app(config_file):
@@ -53,6 +54,17 @@ def sage_app(config_file):
     @app.route('/documentation')
     def doc():
         return render_template("documentation.html")
+
+    @app.route('/specs')
+    def specs():
+        try:
+            specs = {
+                'load_avg': os.getloadavg(),
+                'cpu_count': os.cpu_count()
+            }
+            return render_template("specs.html", specs=specs)
+        except Exception:
+            abort(500)
 
     app.register_blueprint(sparql_blueprint(datasets, gunicorn_logger))
     app.register_blueprint(void_blueprint(datasets, gunicorn_logger))

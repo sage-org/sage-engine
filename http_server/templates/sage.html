@@ -18,7 +18,7 @@
         for evaluating SPARQL queries against this dataset.
     </p>
 
-      <h3><i class="fas fa-sitemap"></i> VOID description</h3>
+      <h3><i class="fas fa-sitemap"></i> VoID description</h3>
       <p>Access the <a href="https://www.w3.org/TR/void/">VoID description</a> of the dataset at
         <a href="{{ url_for('void-interface.void_dataset', dataset_name=dataset_info["title"]) }}">
           {{ url_for('void-interface.void_dataset', dataset_name=dataset_info['title'], _external=True) }}
@@ -26,14 +26,15 @@
       </p>
       <!-- VoID descriptions -->
       <p>
+        View the VoID description in 
         <a class="btn btn-primary" data-toggle="collapse" href="#voidNTriples" role="button" aria-expanded="false" aria-controls="voidNTriples">
-          View in N-Triples
+          N-Triples
         </a>
         <a class="btn btn-primary" data-toggle="collapse" href="#voidTurtle" role="button" aria-expanded="false" aria-controls="voidTurtle">
-          View in Turtle
+          Turtle
         </a>
         <a class="btn btn-primary" data-toggle="collapse" href="#voidXML" role="button" aria-expanded="false" aria-controls="voidXML">
-          View in XML
+          XML
         </a>
       </p>
       <div class="collapse" id="voidNTriples">
