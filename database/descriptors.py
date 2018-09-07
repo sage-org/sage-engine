@@ -18,7 +18,7 @@ def bind_prefixes(graph):
     graph.bind("dcterms", "http://purl.org/dc/terms/")
     graph.bind("foaf", "http://xmlns.com/foaf/0.1/")
     graph.bind("hydra", "http://www.w3.org/ns/hydra/core#")
-    graph.bind("sage", "http://sage.univ-nantes.fr/owl#")
+    graph.bind("sage", "http://sage.univ-nantes.fr/sage-voc#")
     graph.bind("sd", "http://www.w3.org/ns/sparql-service-description#")
     graph.bind("void", "http://rdfs.org/ns/void#")
 
