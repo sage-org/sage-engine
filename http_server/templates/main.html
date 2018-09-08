@@ -57,5 +57,6 @@
     <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.min.js') }}" type="text/javascript" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='node_modules/sage-client/dist/sage-client.bundle.js') }}" type="text/javascript" charset="utf-8"></script>
     <script src="{{ url_for('static', filename='node_modules/sage-widget/dist/sage-widget.bundle.js') }}" type="text/javascript" charset="utf-8"></script>
+    {% block extra_js %}{% endblock %}
   </body>
 </html>

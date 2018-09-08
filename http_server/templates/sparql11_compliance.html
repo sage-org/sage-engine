@@ -18,7 +18,7 @@
 
           <h3>Unsupported SPARQL 1.1 features</h3>
           <ul>
-            <li><a href="https://www.w3.org/TR/sparql11-query/#propertypaths">Property Paths</a></li>
+            <li><a href="https://www.w3.org/TR/sparql11-query/#propertypaths">Property Paths</a> (only with the Javascript client)</li>
             <li><a href="https://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/">SPARQL Entailment</a> (unless the original RDF Graph has been saturated beforehand)</li>
             <li><a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">SPARQL 1.1 Update</a> (RDF datasets hosted by Sage are <em>read-only</em>)</li>
           </ul>
@@ -27,889 +27,1113 @@
           <table class="table table-bordered">
       			<thead>
       				<tr>
-      					<th scope="col">W3C SPARQL 1.1 Test</th>
-      					<th scope="col">Executable with Sage?</th>
+      					<th scope="col" rowspan=2>W3C SPARQL 1.1 Test</th>
+      					<th scope="col" colspan=2>Executable with Sage?</th>
+      				</tr>
+              <tr>
+      					<th scope="col"><a href="https://github.com/sage-org/sage-jena" target="_blank">Java client</a></th>
+                <th scope="col"><a href="https://github.com/sage-org/sage-client" target="_blank">Javascript client</a></th>
       				</tr>
       			</thead>
-      			<tbody>
+      			<tbody id="compliance-tbody">
       				<tr>
       					<td>aggregates/agg01</td>
       					<td class="table-success">Yes</td>
+                <td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg02</td>
       					<td class="table-success">Yes</td>
+                <td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg03</td>
       					<td class="table-success">Yes</td>
+                <td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg04</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg05</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg06</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg07</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg08b</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-groupconcat-1</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-groupconcat-2</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-groupconcat-3</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-avg-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-avg-02</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-min-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-min-02</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-max-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-max-02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-sum-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-sum-02</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-sample-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-err-01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-err-02</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>aggregates/agg-empty-group</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>bindings/values01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/values02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/values03</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/values04</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/values05</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/values06</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/values07</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/values08</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/inline01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bindings/inline02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind03</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind04</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind05</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind06</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind07</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind08</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind10</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>bind/bind11</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/rdf02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/rdf03</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/rdf04</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/rdfs08</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/rdfs11</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/rdfs12</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/rdfs13</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/plainLit</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/paper-sparqldl-Q5</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind01</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind02</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind03</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind04</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind05</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind06</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind07</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/bind08</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-04</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-05</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-06</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-07</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-08</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-09</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/sparqldl-12</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/lang</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>entailment/parent2</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>exists/exists01</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>exists/exists02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>exists/exists03</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>exists/exists04</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>exists/exists05</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/strdt01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strdt02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strdt03</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/strlang01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strlang02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strlang03</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/isnumeric01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/abs01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/ceil01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/floor01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/round01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/concat01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/concat02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/substring01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/substring02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/length01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/ucase01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/lcase01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/encode01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/contains01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/starts01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/ends01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/plus-1</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/plus-2</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/md5-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/md5-02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/sha1-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/sha1-02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/sha256-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/sha256-02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/sha512-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/sha512-02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/hours-01</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/minutes-01</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/seconds-01</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/year-01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/month-01</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/day-01</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/timezone-01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/tz-01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/bnode01</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/in01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/in02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/notin01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/notin02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/now01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/rand01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/bnode02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/iri01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/if01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/if02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/coalesce01</td>
       					<td class="table-success">Yes</td>
-      				</tr>
-      				<tr>
-      					<td>functions/strbefore01</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strbefore01</td>
+      					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
+      				</tr>
+      				<tr>
+      					<td>functions/strbefore01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strbefore02</td>
       					<td class="table-success">Yes</td>
-      				</tr>
-      				<tr>
-      					<td>functions/strafter01</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strafter01</td>
+      					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
+      				</tr>
+      				<tr>
+      					<td>functions/strafter01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/strafter02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/replace01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/replace02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/replace03</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>functions/uuid01</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>functions/struuid01</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>grouping/group01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>grouping/group02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>grouping/group03</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>grouping/group04</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>grouping/group05</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/subsetByExcl01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/subsetByExcl02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/temporalProximity01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/subset-01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/subset-02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/set-equals-1</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/subset-03</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/exists-01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/exists-02</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>negation/full-minuend</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>negation/part-minuend</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>project-expression/projexp01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>project-expression/projexp02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>project-expression/projexp03</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>project-expression/projexp04</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>project-expression/projexp05</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>project-expression/projexp06</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>project-expression/projexp07</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp03</td>
       					<td class="table-success">Yes</td>
-      				</tr>
-      				<tr>
-      					<td>property-path/pp06</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp06</td>
+      					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
+      				</tr>
+      				<tr>
+      					<td>property-path/pp06</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp08</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp09</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp10</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp11</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp12</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp14</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp14</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-2-2</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-2-2</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-2-2</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-p2</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-p3</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-p4</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-ng-01</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/path-ng-02</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp36</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>property-path/pp37</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>service/service01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>service/service02</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>service/service03</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>service/service04a</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>service/service05</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>service/service06</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>service/service07</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>subquery/sq11</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>subquery/sq12</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq11</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>subquery/sq14</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>construct/constructwhere01</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>construct/constructwhere02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>construct/constructwhere03</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>construct/constructwhere04</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>csv-tsv-res/csvtsv01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>csv-tsv-res/csvtsv02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>csv-tsv-res/csvtsv01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>csv-tsv-res/csvtsv01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>csv-tsv-res/csvtsv02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>csv-tsv-res/csvtsv01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>json-res/jsonres01</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>json-res/jsonres02</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>json-res/jsonres03</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>json-res/jsonres04</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq01</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq02</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq03</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq04</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq05</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq06</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq07</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>subquery/sq08</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq09</td>
       					<td class="table-danger">No</td>
+      					<td class="table-danger">No</td>
       				</tr>
       				<tr>
       					<td>subquery/sq10</td>
+      					<td class="table-danger">No</td>
       					<td class="table-danger">No</td>
       				</tr>
               <tr>
       					<td>subquery/sq13</td>
       					<td class="table-success">Yes</td>
+      					<td class="table-success">Yes</td>
       				</tr>
               <tr>
       					<td>subquery/sq14</td>
+      					<td class="table-success">Yes</td>
       					<td class="table-success">Yes</td>
       				</tr>
       			</tbody>
@@ -917,4 +1141,16 @@
         </div>
       </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+  $(document).ready(function () {
+    for (var tr of $("#compliance-tbody > tr")) {
+      var content = tr.firstElementChild.innerHTML
+      var newContent = '<a target="_blank" href="https://www.w3.org/2009/sparql/docs/tests/data-sparql11/' + content + '.rq">' + content + '</a>'
+      tr.firstElementChild.innerHTML = newContent
+    }
+  })
+</script>
 {% endblock %}
