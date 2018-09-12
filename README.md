@@ -1,10 +1,12 @@
-# SaGe server
-Python implementation of SaGe, a preemptive query engine for Basic Graph pattern evaluation.
+# Sage: a stable, responsive and unrestricted SPARQL query server
+Python implementation of SaGe, a stable, responsive and unrestricted SPARQL query server.
 
 # Table of contents
 
 * [Installation](#installation)
 * [Getting started](#getting-started)
+  * [Installation](#installation)
+  * [Starting the server](#starting-the-server)
 * [Sage Docker image](#sage-docker-image)
 * [Documentation](#documentation)
 
@@ -55,7 +57,7 @@ allowed per request, respectively.
 Each entry in the `datasets` field declare a RDF dataset with a name, description, backend and options specific to this backend.
 Currently, **only** the `hdt-file` backend is supported, which allow a Sage server to load RDF datasets from [HDT files](http://www.rdfhdt.org/). Sage uses [pyHDT](https://github.com/Callidon/pyHDT) to load and query HDT files.
 
-# Start a Sage server
+## Starting the server
 
 The `sage` executable, installed alongside the Sage server, allows to easily start a Sage server from a configuration file using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
 
@@ -106,3 +108,5 @@ cd docs/
 make html
 open build/html/index.html
 ```
+
+Copyright 2017-2018 - [GDD Team](https://sites.google.com/site/gddlina/), [LS2N](https://www.ls2n.fr/?lang=en), [University of Nantes](http://www.univ-nantes.fr/)
