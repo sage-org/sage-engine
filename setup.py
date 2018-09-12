@@ -39,7 +39,7 @@ setup(
     author="Thomas Minier",
     author_email="thomas.minier@univ-nantes.fr",
     url="https://github.com/sage-org/sage-engine",
-    description="...",
+    description="Sage: a stable, responsive and unrestricted SPARQL query server",
     long_description=long_description,
     keywords=["rdf", "sparql", "query engine"],
     license="MIT",
