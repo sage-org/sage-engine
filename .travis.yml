@@ -17,6 +17,7 @@ before_install:
   - wget -O watdiv.10M.hdt $WATDIV_LINK
   - cp watdiv.10M.hdt tests/data/watdiv.10M.hdt
 install:
+  - pip install pybind11
   - pip install -r requirements.txt
   - python setup.py install
 script:
