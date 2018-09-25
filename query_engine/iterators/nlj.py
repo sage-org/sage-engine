@@ -3,17 +3,17 @@
 from query_engine.iterators.preemptable_iterator import PreemptableIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.utils import apply_bindings, tuple_to_triple
-from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedNestedLoopJoinIterator
+from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedIndexJoinIterator
 from query_engine.protobuf.utils import pyDict_to_protoDict
 from query_engine.iterators.utils import IteratorExhausted
 from asyncio import coroutine
 
 
-class NestedLoopJoinIterator(PreemptableIterator):
-    """A NestedLoopJoinIterator is an iterator over a nested loop join between an iterator, which yields mappings, and a triple pattern.
+class IndexJoinIterator(PreemptableIterator):
+    """A IndexJoinIterator implements an Index Join using the iterator paradigm.
 
     Args:
-        - source :class:`.ScanIterator` | :class:`.NestedLoopJoinIterator` - The outer relation of the join: an iterator that yields solution mappings.
+        - source :class:`.ScanIterator` | :class:`.IndexJoinIterator` - The outer relation of the join: an iterator that yields solution mappings.
         - innerTriple ``dict``- The inner relation, i.e., a triple pattern.
         - hdtDocument :class:`.DatabaseConnector` - The document scanned by inner loops.
         - currentBinding ``dict=None`` - A set of solution mappings used to resume join processing.
@@ -21,7 +21,7 @@ class NestedLoopJoinIterator(PreemptableIterator):
     """
 
     def __init__(self, source, innerTriple, hdtDocument, currentBinding=None, iterOffset=0):
-        super(NestedLoopJoinIterator, self).__init__()
+        super(IndexJoinIterator, self).__init__()
         self._source = source
         self._innerTriple = innerTriple
         self._currentBinding = currentBinding
@@ -32,10 +32,10 @@ class NestedLoopJoinIterator(PreemptableIterator):
             self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding, offset=iterOffset)
 
     def __repr__(self):
-        return "<NestedLoopJoinIterator (%s JOIN {%s %s %s})>" % (str(self._source), self._innerTriple['subject'], self._innerTriple['predicate'], self._innerTriple['object'])
+        return "<IndexJoinIterator (%s JOIN {%s %s %s})>" % (str(self._source), self._innerTriple['subject'], self._innerTriple['predicate'], self._innerTriple['object'])
 
     def serialized_name(self):
-        return "nlj"
+        return "join"
 
     @property
     def currentBinding(self):
@@ -72,7 +72,7 @@ class NestedLoopJoinIterator(PreemptableIterator):
 
     def save(self):
         """Save the operator using protobuf"""
-        saved_join = SavedNestedLoopJoinIterator()
+        saved_join = SavedIndexJoinIterator()
         # save source operator
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_join, source_field).CopyFrom(self._source.save())
@@ -91,8 +91,8 @@ class NestedLoopJoinIterator(PreemptableIterator):
         return saved_join
 
 
-class LeftNLJIterator(NestedLoopJoinIterator):
-    """A NestedLoopJoinIterator which implements a left-join"""
+class LeftNLJIterator(IndexJoinIterator):
+    """A IndexJoinIterator which implements a left-join"""
 
     @coroutine
     async def next(self):

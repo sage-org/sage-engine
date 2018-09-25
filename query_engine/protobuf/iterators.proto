@@ -18,15 +18,15 @@ message SavedProjectionIterator {
   repeated string values = 1;
   oneof source {
     SavedScanIterator scan_source = 2;
-    SavedNestedLoopJoinIterator nlj_source = 3;
+    SavedIndexJoinIterator join_source = 3;
     SavedBagUnionIterator union_source = 4;
   }
 }
 
-message SavedNestedLoopJoinIterator {
+message SavedIndexJoinIterator {
   oneof source {
     SavedScanIterator scan_source = 1;
-    SavedNestedLoopJoinIterator nlj_source = 2;
+    SavedIndexJoinIterator join_source = 2;
   }
   TriplePattern inner = 3;
   map<string, string> muc = 4;

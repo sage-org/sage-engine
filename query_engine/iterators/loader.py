@@ -2,11 +2,11 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import NestedLoopJoinIterator, LeftNLJIterator
+from query_engine.iterators.nlj import IndexJoinIterator, LeftNLJIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.protobuf.utils import protoTriple_to_dict
-from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedNestedLoopJoinIterator, SavedBagUnionIterator, SavedFilterIterator
+from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedIndexJoinIterator, SavedBagUnionIterator, SavedFilterIterator
 
 
 def load(protoMsg, db_connector):
@@ -23,7 +23,7 @@ def load(protoMsg, db_connector):
         return load_projection(saved_plan, db_connector)
     elif type(saved_plan) is SavedScanIterator:
         return load_scan(saved_plan, db_connector)
-    elif type(saved_plan) is SavedNestedLoopJoinIterator:
+    elif type(saved_plan) is SavedIndexJoinIterator:
         return load_nlj(saved_plan, db_connector)
     if type(saved_plan) is SavedBagUnionIterator:
         return load_union(saved_plan, db_connector)
@@ -55,7 +55,7 @@ def load_scan(saved_plan, db_connector):
 
 
 def load_nlj(saved_plan, db_connector):
-    """Load a NestedLoopJoinIterator from a protobuf serialization"""
+    """Load a IndexJoinIterator from a protobuf serialization"""
     currentBinding = None
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), db_connector)
@@ -65,7 +65,7 @@ def load_nlj(saved_plan, db_connector):
     iterOffset = saved_plan.offset
     if saved_plan.optional:
         return LeftNLJIterator(source, innerTriple, db_connector, currentBinding=currentBinding, iterOffset=iterOffset)
-    return NestedLoopJoinIterator(source, innerTriple, db_connector, currentBinding=currentBinding, iterOffset=iterOffset)
+    return IndexJoinIterator(source, innerTriple, db_connector, currentBinding=currentBinding, iterOffset=iterOffset)
 
 
 def load_union(saved_plan, db_connector):

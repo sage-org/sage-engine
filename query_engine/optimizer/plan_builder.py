@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import NestedLoopJoinIterator
+from query_engine.iterators.nlj import IndexJoinIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.loader import load
@@ -95,6 +95,6 @@ def build_left_plan(bgp, db_connector, source=None, base_vars=None):
             pattern = triples[0]
             query_vars = query_vars | get_vars(pattern['triple'])
             pos = 0
-        acc = NestedLoopJoinIterator(acc, pattern['triple'], db_connector)
+        acc = IndexJoinIterator(acc, pattern['triple'], db_connector)
         triples.pop(pos)
     return acc, query_vars, cardinalities

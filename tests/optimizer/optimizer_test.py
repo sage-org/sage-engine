@@ -4,9 +4,8 @@ from query_engine.optimizer.plan_builder import build_query_plan
 from database.hdt_file_connector import HDTFileConnector
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import NestedLoopJoinIterator
+from query_engine.iterators.nlj import IndexJoinIterator
 from query_engine.iterators.union import BagUnionIterator
-from query_engine.iterators.utils import EmptyIterator
 
 hdtDoc = HDTFileConnector('data/watdiv.10M.hdt')
 
@@ -51,7 +50,7 @@ def test_build_left_linear_plan():
     }
     plan, c = build_query_plan(query, hdtDoc)
     assert type(plan) is ProjectionIterator
-    assert type(plan._source) is NestedLoopJoinIterator
+    assert type(plan._source) is IndexJoinIterator
     assert plan._source._innerTriple == bgp[1]
     assert type(plan._source._source) is ScanIterator
     assert plan._source._source._triple == bgp[0]
@@ -102,7 +101,7 @@ def test_load_from_savedPlan():
     savedPlan = plan.save()
     plan, c = build_query_plan(None, hdtDoc, savedPlan)
     assert type(plan) is ProjectionIterator
-    assert type(plan._source) is NestedLoopJoinIterator
+    assert type(plan._source) is IndexJoinIterator
     assert plan._source._innerTriple == bgp[1]
     assert type(plan._source._source) is ScanIterator
     assert plan._source._source._triple == bgp[0]

@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.sage_engine import SageEngine
 from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import NestedLoopJoinIterator, LeftNLJIterator
+from query_engine.iterators.nlj import IndexJoinIterator, LeftNLJIterator
 from database.hdt_file_connector import HDTFileConnector
 
 hdtDoc = HDTFileConnector('data/test.hdt')
@@ -22,7 +22,7 @@ innerTriple = {
 def test_nlj_read():
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
-    join = NestedLoopJoinIterator(scan, innerTriple, hdtDoc)
+    join = IndexJoinIterator(scan, innerTriple, hdtDoc)
     (results, saved, done) = engine.execute(join, 10e7)
     assert len(results) == 20
     for res in results:
@@ -33,7 +33,7 @@ def test_nlj_read():
 def test_nlj_interrupt():
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
-    join = NestedLoopJoinIterator(scan, innerTriple, hdtDoc)
+    join = IndexJoinIterator(scan, innerTriple, hdtDoc)
     (results, saved, done) = engine.execute(join, 10e-5)
     assert len(results) < 20
     assert not done
