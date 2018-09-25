@@ -1,0 +1,33 @@
+language: python
+cache: pip
+python:
+- '3.6'
+notifications:
+  email: false
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+env:
+  - WATDIV_LINK=https://hqrciw.bl.files.1drv.com/y4mXcGeDGwx0Dh82KRnxZTPaDf50wX31JnPm1t7ODXBlcuEwPk6NIegdcSFjclambp62u_xgtJBjTEWgpD32aEDRjFOAzzi4ysWXXfGdxTIq1UaOj72t5GZPPX-wi9LXcqQoFIzQA74Q5_EH9Vt9bP4MOMX8jXIFz3F3zEqtDKuTG53ZC05LjXybFzhy0Pvukd4W58Xtkh5ZcO2jiZ6HxkcYA/watdiv.10M.hdt?download
+before_install:
+  - pip install pytest
+  - wget -O watdiv.10M.hdt $WATDIV_LINK
+  - cp watdiv.10M.hdt tests/data/watdiv.10M.hdt
+install:
+  - pip install -r requirements.txt
+  - python setup.py install
+script:
+  - pytest
+before_deploy:
+  - rm -rf build/
+  - rm -rf tests/
+deploy:
+- provider: pypi
+  skip_cleanup: true
+  user: callidon
+  password: $PYPI_PASSWD
+  on:
+    tags: true
