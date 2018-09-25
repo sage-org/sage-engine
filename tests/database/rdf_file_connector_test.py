@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from database.rdf_file_connector import RDFFileConnector, TripleIndex
 
-db = RDFFileConnector("data/test.ttl", format="ttl", useCache=True)
+db = RDFFileConnector("tests/data/test.ttl", format="ttl", useCache=True)
 
 
 def test_triple_index():

@@ -4,7 +4,7 @@ import pytest
 from http_server.server import sage_app
 from tests.http.utils import jsonPost
 
-app = sage_app('data/test_config.yaml')
+app = sage_app('tests/data/test_config.yaml')
 
 bgp_queries = [
     ({

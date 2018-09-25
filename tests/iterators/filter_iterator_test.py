@@ -7,7 +7,7 @@ from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.loader import load
 from database.hdt_file_connector import HDTFileConnector
 
-hdtDoc = HDTFileConnector('data/test.hdt')
+hdtDoc = HDTFileConnector('tests/data/test.hdt')
 engine = SageEngine()
 triple = {
     'subject': '?s',

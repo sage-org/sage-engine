@@ -7,7 +7,7 @@ from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import IndexJoinIterator
 from query_engine.iterators.union import BagUnionIterator
 
-hdtDoc = HDTFileConnector('data/watdiv.10M.hdt')
+hdtDoc = HDTFileConnector('tests/data/watdiv.10M.hdt')
 
 
 def test_empty_patterns():

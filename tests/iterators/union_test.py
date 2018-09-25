@@ -5,7 +5,7 @@
 # from query_engine.iterators.union import BagUnionIterator, RandomBagUnionIterator
 # from database.hdt_file_connector import HDTFileConnector
 #
-# hdtDoc = HDTFileConnector('data/test.hdt')
+# hdtDoc = HDTFileConnector('tests/data/test.hdt')
 # engine = SageEngine()
 # triple1 = {
 #     'subject': 'http://example.org/s1',

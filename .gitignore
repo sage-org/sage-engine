@@ -7,6 +7,8 @@ watdiv.10M.hdt
 watdiv.10M.hdt.index.v1-1
 
 ./data/
+test.hdt.index.v*
+test.ttl.v*
 
 # frontend related
 node_modules/

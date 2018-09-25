@@ -4,7 +4,7 @@ from database.datasets import DatasetCollection
 from database.descriptors import VoidDescriptor, many_void
 from rdflib import Graph
 
-datasets = DatasetCollection("data/test_config.yaml")
+datasets = DatasetCollection("tests/data/test_config.yaml")
 
 
 def test_describe_dataset_void():
