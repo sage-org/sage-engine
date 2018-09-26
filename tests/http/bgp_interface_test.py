@@ -28,7 +28,7 @@ bgp_queries = [
                 }
             ]
         }
-    }, 2180, 6),
+    }, 2180),
     ({
         'query': {
             'type': 'bgp',
@@ -50,7 +50,7 @@ bgp_queries = [
                 }
             ]
         }
-    }, 531, 8),
+    }, 531),
     ({
         'query': {
             'type': 'bgp',
@@ -72,7 +72,7 @@ bgp_queries = [
                 }
             ]
         }
-    }, 93, 6)
+    }, 93)
 ]
 
 
@@ -86,8 +86,8 @@ class TestBGPInterface(object):
     def teardown_class(self):
         pass
 
-    @pytest.mark.parametrize("body,cardinality,calls", bgp_queries)
-    def test_bgp_interface(self, body, cardinality, calls):
+    @pytest.mark.parametrize("body,cardinality", bgp_queries)
+    def test_bgp_interface(self, body, cardinality):
         query = body
         nbResults = 0
         nbCalls = 0
@@ -99,4 +99,4 @@ class TestBGPInterface(object):
             query['next'] = response['next']
             nbCalls += 1
         assert nbResults == cardinality
-        assert nbCalls <= calls
+        assert nbCalls > 1
