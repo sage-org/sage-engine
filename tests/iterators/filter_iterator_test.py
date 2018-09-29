@@ -72,7 +72,7 @@ def test_filter_iterator_interrupt():
     iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
-    (results, saved, done) = engine.execute(iterator, 10e-4)
+    (results, saved, done) = engine.execute(iterator, 10e-7)
     assert len(results) < 4
     for b in results:
         assert b['?p'] == 'http://schema.org/eligibleRegion'

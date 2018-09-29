@@ -7,7 +7,7 @@ from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.loader import load
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
-from query_engine.filter.compiler import compile_filter
+from functools import reduce
 
 
 def build_query_plan(query, db_connector, saved_plan=None, projection=None):
@@ -16,7 +16,6 @@ def build_query_plan(query, db_connector, saved_plan=None, projection=None):
         return load(saved_plan, db_connector), []
 
     # optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
-    filters = query['filters'] if 'filters' in query else []
     root = None
 
     if query['type'] == 'union':
@@ -25,9 +24,12 @@ def build_query_plan(query, db_connector, saved_plan=None, projection=None):
         root, cardinalities = build_join_plan(query['bgp'], db_connector, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
-    for f in filters:
-        expr, filterVars = compile_filter(f)
-        root = FilterIterator(root, expr, filterVars)
+
+    # apply filter clause(s)
+    if 'filters' in query and len(query['filters']) > 0:
+        # reduce all filters in a conjunctive expression
+        expression = reduce(lambda x, y: "({}) && ({})".format(x, y), query['filters'])
+        root = FilterIterator(root, expression)
     return root, cardinalities
 
 

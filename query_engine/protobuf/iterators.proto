@@ -51,7 +51,6 @@ message SavedFilterIterator {
     SavedFilterIterator filter_source = 2;
   }
   string expression = 3;
-  repeated string variables = 4;
 }
 
 message RootTree {

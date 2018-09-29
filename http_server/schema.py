@@ -32,20 +32,13 @@ class TriplePatternSchema(Schema):
     object = fields.Str(require=True)
 
 
-class FilterSchema(Schema):
-    """Marshmallow schema for a SPARQL filter parameter"""
-    type = fields.Str(required=True)
-    operator = fields.Str(required=True)
-    args = fields.List(ManyNested(fields.Str(), fields.Dict()), required=True)
-
-
 class SparqlQuerySchema(Schema):
     """Marshmallow schema for a SPARQL query"""
     type = fields.Str(required=True)
     bgp = fields.Nested(TriplePatternSchema, required=False, many=True)
     union = fields.List(fields.Nested(TriplePatternSchema, many=True), many=True)
     optional = fields.Nested(TriplePatternSchema, required=False, many=True)
-    filters = fields.Nested(FilterSchema, required=False, many=True)
+    filters = fields.List(fields.Str(), required=False)
 
 
 class QueryRequest(Schema):
