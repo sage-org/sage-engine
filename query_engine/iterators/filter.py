@@ -1,35 +1,49 @@
 # filter.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from query_engine.iterators.preemptable_iterator import PreemptableIterator
-from query_engine.filter.runtime import FILTER_RUNTIME
-from query_engine.filter.utils import compile_literal
 from query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from query_engine.iterators.utils import IteratorExhausted
-from string import Template
+from rdflib import URIRef, Variable
+from rdflib.plugins.sparql.parser import parseQuery
+from rdflib.plugins.sparql.algebra import translateQuery
+from rdflib.plugins.sparql.sparql import QueryContext, Bindings
+from rdflib.util import from_n3
+
+
+def to_rdflib_term(value):
+    """Convert a N3 term to a RDFLib Term"""
+    if value.startswith('http'):
+        return URIRef(value)
+    elif '"^^http' in value:
+        index = value.find('"^^http')
+        value = "{}<{}>".format(value[0:index+3], value[index+3:])
+    return from_n3(value)
 
 
 class FilterIterator(PreemptableIterator):
     """A FilterIterator evaluates a FILTER clause on set of mappings"""
 
-    def __init__(self, source, expression, variables):
+    def __init__(self, source, expression):
         super(FilterIterator, self).__init__()
         self._source = source
-        self._expression = expression
-        self._template = Template(expression)
-        self._variables = variables
-        self._baseBindings = {key: None for key in self._variables}
+        self._raw_expression = expression
+        # compile the expression using rdflib
+        compiled_expr = parseQuery("SELECT * WHERE {?s ?p ?o FILTER(" + expression + ")}")
+        compiled_expr = translateQuery(compiled_expr)
+        self._compiled_expression = compiled_expr.algebra.p.p.expr
 
     def __repr__(self):
-        return "<FilterIterator '{}' (variables: {}) on {}>".format(self._expression, self._variables, self._source)
+        return "<FilterIterator '{}' on {}>".format(self._raw_expression, self._source)
 
     def serialized_name(self):
         return "filter"
 
     def _evaluate(self, bindings):
-        b = dict(self._baseBindings)
-        for key, value in bindings.items():
-            b[key[1:]] = compile_literal(value)
-        return eval(self._template.substitute(b), FILTER_RUNTIME)
+        """Evaluate the FILTER expression with a set mappings"""
+        d = {Variable(key[1:]): to_rdflib_term(value) for key, value in bindings.items()}
+        b = Bindings(d=d)
+        context = QueryContext(bindings=b)
+        return self._compiled_expression.eval(context)
 
     async def next(self):
         if not self.has_next():
@@ -48,6 +62,5 @@ class FilterIterator(PreemptableIterator):
         saved_filter = SavedFilterIterator()
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_filter, source_field).CopyFrom(self._source.save())
-        saved_filter.expression = self._expression
-        saved_filter.variables.extend(self._variables)
+        saved_filter.expression = self._raw_expression
         return saved_filter

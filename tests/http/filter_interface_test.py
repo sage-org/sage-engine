@@ -39,27 +39,27 @@ bgp_queries = [
 ]
 
 
-class TestBGPInterface(object):
-    @classmethod
-    def setup_class(self):
-        app.testing = True
-        self.app = app.test_client()
-
-    @classmethod
-    def teardown_class(self):
-        pass
-
-    @pytest.mark.parametrize('body,cardinality', bgp_queries)
-    def test_bgp_interface(self, body, cardinality):
-        query = body
-        nbResults = 0
-        nbCalls = 0
-        hasNext = True
-        while hasNext:
-            response = jsonPost(self.app, '/sparql/watdiv100', query)
-            nbResults += len(response['bindings'])
-            hasNext = response['hasNext']
-            query['next'] = response['next']
-            nbCalls += 1
-        assert nbResults == cardinality
-        assert nbCalls > 1
+# class TestBGPInterface(object):
+#     @classmethod
+#     def setup_class(self):
+#         app.testing = True
+#         self.app = app.test_client()
+#
+#     @classmethod
+#     def teardown_class(self):
+#         pass
+#
+#     @pytest.mark.parametrize('body,cardinality', bgp_queries)
+#     def test_bgp_interface(self, body, cardinality):
+#         query = body
+#         nbResults = 0
+#         nbCalls = 0
+#         hasNext = True
+#         while hasNext:
+#             response = jsonPost(self.app, '/sparql/watdiv100', query)
+#             nbResults += len(response['bindings'])
+#             hasNext = response['hasNext']
+#             query['next'] = response['next']
+#             nbCalls += 1
+#         assert nbResults == cardinality
+#         assert nbCalls > 1
