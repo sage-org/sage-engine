@@ -15,6 +15,11 @@ tags:
   externalDocs:
     description: "See more"
     url: "http://sage.univ-nantes.fr/"
+- name: "void"
+  description: "Get VoID descriptions"
+  externalDocs:
+    description: "See more"
+    url: "https://www.w3.org/TR/void/"
 schemes:
 - "https"
 - "http"
@@ -24,8 +29,7 @@ paths:
       tags:
       - "sparql"
       summary: "Execute a SPARQL query"
-      description: ""
-      operationId: "addPet"
+      description: "Execute a SPARQL query using the preemptive SPARQL query server"
       consumes:
       - "application/json"
       produces:
@@ -49,6 +53,44 @@ paths:
           description: "Successful operation"
           schema:
             $ref: "#/definitions/QueryResponse"
+        500:
+          description: "Invalid query"
+  /void/:
+    get:
+      tags:
+      - "void"
+      summary: "Server VoID description"
+      description: "Get the VoID description of the SaGe server"
+      produces:
+      - "application/xml"
+      - "application/n-triples"
+      - "application/json"
+      - "text/turtle"
+      responses:
+        200:
+          description: "Successful operation"
+        500:
+          description: "Invalid query"
+  /void/{dataset}:
+    get:
+      tags:
+      - "void"
+      summary: "Dataset VoID description"
+      description: "Get the VoID description of a RDF Dataset hosted by the SaGe server"
+      produces:
+      - "application/xml"
+      - "application/n-triples"
+      - "application/json"
+      - "text/turtle"
+      parameters:
+      - name: "dataset"
+        in: "path"
+        description: "Name of the RDF dataset"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
         500:
           description: "Invalid query"
 definitions:
@@ -83,16 +125,18 @@ definitions:
             - "union"
           bgp:
             type: "array"
+            description: "Basic Graph pattern to evaluate"
             items:
               $ref: '#/definitions/TriplePattern'
           filters:
             type: array
-            description: "SPARQL Filters"
+            description: "SPARQL Filters to evaluate"
             items:
               type: "string"
               example: "isIRI(?alice) && ?alice != <http://example.org#bob>"
           union:
             type: "array"
+            description: "Union of Basic Graph patterns to evaluate"
             items:
               type: "array"
               items:
