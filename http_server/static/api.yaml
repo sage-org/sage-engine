@@ -1,0 +1,121 @@
+swagger: "2.0"
+info:
+  description: "Documentation for the SaGe API"
+  version: "1.0.0"
+  title: "SaGe API"
+  contact:
+    email: "sage@univ-nantes.fr"
+  license:
+    name: "MIT"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+basePath: "/"
+tags:
+- name: "sparql"
+  description: "Evaluate SPARQL queries using the SaGe preemptive SPARQL query server"
+  externalDocs:
+    description: "See more"
+    url: "http://sage.univ-nantes.fr/"
+schemes:
+- "https"
+- "http"
+paths:
+  /sparql/{dataset}:
+    post:
+      tags:
+      - "sparql"
+      summary: "Execute a SPARQL query"
+      description: ""
+      operationId: "addPet"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      - "application/sparql-results+json"
+      - "application/sparql-results+xml"
+      parameters:
+      - name: "dataset"
+        in: "path"
+        description: "Name of the RDF dataset queried"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "query"
+        description: "Query object"
+        required: true
+        schema:
+          $ref: "#/definitions/QueryObject"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/QueryResponse"
+        500:
+          description: "Invalid query"
+definitions:
+  TriplePattern:
+    type: "object"
+    description: "Triple pattern"
+    properties:
+      triple:
+        type: "string"
+        description: "Triple pattern's subject"
+        example: "?bob"
+      predicate:
+        type: "string"
+        description: "Triple pattern's predicate"
+        example: "http://xmlns.com/foaf/0.1/knows"
+      object:
+        type: "string"
+        description: "Triple pattern's object"
+        example: "?alice"
+  QueryObject:
+    type: "object"
+    properties:
+      query:
+        type: "object"
+        description: "Query content"
+        properties:
+          type:
+            type: "string"
+            description: "Query type"
+            enum:
+            - "bgp"
+            - "union"
+          bgp:
+            type: "array"
+            items:
+              $ref: '#/definitions/TriplePattern'
+          filters:
+            type: array
+            description: "SPARQL Filters"
+            items:
+              type: "string"
+              example: "isIRI(?alice) && ?alice != <http://example.org#bob>"
+          union:
+            type: "array"
+            items:
+              type: "array"
+              items:
+                $ref: '#/definitions/TriplePattern'
+      next:
+        type: "string"
+        description: "Next link used to resume query execution"
+  QueryResponse:
+    type: "object"
+    properties:
+      bindings:
+        type: "array"
+        description: "Solutions bindings"
+        items:
+          type: "object"
+      next:
+        type: "string"
+        description: "Next link used to resume query processing"
+      hasNext:
+        type: "boolean"
+      pageSize:
+        type: "int"
+        description: "Number of solution bindings in this response"
+externalDocs:
+  description: "Find out more about SaGe"
+  url: "http://sage.univ-nantes.fr"

@@ -53,7 +53,7 @@ def sage_app(config_file):
 
     @app.route('/documentation')
     def doc():
-        return render_template("documentation.html")
+        return app.send_static_file("documentation.html")
 
     @app.route('/specs')
     def specs():
