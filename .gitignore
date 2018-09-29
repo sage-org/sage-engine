@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 watdiv.10M.hdt
 watdiv.10M.hdt.index.v1-1
+documentation.html
 
 ./data/
 test.hdt.index.v*

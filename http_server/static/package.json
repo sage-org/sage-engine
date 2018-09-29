@@ -6,6 +6,9 @@
     "sage",
     "frontend"
   ],
+  "scripts": {
+    "build": "redoc-cli bundle api.yaml -o documentation.html"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Callidon/sage-engine.git"
@@ -24,5 +27,9 @@
     "sage-client": "^1.1.4",
     "sage-widget": "^1.4.1",
     "yasgui-yasqe": "^2.11.22"
+  },
+  "devDependencies": {
+    "redoc": "^2.0.0-alpha.39",
+    "redoc-cli": "^0.6.4"
   }
 }

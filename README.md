@@ -26,6 +26,7 @@ Requirements:
 ```bash
 git clone https://github.com/sage-org/sage-bgp
 cd sage-engine/
+pip install pybind11
 pip install -r requirements.txt
 python setup.py install
 ```
