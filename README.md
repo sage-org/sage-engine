@@ -1,4 +1,4 @@
-# Sage: a stable, responsive and unrestricted SPARQL query server
+# Sage: a SPARQL query engine for public Linked Data providers
 Python implementation of SaGe, a stable, responsive and unrestricted SPARQL query server.
 
 # Table of contents
