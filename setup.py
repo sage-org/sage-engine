@@ -9,9 +9,6 @@ from sys import exit
 def install_web_deps():
     """Install Sage web interface dependencies using npm"""
     path = "{}/http_server/static".format(getcwd())
-    run(["npm", "install"], cwd=path)
-    run(["npm", "run", "build"], cwd=path)
-    run(["rm", "-rf", "node_modules"], cwd=path)
     run(["npm", "install", "--production"], cwd=path)
 
 
