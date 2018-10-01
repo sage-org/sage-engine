@@ -3,6 +3,12 @@
 {% block title%}API Documentation - Sage{% endblock %}
 
 {% block body %}
+<style media="screen">
+  .col {
+    width: auto;
+  }
+</style>
+
 <div class="container">
   <div id="swaggerWidget"></div>
 </div>
@@ -11,7 +17,7 @@
 <script type="text/javascript">
   SwaggerUIBundle({
     dom_id: '#swaggerWidget',
-    url: '/openapi'
+    url: '/api'
   })
 </script>
 {% endblock %}

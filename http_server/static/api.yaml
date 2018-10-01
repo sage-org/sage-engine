@@ -7,7 +7,7 @@ info:
     email: "sage@univ-nantes.fr"
   license:
     name: "MIT"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    url: "https://github.com/sage-org/sage-engine/blob/master/LICENSE"
 basePath: "/"
 tags:
 - name: "sparql"
@@ -20,8 +20,9 @@ tags:
   externalDocs:
     description: "See more"
     url: "https://www.w3.org/TR/void/"
+- name: "miscellaneous"
+  description: "Miscellaneous operations"
 schemes:
-- "https"
 - "http"
 paths:
   /sparql/{dataset}:
@@ -59,7 +60,7 @@ paths:
     get:
       tags:
       - "void"
-      summary: "Server VoID description"
+      summary: "Get the Server VoID description"
       description: "Get the VoID description of the SaGe server"
       produces:
       - "application/xml"
@@ -75,7 +76,7 @@ paths:
     get:
       tags:
       - "void"
-      summary: "Dataset VoID description"
+      summary: "Get VoID description of a RDF Dataset"
       description: "Get the VoID description of a RDF Dataset hosted by the SaGe server"
       produces:
       - "application/xml"
@@ -93,6 +94,17 @@ paths:
           description: "Successful operation"
         500:
           description: "Invalid query"
+  /api/:
+    get:
+      tags:
+      - "miscellaneous"
+      summary: "Get the Server OpenAPI specification"
+      description: "Get the Server OpenAPI specification"
+      produces:
+      - "text/yaml"
+      responses:
+        200:
+          description: "Successful operation"
 definitions:
   TriplePattern:
     type: "object"
@@ -101,7 +113,7 @@ definitions:
       triple:
         type: "string"
         description: "Triple pattern's subject"
-        example: "?bob"
+        example: "http://example.org#Alice"
       predicate:
         type: "string"
         description: "Triple pattern's predicate"
@@ -109,9 +121,17 @@ definitions:
       object:
         type: "string"
         description: "Triple pattern's object"
-        example: "?alice"
+        example: "?bob"
   QueryObject:
     type: "object"
+    example:
+      - type: "bgp"
+        bgp:
+          - subject: "http://example.org#Alice"
+            predicate: "http://xmlns.com/foaf/0.1/knows"
+            object: "?bob"
+        filters:
+          - "isIRI(?bob) && ?alice != ?bob"
     properties:
       query:
         type: "object"
@@ -120,9 +140,8 @@ definitions:
           type:
             type: "string"
             description: "Query type"
-            enum:
-            - "bgp"
-            - "union"
+            enum: [ "bgp", "union" ]
+            example: "bgp"
           bgp:
             type: "array"
             description: "Basic Graph pattern to evaluate"
@@ -133,7 +152,7 @@ definitions:
             description: "SPARQL Filters to evaluate"
             items:
               type: "string"
-              example: "isIRI(?alice) && ?alice != <http://example.org#bob>"
+              example: "isIRI(?bob) && ?alice != ?bob"
           union:
             type: "array"
             description: "Union of Basic Graph patterns to evaluate"
@@ -146,6 +165,13 @@ definitions:
         description: "Next link used to resume query execution"
   QueryResponse:
     type: "object"
+    example:
+      bindings:
+        - ?bob: "http://example.org#Sponge_Bob"
+        - ?bob: "http://example.org#Bob_Lennon"
+      next: "xRVCiMKAj9zCgI=="
+      hasNext: true
+      pageSize: 2
     properties:
       bindings:
         type: "array"
@@ -158,7 +184,7 @@ definitions:
       hasNext:
         type: "boolean"
       pageSize:
-        type: "int"
+        type: "integer"
         description: "Number of solution bindings in this response"
 externalDocs:
   description: "Find out more about SaGe"

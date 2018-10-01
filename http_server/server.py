@@ -55,7 +55,7 @@ def sage_app(config_file):
     def doc():
         return render_template("documentation.html")
 
-    @app.route('/openapi')
+    @app.route('/api')
     def open_api():
         return app.send_static_file('api.yaml')
 
