@@ -21,6 +21,13 @@ def sage_app(config_file):
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
+    @app.context_processor
+    def inject_user():
+        config = dict()
+        if "google_analytics" in datasets._config:
+            config["google_analytics"] = datasets._config["google_analytics"]
+        return dict(config=config)
+
     @app.route('/')
     def index():
         try:
