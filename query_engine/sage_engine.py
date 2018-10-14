@@ -1,6 +1,6 @@
 # sage_engine.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from asyncio import Queue, get_event_loop, shield, wait_for
+from asyncio import Queue, get_event_loop, shield, wait_for, sleep
 from asyncio import TimeoutError as asyncTimeoutError
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.union import BagUnionIterator
@@ -23,9 +23,11 @@ async def executor(plan, queue, limit):
     try:
         while plan.has_next():
             value = await plan.next()
-            await shield(queue.put(value))
-            if queue.qsize() >= limit:
-                raise TooManyResults()
+            if value is not None:
+                await shield(queue.put(value))
+                if queue.qsize() >= limit:
+                    raise TooManyResults()
+            await sleep(0)
     except IteratorExhausted:
         pass
 

@@ -43,7 +43,6 @@ class ScanIterator(PreemptableIterator):
     def has_next(self):
         return self._source.has_next()
 
-    @coroutine
     async def next(self):
         """Scan the relation and return the next set of solution mappings"""
         if not self.has_next():

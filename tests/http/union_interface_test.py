@@ -62,7 +62,7 @@ class TestUnionInterface(object):
         pass
 
     @pytest.mark.parametrize("body,cardinality", bgp_queries)
-    def test_bgp_interface(self, body, cardinality):
+    def test_union_interface(self, body, cardinality):
         query = body
         nbResults = 0
         nbCalls = 0

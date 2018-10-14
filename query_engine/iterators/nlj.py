@@ -6,7 +6,7 @@ from query_engine.iterators.utils import apply_bindings, tuple_to_triple
 from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedIndexJoinIterator
 from query_engine.protobuf.utils import pyDict_to_protoDict
 from query_engine.iterators.utils import IteratorExhausted
-from asyncio import coroutine
+from asyncio import coroutine, sleep
 
 
 class IndexJoinIterator(PreemptableIterator):
@@ -60,7 +60,6 @@ class IndexJoinIterator(PreemptableIterator):
         mu = await self._currentIter.next()
         return {**self._currentBinding, **mu}
 
-    @coroutine
     async def next(self):
         """Get the next element from the join"""
         if not self.has_next():
@@ -68,6 +67,7 @@ class IndexJoinIterator(PreemptableIterator):
         while self._currentIter is None or (not self._currentIter.has_next()):
             self._currentBinding = await self._source.next()
             self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
+            await sleep(0)
         return await self._innerLoop()
 
     def save(self):
