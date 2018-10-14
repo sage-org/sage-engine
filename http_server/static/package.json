@@ -22,7 +22,7 @@
     "jquery": "^3.3.1",
     "popper.js": "^1.14.4",
     "sage-client": "^1.1.4",
-    "sage-widget": "^1.4.1",
+    "sage-widget": "^1.4.2",
     "swagger-ui-dist": "^3.19.1",
     "yasgui-yasqe": "^2.11.22"
   }
