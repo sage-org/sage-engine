@@ -20,7 +20,7 @@ class IndexJoinIterator(PreemptableIterator):
         - iterOffset ``integer=0]`` - An offset used to resume processing of an inner loop.
     """
 
-    def __init__(self, source, innerTriple, hdtDocument, currentBinding=None, iterOffset=0):
+    def __init__(self, source, innerTriple, hdtDocument, currentBinding=None, iterOffset=None):
         super(IndexJoinIterator, self).__init__()
         self._source = source
         self._innerTriple = innerTriple
@@ -48,9 +48,9 @@ class IndexJoinIterator(PreemptableIterator):
     def has_next(self):
         return self._source.has_next() or (self._currentIter is not None and self._currentIter.has_next())
 
-    def _initInnerLoop(self, triple, mappings, offset=0):
+    def _initInnerLoop(self, triple, mappings, offset=None):
         (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))
-        iterator, card = self._hdtDocument.search_triples(s, p, o, offset=offset)
+        iterator, card = self._hdtDocument.search(s, p, o, offset=offset)
         if card == 0:
             return None
         return ScanIterator(iterator, tuple_to_triple(s, p, o), card)
@@ -85,9 +85,7 @@ class IndexJoinIterator(PreemptableIterator):
         if self._currentBinding is not None:
             pyDict_to_protoDict(self._currentBinding, saved_join.muc)
         if self._currentIter is not None:
-            saved_join.offset = self._currentIter.offset + self._currentIter.nb_reads
-        else:
-            saved_join.offset = 0
+            saved_join.offset = self._currentIter.last_read()
         return saved_join
 
 

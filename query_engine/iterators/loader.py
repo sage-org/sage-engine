@@ -50,7 +50,7 @@ def load_scan(saved_plan, db_connector):
     """Load a ScanIterator from a protobuf serialization"""
     triple = saved_plan.triple
     s, p, o = (triple.subject, triple.predicate, triple.object)
-    iterator, card = db_connector.search_triples(s, p, o, offset=int(saved_plan.offset))
+    iterator, card = db_connector.search(s, p, o, offset=saved_plan.offset)
     return ScanIterator(iterator, protoTriple_to_dict(triple), saved_plan.cardinality)
 
 
