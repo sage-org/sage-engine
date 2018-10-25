@@ -19,7 +19,7 @@ triple = {
 
 def test_simple_filter_iterator():
     expression = "?p = <http://schema.org/eligibleRegion>"
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
     (results, saved, done) = engine.execute(iterator, math.inf)
@@ -36,7 +36,7 @@ def test_simple_filter_iterator():
 
 def test_and_or_filter_iterator():
     expression = "?p = <http://schema.org/eligibleRegion> && (?o = <http://db.uwaterloo.ca/~galuc/wsdbm/Country0> || ?o = <http://db.uwaterloo.ca/~galuc/wsdbm/Country9>)"
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
     (results, saved, done) = engine.execute(iterator, math.inf)
@@ -51,7 +51,7 @@ def test_and_or_filter_iterator():
 
 def test_operation_filter_iterator():
     expression = "10 = 5 * 2"
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
     (results, saved, done) = engine.execute(iterator, math.inf)
@@ -60,7 +60,7 @@ def test_operation_filter_iterator():
 
 def test_function_filter_iterator():
     expression = '?p = <http://purl.org/goodrelations/price> && isLiteral(?o) && !isNumeric(?o)'
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
     (results, saved, done) = engine.execute(iterator, math.inf)
@@ -69,7 +69,7 @@ def test_function_filter_iterator():
 
 def test_filter_iterator_interrupt():
     expression = "?p = <http://schema.org/eligibleRegion>"
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
     (results, saved, done) = engine.execute(iterator, 10e-7)

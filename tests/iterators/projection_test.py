@@ -15,7 +15,7 @@ triple = {
 
 
 def test_projection_read():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     proj = ProjectionIterator(scan, ['?common'])
     (results, saved, done) = engine.execute(proj, 10e7)
@@ -26,7 +26,7 @@ def test_projection_read():
 
 
 def test_projection_read_stopped():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     proj = ProjectionIterator(scan, ['?common'])
     (results, saved, done) = engine.execute(proj, 10e-4)

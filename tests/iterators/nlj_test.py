@@ -20,7 +20,7 @@ innerTriple = {
 
 
 def test_nlj_read():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     join = IndexJoinIterator(scan, innerTriple, hdtDoc)
     (results, saved, done) = engine.execute(join, 10e7)
@@ -31,7 +31,7 @@ def test_nlj_read():
 
 
 def test_nlj_interrupt():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     join = IndexJoinIterator(scan, innerTriple, hdtDoc)
     (results, saved, done) = engine.execute(join, 10e-5)
@@ -40,7 +40,7 @@ def test_nlj_interrupt():
 
 
 def test_leftnlj_read():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     join = LeftNLJIterator(scan, innerTriple, hdtDoc)
     (results, saved, done) = engine.execute(join, 10e7)
@@ -51,7 +51,7 @@ def test_leftnlj_read():
 
 
 def test_leftnlj_interrupt():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     join = LeftNLJIterator(scan, innerTriple, hdtDoc)
     (results, saved, done) = engine.execute(join, 10e-5)

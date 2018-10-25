@@ -2,7 +2,29 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from hdt import HDTDocument
 from database.db_connector import DatabaseConnector
+from database.db_iterator import DBIterator
 import os.path
+
+
+class HDTIterator(DBIterator):
+    """An HDTIterator implements a DBIterator for a triple pattern evaluated using an HDT file"""
+
+    def __init__(self, source, pattern, start_offset=0):
+        super(HDTIterator, self).__init__(pattern)
+        self._source = source
+        self._start_offset = start_offset
+
+    def last_read(self):
+        """Return the ID of the last element read"""
+        return str(self._source.nb_reads + self._start_offset)
+
+    def next(self):
+        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
+        return next(self._source)
+
+    def has_next(self):
+        """Return True if there is still results to read, and False otherwise"""
+        return self._source.has_next()
 
 
 class HDTFileConnector(DatabaseConnector):
@@ -28,8 +50,11 @@ class HDTFileConnector(DatabaseConnector):
         subject = subject if (subject is not None) and (not subject.startswith('?')) else ""
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else ""
         obj = obj if (obj is not None) and (not obj.startswith('?')) else ""
-        offset = 0 if offset is None else int(float(offset))
-        return self._hdt.search_triples(subject, predicate, obj, offset=offset)
+        # convert None & empty string to offset = 0
+        offset = 0 if offset is None or offset == '' else int(float(offset))
+        pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
+        iterator, card = self._hdt.search_triples(subject, predicate, obj, offset=offset)
+        return HDTIterator(iterator, pattern, start_offset=offset), card
 
     @property
     def nb_triples(self):

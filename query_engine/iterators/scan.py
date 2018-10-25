@@ -31,13 +31,8 @@ class ScanIterator(PreemptableIterator):
     def serialized_name(self):
         return "scan"
 
-    @property
-    def nb_reads(self):
-        return self._source.nb_reads
-
-    @property
-    def offset(self):
-        return self._source.offset
+    def last_read(self):
+        return self._source.last_read()
 
     def has_next(self):
         return self._source.has_next()
