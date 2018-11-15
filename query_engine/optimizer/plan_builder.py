@@ -27,9 +27,12 @@ def build_query_plan(query, db_connector, saved_plan=None, projection=None):
 
     # apply filter clause(s)
     if 'filters' in query and len(query['filters']) > 0:
-        # reduce all filters in a conjunctive expression
-        expression = reduce(lambda x, y: "({}) && ({})".format(x, y), query['filters'])
-        root = FilterIterator(root, expression)
+        # exclude possible empty strings
+        filters = list(filter(lambda x: len(x) > 0, query['filters']))
+        if len(filters) > 0:
+            # reduce all filters in a conjunctive expression
+            expression = reduce(lambda x, y: "({}) && ({})".format(x, y), filters)
+            root = FilterIterator(root, expression)
     return root, cardinalities
 
 
@@ -75,7 +78,7 @@ def build_left_plan(bgp, db_connector, source=None, base_vars=None):
     triples = []
     cardinalities = []
     for triple in bgp:
-        it, c = db_connector.search_triples(triple['subject'], triple['predicate'], triple['object'])
+        it, c = db_connector.search(triple['subject'], triple['predicate'], triple['object'])
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
         cardinalities += [{'triple': triple, 'cardinality': c}]
     # sort triples by ascending cardinality
