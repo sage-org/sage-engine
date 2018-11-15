@@ -27,6 +27,17 @@ def protobuf(bindings, next_page, stats):
     return sageResponse.SerializeToString()
 
 
+def deskolemize(bindings, url):
+    """Deskolemize blank nodes"""
+    results = []
+    for b in bindings:
+        r = dict()
+        for key, value in b.items():
+            r[key] = "{}/bnode#{}".format(url, value[2:]) if value.startswith("_:") else value
+        results.append(r)
+    return results
+
+
 def json(bindings, next_link, stats):
     page = sparql_json(bindings)
     page["head"]["controls"] = dict()
@@ -36,9 +47,9 @@ def json(bindings, next_link, stats):
     return page
 
 
-def raw_json(bindings, next_link, stats):
+def raw_json(bindings, next_link, stats, url):
     res = {
-        "bindings": bindings,
+        "bindings": deskolemize(bindings, url),
         "pageSize": len(bindings),
         "hasNext": next_link is not None,
         "next": next_link,

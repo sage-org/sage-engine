@@ -78,7 +78,7 @@ def build_left_plan(bgp, db_connector, source=None, base_vars=None):
     triples = []
     cardinalities = []
     for triple in bgp:
-        it, c = db_connector.search(triple['subject'], triple['predicate'], triple['object'])
+        it, c = db_connector.search_triples(triple['subject'], triple['predicate'], triple['object'])
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
         cardinalities += [{'triple': triple, 'cardinality': c}]
     # sort triples by ascending cardinality
