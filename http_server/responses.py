@@ -66,17 +66,17 @@ def raw_json_streaming(bindings, next_link, stats, url):
         # get first result
         prev_binding = next(b_iter)
         for b in b_iter:
-            yield dumps(prev_binding) + ','
+            yield dumps(prev_binding, separators=(',', ':')) + ','
             prev_binding = b
         # Now yield the last iteration without comma but with the closing brackets
-        yield dumps(prev_binding)
+        yield dumps(prev_binding, separators=(',', ':'))
     except StopIteration:
         # the case where there is no bindings
         pass
     finally:
         # StopIteration here means the length was zero, so yield a valid releases doc and stop
-        yield "],\"pageSize\": {},\"hasNext\": {},\"next\":\"{}\",".format(len(bindings), hasNext, next_link)
-        yield "\"stats\":" + dumps(stats) + "}"
+        yield "],\"pageSize\":{},\"hasNext\":{},\"next\":\"{}\",".format(len(bindings), hasNext, next_link)
+        yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "}"
 
 
 def w3c_xml(bindings, next_link, stats):
