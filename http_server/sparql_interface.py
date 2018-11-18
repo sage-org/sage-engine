@@ -1,6 +1,6 @@
 # bgp_interface.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from flask import Blueprint, request, Response, render_template, abort, json
+from flask import Blueprint, request, Response, render_template, abort
 from query_engine.sage_engine import SageEngine
 from query_engine.optimizer.plan_builder import build_query_plan
 from http_server.schema import QueryRequest
@@ -12,31 +12,18 @@ from time import time
 
 def sparql_blueprint(datasets, logger):
     """Get a Blueprint that implement a SPARQL interface with quota on /sparql/<dataset-name>"""
-    sparql_blueprint = Blueprint("sparql-interface", __name__)
+    s_blueprint = Blueprint("sparql-interface", __name__)
 
-    @sparql_blueprint.route("/sparql/", methods=["GET"])
+    @s_blueprint.route("/sparql/", methods=["GET"])
     def sparql_index():
         try:
-            mimetype = request.accept_mimetypes.best_match(["application/json", "text/html"])
             url = secure_url(request.url)
-            api_doc = {
-                "@context": "http://www.w3.org/ns/hydra/context.jsonld",
-                "@id": url,
-                "@type": "ApiDocumentation",
-                "title": "SaGe SPARQL API",
-                "description": "A SaGe interface which allow evaluation of SPARQL queries over RDF datasets",
-                "entrypoint": "{}sparql".format(url),
-                "supportedClass": []
-            }
-            for dinfo in datasets.describe(url):
-                api_doc["supportedClass"].append(dinfo)
-            if mimetype is "text/html":
-                return render_template("interfaces.html", api=api_doc)
-            return json.jsonify(api_doc)
+            datasets = [dinfo for dinfo in datasets.describe(url)]
+            return render_template("interfaces.html", datasets=datasets)
         except Exception:
             abort(500)
 
-    @sparql_blueprint.route("/sparql/<dataset_name>", methods=["GET", "POST"])
+    @s_blueprint.route("/sparql/<dataset_name>", methods=["GET", "POST"])
     def sparql_query(dataset_name):
         logger.info('[IP: {}] [/sparql/] Querying {}'.format(request.environ['REMOTE_ADDR'], dataset_name))
         dataset = datasets.get_dataset(dataset_name)
@@ -106,4 +93,4 @@ def sparql_blueprint(datasets, logger):
         except Exception as e:
             print(e)
             abort(500)
-    return sparql_blueprint
+    return s_blueprint

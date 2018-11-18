@@ -58,10 +58,9 @@ class Dataset(object):
         return self._connector.search_triples(subject, predicate, obj, limit, offset)
 
     def describe(self, url):
-        """Describe the Dataset API using the Hydra spec"""
-        description = {
-            "@type": "Class",
-            "@id": "{}/{}".format(url, self._config["name"]),
+        """Describe the Dataset API as a dictionary"""
+        return {
+            "endpoint": "{}/{}".format(url, self._config["name"]),
             "title": self._config["name"],
             "description": self._config["description"],
             "stats": {
@@ -72,32 +71,8 @@ class Dataset(object):
             },
             "timeQuota": self.quota,
             "maxResults": self.max_results if self.max_results is not inf else 'inf',
-            "examples": self.example_queries,
-            "supportedOperation": [
-                {
-                    "@type": "Operation",
-                    "title": "Evaluate a SPARQL query",
-                    "method": "POST"
-                }
-            ],
-            "supportedProperty": [
-                {
-                    "@type": "SupportedProperty",
-                    "property": "#query",
-                    "required": True,
-                    "readable": True,
-                    "writable": True
-                },
-                {
-                    "@type": "SupportedProperty",
-                    "property": "#next",
-                    "required": False,
-                    "readable": True,
-                    "writable": True
-                }
-            ]
+            "examples": self.example_queries
         }
-        return description
 
 
 def load_config(config_file="config.yaml"):

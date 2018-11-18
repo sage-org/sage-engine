@@ -17,7 +17,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for dataset in api["supportedClass"] %}
+            {% for dataset in datasets %}
             <tr>
               <td>
                 <a href="{{ url_for('sparql-interface.sparql_query', dataset_name=dataset["title"]) }}">

@@ -31,21 +31,10 @@ def sage_app(config_file):
     @app.route('/')
     def index():
         try:
-            datasets_infos = datasets._config["datasets"]
             url = secure_url(request.url)
-            api_doc = {
-                "@context": "http://www.w3.org/ns/hydra/context.jsonld",
-                "@id": url,
-                "@type": "ApiDocumentation",
-                "title": "SaGe SPARQL API",
-                "description": "A SaGe interface which allow evaluation of SPARQL queries over RDF datasets",
-                "entrypoint": "{}sparql".format(url),
-                "supportedClass": []
-            }
-            for dinfo in datasets.describe(url):
-                api_doc["supportedClass"].append(dinfo)
+            dinfos = [dinfo for dinfo in datasets.describe(url)]
             long_description = Markup(markdown(datasets.long_description))
-            return render_template("index_sage.html", datasets=datasets_infos, api=api_doc, server_public_url=datasets.public_url, default_query=datasets.default_query, long_description=long_description)
+            return render_template("index_sage.html", datasets=dinfos, server_public_url=datasets.public_url, default_query=datasets.default_query, long_description=long_description)
         except Exception as e:
             print(e)
             abort(500)
