@@ -1,6 +1,6 @@
 # void_interface.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from flask import Blueprint, request, Response, abort
+from flask import Blueprint, request, Response, abort, redirect
 from database.descriptors import VoidDescriptor, many_void
 from http_server.utils import secure_url
 
@@ -21,9 +21,9 @@ def choose_format(mimetype):
 
 def void_blueprint(datasets, logger):
     """Get a Blueprint that provides VOID descritions of the hosted RDF datasets"""
-    void_blueprint = Blueprint("void-interface", __name__)
+    v_blueprint = Blueprint("void-interface", __name__)
 
-    @void_blueprint.route("/void/", methods=["GET"])
+    @v_blueprint.route("/void/", methods=["GET"])
     def void_all():
         """Describe all RDF datasets hosted by the Sage endpoint"""
         try:
@@ -41,7 +41,11 @@ def void_blueprint(datasets, logger):
         except Exception:
             abort(500)
 
-    @void_blueprint.route("/void/<dataset_name>", methods=["GET"])
+    @v_blueprint.route("/.well-known/void/", methods=["GET"])
+    def void_well_known():
+        return redirect("/void", code=302)
+
+    @v_blueprint.route("/void/<dataset_name>", methods=["GET"])
     def void_dataset(dataset_name):
         """Describe one RDF dataset"""
         try:
@@ -64,4 +68,4 @@ def void_blueprint(datasets, logger):
             return Response(descriptor.describe(format), content_type=mimetype)
         except Exception:
             abort(500)
-    return void_blueprint
+    return v_blueprint
