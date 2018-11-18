@@ -25,27 +25,18 @@ def get_binding_type(value):
         return value, "uri", None, None
 
 
-def sparql_json(bindings_list):
-    """Formats a set of bindings into SPARQL results in JSON formats."""
-    def binding_transformer(b):
-        binding = dict()
-        for variable, value in b.items():
-            variable = variable[1:]
-            binding[variable] = dict()
-            value, type, extra_label, extra_value = get_binding_type(value.strip())
-            binding[variable]["value"] = value
-            binding[variable]["type"] = type
-            if extra_label is not None:
-                binding[variable][extra_label] = extra_value
-        return binding
-
-    page = dict()
-    page["head"] = dict()
-    page["head"]["vars"] = list(map(lambda x: x[1:], bindings_list[0].keys()))
-    page["results"] = dict()
-    page["results"]["bindings"] = list(map(binding_transformer, bindings_list))
-    page["results"]["size"] = len(bindings_list)
-    return page
+def binding_to_json(binding):
+    """Format a set of solutions bindings in the W3C SPARQL JSON format"""
+    json_binding = dict()
+    for variable, value in binding.items():
+        variable = variable[1:]
+        json_binding[variable] = dict()
+        value, type, extra_label, extra_value = get_binding_type(value.strip())
+        json_binding[variable]["value"] = value
+        json_binding[variable]["type"] = type
+        if extra_label is not None:
+            json_binding[variable][extra_label] = extra_value
+    return json_binding
 
 
 def sparql_xml(bindings_list):

@@ -99,7 +99,7 @@ def sparql_blueprint(datasets, logger):
             stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
             if mimetype == "application/sparql-results+json":
-                return json.jsonify(responses.w3c_json(bindings, next_page, stats))
+                return Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
             if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
                 return Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
             return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')

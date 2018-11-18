@@ -1,9 +1,24 @@
 # responses.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStatistics, SageResponse
-from query_engine.formatters import sparql_json, sparql_xml
+from query_engine.formatters import sparql_xml, binding_to_json
 from json import dumps
 from xml.etree import ElementTree
+
+
+def stream_json_list(iterator):
+    """A generator for streaming a list of JSON results in Flask API"""
+    try:
+        # get first result
+        prev_binding = next(iterator)
+        for b in iterator:
+            yield dumps(prev_binding, separators=(',', ':')) + ','
+            prev_binding = b
+        # Now yield the last iteration without comma but with the closing brackets
+        yield dumps(prev_binding, separators=(',', ':'))
+    except StopIteration:
+        # StopIteration here means the length was zero, so yield a valid releases doc and stop
+        pass
 
 
 def protobuf(bindings, next_page, stats):
@@ -37,46 +52,29 @@ def deskolemize(bindings, url):
         yield r
 
 
-def w3c_json(bindings, next_link, stats):
-    page = sparql_json(bindings)
-    page["head"]["controls"] = dict()
-    page["head"]["controls"]["hasNext"] = next_link is not None
-    page["head"]["controls"]["next"] = next_link
-    page["head"]["stats"] = stats
-    return page
-
-
-def raw_json(bindings, next_link, stats, url):
-    res = {
-        "bindings": list(deskolemize(bindings, url)),
-        "pageSize": len(bindings),
-        "hasNext": next_link is not None,
-        "next": next_link,
-        "stats": stats
-    }
-    return res
+def w3c_json_streaming(bindings, next_link, stats, url):
+    """Creates a page of SaGe results in the W3C SPARQL JSON results format, compatible with Flask streaming API"""
+    hasNext = "true" if next_link is not None else "false"
+    vars = list(map(lambda x: x[1:], bindings[0].keys()))
+    # generate headers
+    yield "{\"head\":{\"vars\":["
+    yield ",".join(map(lambda x: "\"{}\"".format(x), vars))
+    yield "],\"pageSize\":{},\"hasNext\":{},\"next\":\"{}\",".format(len(bindings), hasNext, next_link)
+    yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "},\"results\":{\"bindings\":["
+    # generate results
+    b_iter = map(binding_to_json, deskolemize(bindings, url))
+    yield from stream_json_list(b_iter)
+    yield "]}}"
 
 
 def raw_json_streaming(bindings, next_link, stats, url):
-    """Return Sage results in a simple, non-standard JSON format, using Flask streaming API"""
+    """Creates a page of SaGe results in a simple, non-standard JSON format, compatible with Flask streaming API"""
     hasNext = "true" if next_link is not None else "false"
     yield "{\"bindings\":["
     b_iter = deskolemize(bindings, url)
-    try:
-        # get first result
-        prev_binding = next(b_iter)
-        for b in b_iter:
-            yield dumps(prev_binding, separators=(',', ':')) + ','
-            prev_binding = b
-        # Now yield the last iteration without comma but with the closing brackets
-        yield dumps(prev_binding, separators=(',', ':'))
-    except StopIteration:
-        # the case where there is no bindings
-        pass
-    finally:
-        # StopIteration here means the length was zero, so yield a valid releases doc and stop
-        yield "],\"pageSize\":{},\"hasNext\":{},\"next\":\"{}\",".format(len(bindings), hasNext, next_link)
-        yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "}"
+    yield from stream_json_list(b_iter)
+    yield "],\"pageSize\":{},\"hasNext\":{},\"next\":\"{}\",".format(len(bindings), hasNext, next_link)
+    yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "}"
 
 
 def w3c_xml(bindings, next_link, stats):
