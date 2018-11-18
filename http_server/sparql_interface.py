@@ -90,7 +90,6 @@ def sparql_blueprint(datasets, logger):
             if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
                 return Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
             return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
-        except Exception as e:
-            print(e)
+        except Exception:
             abort(500)
     return s_blueprint
