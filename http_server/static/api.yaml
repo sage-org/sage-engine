@@ -52,8 +52,40 @@ paths:
       responses:
         200:
           description: "Successful operation"
-          schema:
-            $ref: "#/definitions/QueryResponse"
+          examples:
+            application/json: |
+              {
+                "bindings": [
+                  { "?bob": "http://example.org#Sponge_Bob" },
+                  { "?bob": "http://example.org#Bob_Lennon"}
+                ],
+                "hasNext": true,
+                "next": "xRVCiMKAj9zCgI==",
+                "pageSize": 2
+              }
+            application/sparql-results+json: |
+              {
+                "head": {
+                    "vars": [ "bob" ],
+                    "hasNext": true,
+                    "next": "xRVCiMKAj9zCgI==",
+                    "pageSize": 2
+                },
+                "results": {
+                  "bindings": [
+                    { "bob": {
+                        "type": "uri",
+                        "value": "http://example.org#Sponge_Bob"
+                      }
+                    }
+                    { "bob": {
+                        "type": "uri",
+                        "value": "http://example.org#Bob_Lennon"
+                      }
+                    }
+                  ]
+                }
+              }
         500:
           description: "Invalid query"
   /void/:
