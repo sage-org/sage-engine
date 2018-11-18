@@ -9,6 +9,11 @@ datasets:
   backend: hdt-file
   file: tests/data/test.hdt
 -
+  name: foo
+  description: Sample dataset used for testing entity lookup
+  backend: hdt-file
+  file: tests/data/entity.hdt
+-
   name: watdiv100
   description: Sample dataset in HDT format, used for testing
   backend: hdt-file

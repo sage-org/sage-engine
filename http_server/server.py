@@ -6,6 +6,7 @@ from flask_cors import CORS
 from database.datasets import DatasetCollection
 from http_server.sparql_interface import sparql_blueprint
 from http_server.void_interface import void_blueprint
+from http_server.lookup_interface import lookup_blueprint
 from http_server.utils import secure_url
 import logging
 import os
@@ -66,5 +67,6 @@ def sage_app(config_file):
             abort(500)
 
     app.register_blueprint(sparql_blueprint(datasets, gunicorn_logger))
+    app.register_blueprint(lookup_blueprint(datasets, gunicorn_logger))
     app.register_blueprint(void_blueprint(datasets, gunicorn_logger))
     return app

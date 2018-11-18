@@ -4,6 +4,7 @@ from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStat
 from query_engine.formatters import sparql_xml, binding_to_json
 from json import dumps
 from xml.etree import ElementTree
+from rdflib.graph import Graph
 
 
 def stream_json_list(iterator):
@@ -52,6 +53,14 @@ def deskolemize(bindings, url):
         yield r
 
 
+def ntriples_streaming(triples):
+    for s, p, o in triples:
+        subj = "<{}>".format(s) if not s.startswith("\"") else s
+        pred = "<{}>".format(p)
+        obj = "<{}>".format(o) if not o.startswith("\"") else o
+        yield "{} {} {} .\n".format(subj, pred, obj)
+
+
 def w3c_json_streaming(bindings, next_link, stats, url):
     """Creates a page of SaGe results in the W3C SPARQL JSON results format, compatible with Flask streaming API"""
     hasNext = "true" if next_link is not None else "false"
@@ -59,7 +68,9 @@ def w3c_json_streaming(bindings, next_link, stats, url):
     # generate headers
     yield "{\"head\":{\"vars\":["
     yield ",".join(map(lambda x: "\"{}\"".format(x), vars))
-    yield "],\"pageSize\":{},\"hasNext\":{},\"next\":\"{}\",".format(len(bindings), hasNext, next_link)
+    yield "],\"pageSize\":{},\"hasNext\":{},".format(len(bindings), hasNext)
+    if next_link is not None:
+        yield "\"next\":\"{}\",".format(next_link)
     yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "},\"results\":{\"bindings\":["
     # generate results
     b_iter = map(binding_to_json, deskolemize(bindings, url))
@@ -73,7 +84,11 @@ def raw_json_streaming(bindings, next_link, stats, url):
     yield "{\"bindings\":["
     b_iter = deskolemize(bindings, url)
     yield from stream_json_list(b_iter)
-    yield "],\"pageSize\":{},\"hasNext\":{},\"next\":\"{}\",".format(len(bindings), hasNext, next_link)
+    yield "],\"pageSize\":{},\"hasNext\":{},".format(len(bindings), hasNext)
+    if next_link is not None:
+        yield "\"next\":\"{}\",".format(next_link)
+    else:
+        yield "\"next\":null,"
     yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "}"
 
 

@@ -15,7 +15,6 @@ def test_describe_dataset_void():
     dataset = datasets.get_dataset("watdiv100")
     descriptor = VoidDescriptor(url, dataset)
     desc_graph = Graph()
-    print(descriptor.describe("turtle"))
     desc_graph.parse(data=descriptor.describe("turtle"), format="ttl")
     assert ref_graph.isomorphic(desc_graph)
 
@@ -26,5 +25,6 @@ def test_describe_many_dataset_void():
     # generate description
     url = "http://localhost:8000"
     desc_graph = Graph()
+    print(many_void(url, datasets, "turtle"))
     desc_graph.parse(data=many_void(url, datasets, "turtle"), format="ttl")
     assert ref_graph.isomorphic(desc_graph)

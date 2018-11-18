@@ -16,7 +16,9 @@
             sd:namedGraph [ sd:graph <http://localhost:8000/sparql/watdiv100> ;
                     sd:name <http://localhost:8000/sparql/watdiv100> ],
                 [ sd:graph <http://localhost:8000/sparql/testdata> ;
-                    sd:name <http://localhost:8000/sparql/testdata> ] ] ;
+                    sd:name <http://localhost:8000/sparql/testdata> ],
+                [ sd:graph <http://localhost:8000/sparql/foo> ;
+                    sd:name <http://localhost:8000/sparql/foo> ] ] ;
     foaf:homepage <http://localhost:8000> .
 
 <http://localhost:8000/sparql/testdata> a sage:SageDataset ;
@@ -48,6 +50,21 @@ WHERE {
     hydra:itemsPerPage 500 ;
     sd:endpoint <http://localhost:8000/sparql/testdata> ;
     foaf:homepage <http://localhost:8000/sparql/testdata> .
+
+<http://localhost:8000/sparql/foo> a sage:SageDataset ;
+  dcterms:description "Sample dataset used for testing entity lookup" ;
+  dcterms:title "foo" ;
+  void:distinctObjects 2 ;
+  void:distinctSubjects 1 ;
+  void:feature <http://www.w3.org/ns/formats/SPARQL_Results_JSON>,
+      <http://www.w3.org/ns/formats/SPARQL_Results_XML> ;
+  void:properties 2 ;
+  void:triples 2 ;
+  sage:quota 75 ;
+  hydra:entrypoint <http://localhost:8000/sparql/foo> ;
+  hydra:itemsPerPage 500 ;
+  sd:endpoint <http://localhost:8000/sparql/foo> ;
+  foaf:homepage <http://localhost:8000/sparql/foo> .
 
 <http://localhost:8000/sparql/watdiv100> a sage:SageDataset ;
     dcterms:description "Sample dataset in HDT format, used for testing" ;
