@@ -8,20 +8,6 @@ import http_server.responses as responses
 # from time import time
 
 
-def choose_format(mimetype):
-    if mimetype == "text/turtle":
-        return "turtle", mimetype
-    elif mimetype == "application/xml":
-        return "xml", mimetype
-    elif mimetype == "application/n-quads":
-        return "nquads", mimetype
-    elif mimetype == "application/trig":
-        return "trig", mimetype
-    elif mimetype == "application/json" or mimetype == "application/json+ld":
-        return "json-ld", mimetype
-    return "ntriples", "application/n-triples"
-
-
 def build_describe_query(subject):
     """Create a query SELECT * WHERE { <subject> ?p ?o .}"""
     return {
