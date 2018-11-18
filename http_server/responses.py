@@ -4,7 +4,6 @@ from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStat
 from query_engine.formatters import sparql_xml, binding_to_json
 from json import dumps
 from xml.etree import ElementTree
-from rdflib.graph import Graph
 
 
 def stream_json_list(iterator):
