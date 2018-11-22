@@ -34,7 +34,7 @@ def lookup_blueprint(datasets, logger):
     @l_blueprint.route("/entity/<dataset_name>/<entity>", methods=["GET"])
     def lookup_entity(dataset_name, entity):
         """Evaluates a DESCRIBE query over a RDF dataset"""
-        logger.info('[IP: {}] [/lookup/] Querying {}'.format(request.environ['REMOTE_ADDR'], dataset_name))
+        logger.debug('[IP: {}] [/lookup/] Querying {}'.format(request.environ['REMOTE_ADDR'], dataset_name))
         dataset = datasets.get_dataset(dataset_name)
         if dataset is None:
             abort(404)
@@ -47,7 +47,7 @@ def lookup_blueprint(datasets, logger):
             next_link = request.args.get("next", default=None)
             post_query = build_describe_query(entity_uri)
 
-            logger.info('[IP: {}] [/lookup/] Entity={}'.format(request.environ['REMOTE_ADDR'], entity_uri))
+            logger.debug('[IP: {}] [/lookup/] Entity={}'.format(request.environ['REMOTE_ADDR'], entity_uri))
             quota = dataset.quota / 1000
             max_results = dataset.max_results
 
