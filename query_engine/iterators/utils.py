@@ -45,11 +45,9 @@ class ArrayIterator(object):
         return mu
 
 
-def selection(triple, variables, formatter=None):
+def selection(triple, variables):
     """Apply selection on a RDF triple"""
     bindings = set()
-    if formatter is not None:
-        triple = formatter(triple)
     if variables[0] is not None:
         bindings.add((variables[0], triple[0]))
     if variables[1] is not None:

@@ -23,7 +23,7 @@ def build_describe_query(subject):
 
 
 def bindings_to_triple(entity, bindings, url):
-    for b in responses.deskolemize(bindings, url):
+    for b in responses.skolemize(bindings, url):
         yield (entity, b["?p"], b["?o"])
 
 
