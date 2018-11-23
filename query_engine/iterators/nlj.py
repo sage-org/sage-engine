@@ -6,7 +6,7 @@ from query_engine.iterators.utils import apply_bindings, tuple_to_triple
 from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedIndexJoinIterator
 from query_engine.protobuf.utils import pyDict_to_protoDict
 from query_engine.iterators.utils import IteratorExhausted
-from asyncio import coroutine, sleep
+from asyncio import sleep
 
 
 class IndexJoinIterator(PreemptableIterator):
@@ -89,30 +89,4 @@ class IndexJoinIterator(PreemptableIterator):
             saved_join.offset = self._currentIter.offset + self._currentIter.nb_reads
         else:
             saved_join.offset = 0
-        return saved_join
-
-
-class LeftNLJIterator(IndexJoinIterator):
-    """A IndexJoinIterator which implements a left-join"""
-
-    @coroutine
-    async def next(self):
-        """Get the next element from the join"""
-        if not self.has_next():
-            raise IteratorExhausted()
-        if self._currentIter is None or (not self._currentIter.has_next()):
-            self._currentBinding = await self._source.next()
-            self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
-        return await self._innerLoop()
-
-    async def _innerLoop(self):
-        """Execute one loop of the inner loop"""
-        if self._currentIter is None:
-            return self._currentBinding
-        mu = await self._currentIter.next()
-        return {**self._currentBinding, **mu}
-
-    def save(self):
-        saved_join = super().save()
-        saved_join.optional = True
         return saved_join
