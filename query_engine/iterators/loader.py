@@ -64,8 +64,6 @@ def load_nlj(saved_plan, dataset):
         currentBinding = saved_plan.muc
     iterOffset = saved_plan.offset
     dataset = dataset.get_graph(innerTriple['graph'])
-    # if saved_plan.optional:
-    #     return LeftNLJIterator(source, innerTriple, db_connector, currentBinding=currentBinding, iterOffset=iterOffset)
     return IndexJoinIterator(source, innerTriple, dataset, currentBinding=currentBinding, iterOffset=iterOffset)
 
 
