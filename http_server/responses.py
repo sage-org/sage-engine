@@ -4,6 +4,7 @@ from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStat
 from query_engine.formatters import sparql_xml, binding_to_json
 from json import dumps
 from xml.etree import ElementTree
+from functools import lru_cache
 
 
 def stream_json_list(iterator):
@@ -43,12 +44,17 @@ def protobuf(bindings, next_page, stats):
     return sageResponse.SerializeToString()
 
 
-def deskolemize(bindings, url):
-    """Deskolemize blank nodes"""
+@lru_cache()
+def skolemize_one(value, url):
+    return "{}/bnode#{}".format(url, value[2:]) if value.startswith("_:") else value
+
+
+def skolemize(bindings, url):
+    """Skolemize blank nodes"""
     for b in bindings:
         r = dict()
         for key, value in b.items():
-            r[key] = "{}/bnode#{}".format(url, value[2:]) if value.startswith("_:") else value
+            r[key] = skolemize_one(value, url)
         yield r
 
 
@@ -72,7 +78,7 @@ def w3c_json_streaming(bindings, next_link, stats, url):
         yield "\"next\":\"{}\",".format(next_link)
     yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "},\"results\":{\"bindings\":["
     # generate results
-    b_iter = map(binding_to_json, deskolemize(bindings, url))
+    b_iter = map(binding_to_json, skolemize(bindings, url))
     yield from stream_json_list(b_iter)
     yield "]}}"
 
@@ -81,7 +87,7 @@ def raw_json_streaming(bindings, next_link, stats, url):
     """Creates a page of SaGe results in a simple, non-standard JSON format, compatible with Flask streaming API"""
     hasNext = "true" if next_link is not None else "false"
     yield "{\"bindings\":["
-    b_iter = deskolemize(bindings, url)
+    b_iter = skolemize(bindings, url)
     yield from stream_json_list(b_iter)
     yield "],\"pageSize\":{},\"hasNext\":{},".format(len(bindings), hasNext)
     if next_link is not None:

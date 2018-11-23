@@ -25,6 +25,5 @@ def test_describe_many_dataset_void():
     # generate description
     url = "http://localhost:8000"
     desc_graph = Graph()
-    print(many_void(url, dataset, "turtle"))
     desc_graph.parse(data=many_void(url, dataset, "turtle"), format="ttl")
     assert ref_graph.isomorphic(desc_graph)
