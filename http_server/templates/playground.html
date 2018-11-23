@@ -13,7 +13,7 @@
       </p>
       <div id="sage-widget"
         url="{{ server_public_url }}"
-        defaultServer="{{ url_for('sparql-interface.sparql_query', dataset_name=default_query.dataset_name, _external=True) }}"
+        defaultServer="{{ url_for('sparql-interface.sparql_query', graph_name=default_query.dataset_name, _external=True) }}"
         defaultQuery="{{ default_query.value }}"
         defaultQName="{{ default_query.name }}">
       </div>

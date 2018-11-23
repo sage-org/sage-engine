@@ -140,20 +140,28 @@ paths:
 definitions:
   TriplePattern:
     type: "object"
-    description: "Triple pattern"
+    description: "A Triple pattern"
     properties:
       triple:
         type: "string"
         description: "Triple pattern's subject"
         example: "http://example.org#Alice"
+        required: true
       predicate:
         type: "string"
         description: "Triple pattern's predicate"
         example: "http://xmlns.com/foaf/0.1/knows"
+        required: true
       object:
         type: "string"
         description: "Triple pattern's object"
         example: "?bob"
+        required: true
+      graph:
+        type: "string"
+        description: "An IRI labeling what graph in a dataset the triple belongs to"
+        example: "http://sage.univ-nantes.fr/sparql/dbpedia-2016-04"
+        required: false
   QueryObject:
     type: "object"
     example:

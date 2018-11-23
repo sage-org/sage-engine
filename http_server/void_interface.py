@@ -38,7 +38,8 @@ def void_blueprint(dataset, logger):
             format, mimetype = choose_format(mimetype)
             description = many_void(url, dataset, format)
             return Response(description, content_type=mimetype)
-        except Exception:
+        except Exception as e:
+            logger.error(e)
             abort(500)
 
     @v_blueprint.route("/.well-known/void/", methods=["GET"])
@@ -66,6 +67,7 @@ def void_blueprint(dataset, logger):
             descriptor = VoidDescriptor(url, graph)
             format, mimetype = choose_format(mimetype)
             return Response(descriptor.describe(format), content_type=mimetype)
-        except Exception:
+        except Exception as e:
+            logger.error(e)
             abort(500)
     return v_blueprint

@@ -14,7 +14,7 @@ import os
 
 def sage_app(config_file):
     """Build a Sage application with the given configuration file"""
-    datasets = Dataset(config_file)
+    dataset = Dataset(config_file)
     app = Flask(__name__)
     CORS(app)
 
@@ -25,18 +25,19 @@ def sage_app(config_file):
     @app.context_processor
     def inject_user():
         config = dict()
-        if "google_analytics" in datasets._config:
-            config["google_analytics"] = datasets._config["google_analytics"]
+        if "google_analytics" in dataset._config:
+            config["google_analytics"] = dataset._config["google_analytics"]
         return dict(config=config)
 
     @app.route('/')
     def index():
         try:
             url = secure_url(request.url)
-            dinfos = [dinfo for dinfo in datasets.describe(url)]
-            long_description = Markup(markdown(datasets.long_description))
-            return render_template("index_sage.html", datasets=dinfos, server_public_url=datasets.public_url, default_query=datasets.default_query, long_description=long_description)
-        except Exception:
+            dinfos = [dinfo for dinfo in dataset.describe(url)]
+            long_description = Markup(markdown(dataset.long_description))
+            return render_template("index_sage.html", dataset=dinfos, server_public_url=dataset.public_url, default_query=dataset.default_query, long_description=long_description)
+        except Exception as e:
+            gunicorn_logger.error(e)
             abort(500)
 
     @app.route('/sparql11-compliance')
@@ -63,10 +64,11 @@ def sage_app(config_file):
                 'cpu_count': os.cpu_count()
             }
             return render_template("specs.html", specs=specs)
-        except Exception:
+        except Exception as e:
+            gunicorn_logger.error(e)
             abort(500)
 
-    app.register_blueprint(sparql_blueprint(datasets, gunicorn_logger))
-    app.register_blueprint(lookup_blueprint(datasets, gunicorn_logger))
-    app.register_blueprint(void_blueprint(datasets, gunicorn_logger))
+    app.register_blueprint(sparql_blueprint(dataset, gunicorn_logger))
+    app.register_blueprint(lookup_blueprint(dataset, gunicorn_logger))
+    app.register_blueprint(void_blueprint(dataset, gunicorn_logger))
     return app

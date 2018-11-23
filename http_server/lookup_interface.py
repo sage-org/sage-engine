@@ -86,6 +86,7 @@ def lookup_blueprint(dataset, logger):
                 headers["Link"] = "<{}?next={}>; rel=\"next\"; title=\"Next page\"".format(entity_uri, next_page)
 
             return Response(responses.ntriples_streaming(triples), content_type="application/ntriples", headers=headers)
-        except Exception:
+        except Exception as e:
+            logger.error(e)
             abort(500)
     return l_blueprint

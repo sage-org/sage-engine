@@ -20,13 +20,13 @@
 
       <h3><i class="fas fa-sitemap"></i> VoID description</h3>
       <p>Access the <a href="https://www.w3.org/TR/void/">VoID description</a> of the dataset at
-        <a href="{{ url_for('void-interface.void_dataset', dataset_name=dataset_info["title"]) }}">
-          {{ url_for('void-interface.void_dataset', dataset_name=dataset_info['title'], _external=True) }}
+        <a href="{{ url_for('void-interface.void_dataset', graph_name=dataset_info["title"]) }}">
+          {{ url_for('void-interface.void_dataset', graph_name=dataset_info['title'], _external=True) }}
         </a>.
       </p>
       <!-- VoID descriptions -->
       <p>
-        View the VoID description in 
+        View the VoID description in
         <a class="btn btn-primary" data-toggle="collapse" href="#voidNTriples" role="button" aria-expanded="false" aria-controls="voidNTriples">
           N-Triples
         </a>
