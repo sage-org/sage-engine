@@ -6,8 +6,11 @@ from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.scan import ScanIterator
 from query_engine.iterators.nlj import IndexJoinIterator
 from query_engine.iterators.union import BagUnionIterator
+from tests.utils import DummyDataset
+
 
 hdtDoc = HDTFileConnector('tests/data/watdiv.10M.hdt')
+datasets = DummyDataset(hdtDoc, 'watdiv100')
 
 
 def test_empty_patterns():
@@ -27,7 +30,7 @@ def test_empty_patterns():
         'type': 'bgp',
         'bgp': bgp
     }
-    plan, c = build_query_plan(query, hdtDoc)
+    plan, c = build_query_plan(query, datasets, 'watdiv100')
     assert not plan.has_next()
 
 
@@ -48,7 +51,7 @@ def test_build_left_linear_plan():
         'type': 'bgp',
         'bgp': bgp
     }
-    plan, c = build_query_plan(query, hdtDoc)
+    plan, c = build_query_plan(query, datasets, 'watdiv100')
     assert type(plan) is ProjectionIterator
     assert type(plan._source) is IndexJoinIterator
     assert plan._source._innerTriple == bgp[1]
@@ -76,7 +79,7 @@ def test_build_union():
             ]
         ]
     }
-    plan, c = build_query_plan(query, hdtDoc)
+    plan, c = build_query_plan(query, datasets, 'watdiv100')
     assert type(plan) is BagUnionIterator
 
 
@@ -97,9 +100,9 @@ def test_load_from_savedPlan():
         'type': 'bgp',
         'bgp': bgp
     }
-    plan, c = build_query_plan(query, hdtDoc)
+    plan, c = build_query_plan(query, datasets, 'watdiv100')
     savedPlan = plan.save()
-    plan, c = build_query_plan(None, hdtDoc, savedPlan)
+    plan, c = build_query_plan(None, datasets, 'watdiv100', savedPlan)
     assert type(plan) is ProjectionIterator
     assert type(plan._source) is IndexJoinIterator
     assert plan._source._innerTriple == bgp[1]

@@ -3,7 +3,7 @@
 from markdown import markdown
 from flask import Flask, Markup, render_template, request, abort
 from flask_cors import CORS
-from database.datasets import DatasetCollection
+from database.datasets import Dataset
 from http_server.sparql_interface import sparql_blueprint
 from http_server.void_interface import void_blueprint
 from http_server.lookup_interface import lookup_blueprint
@@ -14,7 +14,7 @@ import os
 
 def sage_app(config_file):
     """Build a Sage application with the given configuration file"""
-    datasets = DatasetCollection(config_file)
+    datasets = Dataset(config_file)
     app = Flask(__name__)
     CORS(app)
 

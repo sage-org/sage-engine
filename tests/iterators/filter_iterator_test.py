@@ -6,14 +6,17 @@ from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.loader import load
 from database.hdt_file_connector import HDTFileConnector
+from tests.utils import DummyDataset
 import math
+
 
 hdtDoc = HDTFileConnector('tests/data/watdiv.10M.hdt')
 engine = SageEngine()
 triple = {
     'subject': 'http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000',
     'predicate': '?p',
-    'object': '?o'
+    'object': '?o',
+    'graph': 'watdiv100'
 }
 
 
@@ -83,7 +86,7 @@ def test_filter_iterator_interrupt():
             'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
         ]
     tmp = len(results)
-    reloaded = load(saved.SerializeToString(), hdtDoc)
+    reloaded = load(saved.SerializeToString(), DummyDataset(hdtDoc, 'watdiv100'))
     (results, saved, done) = engine.execute(reloaded, 10e7)
     assert len(results) + tmp == 4
     for b in results:

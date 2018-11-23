@@ -9,7 +9,8 @@ engine = SageEngine()
 triple = {
     'subject': '?s',
     'predicate': '?p',
-    'object': '?o'
+    'object': '?o',
+    'graph': 'watdiv100'
 }
 
 

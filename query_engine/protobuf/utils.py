@@ -12,5 +12,6 @@ def protoTriple_to_dict(triple):
     return {
         'subject': triple.subject,
         'predicate': triple.predicate,
-        'object': triple.object
+        'object': triple.object,
+        'graph': triple.graph
     }
