@@ -1,12 +1,10 @@
 # datasets.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from yaml import load
-from database.rdf_file_connector import RDFFileConnector
 from database.hdt_file_connector import HDTFileConnector
 from math import inf
 
 DB_CONNECTORS = {
-    'rdf-file': RDFFileConnector,
     'hdt-file': HDTFileConnector
 }
 
