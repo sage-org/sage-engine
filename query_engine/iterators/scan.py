@@ -4,7 +4,6 @@ from query_engine.iterators.preemptable_iterator import PreemptableIterator
 from query_engine.iterators.utils import vars_positions, selection
 from query_engine.protobuf.iterators_pb2 import TriplePattern, SavedScanIterator
 from query_engine.iterators.utils import IteratorExhausted
-from asyncio import coroutine
 
 
 class ScanIterator(PreemptableIterator):
@@ -57,6 +56,7 @@ class ScanIterator(PreemptableIterator):
         triple.subject = self._triple['subject']
         triple.predicate = self._triple['predicate']
         triple.object = self._triple['object']
+        triple.graph = self._triple['graph']
         saved_scan.triple.CopyFrom(triple)
         saved_scan.offset = self.offset + self.nb_reads
         saved_scan.cardinality = self._cardinality

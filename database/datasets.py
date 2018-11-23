@@ -11,11 +11,11 @@ DB_CONNECTORS = {
 }
 
 
-class Dataset(object):
-    """A RDF Dataset with a dedicated backend"""
+class Graph(object):
+    """A RDF Graph with a dedicated backend"""
 
     def __init__(self, config):
-        super(Dataset, self).__init__()
+        super(Graph, self).__init__()
         self._config = config
         connectorClass = DB_CONNECTORS[self._config['backend']] if self._config['backend'] in DB_CONNECTORS else None
         self._connector = connectorClass.from_config(self._config)
@@ -109,16 +109,16 @@ def load_config(config_file="config.yaml"):
             c['max_results'] = max_results
         if 'queries' not in c:
             c['queries'] = []
-    # build datasets
-    datasets = {c["name"]: Dataset(c) for c in config["datasets"]}
-    return (config, datasets)
+    # build graphs
+    graphs = {c["name"]: Graph(c) for c in config["datasets"]}
+    return (config, graphs)
 
 
-class DatasetCollection(object):
-    """A collection of RDF datasets, served as a Singleton"""
+class Dataset(object):
+    """A collection of RDF graphs"""
 
     def __init__(self, config_file):
-        super(DatasetCollection, self).__init__()
+        super(Dataset, self).__init__()
         self._config_file = config_file
         (self._config, self._datasets) = load_config(self._config_file)
         if "long_description" in self._config:
@@ -156,7 +156,11 @@ class DatasetCollection(object):
         for name, dataset in self._datasets.items():
             yield dataset.describe(url)
 
-    def get_dataset(self, dataset_name):
+    def get_graph(self, dataset_name):
         """Get a dataset given its name"""
         dataset = self._datasets[dataset_name] if dataset_name in self._datasets else None
         return dataset
+
+    def has_graph(self, dataset_name):
+        """Test fi a graph exist"""
+        return dataset_name in self._datasets

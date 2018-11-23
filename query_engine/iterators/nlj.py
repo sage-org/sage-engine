@@ -81,6 +81,7 @@ class IndexJoinIterator(PreemptableIterator):
         inner.subject = self._innerTriple['subject']
         inner.predicate = self._innerTriple['predicate']
         inner.object = self._innerTriple['object']
+        inner.graph = self._innerTriple['graph']
         saved_join.inner.CopyFrom(inner)
         if self._currentBinding is not None:
             pyDict_to_protoDict(self._currentBinding, saved_join.muc)

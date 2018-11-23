@@ -10,12 +10,14 @@ engine = SageEngine()
 triple = {
     'subject': '?s1',
     'predicate': 'http://example.org/p1',
-    'object': '?common'
+    'object': '?common',
+    'graph': 'watdiv100'
 }
 innerTriple = {
     'subject': '?s2',
     'predicate': 'http://example.org/p2',
-    'object': '?common'
+    'object': '?common',
+    'graph': 'watdiv100'
 }
 
 

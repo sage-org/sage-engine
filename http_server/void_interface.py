@@ -19,7 +19,7 @@ def choose_format(mimetype):
     return "ntriples", "application/n-triples"
 
 
-def void_blueprint(datasets, logger):
+def void_blueprint(dataset, logger):
     """Get a Blueprint that provides VOID descritions of the hosted RDF datasets"""
     v_blueprint = Blueprint("void-interface", __name__)
 
@@ -36,7 +36,7 @@ def void_blueprint(datasets, logger):
             if url.endswith('/'):
                 url = url[0:len(url) - 1]
             format, mimetype = choose_format(mimetype)
-            description = many_void(url, datasets, format)
+            description = many_void(url, dataset, format)
             return Response(description, content_type=mimetype)
         except Exception:
             abort(500)
@@ -45,13 +45,13 @@ def void_blueprint(datasets, logger):
     def void_well_known():
         return redirect("/void", code=302)
 
-    @v_blueprint.route("/void/<dataset_name>", methods=["GET"])
-    def void_dataset(dataset_name):
+    @v_blueprint.route("/void/<graph_name>", methods=["GET"])
+    def void_dataset(graph_name):
         """Describe one RDF dataset"""
         try:
-            logger.debug('[/void/] Loading VoID descriptions for dataset {}'.format(dataset_name))
-            dataset = datasets.get_dataset(dataset_name)
-            if dataset is None:
+            logger.debug('[/void/] Loading VoID descriptions for dataset {}'.format(graph_name))
+            graph = dataset.get_graph(graph_name)
+            if graph is None:
                 abort(404)
 
             logger.debug('[/void/] Corresponding dataset found')
@@ -63,7 +63,7 @@ def void_blueprint(datasets, logger):
             url = secure_url(request.url_root)
             if url.endswith('/'):
                 url = url[0:len(url) - 1]
-            descriptor = VoidDescriptor(url, dataset)
+            descriptor = VoidDescriptor(url, graph)
             format, mimetype = choose_format(mimetype)
             return Response(descriptor.describe(format), content_type=mimetype)
         except Exception:

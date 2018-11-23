@@ -30,6 +30,7 @@ class TriplePatternSchema(Schema):
     subject = fields.Str(required=True)
     predicate = fields.Str(required=True)
     object = fields.Str(require=True)
+    graph = fields.Str(required=False)
 
 
 class SparqlQuerySchema(Schema):

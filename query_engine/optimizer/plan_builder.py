@@ -6,22 +6,23 @@ from query_engine.iterators.nlj import IndexJoinIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.loader import load
+from query_engine.iterators.utils import EmptyIterator
 from query_engine.optimizer.utils import find_connected_pattern, get_vars
 from functools import reduce
 
 
-def build_query_plan(query, db_connector, saved_plan=None, projection=None):
+def build_query_plan(query, dataset, default_graph, saved_plan=None, projection=None):
     cardinalities = []
     if saved_plan is not None:
-        return load(saved_plan, db_connector), []
+        return load(saved_plan, dataset), []
 
     # optional = query['optional'] if 'optional' in query and len(query['optional']) > 0 else None
     root = None
 
     if query['type'] == 'union':
-        root, cardinalities = build_union_plan(query['union'], db_connector, projection)
+        root, cardinalities = build_union_plan(query['union'], dataset, default_graph, projection)
     elif query['type'] == 'bgp':
-        root, cardinalities = build_join_plan(query['bgp'], db_connector, projection=projection)
+        root, cardinalities = build_join_plan(query['bgp'], dataset, default_graph, projection=projection)
     else:
         raise Exception('Unkown query type found during query optimization')
 
@@ -36,7 +37,7 @@ def build_query_plan(query, db_connector, saved_plan=None, projection=None):
     return root, cardinalities
 
 
-def build_union_plan(union, db_connector, projection=None):
+def build_union_plan(union, dataset, default_graph, projection=None):
     """Build a Bushy tree of Unions, where leaves are BGPs, from a list of BGPS"""
 
     def chunks(l, n):
@@ -52,7 +53,7 @@ def build_union_plan(union, db_connector, projection=None):
     sources = []
     cardinalities = []
     for bgp in union:
-        iterator, cards = build_join_plan(bgp, db_connector, projection=projection)
+        iterator, cards = build_join_plan(bgp, dataset, default_graph, projection=projection)
         sources.append(iterator)
         cardinalities += cards
     if len(sources) == 1:
@@ -62,9 +63,9 @@ def build_union_plan(union, db_connector, projection=None):
     return sources[0], cardinalities
 
 
-def build_join_plan(bgp, db_connector, projection=None):
+def build_join_plan(bgp, dataset, default_graph, projection=None):
     """Build a join plan between a BGP and a possible OPTIONAL clause"""
-    iterator, query_vars, cardinalities = build_left_plan(bgp, db_connector)
+    iterator, query_vars, cardinalities = build_left_plan(bgp, dataset, default_graph)
     # if optional is not None:
     #     iterator, query_vars, c = build_left_plan(optional, db_connector, source=iterator, base_vars=query_vars, optional=True)
     #     cardinalities += c
@@ -72,15 +73,25 @@ def build_join_plan(bgp, db_connector, projection=None):
     return ProjectionIterator(iterator, values), cardinalities
 
 
-def build_left_plan(bgp, db_connector, source=None, base_vars=None):
+def build_left_plan(bgp, dataset, default_graph, source=None, base_vars=None):
     """Build a Left-linear tree of joins/left-joins from a BGP/OPTIONAL BGP"""
     # gather metadata about triple patterns
     triples = []
     cardinalities = []
+
+    # analyze each triple pattern in the BGP
     for triple in bgp:
-        it, c = db_connector.search_triples(triple['subject'], triple['predicate'], triple['object'])
+        # select the graph used to evaluate the pattern
+        graph_uri = triple['graph'] if 'graph' in triple and len(triple['graph']) > 0 else default_graph
+        triple['graph'] = graph_uri
+        # get iterator and statistics about the pattern
+        if dataset.has_graph(graph_uri):
+            it, c = dataset.get_graph(graph_uri).search_triples(triple['subject'], triple['predicate'], triple['object'])
+        else:
+            it, c = EmptyIterator(), 0
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
         cardinalities += [{'triple': triple, 'cardinality': c}]
+
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
     # if no input iterator provided, build a Scan with the most selective pattern
@@ -100,6 +111,7 @@ def build_left_plan(bgp, db_connector, source=None, base_vars=None):
             pattern = triples[0]
             query_vars = query_vars | get_vars(pattern['triple'])
             pos = 0
-        acc = IndexJoinIterator(acc, pattern['triple'], db_connector)
+        graph_uri = pattern['triple']['graph']
+        acc = IndexJoinIterator(acc, pattern['triple'], dataset.get_graph(graph_uri))
         triples.pop(pos)
     return acc, query_vars, cardinalities

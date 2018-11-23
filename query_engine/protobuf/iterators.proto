@@ -6,6 +6,7 @@ message TriplePattern {
   string subject = 1;
   string predicate = 2;
   string object = 3;
+  string graph = 4;
 }
 
 message SavedScanIterator {
