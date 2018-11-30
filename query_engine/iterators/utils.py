@@ -29,6 +29,10 @@ class EmptyIterator(object):
     def nb_reads(self):
         return 0
 
+    @property
+    def offset(self):
+        return 0
+
 
 class ArrayIterator(object):
     def __init__(self, array):

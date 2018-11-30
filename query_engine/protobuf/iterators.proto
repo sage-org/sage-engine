@@ -21,6 +21,7 @@ message SavedProjectionIterator {
     SavedScanIterator scan_source = 2;
     SavedIndexJoinIterator join_source = 3;
     SavedBagUnionIterator union_source = 4;
+    SavedFilterIterator filter_source = 5;
   }
 }
 
@@ -38,19 +39,24 @@ message SavedBagUnionIterator {
   oneof left {
     SavedProjectionIterator proj_left = 1;
     SavedBagUnionIterator union_left = 2;
+    SavedIndexJoinIterator join_left = 3;
+    SavedFilterIterator filter_left = 4;
   }
   oneof right {
-    SavedProjectionIterator proj_right = 3;
-    SavedBagUnionIterator union_right = 4;
+    SavedProjectionIterator proj_right = 5;
+    SavedBagUnionIterator union_right = 6;
+    SavedIndexJoinIterator join_right = 7;
+    SavedFilterIterator filter_right = 8;
   }
 }
 
 message SavedFilterIterator {
   oneof source {
-    SavedProjectionIterator proj_source = 1;
-    SavedFilterIterator filter_source = 2;
+    SavedScanIterator scan_source = 1;
+    SavedProjectionIterator proj_source = 2;
+    SavedFilterIterator filter_source = 3;
   }
-  string expression = 3;
+  string expression = 4;
 }
 
 message RootTree {
