@@ -10,12 +10,12 @@ from query_engine.optimizer.plan_builder import build_left_plan
 
 
 class UnsupportedSPARQL(Exception):
-    """Throw when a SPARQL feature is not supported by the Sage query engine"""
+    """Thrown when a SPARQL feature is not supported by the Sage query engine"""
     pass
 
 
 def format_triple(graph):
-    """Convert a rdflib RDF triple into the format used by Sage"""
+    """Get a function used to convert a rdflib RDF triple into the format used by Sage"""
     def __formatter(triple):
         s, p, o = triple
         return {
@@ -89,7 +89,6 @@ def parse_query_node(node, dataset, current_graph, server_url):
         iterator, query_vars, cardinalities = build_left_plan(triples, dataset, current_graph)
         return iterator
     else:
-        print(node)
         raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))
 
 
