@@ -6,7 +6,7 @@ from query_engine.optimizer.plan_builder import build_query_plan
 from query_engine.optimizer.query_parser import parse_query
 from query_engine.iterators.loader import load
 from http_server.schema import QueryRequest, SageSparqlQuery
-from http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors
+from http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors, sage_http_error
 from database.descriptors import VoidDescriptor
 import http_server.responses as responses
 from time import time
@@ -16,7 +16,7 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
     """Execute a query using the SageEngine and returns the appropriate HTTP response"""
     graph_name = format_graph_uri(default_graph_uri, url)
     if not dataset.has_graph(graph_name):
-        abort(404)
+        return sage_http_error("No RDF graph matching the default URI provided was found.")
     graph = dataset.get_graph(graph_name)
     # decode next_link or build query execution plan
     cardinalities = dict()
@@ -59,41 +59,40 @@ def sparql_blueprint(dataset, logger):
             "application/sparql-results+json", "application/sparql-results+xml",
             "text/html"
         ])
-        # try:
-        url = secure_url(request.base_url)
-        # serve the HTML web page
-        if mimetype == "text/html":
-            graphs = [dinfo for dinfo in dataset.describe(url)]
-            return render_template("interfaces.html", dataset=graphs)
-        # parse arguments
-        if request.method == "GET":
-            query = request.args.get("query") or None
-            default_graph_uri = request.args.get("default-graph-uri") or None
-            next_link = request.args.get("next") or None
-            # ensure that both the query and default-graph-uri params are set
-            if query is None or default_graph_uri is None:
-                # TODO provide better error message
-                abort(500)
-        elif request.method == "POST" and request.is_json:
-            # POST query
-            post_query, err = SageSparqlQuery().load(request.get_json())
-            if err is not None and len(err) > 0:
-                # TODO better formatting
-                return Response(format_marshmallow_errors(err), status=400)
-            query = post_query["query"]
-            default_graph_uri = post_query["defaultGraph"]
-            next_link = post_query["next"] if 'next' in post_query else None
-        else:
-            # TODO provide better error message
+        try:
+            url = secure_url(request.base_url)
+            # serve the HTML web page
+            if mimetype == "text/html":
+                graphs = [dinfo for dinfo in dataset.describe(url)]
+                return render_template("interfaces.html", dataset=graphs)
+            # parse arguments
+            if request.method == "GET":
+                query = request.args.get("query") or None
+                default_graph_uri = request.args.get("default-graph-uri") or None
+                next_link = request.args.get("next") or None
+                # ensure that both the query and default-graph-uri params are set
+                if query is None or default_graph_uri is None:
+                    return sage_http_error("Invalid request sent to server: a GET request must contains both parameters 'query' and 'default-graph-uri'. See <a href='http://sage.univ-nantes.fr/documentation'>the API documentation</a> for reference.")
+            elif request.method == "POST" and request.is_json:
+                # POST query
+                post_query, err = SageSparqlQuery().load(request.get_json())
+                if err is not None and len(err) > 0:
+                    # TODO better formatting
+                    return Response(format_marshmallow_errors(err), status=400)
+                query = post_query["query"]
+                default_graph_uri = post_query["defaultGraph"]
+                next_link = post_query["next"] if 'next' in post_query else None
+            else:
+                return sage_http_error("Invalid request sent to server: a GET request must contains both parameters 'query' and 'default-graph-uri'. See <a href='http://sage.univ-nantes.fr/documentation'>the API documentation</a> for reference.")
+            # execute query
+            return execute_query(query, default_graph_uri, next_link, dataset, mimetype, url)
+        except Exception as e:
+            logger.error(e)
             abort(500)
-        # execute query
-        return execute_query(query, default_graph_uri, next_link, dataset, mimetype, url)
-        # except Exception as e:
-        #     logger.error(e)
-        #     abort(500)
 
     @s_blueprint.route("/sparql/<graph_name>", methods=["GET", "POST"])
     def sparql_query(graph_name):
+        """WARNING: old API, deprecated"""
         graph = dataset.get_graph(graph_name)
         if graph is None:
             abort(404)

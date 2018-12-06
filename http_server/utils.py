@@ -1,5 +1,6 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2018
+from flask import Response
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from base64 import b64encode, b64decode
 from json import dumps
@@ -50,3 +51,20 @@ def encode_saved_plan(savedPlan):
 
 def decode_saved_plan(bytes):
     return b64decode(bytes) if bytes is not None else None
+
+
+def sage_http_error(text, status=400):
+    content = """
+        <!DOCTYPE html>
+        <html lang="en" dir="ltr">
+          <head>
+            <meta charset="utf-8">
+            <title>SaGe server Error</title>
+          </head>
+          <body>
+            <h1>SaGe server error</h1>
+            <p>{}</p>
+          </body>
+        </html>
+    """.format(text)
+    return Response(content, status=status, content_type="text/html")
