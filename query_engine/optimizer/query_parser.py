@@ -7,6 +7,7 @@ from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.union import BagUnionIterator
 from query_engine.iterators.filter import FilterIterator
 from query_engine.optimizer.plan_builder import build_left_plan
+from http_server.utils import format_graph_uri
 
 
 class UnsupportedSPARQL(Exception):
@@ -48,18 +49,10 @@ def fetch_graph_triples(node, current_graph, server_url):
         raise UnsupportedSPARQL('Unsupported SPARQL Feature: a Sage engine can only perform joins between Graphs and BGPs')
 
 
-def format_graph_uri(uri, server_url):
-    """Format a GRAPH IRI if its belong to the same server than the current one"""
-    if uri.startswith(server_url):
-        index = uri.index(server_url)
-        return uri[index + len(server_url):]
-    return '_:UnkownGraph'
-
-
 def parse_query(query, dataset, default_graph, server_url):
     """Parse a regular SPARQL query into a query execution plan"""
     q_parsed = translateQuery(parseQuery(query)).algebra
-    cardinalities = dict()
+    cardinalities = list()
     iterator = parse_query_node(q_parsed, dataset, default_graph, server_url, cardinalities)
     return iterator, cardinalities
 
@@ -86,7 +79,7 @@ def parse_query_node(node, dataset, current_graph, server_url, cardinalities):
         triples = list(map(format_triple(current_graph), node.triples))
         iterator, query_vars, c = build_left_plan(triples, dataset, current_graph)
         # track cardinalities of every triple pattern
-        cardinalities.update(c)
+        cardinalities += c
         return iterator
     elif node.name == 'Union':
         left = parse_query_node(node.p1, dataset, current_graph, server_url, cardinalities)
@@ -101,7 +94,7 @@ def parse_query_node(node, dataset, current_graph, server_url, cardinalities):
         triples = fetch_graph_triples(node.p1, current_graph, server_url) + fetch_graph_triples(node.p2, current_graph, server_url)
         iterator, query_vars, c = build_left_plan(triples, dataset, current_graph)
         # track cardinalities of every triple pattern
-        cardinalities.update(c)
+        cardinalities += c
         return iterator
     else:
         raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))

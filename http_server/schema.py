@@ -43,7 +43,7 @@ class SparqlQuerySchema(Schema):
 
 
 class QueryRequest(Schema):
-    """Marshmallow schema for a query to SaGe SPARQL API"""
+    """Marshmallow schema for a raw query to SaGe SPARQL API"""
     query = fields.Nested(SparqlQuerySchema, required=True)
     next = fields.Str(required=False, allow_none=True)
 
@@ -55,3 +55,10 @@ class QueryRequest(Schema):
             raise ValidationError('A valid BGP query must contains the "bgp" field')
         elif query['type'] == 'union' and 'union' not in query:
             raise ValidationError('A valid Union query must contains the "union" field')
+
+
+class SageSparqlQuery(Schema):
+    """Marshmallow schema for a SPARQL query to SaGe SPARQL API"""
+    query = fields.Str(required=True)
+    defaultGraph = fields.Str(required=True)
+    next = fields.Str(required=False, allow_none=True)

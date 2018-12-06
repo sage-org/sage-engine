@@ -26,6 +26,16 @@ def secure_url(url):
     return urlunparse((scheme, netloc, path, params, query, fragment)).replace("%7E", "~")
 
 
+def format_graph_uri(uri, server_url):
+    """Format a GRAPH IRI if its belong to the same server than the current one"""
+    if not server_url.endswith('/'):
+        server_url += '/'
+    if uri.startswith(server_url):
+        index = uri.index(server_url)
+        return uri[index + len(server_url):]
+    return '_:UnkownGraph'
+
+
 def format_marshmallow_errors(errors):
     """Format mashmallow validation errors in string format"""
     return dumps(errors, indent=2)
