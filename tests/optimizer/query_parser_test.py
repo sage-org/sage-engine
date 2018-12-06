@@ -59,7 +59,8 @@ queries = [
 class TestQueryParser(object):
     @pytest.mark.parametrize("query,cardinality", queries)
     def test_query_parser(self, query, cardinality):
-        iterator = parse_query(query, dataset, 'watdiv100', 'http://localhost:8000/sparql/')
+        iterator, cards = parse_query(query, dataset, 'watdiv100', 'http://localhost:8000/sparql/')
+        assert len(cards) > 0
         (results, saved, done) = engine.execute(iterator, math.inf)
         assert len(results) == cardinality
         assert done

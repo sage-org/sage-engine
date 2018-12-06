@@ -59,34 +59,49 @@ def format_graph_uri(uri, server_url):
 def parse_query(query, dataset, default_graph, server_url):
     """Parse a regular SPARQL query into a query execution plan"""
     q_parsed = translateQuery(parseQuery(query)).algebra
-    return parse_query_node(q_parsed, dataset, default_graph, server_url)
+    cardinalities = dict()
+    iterator = parse_query_node(q_parsed, dataset, default_graph, server_url, cardinalities)
+    return iterator, cardinalities
 
 
-def parse_query_node(node, dataset, current_graph, server_url):
-    """Recursively parse node in the query logical plan"""
+def parse_query_node(node, dataset, current_graph, server_url, cardinalities):
+    """
+        Recursively parse node in the query logical plan to build a preemptable physical query execution plan.
+
+        Args:
+            * node - Node of the logical plan to parse (in rdflib format)
+            * dataset - RDF dataset used to execute the query
+            * current_graph - IRI of the current RDF graph queried
+            * server_url - URL of the SaGe server
+            * cardinalities - Map<triple,integer> used to track triple patterns cardinalities
+    """
     if node.name == 'SelectQuery':
-        return parse_query_node(node.p, dataset, current_graph, server_url)
+        return parse_query_node(node.p, dataset, current_graph, server_url, cardinalities)
     elif node.name == 'Project':
         query_vars = list(map(lambda t: '?' + str(t), node._vars))
-        child = parse_query_node(node.p, dataset, current_graph, server_url)
+        child = parse_query_node(node.p, dataset, current_graph, server_url, cardinalities)
         return ProjectionIterator(child, query_vars)
     elif node.name == 'BGP':
         # bgp_vars = node._vars
         triples = list(map(format_triple(current_graph), node.triples))
-        iterator, query_vars, cardinalities = build_left_plan(triples, dataset, current_graph)
+        iterator, query_vars, c = build_left_plan(triples, dataset, current_graph)
+        # track cardinalities of every triple pattern
+        cardinalities.update(c)
         return iterator
     elif node.name == 'Union':
-        left = parse_query_node(node.p1, dataset, current_graph, server_url)
-        right = parse_query_node(node.p2, dataset, current_graph, server_url)
+        left = parse_query_node(node.p1, dataset, current_graph, server_url, cardinalities)
+        right = parse_query_node(node.p2, dataset, current_graph, server_url, cardinalities)
         return BagUnionIterator(left, right)
     elif node.name == 'Filter':
         expression = parse_filter_expr(node.expr)
-        iterator = parse_query_node(node.p, dataset, current_graph, server_url)
+        iterator = parse_query_node(node.p, dataset, current_graph, server_url, cardinalities)
         return FilterIterator(iterator, expression)
     elif node.name == 'Join':
         # only allow for joining BGPs from different GRAPH clauses
         triples = fetch_graph_triples(node.p1, current_graph, server_url) + fetch_graph_triples(node.p2, current_graph, server_url)
-        iterator, query_vars, cardinalities = build_left_plan(triples, dataset, current_graph)
+        iterator, query_vars, c = build_left_plan(triples, dataset, current_graph)
+        # track cardinalities of every triple pattern
+        cardinalities.update(c)
         return iterator
     else:
         raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))
@@ -114,4 +129,4 @@ def parse_filter_expr(expr):
             for other in expr.other:
                 expression = "({} || {})".format(expression, parse_filter_expr(other))
             return expression
-        raise UnsupportedSPARQL("Unsupported SPARQL FILTER feature: {}".format(expr.name))
+        raise UnsupportedSPARQL("Unsupported SPARQL FILTER expression: {}".format(expr.name))
