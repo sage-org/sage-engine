@@ -2,47 +2,24 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
 from http_server.server import sage_app
-from tests.http.utils import jsonPost
+from tests.http.utils import jsonSparql
 
 app = sage_app('tests/data/test_config.yaml')
 
-bgp_queries = [
-    ({
-        'query': {
-            'type': 'bgp',
-            'bgp': [
-                {
-                    'subject': 'http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000',
-                    'predicate': 'http://purl.org/goodrelations/price',
-                    'object': '?price'
-                }
-            ],
-            "filters": [
-                "?price = \"232\""
-            ]
+filter_queries = [
+    ("""
+        SELECT * WHERE {
+            <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> <http://purl.org/goodrelations/price> ?price .
+            FILTER(?price = "232")
         }
-    }, 1),
-    ({
-        'query': {
-            'type': 'bgp',
-            'bgp': [
-                {
-                    'subject': 'http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000',
-                    'predicate': 'http://purl.org/goodrelations/price',
-                    'object': '?price'
-                },
-                {
-                    'subject': 'http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000',
-                    'predicate': 'http://schema.org/eligibleQuantity',
-                    'object': '?quantity'
-                }
-            ],
-            "filters": [
-                "isLiteral(?price) && ?price = \"232\"",
-                "?quantity = \"4\""
-            ]
+    """, 1),
+    ("""
+        SELECT * WHERE {
+            <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> <http://purl.org/goodrelations/price> ?price .
+            <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> <http://schema.org/eligibleQuantity> ?quantity .
+            FILTER(?price = "232" && ?quantity = "4")
         }
-    }, 1)
+    """, 1)
 ]
 
 
@@ -56,17 +33,17 @@ class TestFilterInterface(object):
     def teardown_class(self):
         pass
 
-    @pytest.mark.parametrize('body,cardinality', bgp_queries)
-    def test_filter_interface(self, body, cardinality):
-        query = body
+    @pytest.mark.parametrize('query,cardinality', filter_queries)
+    def test_filter_interface(self, query, cardinality):
         nbResults = 0
         nbCalls = 0
         hasNext = True
+        next_link = None
         while hasNext:
-            response = jsonPost(self.app, '/sparql/watdiv100', query)
+            response = jsonSparql(self.app, query, next_link, 'http://localhost/sparql/watdiv100')
             nbResults += len(response['bindings'])
             hasNext = response['hasNext']
-            query['next'] = response['next']
+            next_link = response['next']
             nbCalls += 1
         assert nbResults == cardinality
-        assert nbCalls > 0
+        assert nbCalls >= 1

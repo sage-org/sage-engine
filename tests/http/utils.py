@@ -3,11 +3,6 @@
 from json import dumps, loads
 
 
-def jsonPost(app, url, data):
-    res = app.post(url, data=dumps(data), content_type='application/json')
-    return loads(res.data)
-
-
 def jsonSparql(app, query, next_link, graph_uri):
     data = {
         "query": query,

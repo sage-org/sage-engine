@@ -2,52 +2,24 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
 from http_server.server import sage_app
-from tests.http.utils import jsonPost
+from tests.http.utils import jsonSparql
 
 app = sage_app('tests/data/test_config.yaml')
 
-bgp_queries = [
-    ({
-        'query': {
-            'type': 'union',
-            'union': [
-                [
-                    {
-                        'subject': '?s',
-                        'predicate': 'http://schema.org/eligibleRegion',
-                        'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
-                    },
-                    {
-                        'subject': '?s',
-                        'predicate': 'http://purl.org/goodrelations/includes',
-                        'object': '?includes'
-                    },
-                    {
-                        'subject': '?s',
-                        'predicate': 'http://purl.org/goodrelations/validThrough',
-                        'object': '?validity'
-                    }
-                ],
-                [
-                    {
-                        'subject': '?s',
-                        'predicate': 'http://schema.org/eligibleRegion',
-                        'object': 'http://db.uwaterloo.ca/~galuc/wsdbm/Country10'
-                    },
-                    {
-                        'subject': '?s',
-                        'predicate': 'http://purl.org/goodrelations/includes',
-                        'object': '?includes'
-                    },
-                    {
-                        'subject': '?s',
-                        'predicate': 'http://purl.org/goodrelations/validThrough',
-                        'object': '?validity'
-                    }
-                ]
-            ]
+union_queries = [
+    ("""
+    SELECT * WHERE {
+        {
+            ?s <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
+            ?s <http://purl.org/goodrelations/includes> ?includes .
+            ?s <http://purl.org/goodrelations/validThrough> ?validity .
+        } UNION {
+            ?s <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
+            ?s <http://purl.org/goodrelations/includes> ?includes .
+            ?s <http://purl.org/goodrelations/validThrough> ?validity .
         }
-    }, 4206)
+    }
+    """, 2180 * 2)
 ]
 
 
@@ -61,17 +33,17 @@ class TestUnionInterface(object):
     def teardown_class(self):
         pass
 
-    @pytest.mark.parametrize("body,cardinality", bgp_queries)
-    def test_union_interface(self, body, cardinality):
-        query = body
+    @pytest.mark.parametrize("query,cardinality", union_queries)
+    def test_union_interface(self, query, cardinality):
         nbResults = 0
         nbCalls = 0
         hasNext = True
+        next_link = None
         while hasNext:
-            response = jsonPost(self.app, '/sparql/watdiv100', query)
+            response = jsonSparql(self.app, query, next_link, 'http://localhost/sparql/watdiv100')
             nbResults += len(response['bindings'])
             hasNext = response['hasNext']
-            query['next'] = response['next']
+            next_link = response['next']
             nbCalls += 1
         assert nbResults == cardinality
         assert nbCalls > 1

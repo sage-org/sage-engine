@@ -55,8 +55,9 @@ message SavedFilterIterator {
     SavedScanIterator scan_source = 1;
     SavedProjectionIterator proj_source = 2;
     SavedFilterIterator filter_source = 3;
+    SavedIndexJoinIterator join_source = 4;
   }
-  string expression = 4;
+  string expression = 5;
 }
 
 message RootTree {
