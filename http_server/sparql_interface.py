@@ -142,10 +142,14 @@ def sparql_blueprint(dataset, logger):
             stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
             if mimetype == "application/sparql-results+json":
-                return Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+                res = Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
             if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
-                return Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
-            return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+                res = Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
+            else:
+                res = Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+            # set deprecation warning in headers
+            res.headers.add("Warning", "199 SaGe/2.0 \"You are using a deprecated API. Consider uppgrading to the SaGe SPARQL query API. See http://sage.univ-nantes.fr/documentation fore more details.\"")
+            return res
         except Exception as e:
             logger.error(e)
             abort(500)
