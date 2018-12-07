@@ -25,11 +25,97 @@ tags:
 schemes:
 - "http"
 paths:
-  /sparql/{dataset}:
+  /sparql:
+    get:
+      tags:
+      - "sparql"
+      summary: "Execute a SPARQL query using a GET query"
+      description: "Execute a SPARQL query using the preemptive SPARQL query server"
+      produces:
+      - "application/json"
+      - "application/sparql-results+json"
+      - "application/sparql-results+xml"
+      parameters:
+      - name: "query"
+        in: "query"
+        required: true
+        type: "string"
+        description: |
+          The SPARQL query to execute.
+          Only the following features of SPARQL queries are supported by the SaGe server:
+            - *Triple patterns*
+            - *Basic Graph patterns*
+            - *Union* clauses
+            - *Graph* clauses
+            - *Filter* clauses, with only basic unary and binary operations (=, <, +, -, etc).
+
+          **Example value:**
+          ```
+          SELECT ?person ?label WHERE {
+            ?person <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Actor> .
+            ?person <http://www.w3.org/2000/01/rdf-schema#> ?label .
+          }
+          ```
+      - name: "default-graph-uri"
+        in: "query"
+        required: true
+        type: "string"
+        description: |
+          The URI of the default RDF graph queried.
+
+          **Example value:**
+          ```
+          http://sage.univ-nantes.fr/sparql/dbpedia-2016-04
+          ```
+      - name: "next"
+        in: "query"
+        required: false
+        description: "(Optional) A next link used to resume query execution from a saved state."
+        type: "string"
+        default: null
+      responses:
+        200:
+          description: "Successful operation"
+          examples:
+            application/json: |
+              {
+                "bindings": [
+                  { "?bob": "http://example.org#Sponge_Bob" },
+                  { "?bob": "http://example.org#Bob_Lennon"}
+                ],
+                "hasNext": true,
+                "next": "xRVCiMKAj9zCgI==",
+                "pageSize": 2
+              }
+            application/sparql-results+json: |
+              {
+                "head": {
+                    "vars": [ "bob" ],
+                    "hasNext": true,
+                    "next": "xRVCiMKAj9zCgI==",
+                    "pageSize": 2
+                },
+                "results": {
+                  "bindings": [
+                    { "bob": {
+                        "type": "uri",
+                        "value": "http://example.org#Sponge_Bob"
+                      }
+                    }
+                    { "bob": {
+                        "type": "uri",
+                        "value": "http://example.org#Bob_Lennon"
+                      }
+                    }
+                  ]
+                }
+              }
+        500:
+          description: "Invalid query"
     post:
       tags:
       - "sparql"
-      summary: "Execute a SPARQL query"
+      summary: "Execute a SPARQL query using a POST query"
       description: "Execute a SPARQL query using the preemptive SPARQL query server"
       consumes:
       - "application/json"
@@ -38,17 +124,43 @@ paths:
       - "application/sparql-results+json"
       - "application/sparql-results+xml"
       parameters:
-      - name: "dataset"
-        in: "path"
-        description: "Name of the RDF dataset queried"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "query"
-        description: "Query object"
-        required: true
+      - name: "body"
+        in: "body"
+        description: |
+          SPARQL query to execute with a default RDF Graph/Dataset.
+          The body of the POST query can contains the following parameters:
+            - **query** (required): The SPARQL query to execute.
+            - **defaultGraph** (required): The URI of the default RDF graph queried
+            - **next** (optinal): A next link used to resume query execution from a saved state.
+
+          Only the following features of SPARQL queries are supported by the SaGe server:
+            - *Triple patterns*
+            - *Basic Graph patterns*
+            - *Union* clauses
+            - *Graph* clauses
+            - *Filter* clauses, with only basic unary and binary operations (=, <, +, -, etc).
         schema:
-          $ref: "#/definitions/QueryObject"
+          type: object
+          required:
+            - query
+            - defaultGraph
+          properties:
+            query:
+              type: "string"
+              description: "The SPARQL query to execute"
+              example: |
+                SELECT ?person ?label WHERE {
+                  ?person <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Actor> .
+                  ?person <http://www.w3.org/2000/01/rdf-schema#> ?label .
+                }
+            defaultGraph:
+              description: "The URI of the default RDF graph queried"
+              type: "string"
+              example: "http://sage.univ-nantes.fr/sparql/dbpedia-2016-04"
+            next:
+              description: "(Optional) A next link used to resume query execution from a saved state"
+              type: "string"
+              example: null
       responses:
         200:
           description: "Successful operation"
@@ -108,7 +220,7 @@ paths:
     get:
       tags:
       - "void"
-      summary: "Get VoID description of a RDF Dataset"
+      summary: "Get the VoID description of a RDF Dataset"
       description: "Get the VoID description of a RDF Dataset hosted by the SaGe server"
       produces:
       - "application/xml"
@@ -137,95 +249,6 @@ paths:
       responses:
         200:
           description: "Successful operation"
-definitions:
-  TriplePattern:
-    type: "object"
-    description: "A Triple pattern"
-    properties:
-      triple:
-        type: "string"
-        description: "Triple pattern's subject"
-        example: "http://example.org#Alice"
-        required: true
-      predicate:
-        type: "string"
-        description: "Triple pattern's predicate"
-        example: "http://xmlns.com/foaf/0.1/knows"
-        required: true
-      object:
-        type: "string"
-        description: "Triple pattern's object"
-        example: "?bob"
-        required: true
-      graph:
-        type: "string"
-        description: "An IRI labeling what graph in a dataset the triple belongs to"
-        example: "http://sage.univ-nantes.fr/sparql/dbpedia-2016-04"
-        required: false
-  QueryObject:
-    type: "object"
-    example:
-      - type: "bgp"
-        bgp:
-          - subject: "http://example.org#Alice"
-            predicate: "http://xmlns.com/foaf/0.1/knows"
-            object: "?bob"
-        filters:
-          - "isIRI(?bob) && ?alice != ?bob"
-    properties:
-      query:
-        type: "object"
-        description: "Query content"
-        properties:
-          type:
-            type: "string"
-            description: "Query type"
-            enum: [ "bgp", "union" ]
-            example: "bgp"
-          bgp:
-            type: "array"
-            description: "Basic Graph pattern to evaluate"
-            items:
-              $ref: '#/definitions/TriplePattern'
-          filters:
-            type: array
-            description: "SPARQL Filters to evaluate"
-            items:
-              type: "string"
-              example: "isIRI(?bob) && ?alice != ?bob"
-          union:
-            type: "array"
-            description: "Union of Basic Graph patterns to evaluate"
-            items:
-              type: "array"
-              items:
-                $ref: '#/definitions/TriplePattern'
-      next:
-        type: "string"
-        description: "Next link used to resume query execution"
-  QueryResponse:
-    type: "object"
-    example:
-      bindings:
-        - ?bob: "http://example.org#Sponge_Bob"
-        - ?bob: "http://example.org#Bob_Lennon"
-      next: "xRVCiMKAj9zCgI=="
-      hasNext: true
-      pageSize: 2
-    properties:
-      bindings:
-        type: "array"
-        description: "Solutions bindings"
-        items:
-          type: "object"
-      next:
-        type: "string"
-        description: "Next link used to resume query processing"
-      hasNext:
-        type: "boolean"
-      pageSize:
-        type: "integer"
-        description: "Number of solution bindings in this response"
 externalDocs:
   description: "Find out more about SaGe"
   url: "http://sage.univ-nantes.fr"
