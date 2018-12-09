@@ -15,17 +15,17 @@ class UnsupportedSPARQL(Exception):
     pass
 
 
-def format_triple(graph):
-    """Get a function used to convert a rdflib RDF triple into the format used by Sage"""
-    def __formatter(triple):
-        s, p, o = triple
-        return {
-            'subject': format_term(s),
-            'predicate': format_term(p),
-            'object': format_term(o),
-            'graph': graph
-        }
-    return __formatter
+def localize_triple(triples, graphs):
+    """Using a set of RDF graphs, performs data localization of a set of RDF triples"""
+    for t in triples:
+        s, p, o = format_term(t[0]), format_term(t[1]), format_term(t[2])
+        for graph in graphs:
+            yield {
+                'subject': s,
+                'predicate': p,
+                'object': o,
+                'graph': graph
+            }
 
 
 def format_term(term):
@@ -38,13 +38,13 @@ def format_term(term):
         return term.n3()
 
 
-def fetch_graph_triples(node, current_graph, server_url):
+def fetch_graph_triples(node, current_graphs, server_url):
     """Fetch triples in a BGP or a BGP nested in a GRAPH clause"""
     if node.name == 'Graph' and node.p.name == 'BGP':
         graph_uri = format_graph_uri(format_term(node.term), server_url)
-        return list(map(format_triple(graph_uri), node.p.triples))
+        return list(localize_triple(node.p.triples, [graph_uri]))
     elif node.name == 'BGP':
-        return list(map(format_triple(current_graph), node.triples))
+        return list(localize_triple(node.triples, current_graphs))
     else:
         raise UnsupportedSPARQL('Unsupported SPARQL Feature: a Sage engine can only perform joins between Graphs and BGPs')
 
@@ -53,46 +53,50 @@ def parse_query(query, dataset, default_graph, server_url):
     """Parse a regular SPARQL query into a query execution plan"""
     q_parsed = translateQuery(parseQuery(query)).algebra
     cardinalities = list()
-    iterator = parse_query_node(q_parsed, dataset, default_graph, server_url, cardinalities)
+    iterator = parse_query_node(q_parsed, dataset, [default_graph], server_url, cardinalities)
     return iterator, cardinalities
 
 
-def parse_query_node(node, dataset, current_graph, server_url, cardinalities):
+def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):
     """
         Recursively parse node in the query logical plan to build a preemptable physical query execution plan.
 
         Args:
             * node - Node of the logical plan to parse (in rdflib format)
             * dataset - RDF dataset used to execute the query
-            * current_graph - IRI of the current RDF graph queried
+            * current_graphs - List of IRI of the current RDF graph queried
             * server_url - URL of the SaGe server
             * cardinalities - Map<triple,integer> used to track triple patterns cardinalities
     """
     if node.name == 'SelectQuery':
-        return parse_query_node(node.p, dataset, current_graph, server_url, cardinalities)
+        # in case of a FROM clause, set the new default graphs used
+        graphs = current_graphs
+        if node.datasetClause is not None:
+            graphs = [format_graph_uri(format_term(graph_iri.default), server_url) for graph_iri in node.datasetClause]
+        return parse_query_node(node.p, dataset, graphs, server_url, cardinalities)
     elif node.name == 'Project':
         query_vars = list(map(lambda t: '?' + str(t), node._vars))
-        child = parse_query_node(node.p, dataset, current_graph, server_url, cardinalities)
+        child = parse_query_node(node.p, dataset, current_graphs, server_url, cardinalities)
         return ProjectionIterator(child, query_vars)
     elif node.name == 'BGP':
         # bgp_vars = node._vars
-        triples = list(map(format_triple(current_graph), node.triples))
-        iterator, query_vars, c = build_left_plan(triples, dataset, current_graph)
+        triples = list(localize_triple(node.triples, current_graphs))
+        iterator, query_vars, c = build_left_plan(triples, dataset, current_graphs)
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator
     elif node.name == 'Union':
-        left = parse_query_node(node.p1, dataset, current_graph, server_url, cardinalities)
-        right = parse_query_node(node.p2, dataset, current_graph, server_url, cardinalities)
+        left = parse_query_node(node.p1, dataset, current_graphs, server_url, cardinalities)
+        right = parse_query_node(node.p2, dataset, current_graphs, server_url, cardinalities)
         return BagUnionIterator(left, right)
     elif node.name == 'Filter':
         expression = parse_filter_expr(node.expr)
-        iterator = parse_query_node(node.p, dataset, current_graph, server_url, cardinalities)
+        iterator = parse_query_node(node.p, dataset, current_graphs, server_url, cardinalities)
         return FilterIterator(iterator, expression)
     elif node.name == 'Join':
         # only allow for joining BGPs from different GRAPH clauses
-        triples = fetch_graph_triples(node.p1, current_graph, server_url) + fetch_graph_triples(node.p2, current_graph, server_url)
-        iterator, query_vars, c = build_left_plan(triples, dataset, current_graph)
+        triples = fetch_graph_triples(node.p1, current_graphs, server_url) + fetch_graph_triples(node.p2, current_graphs, server_url)
+        iterator, query_vars, c = build_left_plan(triples, dataset, current_graphs)
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator

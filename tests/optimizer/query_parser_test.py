@@ -21,6 +21,15 @@ queries = [
     }
     """, 2180),
     ("""
+    SELECT *
+    FROM <http://localhost:8000/sparql/watdiv100>
+    WHERE {
+        ?s <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
+        ?s <http://purl.org/goodrelations/includes> ?includes .
+        ?s <http://purl.org/goodrelations/validThrough> ?validity .
+    }
+    """, 2180),
+    ("""
     SELECT * WHERE {
         {
             ?s <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
