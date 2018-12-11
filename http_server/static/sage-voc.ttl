@@ -45,6 +45,11 @@ sage:SolutionBinding a rdfs:Class ;
   rdfs:label "A solution binding ?variable -> value"@en ;
   rdfs:label "Un mapping de solution ?variable -> value"@fr .
 
+sage:pageSize a owl:FunctionalProperty ;
+  rdfs:domain sage:ResultsPage ;
+  rdfs:range xsd:nonNegativeInteger ;
+  rdfs:label "contains a number of query results"@en .
+
 sage:hasResult a owl:FunctionalProperty ;
   rdfs:domain sage:ResultsPage ;
   rdfs:range sage:SolutionBinding ;
