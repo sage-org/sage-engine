@@ -45,7 +45,10 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
         return Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
     if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
         return Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
-    return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+    if mimetype == "application/json":
+        return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+    # otherwise, return the HTML version
+    return render_template("sage_page.html", query=query, default_graph_uri=default_graph_uri, bindings=bindings, next_page=next_page, stats=stats)
 
 
 def sparql_blueprint(dataset, logger):
@@ -61,17 +64,13 @@ def sparql_blueprint(dataset, logger):
         ])
         try:
             url = secure_url(request.base_url)
-            # serve the HTML web page
-            if mimetype == "text/html":
-                graphs = [dinfo for dinfo in dataset.describe(url)]
-                return render_template("interfaces.html", dataset=graphs)
             # parse arguments
             if request.method == "GET":
                 query = request.args.get("query") or None
                 default_graph_uri = request.args.get("default-graph-uri") or None
                 next_link = request.args.get("next") or None
                 # ensure that both the query and default-graph-uri params are set
-                if query is None or default_graph_uri is None:
+                if (query is None or default_graph_uri is None) and (next_link is None or default_graph_uri is None):
                     return sage_http_error("Invalid request sent to server: a GET request must contains both parameters 'query' and 'default-graph-uri'. See <a href='http://sage.univ-nantes.fr/documentation'>the API documentation</a> for reference.")
             elif request.method == "POST" and request.is_json:
                 # POST query

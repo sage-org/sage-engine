@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>SPARQL query results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/all.css')}}">
+  </head>
+  <body>
+    <div class="container" itemscope itemtype="http://sage.univ-nantes.fr/sage-voc#ResultsPage">
+      <h1>SPARQL query results</h1>
+
+        <h2>Query Statistics</h2>
+        <ul>
+          <li><strong>Default graph URI:</strong> {{default_graph_uri}}</li>
+          <li><strong>SPARQL query evaluated:</strong> <code>{{query}}</code></li>
+          <li><strong>Plan loading time:</strong> {{stats['import']}} milliseconds</li>
+          <li><strong>Plan serialization time:</strong> {{stats['export']}} milliseconds</li>
+        </ul>
+
+      {% if next_page %}
+        <h2>Hypermedia controls</h2>
+        <p><a href="{{ url_for('sparql-interface.sparql_index', next=next_page)}}&default-graph-uri={{default_graph_uri}}" itemprop="http://sage.univ-nantes.fr/sage-voc#next">Next page of results</a></p>
+      {% endif %}
+
+        <h2>Query Results</h2>
+        {% for binding in bindings %}
+        <ul>
+          {% for key, value in binding.items() %}
+          {% if value.startswith('http') %}
+          <li><strong>{{key}}:</strong> <a href="{{value}}" target="_blank">{{value}}</a></li>
+          {% else %}
+          <li><strong>{{key}}:</strong> {{value}}</li>
+          {% endif %}
+          {% endfor %}
+        </ul>
+        {% endfor %}
+    </div>
+  </body>
+</html>
