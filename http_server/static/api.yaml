@@ -53,7 +53,7 @@ paths:
           ```
           SELECT ?person ?label WHERE {
             ?person <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Actor> .
-            ?person <http://www.w3.org/2000/01/rdf-schema#> ?label .
+            ?person <http://www.w3.org/2000/01/rdf-schema#label> ?label .
           }
           ```
       - name: "default-graph-uri"
@@ -151,7 +151,7 @@ paths:
               example: |
                 SELECT ?person ?label WHERE {
                   ?person <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Actor> .
-                  ?person <http://www.w3.org/2000/01/rdf-schema#> ?label .
+                  ?person <http://www.w3.org/2000/01/rdf-schema#label> ?label .
                 }
             defaultGraph:
               description: "The URI of the default RDF graph queried"
