@@ -2,42 +2,44 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>SPARQL query results</title>
+    <title>SaGe - SPARQL query results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/all.css')}}">
   </head>
   <body>
     <!-- Microdata -->
     <div itemscope itemtype="http://sage.univ-nantes.fr/sage-voc#ResultsPage">
-      <meta itemprop="http://sage.univ-nantes.fr/sage-voc#next" content="{{ url_for('sparql-interface.sparql_index', next=next_page, _external=True)}}&default-graph-uri={{default_graph_uri}}">
-      <meta itemprop="http://sage.univ-nantes.fr/sage-voc#pageSize" content="{{bindings | length}}" />
+      <meta itemprop="http://sage.univ-nantes.fr/sage-voc#next" content="{{ url_for('sparql-interface.sparql_index', next=next_page, _external=True) }}&default-graph-uri={{ default_graph_uri }}">
+      <meta itemprop="http://sage.univ-nantes.fr/sage-voc#pageSize" content="{{ bindings | length }}" />
     </div>
     <div class="container">
-      <h1>SPARQL query results</h1>
+      <h1><i class="fab fa-hubspot"></i> SPARQL query results</h1>
 
-        <h2>Query Statistics</h2>
+        <h2><i class="fas fa-info-circle"></i> Query Infos</h2>
         <ul>
-          <li><strong>Default graph URI:</strong> {{default_graph_uri}}</li>
-          <li><strong>SPARQL query evaluated:</strong> <code>{{query}}</code></li>
-          <li><strong>Number of query results on this page:</strong> {{bindings | length}} solution bindings</li>
-          <li><strong>Plan loading time:</strong> {{stats['import']}} milliseconds</li>
-          <li><strong>Plan serialization time:</strong> {{stats['export']}} milliseconds</li>
+          <li><strong>Default graph URI:</strong> <a href="{{ default_graph_uri }}" target="_blank">{{ default_graph_uri }}</a></li>
+          {% if query %}
+          <li><strong>SPARQL query evaluated:</strong> <code>{{ query }}</code></li>
+          {% endif %}
+          <li><strong>Number of query results on this page:</strong> {{ bindings | length }} solution bindings</li>
+          <li><strong>Plan loading time:</strong> {{ stats['import'] | round(4)}} milliseconds</li>
+          <li><strong>Plan serialization time:</strong> {{ stats['export'] | round(4)}} milliseconds</li>
         </ul>
 
       {% if next_page %}
-        <h2>Hypermedia controls</h2>
-        <p><a href="{{ url_for('sparql-interface.sparql_index', next=next_page, _external=True)}}&default-graph-uri={{default_graph_uri}}">Next page of results</a></p>
+        <p><a class="btn btn-primary" href="{{ url_for('sparql-interface.sparql_index', next=next_page, _external=True) }}&default-graph-uri={{ default_graph_uri }}">Next page of results <i class="fas fa-arrow-right"></i></a></p>
       {% endif %}
 
-        <h2>Query Results</h2>
+        <h2><i class="fas fa-list-ul"></i> Query Results</h2>
         {% for binding in bindings %}
-        <ul>
+        <ul class="list-unstyled">
+          <hr>
           {% for key, value in binding.items() %}
-          {% if value.startswith('http') %}
-          <li><span class="badge badge-primary">{{key}}:</span> <a href="{{value}}" target="_blank">{{value}}</a></li>
-          {% else %}
-          <li><span class="badge badge-primary">{{key}}:</span> {{value}}</li>
-          {% endif %}
+            {% if value.startswith('http') %}
+            <li><span class="badge badge-primary">{{ key }}</span> <a href="{{ value }}" target="_blank">{{value}}</a></li>
+            {% else %}
+            <li><span class="badge badge-primary">{{ key }}</span> {{ value }}</li>
+            {% endif %}
           {% endfor %}
         </ul>
         {% endfor %}
