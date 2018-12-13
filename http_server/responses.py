@@ -4,7 +4,6 @@ from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStat
 from query_engine.formatters import sparql_xml, binding_to_json
 from json import dumps
 from xml.etree import ElementTree
-from functools import lru_cache
 
 
 def stream_json_list(iterator):
@@ -44,7 +43,6 @@ def protobuf(bindings, next_page, stats):
     return sageResponse.SerializeToString()
 
 
-@lru_cache()
 def skolemize_one(value, url):
     return "{}/bnode#{}".format(url, value[2:]) if value.startswith("_:") else value
 

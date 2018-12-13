@@ -8,10 +8,8 @@ from rdflib.plugins.sparql.parser import parseQuery
 from rdflib.plugins.sparql.algebra import translateQuery
 from rdflib.plugins.sparql.sparql import QueryContext, Bindings
 from rdflib.util import from_n3
-from functools import lru_cache
 
 
-@lru_cache()
 def to_rdflib_term(value):
     """Convert a N3 term to a RDFLib Term"""
     if value.startswith('http'):
