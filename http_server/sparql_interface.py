@@ -112,7 +112,7 @@ def sparql_blueprint(dataset, logger):
                     "ttl": VoidDescriptor(url, graph).describe("turtle"),
                     "xml": VoidDescriptor(url, graph).describe("xml")
                 }
-                return render_template("sage_dataset.html", dataset_info=dinfo, void_desc=void_desc)
+                return render_template("website/sage_dataset.html", dataset_info=dinfo, void_desc=void_desc)
 
             engine = SageEngine()
             post_query, err = QueryRequest().load(request.get_json())

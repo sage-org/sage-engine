@@ -35,14 +35,14 @@ def sage_app(config_file):
             url = secure_url(request.url)
             dinfos = [dinfo for dinfo in dataset.describe(url)]
             long_description = Markup(markdown(dataset.long_description))
-            return render_template("index_sage.html", dataset=dinfos, server_public_url=dataset.public_url, default_query=dataset.default_query, long_description=long_description)
+            return render_template("website/index.html", dataset=dinfos, server_public_url=dataset.public_url, default_query=dataset.default_query, long_description=long_description)
         except Exception as e:
             gunicorn_logger.error(e)
             abort(500)
 
     @app.route('/sparql11-compliance')
     def sparql11_compliance():
-        return render_template('sparql11_compliance.html')
+        return render_template('website/sparql11_compliance.html')
 
     @app.route('/sage-voc')
     def voc():
@@ -50,7 +50,7 @@ def sage_app(config_file):
 
     @app.route('/documentation')
     def doc():
-        return render_template("documentation.html")
+        return render_template("website/documentation.html")
 
     @app.route('/api')
     def open_api():
@@ -63,7 +63,7 @@ def sage_app(config_file):
                 'load_avg': os.getloadavg(),
                 'cpu_count': os.cpu_count()
             }
-            return render_template("specs.html", specs=specs)
+            return render_template("website/specs.html", specs=specs)
         except Exception as e:
             gunicorn_logger.error(e)
             abort(500)

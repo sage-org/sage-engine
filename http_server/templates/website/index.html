@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+
+{% block title %}Home - Sage{% endblock %}
+
+{% block body %}
+  {% include 'website/intro.html' %}
+  <hr>
+  {% include 'website/playground.html' %}
+  <hr>
+  {% include 'website/interfaces.html' %}
+  <hr>
+  {% include 'website/software.html' %}
+{% endblock %}
