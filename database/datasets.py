@@ -3,6 +3,7 @@
 from yaml import load
 from database.hdt_file_connector import HDTFileConnector
 from math import inf
+from urllib.parse import quote_plus
 
 DB_CONNECTORS = {
     'hdt-file': HDTFileConnector
@@ -17,6 +18,9 @@ class Graph(object):
         self._config = config
         connectorClass = DB_CONNECTORS[self._config['backend']] if self._config['backend'] in DB_CONNECTORS else None
         self._connector = connectorClass.from_config(self._config)
+        # format preset queries
+        for query in self.example_queries:
+            query['@id'] = quote_plus(query['name'])
 
     def config(self):
         return self._config
@@ -71,6 +75,13 @@ class Graph(object):
             "maxResults": self.max_results if self.max_results is not inf else 'inf',
             "examples": self.example_queries
         }
+
+    def get_query(self, q_id):
+        """Get an example SPARQL query associated with the graph, or None if it was not found"""
+        for query in self.example_queries:
+            if query['@id'] == q_id:
+                return query
+        return None
 
 
 def load_config(config_file="config.yaml"):

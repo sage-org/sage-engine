@@ -64,10 +64,16 @@ class IndexJoinIterator(PreemptableIterator):
         """Get the next element from the join"""
         if not self.has_next():
             raise IteratorExhausted()
+        cpt = 0
         while self._currentIter is None or (not self._currentIter.has_next()):
+            cpt += 1
             self._currentBinding = await self._source.next()
             self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
-            await sleep(0)
+            # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
+            # additionnaly, there may be other call to await sleep(0) in index join in the pipeline.
+            if cpt > 50:
+                cpt = 0
+                await sleep(0)
         return await self._innerLoop()
 
     def save(self):

@@ -51,13 +51,13 @@ class ArrayIterator(object):
 
 def selection(triple, variables):
     """Apply selection on a RDF triple"""
-    bindings = set()
+    bindings = dict()
     if variables[0] is not None:
-        bindings.add((variables[0], triple[0]))
+        bindings[variables[0]] = triple[0]
     if variables[1] is not None:
-        bindings.add((variables[1], triple[1]))
+        bindings[variables[1]] = triple[1]
     if variables[2] is not None:
-        bindings.add((variables[2], triple[2]))
+        bindings[variables[2]] = triple[2]
     return bindings
 
 

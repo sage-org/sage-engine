@@ -1,6 +1,6 @@
 # sage_engine.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from asyncio import Queue, get_event_loop, shield, wait_for, sleep
+from asyncio import Queue, get_event_loop, wait_for, sleep
 from asyncio import TimeoutError as asyncTimeoutError
 from query_engine.iterators.projection import ProjectionIterator
 from query_engine.iterators.union import BagUnionIterator
@@ -21,13 +21,18 @@ class TooManyResults(Exception):
 async def executor(plan, queue, limit):
     """Executor used to evaluated a plan under a time quota"""
     try:
+        cpt = 0
         while plan.has_next():
             value = await plan.next()
-            if value is not None:
-                await shield(queue.put(value))
-                if queue.qsize() >= limit:
-                    raise TooManyResults()
-            await sleep(0)
+            cpt += 1
+            await queue.put(value)
+            if queue.qsize() >= limit:
+                raise TooManyResults()
+            # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
+            # additionnaly, there may be other call to await sleep(0) in index join in the pipeline.
+            if cpt > 50:
+                cpt = 0
+                await sleep(0)
     except IteratorExhausted:
         pass
 

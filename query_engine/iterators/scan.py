@@ -46,7 +46,7 @@ class ScanIterator(PreemptableIterator):
         """Scan the relation and return the next set of solution mappings"""
         if not self.has_next():
             raise IteratorExhausted()
-        mappings = dict(selection(next(self._source), self._variables))
+        mappings = selection(next(self._source), self._variables)
         return mappings
 
     def save(self):
