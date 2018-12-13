@@ -31,7 +31,6 @@ def test_projection_read_stopped():
     scan = ScanIterator(iterator, triple, card)
     proj = ProjectionIterator(scan, ['?common'])
     (results, saved, done) = engine.execute(proj, 10e-4)
-    assert len(results) < card
+    assert len(results) <= card
     for res in results:
         assert '?common' in res and '?s1' not in res
-    assert not done

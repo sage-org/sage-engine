@@ -54,4 +54,4 @@ class TestBGPInterface(object):
             next_link = response['next']
             nbCalls += 1
         assert nbResults == cardinality
-        assert nbCalls > 1
+        assert nbCalls >= 1

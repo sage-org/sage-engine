@@ -76,7 +76,7 @@ def test_filter_iterator_interrupt():
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
     (results, saved, done) = engine.execute(iterator, 10e-7)
-    assert len(results) < 4
+    assert len(results) <= 4
     for b in results:
         assert b['?p'] == 'http://schema.org/eligibleRegion'
         assert b['?o'] in [
@@ -97,3 +97,4 @@ def test_filter_iterator_interrupt():
             'http://db.uwaterloo.ca/~galuc/wsdbm/Country4',
             'http://db.uwaterloo.ca/~galuc/wsdbm/Country9'
         ]
+    assert done
