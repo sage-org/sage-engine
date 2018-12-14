@@ -93,6 +93,7 @@ docker pull callidon/sage
 docker run -v path/to/config-file:/opt/data/ -p 8000:8000 callidon/sage sage /opt/data/config.yaml -w 4 -p 8000
 ```
 
+Notice: you can also use [docker-compose.yml](https://github.com/sage-org/sage-engine/blob/master/docker-compose.yml) instead of the long docker run command. 
 
 # Documentation
 
