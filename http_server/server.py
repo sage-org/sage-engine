@@ -7,6 +7,7 @@ from database.datasets import Dataset
 from http_server.sparql_interface import sparql_blueprint
 from http_server.void_interface import void_blueprint
 from http_server.lookup_interface import lookup_blueprint
+from http_server.publish_query_interface import publish_query_blueprint
 from http_server.utils import secure_url
 import logging
 import os
@@ -71,4 +72,5 @@ def sage_app(config_file):
     app.register_blueprint(sparql_blueprint(dataset, gunicorn_logger))
     app.register_blueprint(lookup_blueprint(dataset, gunicorn_logger))
     app.register_blueprint(void_blueprint(dataset, gunicorn_logger))
+    app.register_blueprint(publish_query_blueprint(dataset, gunicorn_logger))
     return app

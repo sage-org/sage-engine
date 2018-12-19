@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ query["name"] }} - SaGe queries</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/all.css')}}">
+  </head>
+  <body>
+    <div class="container">
+      <h1>{{ query['name'] }}</h1>
+      <p><strong>Source dataset:</strong> <a href="{{ url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True) }}">{{ url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True) }}</a></p>
+      
+      <p><strong>SPARQL query:</strong></p>
+      <pre>{{ query["value"] }}</pre>
+
+      <p><a class="btn btn-primary" href="{{ query_url }}" target="_blank">Execute this query</a></p>
+
+      <p><strong>JSON-LD description</strong></p>
+      <pre>{{ description | safe }}</pre>
+    </div>
+    <script type="application/ld+json">
+    {{ description | safe }}
+    </script>
+  </body>
+</html>

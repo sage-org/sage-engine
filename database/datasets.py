@@ -21,6 +21,10 @@ class Graph(object):
         # format preset queries
         for query in self.example_queries:
             query['@id'] = quote_plus(query['name'])
+            if 'description' not in query:
+                query['description'] = query['name']
+            if 'publish' not in query:
+                query['publish'] = False
 
     def config(self):
         return self._config
