@@ -51,6 +51,8 @@ def publish_query_blueprint(dataset, logger):
                      }
                   }
             }
+            if "keywords" in query:
+                jsonld_description["keywords"] = query["keywords"]
             return render_template('query.html', query=query, graph_name=graph_name, description=dumps(jsonld_description, indent=2), query_url=query_url)
         except Exception as e:
             logger.error(e)
