@@ -1,9 +1,10 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from flask import Response
+from flask import Response, url_for
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 from base64 import b64encode, b64decode
 from json import dumps
+from xml.etree import ElementTree
 
 
 def sort_qparams(v):
@@ -68,3 +69,22 @@ def sage_http_error(text, status=400):
         </html>
     """.format(text)
     return Response(content, status=status, content_type="text/html")
+
+
+def generate_sitemap(dataset, last_mod):
+    """Generate a XML sitemap from the datasets & queries hosted on the server"""
+    root = ElementTree.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    for graph_name, graph in dataset._datasets.items():
+        graph_xml = ElementTree.SubElement(root, "url")
+        # location
+        ElementTree.SubElement(graph_xml, "loc").text = url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True)
+        # last_mod
+        ElementTree.SubElement(graph_xml, "last_mod").text = last_mod
+        for query in graph.example_queries:
+            if query["publish"]:
+                query_xml = ElementTree.SubElement(root, "url")
+                # location
+                ElementTree.SubElement(query_xml, "loc").text = url_for('publish-query-interface.publish_query', graph_name=graph_name, query_name=query["@id"], _external=True)
+                # last_mod
+                ElementTree.SubElement(query_xml, "last_mod").text = last_mod
+    return ElementTree.tostring(root, encoding="utf8", method="xml").decode("utf-8")

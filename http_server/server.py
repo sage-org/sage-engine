@@ -1,14 +1,15 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from markdown import markdown
-from flask import Flask, Markup, render_template, request, abort
+from flask import Flask, Markup, render_template, request, abort, Response
 from flask_cors import CORS
 from database.datasets import Dataset
 from http_server.sparql_interface import sparql_blueprint
 from http_server.void_interface import void_blueprint
 from http_server.lookup_interface import lookup_blueprint
 from http_server.publish_query_interface import publish_query_blueprint
-from http_server.utils import secure_url
+from http_server.utils import secure_url, generate_sitemap
+import datetime
 import logging
 import os
 
@@ -17,6 +18,7 @@ def sage_app(config_file):
     """Build a Sage application with the given configuration file"""
     dataset = Dataset(config_file)
     app = Flask(__name__)
+    start_date = datetime.datetime.now()
     CORS(app)
 
     gunicorn_logger = logging.getLogger("gunicorn.error")
@@ -68,6 +70,10 @@ def sage_app(config_file):
         except Exception as e:
             gunicorn_logger.error(e)
             abort(500)
+
+    @app.route('/sitemap.xml')
+    def sitemap():
+        return Response(generate_sitemap(dataset, start_date.strftime("%Y-%m-%d")), content_type="application/xml")
 
     app.register_blueprint(sparql_blueprint(dataset, gunicorn_logger))
     app.register_blueprint(lookup_blueprint(dataset, gunicorn_logger))

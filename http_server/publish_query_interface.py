@@ -9,12 +9,13 @@ def publish_query_blueprint(dataset, logger):
     pq_blueprint = Blueprint("publish-query-interface", __name__)
 
     @pq_blueprint.route("/query/<graph_name>/<query_name>", methods=["GET"])
-    def void_all(graph_name, query_name):
+    def publish_query(graph_name, query_name):
         """Get a SPARQL query as a RDF dataset"""
         try:
             if not dataset.has_graph(graph_name):
                 abort(404)
             graph = dataset.get_graph(graph_name)
+            print(query_name)
             query = graph.get_query(query_name)
             # query that are not designed to be published cannot be accessed
             if query is None or not query['publish']:
