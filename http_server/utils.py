@@ -74,6 +74,11 @@ def sage_http_error(text, status=400):
 def generate_sitemap(dataset, last_mod):
     """Generate a XML sitemap from the datasets & queries hosted on the server"""
     root = ElementTree.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    # add basic navigation links
+    home_xml = ElementTree.SubElement(root, "url")
+    ElementTree.SubElement(home_xml, "loc").text = url_for('index', _external=True)
+    ElementTree.SubElement(home_xml, "last_mod").text = last_mod
+    # add datasest and queries
     for graph_name, graph in dataset._datasets.items():
         graph_xml = ElementTree.SubElement(root, "url")
         # location
