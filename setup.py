@@ -12,7 +12,7 @@ def install_web_deps():
     run(["npm", "install", "--production"], cwd=path)
 
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 console_scripts = [
     'sage = http_server.cli:cli_sage'
