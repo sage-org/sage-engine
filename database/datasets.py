@@ -64,20 +64,23 @@ class Graph(object):
         return self._connector.search_triples(subject, predicate, obj, limit, offset)
 
     def describe(self, url):
-        """Describe the Dataset API as a dictionary"""
+        """Describe the RDF Dataset in JSON-LD format"""
         return {
-            "endpoint": "{}/{}".format(url, self._config["name"]),
-            "title": self._config["name"],
-            "description": self._config["description"],
-            "stats": {
-                "size": self.nb_triples,
-                "nb_subjects": self._connector.nb_subjects if self._connector.nb_subjects is not None else 'unknown',
-                "nb_predicates": self._connector.nb_predicates if self._connector.nb_predicates is not None else 'unknown',
-                "nb_objects": self._connector.nb_objects if self._connector.nb_objects is not None else 'unknown'
+            "@context": {
+                "schema": "http://schema.org/",
+                "void": "http://rdfs.org/ns/void#",
+                'sage': 'http://sage.univ-nantes.fr/sage-voc#'
             },
-            "timeQuota": self.quota,
-            "maxResults": self.max_results if self.max_results is not inf else 'inf',
-            "examples": self.example_queries
+            "@type": "http://schema.org/Dataset",
+            "schema:url": url,
+            "schema:name": self._config["name"],
+            "schema:description": self._config["description"],
+            "void:triples": self.nb_triples,
+            "void:distinctSubjects": self._connector.nb_subjects if self._connector.nb_subjects is not None else "unknown",
+            "void:properties": self._connector.nb_predicates if self._connector.nb_predicates is not None else "unknown",
+            "void:distinctObjects": self._connector.nb_objects if self._connector.nb_objects is not None else "unknown",
+            "sage:timeQuota": self.quota,
+            "sage:maxResults": self.max_results if self.max_results is not inf else 'inf'
         }
 
     def get_query(self, q_id):
@@ -120,6 +123,8 @@ def load_config(config_file="config.yaml"):
             c['quota'] = quota
         if 'max_results' not in c:
             c['max_results'] = max_results
+        if 'publish' not in c:
+            c['publish'] = False
         if 'queries' not in c:
             c['queries'] = []
     # build graphs

@@ -16,7 +16,8 @@ def publish_query_blueprint(dataset, logger):
                 abort(404)
             graph = dataset.get_graph(graph_name)
             query = graph.get_query(query_name)
-            if query is None:
+            # query that are not designed to be published cannot be accessed
+            if query is None or not query['publish']:
                 abort(404)
             # compute json-ld description of the query as a dataset
             query_url = url_for("sparql-interface.sparql_index", query=query['value'].replace("\n", " "), _external=True) + "&default-graph-uri=" + url_for('sparql-interface.sparql_index', _external=True) + '/' + graph_name
@@ -26,6 +27,7 @@ def publish_query_blueprint(dataset, logger):
                 "name": query["name"],
                 "description": query["description"],
                 "comment": query['value'].replace("\n", " "),
+                "isBasedOn": url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True),
                 "distribution": [
                     {
                         "@type": "DataDownload",

@@ -20,20 +20,20 @@
             {% for graph in dataset %}
             <tr>
               <td>
-                <a href="{{ url_for('sparql-interface.sparql_query', graph_name=graph["title"]) }}">
-                  {{ graph["title"] }}
+                <a href="{{ url_for('sparql-interface.sparql_query', graph_name=graph["schema:name"]) }}">
+                  {{ graph["schema:name"] }}
                 </a>
               </td>
-              <td>{{ graph["description"] }}</td>
-              <td>{{ "{:,}".format(graph["stats"]["size"]) }} triples</td>
-              <td>{{graph["timeQuota"]}}ms</td>
-              {%- if graph["maxResults"] == 'inf' -%}
+              <td>{{ graph["schema:description"] }}</td>
+              <td>{{ "{:,}".format(graph["void:triples"]) }} triples</td>
+              <td>{{graph["sage:timeQuota"]}}ms</td>
+              {%- if graph["sage:maxResults"] == 'inf' -%}
               <td>No limit</td>
               {%- else -%}
-              <td>{{graph["maxResults"]}} bindings</td>
+              <td>{{graph["sage:maxResults"]}} bindings</td>
               {%- endif -%}
-              <td><a target="_blank" href="{{ url_for('void-interface.void_dataset', graph_name=graph["title"]) }}"><i class="fas fa-external-link-alt"></i> Open</a></td>
-              <td><a target="_blank" href="{{ url_for('sparql-interface.sparql_query', graph_name=graph["title"]) }}"><i class="fas fa-external-link-alt"></i> Open</a></td>
+              <td><a target="_blank" href="{{ url_for('void-interface.void_dataset', graph_name=graph["schema:name"]) }}"><i class="fas fa-external-link-alt"></i> Open</a></td>
+              <td><a target="_blank" href="{{ url_for('sparql-interface.sparql_query', graph_name=graph["schema:name"]) }}"><i class="fas fa-external-link-alt"></i> Open</a></td>
             </tr>
             {% endfor %}
           </tbody>

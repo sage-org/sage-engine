@@ -9,6 +9,7 @@ from http_server.schema import QueryRequest, SageSparqlQuery
 from http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors, sage_http_error
 from database.descriptors import VoidDescriptor
 import http_server.responses as responses
+from json import dumps
 from time import time
 
 
@@ -106,13 +107,14 @@ def sparql_blueprint(dataset, logger):
             # A GET request always returns the homepage of the dataset
             if request.method == "GET" or (not request.is_json):
                 dinfo = graph.describe(url)
+                to_publish = dumps(dinfo) if graph.config()['publish'] else None
                 dinfo['@id'] = url
                 void_desc = {
                     "nt": VoidDescriptor(url, graph).describe("ntriples"),
                     "ttl": VoidDescriptor(url, graph).describe("turtle"),
                     "xml": VoidDescriptor(url, graph).describe("xml")
                 }
-                return render_template("website/sage_dataset.html", dataset_info=dinfo, void_desc=void_desc)
+                return render_template("website/sage_dataset.html", dataset_info=dinfo, void_desc=void_desc, to_publish=to_publish)
 
             engine = SageEngine()
             post_query, err = QueryRequest().load(request.get_json())

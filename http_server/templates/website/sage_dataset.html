@@ -1,16 +1,22 @@
 {% extends "main.html" %}
 
-{% block title%}{{ dataset_info['title'] }} dataset - Sage{% endblock %}
+{% block title%}{{ dataset_info["schema:name"] }} dataset - Sage{% endblock %}
 
 {% block body %}
+<!-- JSON-LD description of the dataset -->
+{% if to_publish %}
+<script type="application/ld+json">
+  {{ to_publish | safe }}
+</script>
+{% endif %}
 <div class="container">
   <div class="row">
     <div class="col-lg">
-      <h1>{{ dataset_info['title'] }} dataset</h1>
+      <h1>{{ dataset_info["schema:name"] }} dataset</h1>
 
       <!-- Description -->
       <h2><i class="fas fa-comments"></i> Description</h2>
-      <p>{{ dataset_info['description'] }}</p>
+      <p>{{ dataset_info['schema:description'] }}</p>
 
       <!-- Statistics -->
       <h2><i class="fas fa-info-circle"></i> Infos</h2>
@@ -28,15 +34,15 @@
           </thead>
           <tbody>
             <tr>
-              <td>{{ "{:,}".format(dataset_info["stats"]["size"]) }} triples</td>
-              <td>{{ "{:,}".format(dataset_info["stats"]["nb_subjects"]) }}</td>
-              <td>{{ "{:,}".format(dataset_info["stats"]["nb_predicates"]) }}</td>
-              <td>{{ "{:,}".format(dataset_info["stats"]["nb_objects"]) }}</td>
-              <td>{{ dataset_info["timeQuota"] }}ms</td>
-              {%- if dataset_info["maxResults"] == 'inf' -%}
+              <td>{{ "{:,}".format(dataset_info["void:triples"]) }} triples</td>
+              <td>{{ "{:,}".format(dataset_info["void:distinctSubjects"]) }}</td>
+              <td>{{ "{:,}".format(dataset_info["void:properties"]) }}</td>
+              <td>{{ "{:,}".format(dataset_info["void:distinctObjects"]) }}</td>
+              <td>{{ dataset_info["sage:timeQuota"] }}ms</td>
+              {%- if dataset_info["sage:maxResults"] == 'inf' -%}
                 <td>No limit</td>
               {%- else -%}
-                <td>{{dataset_info["maxResults"]}} bindings</td>
+                <td>{{dataset_info["sage:maxResults"]}} bindings</td>
               {%- endif -%}
             </tr>
           </tbody>
@@ -46,8 +52,8 @@
       <!-- VoID descriptions -->
       <h2><i class="fas fa-boxes"></i> VoID description</h2>
       <p>Access the <a href="https://www.w3.org/TR/void/">VoID description</a> of the dataset at
-        <a href="{{ url_for('void-interface.void_dataset', graph_name=dataset_info["title"]) }}">
-          {{ url_for('void-interface.void_dataset', graph_name=dataset_info['title'], _external=True) }}</a>.
+        <a href="{{ url_for('void-interface.void_dataset', graph_name=dataset_info["schema:name"]) }}">
+          {{ url_for('void-interface.void_dataset', graph_name=dataset_info["schema:name"], _external=True) }}</a>.
       </p>
 
       <p>
@@ -80,7 +86,7 @@
 
       <!-- Query the dataset -->
       <h2><i class="fab fa-hubspot"></i> Query the Dataset</h2>
-      <p><strong>Dataset URI:</strong> <a href="{{ dataset_info['@id'] }}">{{ dataset_info['@id'] }}</a></p>
+      <p><strong>Dataset URI:</strong> <a href="{{ dataset_info['schema:url'] }}">{{ dataset_info['schema:url'] }}</a></p>
 
       <!-- simple queries -->
       <h4>Basic SPARQL queries</h4>
@@ -93,7 +99,7 @@
         <li><a href="https://www.w3.org/TR/sparql11-query/#queryDataset">GRAPH clauses</a></li>
       </ul>
       <form action="{{ url_for('sparql-interface.sparql_index', _external=True) }}" method="GET">
-        <input hidden="true" name="default-graph-uri" value="{{ dataset_info['@id'] }}" />
+        <input hidden="true" name="default-graph-uri" value="{{ dataset_info['schema:url'] }}" />
         <div class="form-group">
           <label for="sparqlQueryTextArea"><strong>Type your SPARQL query</strong></label>
           <textarea name="query" class="form-control" id="sparqlQueryTextArea"></textarea>
@@ -113,7 +119,7 @@
 
       <div id="sage-widget"
         url=""
-        defaultServer="{{ dataset_info['@id'] }}"
+        defaultServer="{{ dataset_info['schema:url'] }}"
         defaultQuery="SELECT * WHERE { ?s ?p ?o }"
         defaultQName="">
       </div>
