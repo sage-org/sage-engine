@@ -98,13 +98,13 @@
         <li><a href="https://www.w3.org/TR/sparql11-query/#expressions">Filters</a>, with <em>simple expressions only</em> (=, !=, <, >=, +, -, etc)</li>
         <li><a href="https://www.w3.org/TR/sparql11-query/#queryDataset">GRAPH clauses</a></li>
       </ul>
-      <form id="queryForm" method="GET">
+      <form target="{{ url_for('sparql-interface.sparql_index', _external=True) }}" id="queryForm" method="GET">
         <input id="defaultGraphUri" hidden="true" name="default-graph-uri" value="{{ dataset_info['schema:url'] }}" />
         <div class="form-group">
           <label for="sparqlQueryTextArea"><strong>Type your SPARQL query</strong></label>
           <textarea name="query" class="form-control" id="sparqlQueryTextArea"></textarea>
         </div>
-        <button class="btn btn-success"><i class="fas fa-play"></i> Execute</button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-play"></i> Execute</button>
       </form>
 
       <hr>
@@ -132,12 +132,5 @@
     createShareLink: null
   })
   yasqe.setValue("SELECT * WHERE { ?s ?p ?o }")
-
-  document.getElementById("queryForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var graph_uri = document.getElementById("defaultGraphUri").value;
-    var query = yasqe.getValue().replace(/\n/, " ").replace(/\r/, "").replace(/\t/, " ");
-    window.location = "{{ url_for('sparql-interface.sparql_index', _external=True) }}" + '?default-graph-uri=' + encodeURIComponent(graph_uri) + '&query=' + encodeURIComponent(query);
-  })
 </script>
 {% endblock %}

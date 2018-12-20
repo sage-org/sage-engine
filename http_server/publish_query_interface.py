@@ -27,7 +27,7 @@ def publish_query_blueprint(dataset, logger):
                 "@type": "Dataset",
                 "name": query["name"],
                 "description": query["description"],
-                "comment": query['value'].replace("\n", " "),
+                "comment": query['value'].replace("\n", " ").replace("\t", "").replace("\r", ""),
                 "isBasedOn": url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True),
                 "distribution": [
                     {
