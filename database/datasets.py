@@ -7,7 +7,8 @@ from math import inf
 
 DB_CONNECTORS = {
     'rdf-file': RDFFileConnector,
-    'hdt-file': HDTFileConnector
+    'hdt-file': HDTFileConnector,
+    'cassandra-file':CassandraConnector #connexion à cassandra
 }
 
 

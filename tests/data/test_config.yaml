@@ -9,21 +9,7 @@ datasets:
   backend: hdt-file
   file: tests/data/test.hdt
 -
-  name: watdiv100
-  description: Sample dataset in HDT format, used for testing
-  backend: hdt-file
-  file: tests/data/watdiv.10M.hdt
-  queries:
-    - name: select all triples
-      value: |
-        SELECT *
-        WHERE {
-          ?s ?p ?o
-        }
-    - name: Query 37
-      value: |
-        SELECT ?v0 ?v1 ?v3 WHERE {
-          ?v0 <http://purl.org/goodrelations/includes> ?v1 .
-          ?v1 <http://schema.org/contentSize> ?v3 .
-          ?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9>.
-        }
+  name: pkspo
+  description: Sample dataset in Cassandra
+  backend: cassandra-file
+  file: pkspo #keyspace name
