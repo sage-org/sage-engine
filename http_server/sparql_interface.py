@@ -40,6 +40,7 @@ def sparql_blueprint(datasets, logger):
     def sparql_query(dataset_name):
         logger.info('[IP: {}] [/sparql/] Querying {}'.format(request.environ['REMOTE_ADDR'], dataset_name))
         dataset = datasets.get_dataset(dataset_name)
+
         if dataset is None:
             abort(404)
 

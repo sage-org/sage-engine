@@ -3,12 +3,13 @@
 from yaml import load
 from database.rdf_file_connector import RDFFileConnector
 from database.hdt_file_connector import HDTFileConnector
+from database.cassandra_connector import CassandraConnector
 from math import inf
 
 DB_CONNECTORS = {
     'rdf-file': RDFFileConnector,
     'hdt-file': HDTFileConnector,
-    'cassandra-file':CassandraConnector #connexion à cassandra
+    'cassandra-db':CassandraConnector #connexion à cassandra
 }
 
 
@@ -128,6 +129,7 @@ def load_config(config_file="config.yaml"):
     max_results = config['max_results'] if 'max_results' in config else inf
     config['quota'] = quota
     for c in config["datasets"]:
+        print(c)
         if 'quota' not in c:
             c['quota'] = quota
         if 'max_results' not in c:

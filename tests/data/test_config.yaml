@@ -9,7 +9,7 @@ datasets:
   backend: hdt-file
   file: tests/data/test.hdt
 -
-  name: pkspo
-  description: Sample dataset in Cassandra
-  backend: cassandra-file
-  file: pkspo #keyspace name
+  name: testcassandra
+  description: test cassandra
+  backend: cassandra-db
+  keyspace: pkspo
