@@ -8,7 +8,7 @@ class CassandraIterator(DBIterator):
 
     def __init__(self, source, pattern):    #, start_offset=0
         super(CassandraIterator, self).__init__(pattern)
-        self._rowset = source
+        self._rowset = iter(source)
         # self._start_offset = start_offset
 
     def last_read(self):
@@ -17,13 +17,21 @@ class CassandraIterator(DBIterator):
 
     def next(self):
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
+        print("try next")
         return next(self._rowset)
 
     def has_next(self):
         """Return True if there is still results to read, and False otherwise"""
-        print(self._rowset)
-        print(str(self._rowset.has_next()))
-        return self._rowset.has_next()
+        if self._rowset._next:
+            return True
+        try:
+            self._rowset._next = next(self._rowset._it)
+            return True
+        except StopIteration:
+            return False
+        # print(self._rowset)
+        # print(str(self._rowset.has_next()))
+        # return self._rowset.has_next()
 
 class CassandraConnector(DatabaseConnector):
 
