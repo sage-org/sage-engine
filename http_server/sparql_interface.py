@@ -81,10 +81,14 @@ def sparql_blueprint(datasets, logger):
             # build physical query plan, then execute it with the given quota
             logger.debug('[/sparql/{}] Starting query evaluation...'.format(dataset_name))
             start = time()
+            print('building')
             plan, cardinalities = build_query_plan(post_query["query"], dataset, next_link)
             loading_time = (time() - start) * 1000
+            print('done buid')
+            print('executing')
             bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
             logger.debug('[/sparql/{}] Query evaluation completed'.format(dataset_name))
+            print('done exec')
 
             # compute controls for the next page
             start = time()

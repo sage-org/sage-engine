@@ -6,32 +6,65 @@ from database.db_iterator import DBIterator
 class CassandraIterator(DBIterator):
     """An HDTIterator implements a DBIterator for a triple pattern evaluated using an HDT file"""
 
-    def __init__(self, source, pattern):    #, start_offset=0
+    # def __init__(self, source, pattern):    #, start_offset=0
+    #     super(CassandraIterator, self).__init__(pattern)
+    #     self._rowset = iter(source)
+    #     print('chocolat')
+    #     print(self._rowset)
+    #     print(type(self._rowset))
+    #     # self._set = source
+    #     # self._start_offset = start_offset
+    #
+    # def last_read(self):
+    #     """Return the ID of the last element read"""
+    #     return str(self._rowset[-1])
+    #
+    # def next(self):
+    #     """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
+    #     print("next")
+    #     # print(str(self._set))
+    #     print(str(self._rowset))
+    #     print(str(next(self._rowset)))
+    #     return next(self._rowset)
+    #
+    # def has_next(self):
+    #     """Return True if there is still results to read, and False otherwise"""
+    #     # if self._rowset._next:
+    #     #     return True
+    #     # try:
+    #     #     self._rowset._next = next(self._rowset._it)
+    #     #     return True
+    #     # except StopIteration:
+    #     #     return False
+    #     return self._rowset.has_next()
+    #     # print(self._rowset)
+    #     # print(str(self._rowset.has_next()))
+    #     # return self._rowset.has_next()
+    def __init__(self, source, pattern, start_offset=0):
         super(CassandraIterator, self).__init__(pattern)
-        self._rowset = iter(source)
+        self._source = source
+        print(type(source))
+        print(type(self._source))
         # self._start_offset = start_offset
 
     def last_read(self):
         """Return the ID of the last element read"""
-        return str(self._rowset[-1])
+        #on en a pas besoin il faudrait plutot le paging state
+        return str(self._source[0])
 
     def next(self):
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        print("try next")
-        return next(self._rowset)
+        print('next')
+        return next(self._source)
+
 
     def has_next(self):
         """Return True if there is still results to read, and False otherwise"""
-        if self._rowset._next:
-            return True
-        try:
-            self._rowset._next = next(self._rowset._it)
-            return True
-        except StopIteration:
-            return False
-        # print(self._rowset)
-        # print(str(self._rowset.has_next()))
-        # return self._rowset.has_next()
+        print('has next')
+        #return self._source.has_more_pages()
+        print(type(self._source))
+        print(type(self._source.has_more_pages))
+        return self._source.has_more_pages
 
 class CassandraConnector(DatabaseConnector):
 
@@ -65,7 +98,7 @@ class CassandraConnector(DatabaseConnector):
         # convert None & empty string to offset = 0
         # offset = 0 if offset is None or offset == '' else int(float(offset))
 
-        query += " limit 2"
+        #query += " limit 10"
         print(query)
 
         cluster = Cluster()
@@ -73,14 +106,18 @@ class CassandraConnector(DatabaseConnector):
 
         session.set_keyspace('pkspo')
 
-        tailleFetch = 2
+        tailleFetch = 1
         # statement = SimpleStatement(query, fetch_size=2000)
         statement = SimpleStatement(query, fetch_size=tailleFetch)
         res=session.execute_async(statement)
         resultat = res.result()
         print(resultat[0])
+        print(type(resultat))
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
-        return CassandraIterator(resultat, pattern)
+        print('before return search')
+        #le 0 c'est le card qui est renvoye avec searhc triple normalement (pour plan builder, etc)
+        return CassandraIterator(resultat, pattern), 0
+
         # iterator, card = self._hdt.search_triples(subject, predicate, obj, offset=offset)
         # return HDTIterator(iterator, pattern, start_offset=offset), card
 

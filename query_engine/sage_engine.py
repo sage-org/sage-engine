@@ -21,9 +21,12 @@ class TooManyResults(Exception):
 async def executor(plan, queue, limit):
     """Executor used to evaluated a plan under a time quota"""
     try:
+        print('before plan has next')
+        print(str(plan.has_next()))
         while plan.has_next():
+            print('av' + str(value))
             value = await plan.next()
-            print(value)
+            print('ap' + str(value))
             if value is not None:
                 await shield(queue.put(value))
                 if queue.qsize() >= limit:
@@ -53,12 +56,15 @@ class SageEngine(object):
                 - ``saved_plan`` is the state of the plan saved using protocol-buffers
                 - ``is_done`` is True when the plan has completed query evalution, False otherwise
         """
+        print('start execute sage_engine')
         results = list()
         queue = Queue()
         loop = get_event_loop()
         query_done = False
         try:
+            print('task wait for')
             task = wait_for(executor(plan, queue, limit), timeout=quota)
+            print('task done')
             loop.run_until_complete(task)
             query_done = True
         except asyncTimeoutError:
