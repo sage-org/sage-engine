@@ -24,9 +24,10 @@ async def executor(plan, queue, limit):
         print('before plan has next')
         print(str(plan.has_next()))
         while plan.has_next():
-            print('av')
             value = await plan.next()
             #print('ap' + str(value))
+            print(plan.has_next())
+            print(value)
             if value is not None:
                 await shield(queue.put(value))
                 if queue.qsize() >= limit:
