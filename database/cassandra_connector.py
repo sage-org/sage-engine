@@ -76,14 +76,17 @@ class CassandraConnector(DatabaseConnector):
         tailleFetch = 1
         # statement = SimpleStatement(query, fetch_size=2000)
         statement = SimpleStatement(query, fetch_size=tailleFetch)
-        res=session.execute_async(statement)
+        if offset is not None:
+            res=session.execute_async(statement,offset)
+        else:
+            res=session.execute_async(statement)
         resultat = res.result()
         # print(resultat[0])
         print(type(resultat))
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
         print('before return search')
         #le 0 c'est le card qui est renvoye avec searhc triple normalement (pour plan builder, etc)
-        return CassandraIterator(resultat, pattern, resultat.paging_state), 0
+        return CassandraIterator(resultat, pattern), 0
 
         # iterator, card = self._hdt.search_triples(subject, predicate, obj, offset=offset)
         # return HDTIterator(iterator, pattern, start_offset=offset), card
