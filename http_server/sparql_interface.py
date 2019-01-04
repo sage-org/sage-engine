@@ -87,6 +87,7 @@ def sparql_blueprint(datasets, logger):
             print('done buid')
             print('executing')
             bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
+            print('bindings : ' + str(bindings))
             logger.debug('[/sparql/{}] Query evaluation completed'.format(dataset_name))
             print('done exec')
 

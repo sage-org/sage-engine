@@ -42,29 +42,42 @@ class CassandraIterator(DBIterator):
     #     # return self._rowset.has_next()
     def __init__(self, source, pattern, start_offset=0):
         super(CassandraIterator, self).__init__(pattern)
-        self._source = source
+        self._source = iter(source)
+        self._paging_state = source.paging_state
+        self.hasNext = 1
         print(type(source))
         print(type(self._source))
+        print(type(iter(source)))
         # self._start_offset = start_offset
 
     def last_read(self):
         """Return the ID of the last element read"""
         #on en a pas besoin il faudrait plutot le paging state
-        return str(self._source[0])
+        return str(self._paging_state)
 
     def next(self):
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
         print('next')
-        return next(self._source)
+        res = None
+        try:
+            res = next(self._source)
+        except StopIteration:
+            self.hasNext = 0
+            #on renvoie ça pour avoir une valeur non vide (parce que pour le moment on va trop loin)
+            return (0,0,0)
+        self._paging_state = self._source.paging_state
+        #il faut renvoyer un tuple (res c'est un cassandra.Row et pas tuple)
+        return (res[0], res[1], res[2])
+
+
 
 
     def has_next(self):
         """Return True if there is still results to read, and False otherwise"""
         print('has next')
-        #return self._source.has_more_pages()
-        print(type(self._source))
-        print(type(self._source.has_more_pages))
-        return self._source.has_more_pages
+        # return self._source.has_next()
+        return self.hasNext
+
 
 class CassandraConnector(DatabaseConnector):
 
@@ -100,7 +113,7 @@ class CassandraConnector(DatabaseConnector):
 
         #query += " limit 10"
         print(query)
-
+        query2 = "SELECT sujet, predicat, objet FROM records WHERE sujet = 'a4'"
         cluster = Cluster()
         session = cluster.connect()
 
@@ -108,15 +121,15 @@ class CassandraConnector(DatabaseConnector):
 
         tailleFetch = 1
         # statement = SimpleStatement(query, fetch_size=2000)
-        statement = SimpleStatement(query, fetch_size=tailleFetch)
+        statement = SimpleStatement(query2, fetch_size=tailleFetch)
         res=session.execute_async(statement)
         resultat = res.result()
-        print(resultat[0])
+        # print(resultat[0])
         print(type(resultat))
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
         print('before return search')
         #le 0 c'est le card qui est renvoye avec searhc triple normalement (pour plan builder, etc)
-        return CassandraIterator(resultat, pattern), 0
+        return CassandraIterator(resultat, pattern, resultat.paging_state), 0
 
         # iterator, card = self._hdt.search_triples(subject, predicate, obj, offset=offset)
         # return HDTIterator(iterator, pattern, start_offset=offset), card

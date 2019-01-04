@@ -24,9 +24,9 @@ async def executor(plan, queue, limit):
         print('before plan has next')
         print(str(plan.has_next()))
         while plan.has_next():
-            print('av' + str(value))
+            print('av')
             value = await plan.next()
-            print('ap' + str(value))
+            #print('ap' + str(value))
             if value is not None:
                 await shield(queue.put(value))
                 if queue.qsize() >= limit:
@@ -73,14 +73,25 @@ class SageEngine(object):
             pass
         finally:
             while not queue.empty():
+                print('dans le while de queue')
                 results.append(queue.get_nowait())
+                # print(queue)
+                # print(queue.empty())
+                # print(results)
+        print('avant de boire')
         root = RootTree()
+        print('le root boit de l eau')
         # source_field = plan.serialized_name() + '_source'
         # getattr(root, source_field).CopyFrom(self._source.save())
         if type(plan) is ProjectionIterator:
+            print('plan')
             root.proj_source.CopyFrom(plan.save())
         elif type(plan) is BagUnionIterator:
+            print('plan')
             root.union_source.CopyFrom(plan.save())
         elif type(plan) is FilterIterator:
+            print('plan')
             root.filter_source.CopyFrom(plan.save())
+
+        print('results :' + str(results))
         return (results, root, query_done)
