@@ -47,7 +47,6 @@ def sage_app(config_file):
             long_description = Markup(markdown(datasets.long_description))
             return render_template("index_sage.html", datasets=datasets_infos, api=api_doc, server_public_url=datasets.public_url, default_query=datasets.default_query, long_description=long_description)
         except Exception as e:
-            print(e)
             abort(500)
 
     @app.route('/sparql11-compliance')

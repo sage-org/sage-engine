@@ -27,7 +27,6 @@ class BagUnionIterator(PreemptableIterator):
         Get the next item from the iterator, reading from the left source and then the right source
         """
         if not self.has_next():
-            print("raise StopIte Union")
             raise StopIteration()
         elif self._left.has_next():
             return await self._left.next()
@@ -61,7 +60,6 @@ class RandomBagUnionIterator(BagUnionIterator):
         Get the next item from the iterator, reading from a source randomly selected
         """
         if not self.has_next():
-            print("raise StopIte Union 2")
             raise StopIteration()
         elif random() < 0.5:
             if self._left.has_next():

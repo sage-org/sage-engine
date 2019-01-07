@@ -129,7 +129,6 @@ def load_config(config_file="config.yaml"):
     max_results = config['max_results'] if 'max_results' in config else inf
     config['quota'] = quota
     for c in config["datasets"]:
-        print(c)
         if 'quota' not in c:
             c['quota'] = quota
         if 'max_results' not in c:

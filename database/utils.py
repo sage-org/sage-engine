@@ -76,7 +76,6 @@ class ArrayTripleIterator(DBIterator):
 
     def next(self):
         if len(self._triples) == 0:
-            print("raise StopIte database utils")
             raise StopIteration()
         self._nbReads += 1
         return self._triples.pop(0)

@@ -40,7 +40,6 @@ def sparql_blueprint(datasets, logger):
     def sparql_query(dataset_name):
         logger.info('[IP: {}] [/sparql/] Querying {}'.format(request.environ['REMOTE_ADDR'], dataset_name))
         dataset = datasets.get_dataset(dataset_name)
-        print(str(dataset.config))
         if dataset is None:
             abort(404)
 
@@ -81,15 +80,10 @@ def sparql_blueprint(datasets, logger):
             # build physical query plan, then execute it with the given quota
             logger.debug('[/sparql/{}] Starting query evaluation...'.format(dataset_name))
             start = time()
-            print('building')
             plan, cardinalities = build_query_plan(post_query["query"], dataset, next_link)
             loading_time = (time() - start) * 1000
-            print('done buid')
-            print('executing')
             bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
-            print('bindings : ' + str(bindings))
             logger.debug('[/sparql/{}] Query evaluation completed'.format(dataset_name))
-            print('done exec')
 
             # compute controls for the next page
             start = time()
@@ -110,6 +104,5 @@ def sparql_blueprint(datasets, logger):
                 return Response(responses.xml(bindings, next_page, stats), content_type="application/xml")
             return json.jsonify(responses.raw_json(bindings, next_page, stats))
         except Exception as e:
-            print(e)
             abort(500)
     return sparql_blueprint

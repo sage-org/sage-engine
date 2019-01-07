@@ -21,13 +21,8 @@ class TooManyResults(Exception):
 async def executor(plan, queue, limit):
     """Executor used to evaluated a plan under a time quota"""
     try:
-        print('before plan has next')
-        print(str(plan.has_next()))
         while plan.has_next():
             value = await plan.next()
-            #print('ap' + str(value))
-            print(plan.has_next())
-            print(value)
             if value is not None:
                 await shield(queue.put(value))
                 if queue.qsize() >= limit:
@@ -57,15 +52,12 @@ class SageEngine(object):
                 - ``saved_plan`` is the state of the plan saved using protocol-buffers
                 - ``is_done`` is True when the plan has completed query evalution, False otherwise
         """
-        print('start execute sage_engine')
         results = list()
         queue = Queue()
         loop = get_event_loop()
         query_done = False
         try:
-            print('task wait for')
             task = wait_for(executor(plan, queue, limit), timeout=quota)
-            print('task done')
             loop.run_until_complete(task)
             query_done = True
         except asyncTimeoutError:
@@ -74,25 +66,15 @@ class SageEngine(object):
             pass
         finally:
             while not queue.empty():
-                print('dans le while de queue')
                 results.append(queue.get_nowait())
-                # print(queue)
-                # print(queue.empty())
-                # print(results)
-        print('avant de boire')
         root = RootTree()
-        print('le root boit de l eau')
         # source_field = plan.serialized_name() + '_source'
         # getattr(root, source_field).CopyFrom(self._source.save())
         if type(plan) is ProjectionIterator:
-            print('plan')
             root.proj_source.CopyFrom(plan.save())
         elif type(plan) is BagUnionIterator:
-            print('plan')
             root.union_source.CopyFrom(plan.save())
         elif type(plan) is FilterIterator:
-            print('plan')
             root.filter_source.CopyFrom(plan.save())
 
-        print('results :' + str(results))
         return (results, root, query_done)

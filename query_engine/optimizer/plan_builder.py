@@ -19,13 +19,9 @@ def build_query_plan(query, db_connector, saved_plan=None, projection=None):
     root = None
 
     if query['type'] == 'union':
-        print('build union plan')
         root, cardinalities = build_union_plan(query['union'], db_connector, projection)
-        print('done union plan')
     elif query['type'] == 'bgp':
-        print('build join plan')
         root, cardinalities = build_join_plan(query['bgp'], db_connector, projection=projection)
-        print('build join done')
     else:
         raise Exception('Unkown query type found during query optimization')
 
@@ -65,9 +61,7 @@ def build_union_plan(union, db_connector, projection=None):
 
 def build_join_plan(bgp, db_connector, projection=None):
     """Build a join plan between a BGP and a possible OPTIONAL clause"""
-    print('build left plan')
     iterator, query_vars, cardinalities = build_left_plan(bgp, db_connector)
-    print('left plan done')
     # if optional is not None:
     #     iterator, query_vars, c = build_left_plan(optional, db_connector, source=iterator, base_vars=query_vars, optional=True)
     #     cardinalities += c
@@ -81,11 +75,9 @@ def build_left_plan(bgp, db_connector, source=None, base_vars=None):
     triples = []
     cardinalities = []
     for triple in bgp:
-        print('before search')
         it, c = db_connector.search(triple['subject'], triple['predicate'], triple['object'])
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
         cardinalities += [{'triple': triple, 'cardinality': c}]
-        print('after search')
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
     # if no input iterator provided, build a Scan with the most selective pattern

@@ -40,7 +40,6 @@ class ArrayIterator(object):
 
     def next(self):
         if not self.has_next():
-            print("raise StopIte Utils")
             raise StopIteration()
         mu = self._array.pop(0)
         return mu
