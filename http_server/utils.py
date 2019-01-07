@@ -91,5 +91,5 @@ def generate_sitemap(dataset, last_mod):
                 # location
                 ElementTree.SubElement(query_xml, "loc").text = url_for('publish-query-interface.publish_query', graph_name=graph_name, query_name=query["@id"], _external=True)
                 # last_mod
-                ElementTree.SubElement(query_xml, "last_mod").text = last_mod
+                ElementTree.SubElement(query_xml, "lastmod").text = last_mod
     return ElementTree.tostring(root, encoding="utf8", method="xml").decode("utf-8")
