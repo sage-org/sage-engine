@@ -40,7 +40,7 @@ def sparql_blueprint(datasets, logger):
     def sparql_query(dataset_name):
         logger.info('[IP: {}] [/sparql/] Querying {}'.format(request.environ['REMOTE_ADDR'], dataset_name))
         dataset = datasets.get_dataset(dataset_name)
-
+        print(str(dataset.config))
         if dataset is None:
             abort(404)
 
@@ -51,7 +51,7 @@ def sparql_blueprint(datasets, logger):
         ])
         url = secure_url(request.url)
         try:
-            # A GET request always returns the homepage of the dataset
+        # A GET request always returns the homepage of the dataset
             if request.method == "GET" or (not request.is_json):
                 dinfo = dataset.describe(url)
                 dinfo['@id'] = url

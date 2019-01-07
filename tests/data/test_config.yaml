@@ -13,3 +13,8 @@ datasets:
   description: test cassandra
   backend: cassandra-db
   keyspace: pkspo
+-
+  name: swdfcassandra
+  description: premiere implem avec cassandra
+  backend: cassandra-db
+  keyspace: swdf
