@@ -122,6 +122,11 @@ def load_config(config_file="config.yaml"):
         backend: rdf-file
         format: nt
         file: /home/chuck-norris/facts.nt
+    -
+        name: swdf-2017
+        description: swdf dataset, version 2017
+        backend: cassandra-db
+        keyspace: swdf
     """
     config = load(open(config_file))
     # set page size, i.e. the number of triples per page

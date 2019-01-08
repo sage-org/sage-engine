@@ -9,10 +9,10 @@ datasets:
   backend: hdt-file
   file: tests/data/test.hdt
 -
-  name: testcassandra
-  description: test cassandra
-  backend: cassandra-db
-  keyspace: pkspo
+  name: swdfhdt
+  description: pour comparer avec swdfcasssandra
+  backend: hdt-file
+  file: tests/data/swdf-2017.hdt
 -
   name: swdfcassandra
   description: premiere implem avec cassandra

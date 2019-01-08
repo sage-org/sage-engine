@@ -3,7 +3,6 @@ from cassandra.query import SimpleStatement
 from database.db_connector import DatabaseConnector
 from database.db_iterator import DBIterator
 from base64 import b64encode, b64decode
-import os
 
 class CassandraIterator(DBIterator):
     """A CassandraIterator implements a DBIterator for a triple pattern evaluated using cassandra """
@@ -54,58 +53,74 @@ class CassandraConnector(DatabaseConnector):
                 A Python iterator over RDF triples matching the given triples pattern
         """
 
-        #choix de la table (hexastore/c)
-        if subject is None and predicate and obj is None:
+        subject = subject if (subject is not None) and (not subject.startswith('?')) else ""
+        predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else ""
+        obj = obj if (obj is not None) and (not obj.startswith('?')) else ""
+
+        #choix de la table (hexastore/cumulus rdf)
+        if not subject and predicate and not obj:
             record = "pos"
-        elif subject is None and predicate and obj:
+        elif not subject and predicate and obj:
             record = "pos"
-        elif subject and predicate is None and obj:
+        elif subject and not predicate and obj:
             record = "osp"
-        elif subject is None and predicate is None and obj:
+        elif not subject and not predicate and obj:
             record = "osp"
         else:
             record = "spo"
 
         offset=b64decode(offset) if offset is not None else None
+
         query = "SELECT sujet, predicat, objet FROM " + record + " "
-        subject = subject if (subject is not None) and (not subject.startswith('?')) else ""
+
+        # En cassandra, les $$ servent à spécifier que les caractères spéciaux
+        # soient conservés, exemple : ""
         if subject:
             subject = " $$" + subject.replace("$", "\$") + "$$ "
             query += " WHERE sujet = " + subject
-        predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else ""
+
         if predicate:
             predicate = " $$" + predicate.replace("$", "\$") + "$$ "
             if subject:
                 query += " and predicat = " + predicate
             else:
                 query += " WHERE predicat = " + predicate
-        obj = obj if (obj is not None) and (not obj.startswith('?')) else ""
+
         if obj:
             obj = " $$" + obj.replace("$", "\$") + "$$ "
             if predicate or subject:
                 query += " and objet = " + obj
             else:
                 query += " WHERE objet = " + obj
-        query += " ALLOW FILTERING;"
 
-
+        # perspective : augmenter cette taille pour augmenter le throughput
         tailleFetch = 1
-        # statement = SimpleStatement(query, fetch_size=2000)
+
         statement = SimpleStatement(query, fetch_size=tailleFetch)
 
+        # connexion à un cluster (on spécifie les machines)
+        # cluster = Cluster(['172.16.134.141', '172.16.134.142', '172.16.134.143'])
         cluster = Cluster()
         session = cluster.connect()
+
         # Le changement de keyspace ne doit pas etre fait
         # ici si on fait ca bien mais on arrive pas a le declarer
         # dans linit
         session.set_keyspace(self.keyspace)
+
+        # ici il faut gérer une erreur dans le cas où l'on n'utilise pas le bon keyspace
+        # try:
         if offset is not None:
             res=session.execute_async(statement,paging_state=offset)
         else:
             res=session.execute_async(statement)
+        # except Exception:
+        #     raise Exception
+
         resultat = res.result()
 
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
+
         #le 0 c'est le card qui est renvoye avec searhc triple normalement (pour plan builder, etc)
         return CassandraIterator(resultat, pattern), 0
 
