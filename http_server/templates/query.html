@@ -10,14 +10,19 @@
     <div class="container">
       <h1>{{ query['name'] }}</h1>
       <p><strong>Source dataset:</strong> <a href="{{ url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True) }}">{{ url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True) }}</a></p>
-      
-      <p><strong>SPARQL query:</strong></p>
+
+      <h2><i class="fas fa-info-circle"></i> Description</h2>
+      <p>{{ query["description"] }}</p>
+
+      <h2><i class="fab fa-hubspot"></i> SPARQL query</h2>
       <pre>{{ query["value"] }}</pre>
 
-      <p><a class="btn btn-primary" href="{{ query_url }}" target="_blank">Execute this query</a></p>
+      <p><a class="btn btn-success" href="{{ query_url }}" target="_blank"><i class="fas fa-play"></i>  Execute this query</a></p>
 
-      <p><strong>JSON-LD description</strong></p>
-      <pre>{{ description | safe }}</pre>
+      <h2><i class="fas fa-pencil-alt"></i> JSON-LD description</h2>
+      <div class="well">
+        <pre>{{ description | safe }}</pre>
+      </div>
     </div>
     <script type="application/ld+json">
     {{ description | safe }}

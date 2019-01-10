@@ -84,6 +84,36 @@
         </div>
       </div>
 
+      <!-- Example queries -->
+      {% if queries|length > 0 %}
+      <h2><i class="fas fa-atlas"></i> Example SPARQL queries</h2>
+
+      <p>The following SPARQL queries can be executed on this dataset.</p>
+        {% for query in queries %}
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">{{ query["name"] }}</h3>
+            <div class="card-text">
+              <p><strong>Keywords:</strong>
+                {% for keyword in query['keywords'] %}
+                <span class="badge badge-primary">{{ keyword }}</span>
+                {% endfor %}
+              </p>
+              <p><strong>Description:</strong> {{ query['description'] }}</p>
+              <p>
+                <a  class="btn btn-success" href="{{ url_for('sparql-interface.sparql_index', query=query['value'].replace('\n', ' '), _external=True) + '&default-graph-uri=' + url_for('sparql-interface.sparql_index', _external=True) + '/' + dataset_info['schema:name'] }}" target="_blank"><i class="fas fa-play"></i> Execute this query</a>
+                <a class="btn btn-primary" href="{{ url_for('publish-query-interface.publish_query', graph_name=dataset_info['schema:name'], query_name=query['@id'], _external=True) }}" target="_blank"><i class="far fa-id-card"></i> See details</a>
+              </p>
+            </div>
+            <p>
+            </p>
+
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+
+
       <!-- Query the dataset -->
       <h2><i class="fab fa-hubspot"></i> Query the Dataset</h2>
       <p><strong>Dataset URI:</strong> <a href="{{ dataset_info['schema:url'] }}">{{ dataset_info['schema:url'] }}</a></p>

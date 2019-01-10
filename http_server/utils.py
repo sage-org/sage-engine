@@ -78,13 +78,25 @@ def generate_sitemap(dataset, last_mod):
     home_xml = ElementTree.SubElement(root, "url")
     ElementTree.SubElement(home_xml, "loc").text = url_for('index', _external=True)
     ElementTree.SubElement(home_xml, "lastmod").text = last_mod
-    # add datasest and queries
+
+    # add server VoID
+    gvoid_xml = ElementTree.SubElement(root, "url")
+    ElementTree.SubElement(gvoid_xml, "loc").text = url_for('void-interface.void_all', _external=True)
+    ElementTree.SubElement(gvoid_xml, "lastmod").text = last_mod
+
+    # add dataset and queries
     for graph_name, graph in dataset._datasets.items():
+        # add dataset homepage
         graph_xml = ElementTree.SubElement(root, "url")
-        # location
         ElementTree.SubElement(graph_xml, "loc").text = url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True)
-        # last_mod
         ElementTree.SubElement(graph_xml, "lastmod").text = last_mod
+
+        # add dataset VoID
+        void_xml = ElementTree.SubElement(root, "url")
+        ElementTree.SubElement(void_xml, "loc").text = url_for('void-interface.void_dataset', graph_name=graph_name, _external=True)
+        ElementTree.SubElement(void_xml, "lastmod").text = last_mod
+
+        # add dataset queries
         for query in graph.example_queries:
             if query["publish"]:
                 query_xml = ElementTree.SubElement(root, "url")

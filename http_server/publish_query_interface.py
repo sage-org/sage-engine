@@ -15,7 +15,6 @@ def publish_query_blueprint(dataset, logger):
             if not dataset.has_graph(graph_name):
                 abort(404)
             graph = dataset.get_graph(graph_name)
-            print(query_name)
             query = graph.get_query(query_name)
             # query that are not designed to be published cannot be accessed
             if query is None or not query['publish']:
