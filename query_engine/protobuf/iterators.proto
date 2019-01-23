@@ -11,7 +11,7 @@ message TriplePattern {
 
 message SavedScanIterator {
   TriplePattern triple = 1;
-  uint64 offset = 2;
+  string offset = 2;
   int64 cardinality = 3;
 }
 
@@ -32,7 +32,7 @@ message SavedIndexJoinIterator {
   }
   TriplePattern inner = 3;
   map<string, string> muc = 4;
-  uint64 offset = 5;
+  string offset = 5;
 }
 
 message SavedBagUnionIterator {

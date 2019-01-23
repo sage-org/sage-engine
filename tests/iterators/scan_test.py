@@ -15,7 +15,7 @@ triple = {
 
 
 def test_scan_read():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     (results, saved, done) = engine.execute(scan, 10e7)
     assert len(results) == card
@@ -23,13 +23,13 @@ def test_scan_read():
 
 
 def test_scan_save_nointerrupt():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     (results, saved, done) = engine.execute(scan, 10e7)
 
 
 def test_scan_save_interrupt():
-    iterator, card = hdtDoc.search_triples(triple['subject'], triple['predicate'], triple['object'])
+    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     (results, saved, done) = engine.execute(scan, 1e-3)
     assert len(results) <= card

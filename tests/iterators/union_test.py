@@ -20,8 +20,8 @@
 #
 #
 # def test_bag_union_read():
-#     iterator1, card1 = hdtDoc.search_triples(triple1['subject'], triple1['predicate'], triple1['object'])
-#     iterator2, card2 = hdtDoc.search_triples(triple2['subject'], triple2['predicate'], triple2['object'])
+#     iterator1, card1 = hdtDoc.search(triple1['subject'], triple1['predicate'], triple1['object'])
+#     iterator2, card2 = hdtDoc.search(triple2['subject'], triple2['predicate'], triple2['object'])
 #     left = ScanIterator(iterator1, triple1, card1)
 #     right = ScanIterator(iterator2, triple2, card2)
 #     union = BagUnionIterator(left, right)
@@ -31,8 +31,8 @@
 #
 #
 # def test_bag_union_interrupt():
-#     iterator1, card1 = hdtDoc.search_triples(triple1['subject'], triple1['predicate'], triple1['object'])
-#     iterator2, card2 = hdtDoc.search_triples(triple2['subject'], triple2['predicate'], triple2['object'])
+#     iterator1, card1 = hdtDoc.search(triple1['subject'], triple1['predicate'], triple1['object'])
+#     iterator2, card2 = hdtDoc.search(triple2['subject'], triple2['predicate'], triple2['object'])
 #     left = ScanIterator(iterator1, triple1, card1)
 #     right = ScanIterator(iterator2, triple2, card2)
 #     union = BagUnionIterator(left, right)
@@ -42,8 +42,8 @@
 #
 #
 # def test_random_union_read():
-#     iterator1, card1 = hdtDoc.search_triples(triple1['subject'], triple1['predicate'], triple1['object'])
-#     iterator2, card2 = hdtDoc.search_triples(triple2['subject'], triple2['predicate'], triple2['object'])
+#     iterator1, card1 = hdtDoc.search(triple1['subject'], triple1['predicate'], triple1['object'])
+#     iterator2, card2 = hdtDoc.search(triple2['subject'], triple2['predicate'], triple2['object'])
 #     left = ScanIterator(iterator1, triple1, card1)
 #     right = ScanIterator(iterator2, triple2, card2)
 #     union = RandomBagUnionIterator(left, right)
@@ -53,8 +53,8 @@
 #
 #
 # def test_random_union_interrupt():
-#     iterator1, card1 = hdtDoc.search_triples(triple1['subject'], triple1['predicate'], triple1['object'])
-#     iterator2, card2 = hdtDoc.search_triples(triple2['subject'], triple2['predicate'], triple2['object'])
+#     iterator1, card1 = hdtDoc.search(triple1['subject'], triple1['predicate'], triple1['object'])
+#     iterator2, card2 = hdtDoc.search(triple2['subject'], triple2['predicate'], triple2['object'])
 #     left = ScanIterator(iterator1, triple1, card1)
 #     right = ScanIterator(iterator2, triple2, card2)
 #     union = RandomBagUnionIterator(left, right)

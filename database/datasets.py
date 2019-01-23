@@ -49,19 +49,18 @@ class Graph(object):
         """Get the underlying DatabaseConnector for this dataset"""
         return self._connector
 
-    def search_triples(self, subject, predicate, obj, limit=0, offset=0):
+    def search(self, subject, predicate, obj, offset=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
             Args:
                 - subject [string] - Subject of the triple pattern
                 - predicate [string] - Preicate of the triple pattern
                 - object [string] - Object of the triple pattern
-                - limit [int=0] - (Optional) LIMIT modifier, i.e., maximum number of RDF triples to read
-                - offset [int=0] - (Optional) OFFSET modifier, i.e., number of RDF triples to skip
+                - offset ``string=None`` ``optional`` -  OFFSET ID used to resume scan
             Returns:
                 A Python iterator over RDF triples matching the given triples pattern
         """
-        return self._connector.search_triples(subject, predicate, obj, limit, offset)
+        return self._connector.search(subject, predicate, obj, offset)
 
     def describe(self, url):
         """Describe the RDF Dataset in JSON-LD format"""

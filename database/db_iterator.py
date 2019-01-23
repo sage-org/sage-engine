@@ -5,15 +5,13 @@ from abc import ABC, abstractmethod
 
 class DBIterator(ABC):
     """
-        A DBIterator follows the iterator protocol and gives access to RDF triples matching a given triple pattern.
+        A DBIterator follows the iterator protocol and rvalyates a triple patter against a RDF dataset.
         Typically, a subclass of this iterator is returned by a call to DBConnector#search_pattern.
     """
 
-    def __init__(self, pattern, limit=0, offset=0):
+    def __init__(self, pattern):
         super(DBIterator, self).__init__()
         self._pattern = pattern
-        self._limit = limit
-        self._offset = offset
 
     @property
     def subject(self):
@@ -27,14 +25,6 @@ class DBIterator(ABC):
     def object(self):
         return self._pattern["object"]
 
-    @property
-    def limit(self):
-        return self._limit
-
-    @property
-    def offset(self):
-        return self._pattern["offset"]
-
     def __iter__(self):
         return self
 
@@ -42,9 +32,16 @@ class DBIterator(ABC):
         return self.next()
 
     @abstractmethod
+    def last_read(self):
+        """Return the index ID of the last element read"""
+        pass
+
+    @abstractmethod
     def next(self):
+        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
         pass
 
     @abstractmethod
     def has_next(self):
+        """Return True if there is still results to read, and False otherwise"""
         pass

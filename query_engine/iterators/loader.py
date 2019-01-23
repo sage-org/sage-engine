@@ -50,7 +50,7 @@ def load_scan(saved_plan, dataset):
     """Load a ScanIterator from a protobuf serialization"""
     triple = saved_plan.triple
     s, p, o, g = (triple.subject, triple.predicate, triple.object, triple.graph)
-    iterator, card = dataset.get_graph(g).search_triples(s, p, o, offset=int(saved_plan.offset))
+    iterator, card = dataset.get_graph(g).search(s, p, o, offset=saved_plan.offset)
     return ScanIterator(iterator, protoTriple_to_dict(triple), saved_plan.cardinality)
 
 

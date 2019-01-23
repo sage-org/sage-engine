@@ -81,7 +81,7 @@ def build_left_plan(bgp, dataset, default_graph):
         triple['graph'] = graph_uri
         # get iterator and statistics about the pattern
         if dataset.has_graph(graph_uri):
-            it, c = dataset.get_graph(graph_uri).search_triples(triple['subject'], triple['predicate'], triple['object'])
+            it, c = dataset.get_graph(graph_uri).search(triple['subject'], triple['predicate'], triple['object'])
         else:
             it, c = EmptyIterator(), 0
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]

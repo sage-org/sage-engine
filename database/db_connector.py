@@ -7,7 +7,7 @@ class DatabaseConnector(ABC):
     """A DatabaseConnector is an abstract class for creating connectors to a database"""
 
     @abstractmethod
-    def search_triples(self, subject, predicate, obj, limit=0, offset=0):
+    def search(self, subject, predicate, obj, offset=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
 
@@ -15,8 +15,7 @@ class DatabaseConnector(ABC):
                 - subject ``string`` - Subject of the triple pattern
                 - predicate ``string`` - Predicate of the triple pattern
                 - object ``string`` - Object of the triple pattern
-                - limit ``int=0`` ``optional`` -  LIMIT modifier, i.e., maximum number of RDF triples to read
-                - offset ``int=0`` ``optional`` -  OFFSET modifier, i.e., number of RDF triples to skip
+                - offset ``string=None`` ``optional`` -  OFFSET ID used to resume scan
 
             Returns:
                 A Python iterator over RDF triples matching the given triples pattern

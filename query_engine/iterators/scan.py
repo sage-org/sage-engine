@@ -12,7 +12,7 @@ class ScanIterator(PreemptableIterator):
     Constructor args:
         - source [hdt.TripleIterator] - An HDT iterator that yields RDF triple in string format.
         - triple ``dict`` - The triple pattern corresponding to the source iterator.
-        - cardinality ``integer=0]`` - The cardinality of the triple pattern.
+        - cardinality ``[integer=0]`` - The cardinality of the triple pattern.
     """
 
     def __init__(self, source, triple, cardinality=0):
@@ -39,6 +39,10 @@ class ScanIterator(PreemptableIterator):
     def offset(self):
         return self._source.offset
 
+    def last_read(self):
+        """Return the index ID of the last element read"""
+        return self._source.last_read()
+
     def has_next(self):
         return self._source.has_next()
 
@@ -58,6 +62,6 @@ class ScanIterator(PreemptableIterator):
         triple.object = self._triple['object']
         triple.graph = self._triple['graph']
         saved_scan.triple.CopyFrom(triple)
-        saved_scan.offset = self.offset + self.nb_reads
+        saved_scan.offset = self._source.last_read()
         saved_scan.cardinality = self._cardinality
         return saved_scan
