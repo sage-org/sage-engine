@@ -18,7 +18,7 @@ class DatabaseConnector(ABC):
                 - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
 
             Returns:
-                A Python iterator over RDF triples matching the given triples pattern
+                A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
         """
         pass
 
