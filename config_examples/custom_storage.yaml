@@ -1,0 +1,22 @@
+# This file showcase how to declare a new external backend
+name: SaGe Example Server
+maintainer: Chuck Norris
+public_url: http://server-url.com
+quota: 75
+backends:
+-
+  # name of the new backend (used in the "backend" field when declaring a dataset)
+  name: my-custom-backend
+  # source file containing the backend logic
+  path: my_package.custom_connector
+  # Connector class: a subclass of sage.database.db_connector.DatabaseConnector
+  connector: MyCustomConnector
+  # required parameters used to configure the backend
+  required: [ "log_level", "path" ]
+datasets:
+-
+  name: dbpedia
+  description: The DBpedia dataset
+  backend: my-custom-backend
+  log_level: info
+  path: ./dbpedia.foo

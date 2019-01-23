@@ -1,0 +1,17 @@
+# This file showcase how to declare a new external backend
+name: SaGe Example Server
+maintainer: Chuck Norris
+public_url: http://server-url.com
+quota: 75
+backends:
+-
+  name: custom-backend
+  path: tests.database.custom_backend
+  connector: SillyConnector
+  required: [ "foo" ]
+datasets:
+-
+  name: foo
+  description: A foo dataset
+  backend: custom-backend
+  foo: moo
