@@ -11,7 +11,7 @@ backends:
   required: [ "foo" ]
 datasets:
 -
-  name: foo
+  name: foo-dataset
   description: A foo dataset
   backend: custom-backend
   foo: moo

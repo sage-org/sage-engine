@@ -11,7 +11,7 @@ class SillyConnector(DatabaseConnector):
         self._foo = foo
 
     def search(self, subject, predicate, obj, last_read=None):
-        pass
+        return self._foo
 
     def from_config(config):
         return SillyConnector(config['foo'])
