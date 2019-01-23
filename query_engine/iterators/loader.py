@@ -50,7 +50,7 @@ def load_scan(saved_plan, dataset):
     """Load a ScanIterator from a protobuf serialization"""
     triple = saved_plan.triple
     s, p, o, g = (triple.subject, triple.predicate, triple.object, triple.graph)
-    iterator, card = dataset.get_graph(g).search(s, p, o, offset=saved_plan.offset)
+    iterator, card = dataset.get_graph(g).search(s, p, o, last_read=saved_plan.last_read)
     return ScanIterator(iterator, protoTriple_to_dict(triple), saved_plan.cardinality)
 
 
@@ -62,9 +62,8 @@ def load_nlj(saved_plan, dataset):
     innerTriple = protoTriple_to_dict(saved_plan.inner)
     if len(saved_plan.muc) > 0:
         currentBinding = saved_plan.muc
-    iterOffset = saved_plan.offset
     dataset = dataset.get_graph(innerTriple['graph'])
-    return IndexJoinIterator(source, innerTriple, dataset, currentBinding=currentBinding, iterOffset=iterOffset)
+    return IndexJoinIterator(source, innerTriple, dataset, currentBinding=currentBinding, iterOffset=saved_plan.last_read)
 
 
 def load_union(saved_plan, dataset):

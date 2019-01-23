@@ -34,7 +34,7 @@ class HDTFileConnector(DatabaseConnector):
         super(HDTFileConnector, self).__init__()
         self._hdt = HDTDocument(file)
 
-    def search(self, subject, predicate, obj, offset=None):
+    def search(self, subject, predicate, obj, last_read=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
 
@@ -42,7 +42,7 @@ class HDTFileConnector(DatabaseConnector):
                 - subject ``string`` - Subject of the triple pattern
                 - predicate ``string`` - Predicate of the triple pattern
                 - object ``string`` - Object of the triple pattern
-                - offset ``string=None`` ``optional`` -  OFFSET ID used to resume scan
+                - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
 
             Returns:
                 A Python iterator over RDF triples matching the given triples pattern
@@ -51,7 +51,7 @@ class HDTFileConnector(DatabaseConnector):
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else ""
         obj = obj if (obj is not None) and (not obj.startswith('?')) else ""
         # convert None & empty string to offset = 0
-        offset = 0 if offset is None or offset == '' else int(float(offset))
+        offset = 0 if last_read is None or last_read == '' else int(float(last_read))
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
         iterator, card = self._hdt.search_triples(subject, predicate, obj, offset=offset)
         return HDTIterator(iterator, pattern, start_offset=offset), card

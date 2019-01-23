@@ -62,6 +62,6 @@ class ScanIterator(PreemptableIterator):
         triple.object = self._triple['object']
         triple.graph = self._triple['graph']
         saved_scan.triple.CopyFrom(triple)
-        saved_scan.offset = self._source.last_read()
+        saved_scan.last_read = self._source.last_read()
         saved_scan.cardinality = self._cardinality
         return saved_scan
