@@ -1,7 +1,7 @@
 # void_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from database.datasets import Dataset
-from database.descriptors import VoidDescriptor, many_void
+from sage.database.datasets import Dataset
+from sage.database.descriptors import VoidDescriptor, many_void
 from rdflib import Graph
 
 dataset = Dataset("tests/data/test_config.yaml")

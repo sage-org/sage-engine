@@ -1,9 +1,9 @@
 # query_parser_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
-from query_engine.sage_engine import SageEngine
-from query_engine.optimizer.query_parser import parse_query
-from database.hdt_file_connector import HDTFileConnector
+from sage.query_engine.sage_engine import SageEngine
+from sage.query_engine.optimizer.query_parser import parse_query
+from sage.database.hdt_file_connector import HDTFileConnector
 from tests.utils import DummyDataset
 import math
 

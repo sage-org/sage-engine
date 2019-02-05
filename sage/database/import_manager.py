@@ -7,7 +7,7 @@ def hdt_backend():
     """Get the loader for the HDT backend"""
     data = {
         'name': 'hdt-file',
-        'path': 'database.hdt_file_connector',
+        'path': 'sage.database.hdt_file_connector',
         'connector': 'HDTFileConnector',
         'required': [
             'file'

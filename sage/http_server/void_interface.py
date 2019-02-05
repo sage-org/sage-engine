@@ -1,8 +1,8 @@
 # void_interface.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from flask import Blueprint, request, Response, abort, redirect
-from database.descriptors import VoidDescriptor, many_void
-from http_server.utils import secure_url
+from sage.database.descriptors import VoidDescriptor, many_void
+from sage.http_server.utils import secure_url
 
 
 def choose_format(mimetype):

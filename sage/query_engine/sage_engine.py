@@ -3,11 +3,11 @@
 import uvloop
 from asyncio import Queue, get_event_loop, wait_for, sleep, set_event_loop_policy
 from asyncio import TimeoutError as asyncTimeoutError
-from query_engine.iterators.projection import ProjectionIterator
-from query_engine.iterators.union import BagUnionIterator
-from query_engine.iterators.filter import FilterIterator
-from query_engine.iterators.utils import IteratorExhausted
-from query_engine.protobuf.iterators_pb2 import RootTree
+from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.union import BagUnionIterator
+from sage.query_engine.iterators.filter import FilterIterator
+from sage.query_engine.iterators.utils import IteratorExhausted
+from sage.query_engine.protobuf.iterators_pb2 import RootTree
 from math import inf
 
 set_event_loop_policy(uvloop.EventLoopPolicy())

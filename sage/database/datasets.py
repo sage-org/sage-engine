@@ -1,7 +1,7 @@
 # datasets.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from yaml import load
-from database.import_manager import import_backend, hdt_backend
+from sage.database.import_manager import import_backend, hdt_backend
 from math import inf
 from urllib.parse import quote_plus
 

@@ -1,7 +1,7 @@
 # bgp_interface_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
-from http_server.server import sage_app
+from sage.http_server.server import sage_app
 from tests.http.utils import jsonSparql
 
 app = sage_app('tests/data/test_config.yaml')

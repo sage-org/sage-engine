@@ -8,14 +8,14 @@ from sys import exit
 
 def install_web_deps():
     """Install Sage web interface dependencies using npm"""
-    path = "{}/http_server/static".format(getcwd())
+    path = "{}/sage/http_server/static".format(getcwd())
     run(["npm", "install", "--production"], cwd=path)
 
 
 __version__ = "2.0.0"
 
 console_scripts = [
-    'sage = http_server.cli:cli_sage'
+    'sage = sage.http_server.cli:cli_sage'
 ]
 
 with open('README.rst') as file:

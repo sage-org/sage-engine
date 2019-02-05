@@ -1,13 +1,13 @@
 # plan_builder.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from query_engine.iterators.projection import ProjectionIterator
-from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import IndexJoinIterator
-from query_engine.iterators.filter import FilterIterator
-from query_engine.iterators.union import BagUnionIterator
-from query_engine.iterators.loader import load
-from query_engine.iterators.utils import EmptyIterator
-from query_engine.optimizer.utils import find_connected_pattern, get_vars
+from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.nlj import IndexJoinIterator
+from sage.query_engine.iterators.filter import FilterIterator
+from sage.query_engine.iterators.union import BagUnionIterator
+from sage.query_engine.iterators.loader import load
+from sage.query_engine.iterators.utils import EmptyIterator
+from sage.query_engine.optimizer.utils import find_connected_pattern, get_vars
 from functools import reduce
 
 

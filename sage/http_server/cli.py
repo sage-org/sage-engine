@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 import argparse
 from os.path import isfile
-from http_server.server import sage_app
+from sage.http_server.server import sage_app
 from gunicorn.app.base import BaseApplication
 from gunicorn.six import iteritems
 

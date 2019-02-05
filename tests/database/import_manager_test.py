@@ -1,8 +1,8 @@
 # custom_backend.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
-from database.import_manager import import_backend
-from database.datasets import Dataset
+from sage.database.import_manager import import_backend
+from sage.database.datasets import Dataset
 
 
 def test_import_backend():

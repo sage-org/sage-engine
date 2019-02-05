@@ -1,11 +1,11 @@
 # optimizer_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from query_engine.optimizer.plan_builder import build_query_plan
-from database.hdt_file_connector import HDTFileConnector
-from query_engine.iterators.projection import ProjectionIterator
-from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import IndexJoinIterator
-from query_engine.iterators.union import BagUnionIterator
+from sage.database.hdt_file_connector import HDTFileConnector
+from sage.query_engine.optimizer.plan_builder import build_query_plan
+from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.nlj import IndexJoinIterator
+from sage.query_engine.iterators.union import BagUnionIterator
 from tests.utils import DummyDataset
 
 

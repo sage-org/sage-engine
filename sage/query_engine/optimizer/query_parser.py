@@ -3,11 +3,11 @@
 from rdflib import URIRef, BNode
 from rdflib.plugins.sparql.parser import parseQuery
 from rdflib.plugins.sparql.algebra import translateQuery
-from query_engine.iterators.projection import ProjectionIterator
-from query_engine.iterators.union import BagUnionIterator
-from query_engine.iterators.filter import FilterIterator
-from query_engine.optimizer.plan_builder import build_left_plan
-from http_server.utils import format_graph_uri
+from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.union import BagUnionIterator
+from sage.query_engine.iterators.filter import FilterIterator
+from sage.query_engine.optimizer.plan_builder import build_left_plan
+from sage.http_server.utils import format_graph_uri
 
 
 class UnsupportedSPARQL(Exception):

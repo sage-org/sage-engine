@@ -1,11 +1,11 @@
 # filter_iterator_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from query_engine.sage_engine import SageEngine
-from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.filter import FilterIterator
-from query_engine.iterators.projection import ProjectionIterator
-from query_engine.iterators.loader import load
-from database.hdt_file_connector import HDTFileConnector
+from sage.query_engine.sage_engine import SageEngine
+from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.filter import FilterIterator
+from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.loader import load
+from sage.database.hdt_file_connector import HDTFileConnector
 from tests.utils import DummyDataset
 import math
 

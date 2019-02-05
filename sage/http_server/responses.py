@@ -1,7 +1,7 @@
 # responses.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStatistics, SageResponse
-from query_engine.formatters import sparql_xml, binding_to_json
+from sage.http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStatistics, SageResponse
+from sage.query_engine.formatters import sparql_xml, binding_to_json
 from json import dumps
 from xml.etree import ElementTree
 

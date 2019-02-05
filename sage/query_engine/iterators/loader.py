@@ -1,12 +1,12 @@
 # loader.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from query_engine.iterators.projection import ProjectionIterator
-from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import IndexJoinIterator
-from query_engine.iterators.filter import FilterIterator
-from query_engine.iterators.union import BagUnionIterator
-from query_engine.protobuf.utils import protoTriple_to_dict
-from query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedIndexJoinIterator, SavedBagUnionIterator, SavedFilterIterator
+from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.nlj import IndexJoinIterator
+from sage.query_engine.iterators.filter import FilterIterator
+from sage.query_engine.iterators.union import BagUnionIterator
+from sage.query_engine.protobuf.utils import protoTriple_to_dict
+from sage.query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedIndexJoinIterator, SavedBagUnionIterator, SavedFilterIterator
 
 
 def load(protoMsg, dataset):

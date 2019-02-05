@@ -1,8 +1,8 @@
 # projection.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from query_engine.iterators.preemptable_iterator import PreemptableIterator
-from query_engine.protobuf.iterators_pb2 import SavedProjectionIterator
-from query_engine.iterators.utils import IteratorExhausted
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
+from sage.query_engine.protobuf.iterators_pb2 import SavedProjectionIterator
+from sage.query_engine.iterators.utils import IteratorExhausted
 
 
 class ProjectionIterator(PreemptableIterator):

@@ -1,9 +1,9 @@
 # scan_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from query_engine.sage_engine import SageEngine
-from query_engine.iterators.scan import ScanIterator
-from query_engine.iterators.nlj import IndexJoinIterator
-from database.hdt_file_connector import HDTFileConnector
+from sage.query_engine.sage_engine import SageEngine
+from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.nlj import IndexJoinIterator
+from sage.database.hdt_file_connector import HDTFileConnector
 
 hdtDoc = HDTFileConnector('tests/data/test.hdt')
 engine = SageEngine()

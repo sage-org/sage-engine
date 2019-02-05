@@ -1,10 +1,10 @@
 # lookup_interface.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from flask import Blueprint, request, Response, abort
-from query_engine.sage_engine import SageEngine
-from query_engine.optimizer.plan_builder import build_query_plan
-from http_server.utils import encode_saved_plan, decode_saved_plan, secure_url
-import http_server.responses as responses
+from sage.query_engine.sage_engine import SageEngine
+from sage.query_engine.optimizer.plan_builder import build_query_plan
+from sage.http_server.utils import encode_saved_plan, decode_saved_plan, secure_url
+import sage.http_server.responses as responses
 # from time import time
 
 

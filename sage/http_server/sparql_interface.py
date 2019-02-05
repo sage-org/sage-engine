@@ -1,14 +1,14 @@
 # bgp_interface.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from flask import Blueprint, request, Response, render_template, abort
-from query_engine.sage_engine import SageEngine
-from query_engine.optimizer.plan_builder import build_query_plan
-from query_engine.optimizer.query_parser import parse_query
-from query_engine.iterators.loader import load
-from http_server.schema import QueryRequest, SageSparqlQuery
-from http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors, sage_http_error
-from database.descriptors import VoidDescriptor
-import http_server.responses as responses
+from sage.query_engine.sage_engine import SageEngine
+from sage.query_engine.optimizer.plan_builder import build_query_plan
+from sage.query_engine.optimizer.query_parser import parse_query
+from sage.query_engine.iterators.loader import load
+from sage.http_server.schema import QueryRequest, SageSparqlQuery
+from sage.http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors, sage_http_error
+from sage.database.descriptors import VoidDescriptor
+import sage.http_server.responses as responses
 from json import dumps
 from time import time
 
