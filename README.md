@@ -28,7 +28,7 @@ Requirements:
 The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org/) as a backend can be installed as follows:
 
 ```bash
-git clone https://github.com/sage-org/sage-bgp
+git clone https://github.com/sage-org/sage-engine
 cd sage-engine/
 pip install -r requirements.txt
 pip install -e .[hdt]
