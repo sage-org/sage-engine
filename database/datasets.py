@@ -1,14 +1,9 @@
 # datasets.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from yaml import load
-from database.hdt_file_connector import HDTFileConnector
-from database.import_manager import import_backend
+from database.import_manager import import_backend, hdt_backend
 from math import inf
 from urllib.parse import quote_plus
-
-DB_CONNECTORS = {
-    'hdt-file': HDTFileConnector
-}
 
 
 def load_config(config_file="config.yaml"):
@@ -34,13 +29,16 @@ def load_config(config_file="config.yaml"):
         file: /home/chuck-norris/facts.nt
     """
     config = load(open(config_file))
-    custom_backends = dict()
+    # available backends (populated with sage's native backends)
+    backends = {
+        'hdt-file': hdt_backend()
+    }
     # build custom backend (if there is some)
     if 'backends' in config and len(config['backends']) > 0:
         for b in config['backends']:
             if 'name' not in b or 'path' not in b or 'connector' not in b or 'required' not in b:
                 raise SyntaxError('Invalid backend declared. Each custom backend must be declared with properties "name", "path", "connector" and "required"')
-            custom_backends[b['name']] = import_backend(b['name'], b['path'], b['connector'], b['required'])
+            backends[b['name']] = import_backend(b['name'], b['path'], b['connector'], b['required'])
     # set page size, i.e. the number of triples per page
     quota = config['quota'] if 'quota' in config else 75
     max_results = config['max_results'] if 'max_results' in config else inf
@@ -55,21 +53,19 @@ def load_config(config_file="config.yaml"):
         if 'queries' not in c:
             c['queries'] = []
     # build RDF graphs
-    graphs = {c["name"]: Graph(c, custom_backends) for c in config["datasets"]}
-    return (config, graphs, custom_backends)
+    graphs = {c["name"]: Graph(c, backends) for c in config["datasets"]}
+    return (config, graphs, backends)
 
 
 class Graph(object):
     """A RDF Graph with a dedicated backend"""
 
-    def __init__(self, config, custom_backends):
+    def __init__(self, config, backends):
         super(Graph, self).__init__()
         self._config = config
         # build database connector
-        if self._config['backend'] in DB_CONNECTORS:
-            self._connector = DB_CONNECTORS[self._config['backend']].from_config(self._config)
-        elif self._config['backend'] in custom_backends:
-            self._connector = custom_backends[self._config['backend']](self._config)
+        if self._config['backend'] in backends:
+            self._connector = backends[self._config['backend']](self._config)
         else:
             raise SyntaxError('Unknown backend {} encountered'.format(self._config['backend']))
         # format preset queries
@@ -150,7 +146,7 @@ class Dataset(object):
     def __init__(self, config_file):
         super(Dataset, self).__init__()
         self._config_file = config_file
-        (self._config, self._datasets, self._custom_backends) = load_config(self._config_file)
+        (self._config, self._datasets, self._backends) = load_config(self._config_file)
         if "long_description" in self._config:
             with open(self._config["long_description"], "r") as file:
                 self._long_description = file.read()
