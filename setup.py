@@ -14,6 +14,12 @@ def install_web_deps():
 
 __version__ = "2.0.0"
 
+# dependencies required for the HDT backend
+HDT_DEPS = [
+    'pybind11==2.2.1',
+    'hdt==1.1.0'
+]
+
 console_scripts = [
     'sage = sage.http_server.cli:cli_sage'
 ]
@@ -47,6 +53,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     packages=find_packages(exclude=["tests", "tests.*"]),
+    # extras dependencies for the native backends (HDT, PostgreSQL and Cassandra)
+    extras_require={
+        'hdt': HDT_DEPS
+    },
     entry_points={
         'console_scripts': console_scripts
     }

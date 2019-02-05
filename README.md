@@ -23,12 +23,15 @@ Requirements:
 > You should have the `Python.h` header available on your system.   
 > For example, for Python 3.6, install the `python3.6-dev` package on Debian/Ubuntu systems.
 
+## Installing SaGe with the HDT backend
+
+The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org/) as a backend can be installed as follows:
+
 ```bash
 git clone https://github.com/sage-org/sage-bgp
 cd sage-engine/
-pip install pybind11
 pip install -r requirements.txt
-python setup.py install
+pip install -e .[hdt]
 ```
 
 # Getting started

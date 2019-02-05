@@ -7,7 +7,7 @@ WORKDIR /opt/sage-engine/
 COPY . .
 RUN pip install pybind11
 RUN pip install -r requirements.txt
-RUN python setup.py install
+RUN pip install -e .[hdt]
 
 EXPOSE 8000
 
