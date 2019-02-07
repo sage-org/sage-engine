@@ -23,7 +23,7 @@ class StandaloneApplication(BaseApplication):
         return self.application
 
 
-def cli_sage():
+def start_sage_server():
     parser = argparse.ArgumentParser(description='Launch the Sage server using a configuration file')
     parser.add_argument('config', metavar='config', help='Path to the configuration file')
     parser.add_argument('-p', '--port', metavar='P', type=int, help='The port to bind (default: 8000)', default=8000)

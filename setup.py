@@ -21,11 +21,11 @@ HDT_DEPS = [
 ]
 
 POSTGRESQL_DEPS = [
-    'psycopg2-binary-2.7.7'
+    'psycopg2-binary==2.7.7'
 ]
 
 console_scripts = [
-    'sage = sage.http_server.cli:cli_sage'
+    'sage = sage.cli.start_server:start_sage_server'
 ]
 
 with open('README.rst') as file:
