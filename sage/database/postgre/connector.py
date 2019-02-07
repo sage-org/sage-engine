@@ -1,9 +1,8 @@
 # postgre_connector.py
 # Author: Thomas MINIER - MIT License 2017-2019
 from sage.database.db_connector import DatabaseConnector
-from sage.database.db_iterator import DBIterator
+from sage.database.db_iterator import DBIterator, EmptyIterator
 from sage.database.postgre.cursors import create_start_cursor, create_resume_cursor
-from sage.query_engine.iterators.utils import EmptyIterator
 import psycopg2
 import json
 
@@ -113,13 +112,15 @@ class PostgreConnector(DatabaseConnector):
         else:
             # empty last_read key => the scan has already been completed
             if len(last_read) == 0:
-                return EmptyIterator(), 0
+                return EmptyIterator(pattern), 0
             # otherwise, open a cursor to resume the index scan
             p = (subject, predicate, obj)
             last_read = json.loads(last_read)
             cursor_name = create_resume_cursor(parent_cursor, p, last_read['s'], last_read['p'], last_read['o'])
         # create the iterator to yield the matching RDF triples
-        return PostgreIterator(cursor_name, self._connection, parent_cursor, pattern), 0
+        iterator = PostgreIterator(cursor_name, self._connection, parent_cursor, pattern)
+        card = 1 if iterator.has_next() else 0
+        return iterator, card
 
     def from_config(config):
         """Build a DatabaseConnector from a dictionnary"""
