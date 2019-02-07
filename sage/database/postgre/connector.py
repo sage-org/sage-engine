@@ -98,6 +98,8 @@ class PostgreConnector(DatabaseConnector):
             Returns:
                 A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
         """
+        if self._connection is None:
+            self.open()
         subject = subject if (subject is not None) and (not subject.startswith('?')) else None
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else None
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
