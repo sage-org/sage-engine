@@ -45,3 +45,19 @@ class DBIterator(ABC):
     def has_next(self):
         """Return True if there is still results to read, and False otherwise"""
         pass
+
+
+class EmptyIterator(DBIterator):
+    """docstring for EmptyIterator."""
+
+    def last_read(self):
+        """Return the index ID of the last element read"""
+        return ''
+
+    def next(self):
+        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
+        return None
+
+    def has_next(self):
+        """Return True if there is still results to read, and False otherwise"""
+        return False
