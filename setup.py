@@ -20,6 +20,10 @@ HDT_DEPS = [
     'hdt==1.1.0'
 ]
 
+POSTGRESQL_DEPS = [
+    'psycopg2-binary-2.7.7'
+]
+
 console_scripts = [
     'sage = sage.http_server.cli:cli_sage'
 ]
@@ -55,7 +59,8 @@ setup(
     packages=find_packages(exclude=["tests", "tests.*"]),
     # extras dependencies for the native backends (HDT, PostgreSQL and Cassandra)
     extras_require={
-        'hdt': HDT_DEPS
+        'hdt': HDT_DEPS,
+        'postgre': POSTGRESQL_DEPS
     },
     entry_points={
         'console_scripts': console_scripts

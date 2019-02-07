@@ -30,19 +30,39 @@ class DatabaseConnector(ABC):
     @property
     def nb_triples(self):
         """Get the number of RDF triples in the database"""
-        return None
+        return 0
+
+    def open(self):
+        """Open the database connection"""
+        pass
+
+    def close(self):
+        """Close the database connection"""
+        pass
+
+    def __enter__(self):
+        """Implementation of the __enter__ method from the context manager spec"""
+        self.open()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Implementation of the __close__ method from the context manager spec"""
+        self.close()
+
+    def __del__(self):
+        self.close()
 
     @property
     def nb_subjects(self):
         """Get the number of subjects in the database"""
-        return None
+        return 0
 
     @property
     def nb_predicates(self):
         """Get the number of predicates in the database"""
-        return None
+        return 0
 
     @property
     def nb_objects(self):
         """Get the number of objects in the database"""
-        return None
+        return 0
