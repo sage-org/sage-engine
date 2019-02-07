@@ -1,7 +1,7 @@
 # datasets.py
 # Author: Thomas MINIER - MIT License 2017-2018
 from yaml import load
-from sage.database.import_manager import import_backend, hdt_backend
+from sage.database.import_manager import import_backend, hdt_backend, postgre_backend
 from math import inf
 from urllib.parse import quote_plus
 
@@ -31,7 +31,8 @@ def load_config(config_file="config.yaml"):
     config = load(open(config_file))
     # available backends (populated with sage's native backends)
     backends = {
-        'hdt-file': hdt_backend()
+        'hdt-file': hdt_backend(),
+        'postgre': postgre_backend()
     }
     # build custom backend (if there is some)
     if 'backends' in config and len(config['backends']) > 0:
