@@ -3,6 +3,7 @@
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
 from sage.database.postgre.cursors import create_start_cursor, create_resume_cursor
+from sage.database.estimators import pattern_shape_estimate
 import psycopg2
 import json
 
@@ -119,7 +120,7 @@ class PostgreConnector(DatabaseConnector):
             cursor_name = create_resume_cursor(parent_cursor, p, last_read['s'], last_read['p'], last_read['o'])
         # create the iterator to yield the matching RDF triples
         iterator = PostgreIterator(cursor_name, self._connection, parent_cursor, pattern)
-        card = 1 if iterator.has_next() else 0
+        card = pattern_shape_estimate(subject, predicate, object) if iterator.has_next() else 0
         return iterator, card
 
     def from_config(config):
