@@ -16,8 +16,8 @@ __version__ = "2.0.0"
 
 # dependencies required for the HDT backend
 HDT_DEPS = [
-    'pybind11==2.2.1',
-    'hdt==1.1.0'
+    'pybind11==2.2.4',
+    'hdt==2.0'
 ]
 
 console_scripts = [
