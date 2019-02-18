@@ -10,6 +10,15 @@ union_queries = [
     ("""
     SELECT * WHERE {
         {
+            <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> <http://schema.org/eligibleRegion> ?o .
+        } UNION {
+            <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1001> <http://schema.org/eligibleRegion> ?o .
+        }
+    }
+    """, 7),
+    ("""
+    SELECT * WHERE {
+        {
             ?s <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
             ?s <http://purl.org/goodrelations/includes> ?includes .
             ?s <http://purl.org/goodrelations/validThrough> ?validity .
@@ -46,4 +55,4 @@ class TestUnionInterface(object):
             next_link = response['next']
             nbCalls += 1
         assert nbResults == cardinality
-        assert nbCalls > 1
+        assert nbCalls >= 1

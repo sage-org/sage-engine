@@ -38,16 +38,18 @@ message SavedIndexJoinIterator {
 
 message SavedBagUnionIterator {
   oneof left {
-    SavedProjectionIterator proj_left = 1;
-    SavedBagUnionIterator union_left = 2;
-    SavedIndexJoinIterator join_left = 3;
-    SavedFilterIterator filter_left = 4;
+    SavedScanIterator scan_left = 1;
+    SavedProjectionIterator proj_left = 2;
+    SavedBagUnionIterator union_left = 3;
+    SavedIndexJoinIterator join_left = 4;
+    SavedFilterIterator filter_left = 5;
   }
   oneof right {
-    SavedProjectionIterator proj_right = 5;
-    SavedBagUnionIterator union_right = 6;
-    SavedIndexJoinIterator join_right = 7;
-    SavedFilterIterator filter_right = 8;
+    SavedScanIterator scan_right = 6;
+    SavedProjectionIterator proj_right = 7;
+    SavedBagUnionIterator union_right = 8;
+    SavedIndexJoinIterator join_right = 9;
+    SavedFilterIterator filter_right = 10;
   }
 }
 

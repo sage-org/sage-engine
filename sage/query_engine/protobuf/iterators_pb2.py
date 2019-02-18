@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='iterators.proto',
   package='iterators',
   syntax='proto3',
-  serialized_pb=_b('\n\x0fiterators.proto\x12\titerators\"R\n\rTriplePattern\x12\x0f\n\x07subject\x18\x01 \x01(\t\x12\x11\n\tpredicate\x18\x02 \x01(\t\x12\x0e\n\x06object\x18\x03 \x01(\t\x12\r\n\x05graph\x18\x04 \x01(\t\"e\n\x11SavedScanIterator\x12(\n\x06triple\x18\x01 \x01(\x0b\x32\x18.iterators.TriplePattern\x12\x11\n\tlast_read\x18\x02 \x01(\t\x12\x13\n\x0b\x63\x61rdinality\x18\x03 \x01(\x03\"\x95\x02\n\x17SavedProjectionIterator\x12\x0e\n\x06values\x18\x01 \x03(\t\x12\x33\n\x0bscan_source\x18\x02 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x00\x12\x38\n\x0bjoin_source\x18\x03 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x38\n\x0cunion_source\x18\x04 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x00\x12\x37\n\rfilter_source\x18\x05 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x42\x08\n\x06source\"\xeb\x02\n\x16SavedIndexJoinIterator\x12\x33\n\x0bscan_source\x18\x01 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x00\x12\x38\n\x0bjoin_source\x18\x02 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x37\n\rfilter_source\x18\x03 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x12\'\n\x05inner\x18\x04 \x01(\x0b\x32\x18.iterators.TriplePattern\x12\x37\n\x03muc\x18\x05 \x03(\x0b\x32*.iterators.SavedIndexJoinIterator.MucEntry\x12\x11\n\tlast_read\x18\x06 \x01(\t\x1a*\n\x08MucEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x08\n\x06source\"\xec\x03\n\x15SavedBagUnionIterator\x12\x37\n\tproj_left\x18\x01 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x00\x12\x36\n\nunion_left\x18\x02 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x00\x12\x36\n\tjoin_left\x18\x03 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x35\n\x0b\x66ilter_left\x18\x04 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x12\x38\n\nproj_right\x18\x05 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x01\x12\x37\n\x0bunion_right\x18\x06 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x01\x12\x37\n\njoin_right\x18\x07 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x01\x12\x36\n\x0c\x66ilter_right\x18\x08 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x01\x42\x06\n\x04leftB\x07\n\x05right\"\xf5\x02\n\x13SavedFilterIterator\x12\x33\n\x0bscan_source\x18\x01 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x00\x12\x39\n\x0bproj_source\x18\x02 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x00\x12\x37\n\rfilter_source\x18\x03 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x12\x38\n\x0bjoin_source\x18\x04 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x12\n\nexpression\x18\x05 \x01(\t\x12\x32\n\x02mu\x18\x06 \x03(\x0b\x32&.iterators.SavedFilterIterator.MuEntry\x1a)\n\x07MuEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x08\n\x06source\"\xc2\x01\n\x08RootTree\x12\x39\n\x0bproj_source\x18\x01 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x00\x12\x38\n\x0cunion_source\x18\x02 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x00\x12\x37\n\rfilter_source\x18\x03 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x42\x08\n\x06sourceb\x06proto3')
+  serialized_pb=_b('\n\x0fiterators.proto\x12\titerators\"R\n\rTriplePattern\x12\x0f\n\x07subject\x18\x01 \x01(\t\x12\x11\n\tpredicate\x18\x02 \x01(\t\x12\x0e\n\x06object\x18\x03 \x01(\t\x12\r\n\x05graph\x18\x04 \x01(\t\"e\n\x11SavedScanIterator\x12(\n\x06triple\x18\x01 \x01(\x0b\x32\x18.iterators.TriplePattern\x12\x11\n\tlast_read\x18\x02 \x01(\t\x12\x13\n\x0b\x63\x61rdinality\x18\x03 \x01(\x03\"\x95\x02\n\x17SavedProjectionIterator\x12\x0e\n\x06values\x18\x01 \x03(\t\x12\x33\n\x0bscan_source\x18\x02 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x00\x12\x38\n\x0bjoin_source\x18\x03 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x38\n\x0cunion_source\x18\x04 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x00\x12\x37\n\rfilter_source\x18\x05 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x42\x08\n\x06source\"\xeb\x02\n\x16SavedIndexJoinIterator\x12\x33\n\x0bscan_source\x18\x01 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x00\x12\x38\n\x0bjoin_source\x18\x02 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x37\n\rfilter_source\x18\x03 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x12\'\n\x05inner\x18\x04 \x01(\x0b\x32\x18.iterators.TriplePattern\x12\x37\n\x03muc\x18\x05 \x03(\x0b\x32*.iterators.SavedIndexJoinIterator.MucEntry\x12\x11\n\tlast_read\x18\x06 \x01(\t\x1a*\n\x08MucEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x08\n\x06source\"\xd3\x04\n\x15SavedBagUnionIterator\x12\x31\n\tscan_left\x18\x01 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x00\x12\x37\n\tproj_left\x18\x02 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x00\x12\x36\n\nunion_left\x18\x03 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x00\x12\x36\n\tjoin_left\x18\x04 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x35\n\x0b\x66ilter_left\x18\x05 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x12\x32\n\nscan_right\x18\x06 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x01\x12\x38\n\nproj_right\x18\x07 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x01\x12\x37\n\x0bunion_right\x18\x08 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x01\x12\x37\n\njoin_right\x18\t \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x01\x12\x36\n\x0c\x66ilter_right\x18\n \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x01\x42\x06\n\x04leftB\x07\n\x05right\"\xf5\x02\n\x13SavedFilterIterator\x12\x33\n\x0bscan_source\x18\x01 \x01(\x0b\x32\x1c.iterators.SavedScanIteratorH\x00\x12\x39\n\x0bproj_source\x18\x02 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x00\x12\x37\n\rfilter_source\x18\x03 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x12\x38\n\x0bjoin_source\x18\x04 \x01(\x0b\x32!.iterators.SavedIndexJoinIteratorH\x00\x12\x12\n\nexpression\x18\x05 \x01(\t\x12\x32\n\x02mu\x18\x06 \x03(\x0b\x32&.iterators.SavedFilterIterator.MuEntry\x1a)\n\x07MuEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x08\n\x06source\"\xc2\x01\n\x08RootTree\x12\x39\n\x0bproj_source\x18\x01 \x01(\x0b\x32\".iterators.SavedProjectionIteratorH\x00\x12\x38\n\x0cunion_source\x18\x02 \x01(\x0b\x32 .iterators.SavedBagUnionIteratorH\x00\x12\x37\n\rfilter_source\x18\x03 \x01(\x0b\x32\x1e.iterators.SavedFilterIteratorH\x00\x42\x08\n\x06sourceb\x06proto3')
 )
 
 
@@ -298,57 +298,71 @@ _SAVEDBAGUNIONITERATOR = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='proj_left', full_name='iterators.SavedBagUnionIterator.proj_left', index=0,
+      name='scan_left', full_name='iterators.SavedBagUnionIterator.scan_left', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='union_left', full_name='iterators.SavedBagUnionIterator.union_left', index=1,
+      name='proj_left', full_name='iterators.SavedBagUnionIterator.proj_left', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='join_left', full_name='iterators.SavedBagUnionIterator.join_left', index=2,
+      name='union_left', full_name='iterators.SavedBagUnionIterator.union_left', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='filter_left', full_name='iterators.SavedBagUnionIterator.filter_left', index=3,
+      name='join_left', full_name='iterators.SavedBagUnionIterator.join_left', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='proj_right', full_name='iterators.SavedBagUnionIterator.proj_right', index=4,
+      name='filter_left', full_name='iterators.SavedBagUnionIterator.filter_left', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='union_right', full_name='iterators.SavedBagUnionIterator.union_right', index=5,
+      name='scan_right', full_name='iterators.SavedBagUnionIterator.scan_right', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='join_right', full_name='iterators.SavedBagUnionIterator.join_right', index=6,
+      name='proj_right', full_name='iterators.SavedBagUnionIterator.proj_right', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='filter_right', full_name='iterators.SavedBagUnionIterator.filter_right', index=7,
+      name='union_right', full_name='iterators.SavedBagUnionIterator.union_right', index=7,
       number=8, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='join_right', full_name='iterators.SavedBagUnionIterator.join_right', index=8,
+      number=9, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='filter_right', full_name='iterators.SavedBagUnionIterator.filter_right', index=9,
+      number=10, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -372,7 +386,7 @@ _SAVEDBAGUNIONITERATOR = _descriptor.Descriptor(
       index=1, containing_type=None, fields=[]),
   ],
   serialized_start=864,
-  serialized_end=1356,
+  serialized_end=1459,
 )
 
 
@@ -409,8 +423,8 @@ _SAVEDFILTERITERATOR_MUENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1681,
-  serialized_end=1722,
+  serialized_start=1784,
+  serialized_end=1825,
 )
 
 _SAVEDFILTERITERATOR = _descriptor.Descriptor(
@@ -477,8 +491,8 @@ _SAVEDFILTERITERATOR = _descriptor.Descriptor(
       name='source', full_name='iterators.SavedFilterIterator.source',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1359,
-  serialized_end=1732,
+  serialized_start=1462,
+  serialized_end=1835,
 )
 
 
@@ -525,8 +539,8 @@ _ROOTTREE = _descriptor.Descriptor(
       name='source', full_name='iterators.RootTree.source',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1735,
-  serialized_end=1929,
+  serialized_start=1838,
+  serialized_end=2032,
 )
 
 _SAVEDSCANITERATOR.fields_by_name['triple'].message_type = _TRIPLEPATTERN
@@ -561,14 +575,19 @@ _SAVEDINDEXJOINITERATOR.fields_by_name['join_source'].containing_oneof = _SAVEDI
 _SAVEDINDEXJOINITERATOR.oneofs_by_name['source'].fields.append(
   _SAVEDINDEXJOINITERATOR.fields_by_name['filter_source'])
 _SAVEDINDEXJOINITERATOR.fields_by_name['filter_source'].containing_oneof = _SAVEDINDEXJOINITERATOR.oneofs_by_name['source']
+_SAVEDBAGUNIONITERATOR.fields_by_name['scan_left'].message_type = _SAVEDSCANITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['proj_left'].message_type = _SAVEDPROJECTIONITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['union_left'].message_type = _SAVEDBAGUNIONITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['join_left'].message_type = _SAVEDINDEXJOINITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['filter_left'].message_type = _SAVEDFILTERITERATOR
+_SAVEDBAGUNIONITERATOR.fields_by_name['scan_right'].message_type = _SAVEDSCANITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['proj_right'].message_type = _SAVEDPROJECTIONITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['union_right'].message_type = _SAVEDBAGUNIONITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['join_right'].message_type = _SAVEDINDEXJOINITERATOR
 _SAVEDBAGUNIONITERATOR.fields_by_name['filter_right'].message_type = _SAVEDFILTERITERATOR
+_SAVEDBAGUNIONITERATOR.oneofs_by_name['left'].fields.append(
+  _SAVEDBAGUNIONITERATOR.fields_by_name['scan_left'])
+_SAVEDBAGUNIONITERATOR.fields_by_name['scan_left'].containing_oneof = _SAVEDBAGUNIONITERATOR.oneofs_by_name['left']
 _SAVEDBAGUNIONITERATOR.oneofs_by_name['left'].fields.append(
   _SAVEDBAGUNIONITERATOR.fields_by_name['proj_left'])
 _SAVEDBAGUNIONITERATOR.fields_by_name['proj_left'].containing_oneof = _SAVEDBAGUNIONITERATOR.oneofs_by_name['left']
@@ -581,6 +600,9 @@ _SAVEDBAGUNIONITERATOR.fields_by_name['join_left'].containing_oneof = _SAVEDBAGU
 _SAVEDBAGUNIONITERATOR.oneofs_by_name['left'].fields.append(
   _SAVEDBAGUNIONITERATOR.fields_by_name['filter_left'])
 _SAVEDBAGUNIONITERATOR.fields_by_name['filter_left'].containing_oneof = _SAVEDBAGUNIONITERATOR.oneofs_by_name['left']
+_SAVEDBAGUNIONITERATOR.oneofs_by_name['right'].fields.append(
+  _SAVEDBAGUNIONITERATOR.fields_by_name['scan_right'])
+_SAVEDBAGUNIONITERATOR.fields_by_name['scan_right'].containing_oneof = _SAVEDBAGUNIONITERATOR.oneofs_by_name['right']
 _SAVEDBAGUNIONITERATOR.oneofs_by_name['right'].fields.append(
   _SAVEDBAGUNIONITERATOR.fields_by_name['proj_right'])
 _SAVEDBAGUNIONITERATOR.fields_by_name['proj_right'].containing_oneof = _SAVEDBAGUNIONITERATOR.oneofs_by_name['right']
