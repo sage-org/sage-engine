@@ -16,3 +16,16 @@ def find_connected_pattern(variables, triples):
             return triple, pos, variables | tripleVars
         pos += 1
     return None, None, variables
+
+
+def equality_variables(subject, predicate, obj):
+    """
+        Find all variables from triple pattern with the same name, and then returns the equality expression + the triple pattern used to evaluate correctly the pattern.
+    """
+    if subject == predicate:
+        return "{} = {}".format(subject, predicate + '__2'), (subject, predicate + '__2', obj), ""
+    elif subject == obj:
+        return "{} = {}".format(subject, obj + '__2'), (subject, predicate, obj + '__2')
+    elif predicate == obj:
+        return "{} = {}".format(predicate, obj + '__2'), (subject, predicate, obj + '__2')
+    return None, (subject, predicate, obj)

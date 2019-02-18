@@ -27,7 +27,12 @@ bgp_queries = [
             ?s <http://schema.org/nationality> <http://db.uwaterloo.ca/~galuc/wsdbm/Country1> .
             ?s <http://db.uwaterloo.ca/~galuc/wsdbm/gender> <http://db.uwaterloo.ca/~galuc/wsdbm/Gender1> .
         }
-    """, 93)
+    """, 93),
+    ("""
+        SELECT * WHERE {
+            ?s <http://xmlns.com/foaf/age> ?s .
+        }
+    """, 0),
 ]
 
 

@@ -7,10 +7,10 @@ from sage.query_engine.iterators.utils import IteratorExhausted
 
 
 class ScanIterator(PreemptableIterator):
-    """A ScanIterator scans a HDT relation, i.e. RDF triples matching a triple pattern, and apply selections.
+    """A ScanIterator evaluates a triple pattern over a RDF dataset. It yields solution mappings created from RDF triples matching the triple pattern.
 
     Constructor args:
-        - source [hdt.TripleIterator] - An HDT iterator that yields RDF triple in string format.
+        - source :class:`sage.databases.DBIterator` - An HDT iterator that yields RDF triple in string format.
         - triple ``dict`` - The triple pattern corresponding to the source iterator.
         - cardinality ``[integer=0]`` - The cardinality of the triple pattern.
     """
@@ -26,7 +26,7 @@ class ScanIterator(PreemptableIterator):
         return self._cardinality
 
     def __repr__(self):
-        return "<ScanIterator { %s %s %s } OFFSET %i>" % (self._triple['subject'], self._triple['predicate'], self._triple['object'], self._source.offset)
+        return "<ScanIterator { %s %s %s }>" % (self._triple['subject'], self._triple['predicate'], self._triple['object'])
 
     def serialized_name(self):
         return "scan"

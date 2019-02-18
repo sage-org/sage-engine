@@ -51,9 +51,9 @@ def fetch_graph_triples(node, current_graphs, server_url):
 
 def parse_query(query, dataset, default_graph, server_url):
     """Parse a regular SPARQL query into a query execution plan"""
-    q_parsed = translateQuery(parseQuery(query)).algebra
+    logical_plan = translateQuery(parseQuery(query)).algebra
     cardinalities = list()
-    iterator = parse_query_node(q_parsed, dataset, [default_graph], server_url, cardinalities)
+    iterator = parse_query_node(logical_plan, dataset, [default_graph], server_url, cardinalities)
     return iterator, cardinalities
 
 

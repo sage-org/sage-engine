@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 
 class DBIterator(ABC):
     """
-        A DBIterator follows the iterator protocol and rvalyates a triple patter against a RDF dataset.
+        A DBIterator follows the iterator protocol and evaluates a triple pattern against a RDF dataset.
         Typically, a subclass of this iterator is returned by a call to DBConnector#search_pattern.
     """
 

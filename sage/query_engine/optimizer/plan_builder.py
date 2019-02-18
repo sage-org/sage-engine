@@ -7,7 +7,7 @@ from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.iterators.loader import load
 from sage.query_engine.iterators.utils import EmptyIterator
-from sage.query_engine.optimizer.utils import find_connected_pattern, get_vars
+from sage.query_engine.optimizer.utils import find_connected_pattern, get_vars, equality_variables
 from functools import reduce
 
 
@@ -89,10 +89,27 @@ def build_left_plan(bgp, dataset, default_graph):
 
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
-    # to start the pipeline, build a Scan with the most selective pattern
+
+    # start the pipeline with the Scan with the most selective pattern
     pattern = triples.pop(0)
-    pipeline = ScanIterator(pattern['iterator'], pattern['triple'], pattern['cardinality'])
     query_vars = get_vars(pattern['triple'])
+
+    # add a equality filter if the pattern has several variables that binds to the same value
+    # example: ?s rdf:type ?s => Filter(Scan(?s rdf:type ?s_2), ?s == ?s_2)
+    eq_expr, new_pattern = equality_variables(pattern['triple']['subject'], pattern['triple']['predicate'], pattern['triple']['object'])
+    if eq_expr is not None:
+        # copy pattern with rewritten values
+        triple = pattern['triple'].copy()
+        triple["subject"] = new_pattern[0]
+        triple["predicate"] = new_pattern[1]
+        triple["object"] = new_pattern[2]
+        # build a pipline with Index Scan + Equality filter
+        pipeline = ScanIterator(pattern['iterator'], triple, pattern['cardinality'])
+        pipeline = FilterIterator(pipeline, eq_expr)
+        # update query variables
+        query_vars = query_vars | get_vars(triple)
+    else:
+        pipeline = ScanIterator(pattern['iterator'], pattern['triple'], pattern['cardinality'])
 
     # build the left linear tree of joins
     while len(triples) > 0:
