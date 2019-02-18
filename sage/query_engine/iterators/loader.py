@@ -43,7 +43,10 @@ def load_filter(saved_plan, dataset):
     """Load a FilterIterator from a protobuf serialization"""
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), dataset)
-    return FilterIterator(source, saved_plan.expression)
+    mu = None
+    if len(saved_plan.mu) > 0:
+        mu = saved_plan.mu
+    return FilterIterator(source, saved_plan.expression, mu=mu)
 
 
 def load_scan(saved_plan, dataset):

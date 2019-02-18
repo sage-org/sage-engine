@@ -3,11 +3,13 @@
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from sage.query_engine.iterators.utils import IteratorExhausted
+from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 from rdflib import URIRef, Variable
 from rdflib.plugins.sparql.parser import parseQuery
 from rdflib.plugins.sparql.algebra import translateQuery
 from rdflib.plugins.sparql.sparql import QueryContext, Bindings
 from rdflib.util import from_n3
+from asyncio import sleep
 
 
 def to_rdflib_term(value):
@@ -23,10 +25,11 @@ def to_rdflib_term(value):
 class FilterIterator(PreemptableIterator):
     """A FilterIterator evaluates a FILTER clause on set of mappings"""
 
-    def __init__(self, source, expression):
+    def __init__(self, source, expression, mu=None):
         super(FilterIterator, self).__init__()
         self._source = source
         self._raw_expression = expression
+        self._mu = mu
         # compile the expression using rdflib
         compiled_expr = parseQuery("SELECT * WHERE {?s ?p ?o FILTER(" + expression + ")}")
         compiled_expr = translateQuery(compiled_expr)
@@ -48,14 +51,24 @@ class FilterIterator(PreemptableIterator):
     async def next(self):
         if not self.has_next():
             raise IteratorExhausted()
-        mu = await self._source.next()
-        while not self._evaluate(mu):
-            mu = await self._source.next()
+        if self._mu is None:
+            self._mu = await self._source.next()
+        cpt = 0
+        while not self._evaluate(self._mu):
+            cpt += 1
+            self._mu = await self._source.next()
+            if cpt > 50:
+                cpt = 0
+                await sleep(0)
+        if not self.has_next():
+            raise IteratorExhausted()
+        mu = self._mu
+        self._mu = None
         return mu
 
     def has_next(self):
         """Return True if the iterator has more item to yield"""
-        return self._source.has_next()
+        return self._mu is not None or self._source.has_next()
 
     def save(self):
         """Save and serialize the iterator as a machine-readable format"""
@@ -63,4 +76,6 @@ class FilterIterator(PreemptableIterator):
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_filter, source_field).CopyFrom(self._source.save())
         saved_filter.expression = self._raw_expression
+        if self._mu is not None:
+            pyDict_to_protoDict(self._mu, saved_filter.mu)
         return saved_filter

@@ -59,6 +59,7 @@ message SavedFilterIterator {
     SavedIndexJoinIterator join_source = 4;
   }
   string expression = 5;
+  map<string, string> mu = 6;
 }
 
 message RootTree {
