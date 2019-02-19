@@ -10,9 +10,6 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-env:
-  - WATDIV_LINK=https://uncloud.univ-nantes.fr/index.php/s/HaxZmJZJWkgSmQx/download
-  - WATDIV_INDEX_LINK=https://uncloud.univ-nantes.fr/index.php/s/C33QKCLNpc8YkNF/download
 before_install:
   - pip install pytest
   - wget -O watdiv.10M.hdt $WATDIV_LINK
