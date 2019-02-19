@@ -11,11 +11,14 @@ addons:
     packages:
     - g++-4.8
 env:
-  - WATDIV_LINK=https://hqrciw.bl.files.1drv.com/y4mXcGeDGwx0Dh82KRnxZTPaDf50wX31JnPm1t7ODXBlcuEwPk6NIegdcSFjclambp62u_xgtJBjTEWgpD32aEDRjFOAzzi4ysWXXfGdxTIq1UaOj72t5GZPPX-wi9LXcqQoFIzQA74Q5_EH9Vt9bP4MOMX8jXIFz3F3zEqtDKuTG53ZC05LjXybFzhy0Pvukd4W58Xtkh5ZcO2jiZ6HxkcYA/watdiv.10M.hdt?download
+  - WATDIV_LINK=https://uncloud.univ-nantes.fr/index.php/s/HaxZmJZJWkgSmQx/download
+  - WATDIV_INDEX_LINK=https://uncloud.univ-nantes.fr/index.php/s/C33QKCLNpc8YkNF/download
 before_install:
   - pip install pytest
   - wget -O watdiv.10M.hdt $WATDIV_LINK
+  - wget -O watdiv.10M.hdt.index.v1-1 $WATDIV_INDEX_LINK
   - cp watdiv.10M.hdt tests/data/watdiv.10M.hdt
+  - cp watdiv.10M.hdt.index.v1-1 tests/data/watdiv.10M.hdt.index.v1-1
 install:
   - pip install pybind11
   - pip install -r requirements.txt
