@@ -1,4 +1,6 @@
 # Sage: a SPARQL query engine for public Linked Data providers
+[![Build Status](https://travis-ci.com/sage-org/sage-engine.svg?branch=master)](https://travis-ci.com/sage-org/sage-engine)
+
 Python implementation of SaGe, a stable, responsive and unrestricted SPARQL query server.
 
 # Table of contents
