@@ -1,5 +1,5 @@
 # cli.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2019
 import argparse
 from os.path import isfile
 from sage.http_server.server import sage_app

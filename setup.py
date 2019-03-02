@@ -25,7 +25,8 @@ POSTGRESQL_DEPS = [
 ]
 
 console_scripts = [
-    'sage = sage.cli.start_server:start_sage_server'
+    'sage = sage.cli.start_server:start_sage_server',
+    'sage-postgre-init = sage.cli.postgre:init_postgre'
 ]
 
 with open('README.rst') as file:
