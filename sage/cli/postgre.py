@@ -4,6 +4,7 @@ import sage.cli.postgre_utils as p_utils
 from sage.cli.utils import load_dataset, get_rdf_reader
 import argparse
 import psycopg2
+from psycopg2.extras import execute_values
 import coloredlogs
 import logging
 from math import modf
@@ -40,6 +41,9 @@ def init_postgre():
     connection = connect_postgre(dataset)
     if connection is None:
         exit(1)
+    # turn off autocommit
+    connection.autocommit = False
+
     # create all SQL queries used to init the dataset, using the dataset name
     table_name = dataset['name']
     create_table_query = p_utils.get_postgre_create_table(table_name)
@@ -98,9 +102,12 @@ def put_postgre():
     logger.info("Connected to PostgreSQL server")
     if connection is None:
         exit(1)
+    # turn off autocommit
+    connection.autocommit = False
 
+    # compute SQL table name and the bulk load SQL query
     table_name = dataset['name']
-    insert_into_query = p_utils.get_postgre_insert_into(table_name, args.block_size)
+    insert_into_query = p_utils.get_postgre_insert_into(table_name)
 
     logger.info("Reading RDF source file...")
     iterator, nb_triples = get_rdf_reader(args.source, format=args.rdf_format)
@@ -120,8 +127,8 @@ def put_postgre():
         bucket.append(triple)
         # bucket read to be inserted
         if len(bucket) >= args.block_size:
-            values = [term for triple in bucket for term in triple]
-            cursor.execute(insert_into_query, values)
+            # bulk load the bucket of RDF triples
+            execute_values(cursor, insert_into_query, bucket, page_size=args.block_size)
             bucket = list()
             # update and display progress
             frac_part, progress = modf(cpt / nb_triples * 100)
@@ -130,11 +137,16 @@ def put_postgre():
                 logger.info("Progression: {}% ({}/{} RDF triples ingested)".format(progress, cpt, nb_triples))
     # finish the last non-empty bucket
     if len(bucket) > 0:
-        insert_into_query = p_utils.get_postgre_insert_into(table_name, len(bucket))
-        values = [term for triple in bucket for term in triple]
-        cursor.execute(insert_into_query, values)
+        execute_values(cursor, insert_into_query, bucket, page_size=args.block_size)
     end = time()
     logger.info("RDF triples ingestion successfully completed in {}s".format(end - start))
+
+    # run an ANALYZE query to rebuild statistics
+    logger.info("Rebuilding table statistics...")
+    start = time()
+    cursor.execute("ANALYZE {}".format(table_name))
+    end = time()
+    logger.info("Table statistics successfully rebuilt in {}s".format(end - time))
 
     # commit and cleanup connection
     logger.info("Committing and cleaning up...")

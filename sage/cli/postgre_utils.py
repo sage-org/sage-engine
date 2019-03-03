@@ -182,9 +182,8 @@ def get_postgre_functions(table_name):
     return map(__mapper, POSTGRE_FUNCTIONS)
 
 
-def get_postgre_insert_into(table_name, block_size=1):
-    query = "INSERT INTO {} (subject,predicate,object) VALUES (%s,%s,%s)"
-    for i in range(block_size - 1):
-        query += ",(%s,%s,%s)"
-    query += " ON CONFLICT (subject,predicate,object) DO NOTHING"
-    return query.format(table_name)
+def get_postgre_insert_into(table_name):
+    """
+        Get an INSERT INTO query, compatible with `psycopg2.extras.execute_values` to support bulk loading
+    """
+    return "INSERT INTO {} (subject,predicate,object) VALUES %s ON CONFLICT (subject,predicate,object) DO NOTHING".format(table_name)
