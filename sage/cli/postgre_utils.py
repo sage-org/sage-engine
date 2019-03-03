@@ -180,3 +180,11 @@ def get_postgre_functions(table_name):
         return fn.format(table_name, table_name)
 
     return map(__mapper, POSTGRE_FUNCTIONS)
+
+
+def get_postgre_insert_into(table_name, block_size=1):
+    query = "INSERT INTO {} (subject,predicate,object) VALUES (%s,%s,%s)"
+    for i in range(block_size - 1):
+        query += ",(%s,%s,%s)"
+    query += " ON CONFLICT (subject,predicate,object) DO NOTHING"
+    return query.format(table_name)
