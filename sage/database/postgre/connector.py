@@ -57,6 +57,7 @@ class PostgreConnector(DatabaseConnector):
         A PostgreConnector search for RDF triples in a PostgreSQL database.
 
         Constructor arguments:
+            - table_name `str`: Name of the SQL table containing RDF data.
             - dbname `str`: the database name
             - user `str`: user name used to authenticate
             - password `str`: password used to authenticate
@@ -64,8 +65,9 @@ class PostgreConnector(DatabaseConnector):
             - port `int`: connection port number (defaults to 5432 if not provided)
     """
 
-    def __init__(self, dbname, user, password, host='', port=5432):
+    def __init__(self, table_name, dbname, user, password, host='', port=5432):
         super(PostgreConnector, self).__init__()
+        self._table_name = table_name
         self._dbname = dbname
         self._user = user
         self._password = password
@@ -109,7 +111,7 @@ class PostgreConnector(DatabaseConnector):
         parent_cursor = self._connection.cursor()
         # open a cursor to start a new index scan
         if last_read is None:
-            cursor_name = create_start_cursor(parent_cursor, subject, predicate, obj)
+            cursor_name = create_start_cursor(parent_cursor, self._table_name, subject, predicate, obj)
         else:
             # empty last_read key => the scan has already been completed
             if len(last_read) == 0:
@@ -117,7 +119,7 @@ class PostgreConnector(DatabaseConnector):
             # otherwise, open a cursor to resume the index scan
             p = (subject, predicate, obj)
             last_read = json.loads(last_read)
-            cursor_name = create_resume_cursor(parent_cursor, p, last_read['s'], last_read['p'], last_read['o'])
+            cursor_name = create_resume_cursor(parent_cursor, self._table_name, p, last_read['s'], last_read['p'], last_read['o'])
         # create the iterator to yield the matching RDF triples
         iterator = PostgreIterator(cursor_name, self._connection, parent_cursor, pattern)
         card = pattern_shape_estimate(subject, predicate, object) if iterator.has_next() else 0
@@ -127,6 +129,7 @@ class PostgreConnector(DatabaseConnector):
         """Build a DatabaseConnector from a dictionnary"""
         if 'dbname' not in config or 'user' not in config or 'password' not in config:
             raise SyntaxError('A valid configuration for a PostgreSQL connector must contains the dbname, user and password fields')
+        table_name = config['name']
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
-        return PostgreConnector(config['dbname'], config['user'], config['password'], host=host, port=port)
+        return PostgreConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port)

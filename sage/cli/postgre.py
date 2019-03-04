@@ -91,6 +91,7 @@ def put_postgre():
     parser.add_argument('source', metavar='source', help='File containing RDF triples')
     parser.add_argument('-f', '--format', dest='rdf_format', help='Format of the input file. Supported: nt (N-triples), ttl (Turtle) and hdt (HDT). Default to nt', default='nt')
     parser.add_argument('-b', '--block_size', dest='block_size', help='Block size used for the bulk loading. Defaults to 100', type=int, default=100)
+    parser.add_argument('-c', '--commit_threshold', dest='commit_threshold', help='Commit after sending this number of RDF triples. Defaults to 500000', type=int, default=500000)
     args = parser.parse_args()
 
     # load dataset from config file
@@ -121,15 +122,23 @@ def put_postgre():
     cpt = 0
     prev_progress = 0.0
     start = time()
+    to_commit = 0
     # insert by bucket
     for triple in iterator:
         cpt += 1
+        to_commit += 1
         bucket.append(triple)
         # bucket read to be inserted
         if len(bucket) >= args.block_size:
             # bulk load the bucket of RDF triples
             execute_values(cursor, insert_into_query, bucket, page_size=args.block_size)
             bucket = list()
+            # commit if above threshold
+            if to_commit >= args.commit_threshold:
+                logger.info("Commit threshold reached. Committing all changes...")
+                connection.commit()
+                logger.info("All changes were successfully committed.")
+                to_commit = 0
             # update and display progress
             frac_part, progress = modf(cpt / nb_triples * 100)
             if prev_progress < progress:
@@ -146,7 +155,7 @@ def put_postgre():
     start = time()
     cursor.execute("ANALYZE {}".format(table_name))
     end = time()
-    logger.info("Table statistics successfully rebuilt in {}s".format(end - time))
+    logger.info("Table statistics successfully rebuilt in {}s".format(end - start))
 
     # commit and cleanup connection
     logger.info("Committing and cleaning up...")
