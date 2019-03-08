@@ -9,3 +9,4 @@ flask-cors==3.0.3
 protobuf==3.5.2
 markdown==2.6.11
 coloredlogs==10.0
+click==7.0.

@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 import sage.cli.postgre_utils as p_utils
 from sage.cli.utils import load_dataset, get_rdf_reader
-import argparse
+import click
 import psycopg2
 from psycopg2.extras import execute_values
 import coloredlogs
@@ -24,18 +24,19 @@ def connect_postgre(dataset):
     return psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
 
 
-def init_postgre():
-    """Initialize a PostgreSQL table in order to be used as a RDF dataset by Sage"""
+@click.command()
+@click.argument("config")
+@click.argument("dataset_name")
+def init_postgre(config, dataset_name):
+    """
+        Initialize the RDF dataset DATASET_NAME with a PostgreSQL backend, described in the configuration file CONFIG.
+    """
     # install logger
     coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
     logger = logging.getLogger(__name__)
 
-    parser = argparse.ArgumentParser(description='Initialize a PostGre table to be used as a backend by a Sage server')
-    parser.add_argument('config', metavar='config', help='Path to the configuration file used')
-    parser.add_argument('dataset', metavar='dataset', help='Name of the dataset to initialize (as declared in the configuration file provided)')
-    args = parser.parse_args()
     # load dataset from config file
-    dataset = load_dataset(args.config, args.dataset, 'postgre', logger)
+    dataset = load_dataset(config, dataset_name, 'postgre', logger)
 
     # init postgre connection
     connection = connect_postgre(dataset)
@@ -79,23 +80,26 @@ def init_postgre():
     logger.info("Sage PostgreSQL model for table {} successfully initialized".format(table_name))
 
 
-def put_postgre():
-    """Insert RDF triples into a PostgreSQL Sage dataset"""
+@click.command()
+@click.argument("rdf_file")
+@click.argument("config")
+@click.argument("dataset_name")
+@click.option("-f", "--format", type=click.Choice(["nt", "ttl", "hdt"]),
+              default="nt", show_default=True, help="Format of the input file. Supported: nt (N-triples), ttl (Turtle) and hdt (HDT).")
+@click.option("-b", "--block_size", type=int, default=100, show_default=True,
+              help="Block size used for the bulk loading")
+@click.option("-c", "--commit_threshold", type=int, default=500000, show_default=True,
+              help="Commit after sending this number of RDF triples")
+def put_postgre(config, dataset_name, rdf_file, rdf_format, block_size, commit_threshold):
+    """
+        Inert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL backend.
+    """
     # install logger
     coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
     logger = logging.getLogger(__name__)
 
-    parser = argparse.ArgumentParser(description='Insert RDF triples into a PostgreSQL dataset')
-    parser.add_argument('config', metavar='config', help='Path to the configuration file used')
-    parser.add_argument('dataset', metavar='dataset', help='Name of the dataset to initialize (as declared in the configuration file provided)')
-    parser.add_argument('source', metavar='source', help='File containing RDF triples')
-    parser.add_argument('-f', '--format', dest='rdf_format', help='Format of the input file. Supported: nt (N-triples), ttl (Turtle) and hdt (HDT). Default to nt', default='nt')
-    parser.add_argument('-b', '--block_size', dest='block_size', help='Block size used for the bulk loading. Defaults to 100', type=int, default=100)
-    parser.add_argument('-c', '--commit_threshold', dest='commit_threshold', help='Commit after sending this number of RDF triples. Defaults to 500000', type=int, default=500000)
-    args = parser.parse_args()
-
     # load dataset from config file
-    dataset = load_dataset(args.config, args.dataset, 'postgre', logger)
+    dataset = load_dataset(config, dataset_name, 'postgre', logger)
 
     # init postgre connection
     logger.info("Connecting to PostgreSQL server...")
@@ -111,7 +115,7 @@ def put_postgre():
     insert_into_query = p_utils.get_postgre_insert_into(table_name)
 
     logger.info("Reading RDF source file...")
-    iterator, nb_triples = get_rdf_reader(args.source, format=args.rdf_format)
+    iterator, nb_triples = get_rdf_reader(rdf_file, format=rdf_format)
     logger.info("RDF source file loaded. ~{} RDF triples to ingest.".format(nb_triples))
 
     logger.info("Starting RDF triples ingestion...")
@@ -129,12 +133,12 @@ def put_postgre():
         to_commit += 1
         bucket.append(triple)
         # bucket read to be inserted
-        if len(bucket) >= args.block_size:
+        if len(bucket) >= block_size:
             # bulk load the bucket of RDF triples
-            execute_values(cursor, insert_into_query, bucket, page_size=args.block_size)
+            execute_values(cursor, insert_into_query, bucket, page_size=block_size)
             bucket = list()
             # commit if above threshold
-            if to_commit >= args.commit_threshold:
+            if to_commit >= commit_threshold:
                 logger.info("Commit threshold reached. Committing all changes...")
                 connection.commit()
                 logger.info("All changes were successfully committed.")
@@ -146,7 +150,7 @@ def put_postgre():
                 logger.info("Progression: {}% ({}/{} RDF triples ingested)".format(progress, cpt, nb_triples))
     # finish the last non-empty bucket
     if len(bucket) > 0:
-        execute_values(cursor, insert_into_query, bucket, page_size=args.block_size)
+        execute_values(cursor, insert_into_query, bucket, page_size=block_size)
     end = time()
     logger.info("RDF triples ingestion successfully completed in {}s".format(end - start))
 
@@ -162,4 +166,4 @@ def put_postgre():
     connection.commit()
     cursor.close()
     connection.close()
-    logger.info("RDF data from file '{}' successfully inserted into RDF dataset '{}'".format(args.source, table_name))
+    logger.info("RDF data from file '{}' successfully inserted into RDF dataset '{}'".format(rdf_file, table_name))

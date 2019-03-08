@@ -72,7 +72,7 @@ POSTGRE_FUNCTIONS = [
     """
     CREATE OR REPLACE FUNCTION {}_scan_vpv(refcursor, pred text) RETURNS refcursor AS $$
     BEGIN
-        OPEN $1 FOR SELECT * FROM {} WHERE predicate = $2 ORDER BY subject, object;
+        OPEN $1 FOR SELECT * FROM {} WHERE predicate = $2;
         RETURN $1;
     END;
     $$ LANGUAGE plpgsql;
@@ -81,7 +81,7 @@ POSTGRE_FUNCTIONS = [
     """
     CREATE OR REPLACE FUNCTION {}_resume_vpv(refcursor, subj text, pred text, obj text) RETURNS refcursor AS $$
     BEGIN
-        OPEN $1 FOR SELECT * FROM {} WHERE predicate = $3 AND (subject, object) >= ($2, $4) ORDER BY subject, object;
+        OPEN $1 FOR SELECT * FROM {} WHERE predicate = $3 AND (subject, object) >= ($2, $4);
         RETURN $1;
     END;
     $$ LANGUAGE plpgsql;
@@ -90,7 +90,7 @@ POSTGRE_FUNCTIONS = [
     """
     CREATE OR REPLACE FUNCTION {}_scan_vvo(refcursor, obj text) RETURNS refcursor AS $$
     BEGIN
-        OPEN $1 FOR SELECT * FROM {} WHERE object = $2 ORDER BY subject, predicate;
+        OPEN $1 FOR SELECT * FROM {} WHERE object = $2;
         RETURN $1;
     END;
     $$ LANGUAGE plpgsql;
@@ -99,7 +99,7 @@ POSTGRE_FUNCTIONS = [
     """
     CREATE OR REPLACE FUNCTION {}_resume_vvo(refcursor, subj text, pred text, obj text) RETURNS refcursor AS $$
     BEGIN
-        OPEN $1 FOR SELECT * FROM {} WHERE object = $4 AND (subject, predicate) >= ($2, $3) ORDER BY subject, predicate;
+        OPEN $1 FOR SELECT * FROM {} WHERE object = $4 AND (subject, predicate) >= ($2, $3);
         RETURN $1;
     END;
     $$ LANGUAGE plpgsql;
