@@ -74,18 +74,17 @@ sage my_config.yaml -w 4 -p 8000
 
 The full usage of the `sage` executable is detailed below:
 ```
-usage: sage [-h] [-p P] [-w W] [--log-level LEVEL] config
+Usage: sage [OPTIONS] CONFIG
 
-Launch the Sage server using a configuration file
+  Launch the Sage server using the CONFIG configuration file
 
-positional arguments:
-  config             Path to the configuration file
-
-optional arguments:
-  -h, --help         show this help message and exit
-  -p P, --port P     The port to bind (default: 8000)
-  -w W, --workers W  The number of server workers (default: 4)
-  --log-level LEVEL  The granularity of log outputs (default: info)
+Options:
+  -p, --port INTEGER              The port to bind  [default: 8000]
+  -w, --workers INTEGER           The number of server workers  [default: 4]
+  --log-level [debug|info|warning|error]
+                                  The granularity of log outputs  [default:
+                                  info]
+  --help                          Show this message and exit.
 ```
 
 # Sage Docker image
@@ -97,7 +96,6 @@ In order to use it, do not forget to [mount in the container](https://docs.docke
 docker pull callidon/sage
 docker run -v path/to/config-file:/opt/data/ -p 8000:8000 callidon/sage sage /opt/data/config.yaml -w 4 -p 8000
 ```
-
 
 # Documentation
 
