@@ -81,7 +81,7 @@ POSTGRE_FUNCTIONS = [
     """
     CREATE OR REPLACE FUNCTION {}_resume_vpv(refcursor, subj text, pred text, obj text) RETURNS refcursor AS $$
     BEGIN
-        OPEN $1 FOR SELECT * FROM {} WHERE predicate = $3 AND (subject, object) >= ($2, $4);
+        OPEN $1 FOR SELECT * FROM {} WHERE predicate = $3 AND (object, subject) >= ($4, $2);
         RETURN $1;
     END;
     $$ LANGUAGE plpgsql;
