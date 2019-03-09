@@ -7,8 +7,19 @@ import psycopg2
 from psycopg2.extras import execute_values
 import coloredlogs
 import logging
-from math import modf
 from time import time
+
+
+def bucketify(iterable, bucket_size):
+    """Group items from an iterable by buckets"""
+    bucket = list()
+    for item in iterable:
+        bucket.append(item)
+        if len(bucket) >= bucket_size:
+            yield bucket
+            bucket = list()
+    if len(bucket) > 0:
+        yield bucket
 
 
 def connect_postgre(dataset):
@@ -135,7 +146,7 @@ def index_postgre(config, dataset_name):
               help="Block size used for the bulk loading")
 @click.option("-c", "--commit_threshold", type=int, default=500000, show_default=True,
               help="Commit after sending this number of RDF triples")
-def put_postgre(config, dataset_name, rdf_file, rdf_format, block_size, commit_threshold):
+def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_threshold):
     """
         Inert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL backend.
     """
@@ -160,42 +171,29 @@ def put_postgre(config, dataset_name, rdf_file, rdf_format, block_size, commit_t
     insert_into_query = p_utils.get_postgre_insert_into(table_name)
 
     logger.info("Reading RDF source file...")
-    iterator, nb_triples = get_rdf_reader(rdf_file, format=rdf_format)
-    logger.info("RDF source file loaded. ~{} RDF triples to ingest.".format(nb_triples))
+    iterator, nb_triples = get_rdf_reader(rdf_file, format=format)
+    logger.info("RDF source file loaded. Found ~{} RDF triples to ingest.".format(nb_triples))
 
     logger.info("Starting RDF triples ingestion...")
     cursor = connection.cursor()
 
     # insert rdf triples
-    bucket = list()
-    cpt = 0
-    prev_progress = 0.0
     start = time()
     to_commit = 0
-    # insert by bucket
-    for triple in iterator:
-        cpt += 1
-        to_commit += 1
-        bucket.append(triple)
-        # bucket read to be inserted
-        if len(bucket) >= block_size:
-            # bulk load the bucket of RDF triples
+    # insert by bucket (and show a progress bar)
+    with click.progressbar(length=nb_triples,
+                           label="Inserting RDF triples".format(nb_triples)) as bar:
+        for bucket in bucketify(iterator, block_size):
+            to_commit += len(bucket)
+            # bulk load the bucket of RDF triples, then update progress bar
             execute_values(cursor, insert_into_query, bucket, page_size=block_size)
-            bucket = list()
+            bar.update(len(bucket))
             # commit if above threshold
             if to_commit >= commit_threshold:
-                logger.info("Commit threshold reached. Committing all changes...")
+                # logger.info("Commit threshold reached. Committing all changes...")
                 connection.commit()
-                logger.info("All changes were successfully committed.")
+                # logger.info("All changes were successfully committed.")
                 to_commit = 0
-            # update and display progress
-            frac_part, progress = modf(cpt / nb_triples * 100)
-            if prev_progress < progress:
-                prev_progress = progress
-                logger.info("Progression: {}% ({}/{} RDF triples ingested)".format(progress, cpt, nb_triples))
-    # finish the last non-empty bucket
-    if len(bucket) > 0:
-        execute_values(cursor, insert_into_query, bucket, page_size=block_size)
     end = time()
     logger.info("RDF triples ingestion successfully completed in {}s".format(end - start))
 
