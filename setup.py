@@ -20,16 +20,19 @@ HDT_DEPS = [
     'hdt==2.0'
 ]
 
+# dependencies required for the PostgreSQL backend
 POSTGRESQL_DEPS = [
     'psycopg2-binary==2.7.7'
 ]
 
-POSTGRESQL_DEPS = [
-    'psycopg2-binary==2.7.7'
+# dependencies required for the CLI utilities (sage-query, sage-put, etc)
+COMMONS_DEPS = HDT_DEPS + POSTGRESQL_DEPS + [
+    'requests==2.21.0'
 ]
 
 console_scripts = [
     'sage = sage.cli.start_server:start_sage_server',
+    'sage-query = sage.cli.commons:sage_query',
     'sage-postgre-init = sage.cli.postgre:init_postgre',
     'sage-postgre-index = sage.cli.postgre:index_postgre',
     'sage-postgre-put = sage.cli.postgre:put_postgre'
@@ -65,9 +68,11 @@ setup(
     zip_safe=False,
     packages=find_packages(exclude=["tests", "tests.*"]),
     # extras dependencies for the native backends (HDT, PostgreSQL and Cassandra)
+    # and the CLI commons
     extras_require={
         'hdt': HDT_DEPS,
-        'postgre': POSTGRESQL_DEPS
+        'postgre': POSTGRESQL_DEPS,
+        'commons': COMMONS_DEPS
     },
     entry_points={
         'console_scripts': console_scripts
