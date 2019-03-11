@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
-from sage.database.postgre.cursors import create_start_cursor, create_resume_cursor
+from sage.database.postgre.queries import get_start_query, get_resume_query
 from sage.database.estimators import pattern_shape_estimate
 import psycopg2
 import json
@@ -11,22 +11,24 @@ import json
 class PostgreIterator(DBIterator):
     """An PostgreIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file"""
 
-    def __init__(self, cursor_name, connection, root_cursor, pattern):
+    def __init__(self, cursor, connection, start_query, start_params, table_name, pattern):
         super(PostgreIterator, self).__init__(pattern)
-        self._cursor_name = cursor_name
+        self._cursor = cursor
         self._connection = connection
-        self._query_cursor = self._connection.cursor(self._cursor_name)
-        self._root_cursor = root_cursor
-        # always keep the current row buffered inside the iterator
-        self._last_read = self._query_cursor.fetchone()
-
-    def __del__(self):
-        """Destructor, which commit all reads and then close cursors"""
-        # TODO activating the following line yield "psycopg2.ProgrammingError: named cursor isn't valid anymore"
-        # my guess: the cursor is not re-open, so the driver uses the previous cursor which belongs to a committed transaction
+        self._current_query = start_query
+        self._table_name = table_name
+        # resume query execution with a SQL query
+        self._cursor.execute(self._current_query, start_params)
         # self._connection.commit()
-        self._query_cursor.close()
-        self._root_cursor.close()
+        # always keep the current row buffered inside the iterator
+        self._last_read = self._cursor.fetchone()
+
+    def __advance_iteration(self, last_read):
+        query, params = get_resume_query(self._pattern["subject"], self._pattern["predicate"], self._pattern["object"], last_read, self._table_name, symbol=">")
+        if query is not None and params is not None:
+            self._current_query = query
+            # self._connection.commit()
+            self._cursor.execute(self._current_query, params)
 
     def last_read(self):
         """Return the index ID of the last element read"""
@@ -44,7 +46,11 @@ class PostgreIterator(DBIterator):
         triple = self._last_read
         if triple is None:
             return None
-        self._last_read = self._query_cursor.fetchone()
+        self._last_read = self._cursor.fetchone()
+        # truy to fetch the next page
+        if self._last_read is None:
+            self.__advance_iteration(triple)
+            self._last_read = self._cursor.fetchone()
         return triple
 
     def has_next(self):
@@ -65,7 +71,7 @@ class PostgreConnector(DatabaseConnector):
             - port `int`: connection port number (defaults to 5432 if not provided)
     """
 
-    def __init__(self, table_name, dbname, user, password, host='', port=5432):
+    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=100):
         super(PostgreConnector, self).__init__()
         self._table_name = table_name
         self._dbname = dbname
@@ -73,6 +79,7 @@ class PostgreConnector(DatabaseConnector):
         self._password = password
         self._host = host
         self._port = port
+        self._fetch_size = fetch_size
         self._connection = None
 
     def open(self):
@@ -108,20 +115,20 @@ class PostgreConnector(DatabaseConnector):
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
 
         # cursor used to create the query cursor
-        parent_cursor = self._connection.cursor()
-        # open a cursor to start a new index scan
+        cursor = self._connection.cursor()
+        # create a SQL query to start a new index scan
         if last_read is None:
-            cursor_name = create_start_cursor(parent_cursor, self._table_name, subject, predicate, obj)
+            start_query, start_params = get_start_query(subject, predicate, obj, self._table_name, fetch_size=self._fetch_size)
         else:
             # empty last_read key => the scan has already been completed
             if len(last_read) == 0:
                 return EmptyIterator(pattern), 0
-            # otherwise, open a cursor to resume the index scan
-            p = (subject, predicate, obj)
+            # otherwise, create a SQL query to resume the index scan
             last_read = json.loads(last_read)
-            cursor_name = create_resume_cursor(parent_cursor, self._table_name, p, last_read['s'], last_read['p'], last_read['o'])
+            t = (last_read["s"], last_read["p"], last_read["o"])
+            start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name, fetch_size=self._fetch_size)
         # create the iterator to yield the matching RDF triples
-        iterator = PostgreIterator(cursor_name, self._connection, parent_cursor, pattern)
+        iterator = PostgreIterator(cursor, self._connection, start_query, start_params, self._table_name, pattern)
         card = pattern_shape_estimate(subject, predicate, object) if iterator.has_next() else 0
         return iterator, card
 

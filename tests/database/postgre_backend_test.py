@@ -32,8 +32,6 @@ def test_postgre_resume_scan(subj, pred, obj, expected):
             # read first triple, then stop and reload a new iterator
             assert_next_triple(iterator, expected)
             last_read = iterator.last_read()
-            # force close the iterator, to end the previous transaction
-            iterator.__del__()
             iterator, c = backend.search(subj, pred, obj, last_read=last_read)
             while iterator.has_next() and len(expected) > 0:
                 assert_next_triple(iterator, expected)
