@@ -62,8 +62,6 @@ def parse_query(query, dataset, default_graph, server_url):
         return iterator, cardinalities
     except ParseException:
         return parse_update(query, dataset, default_graph)
-    except Exception as e:
-        raise UnsupportedSPARQL("Unsupported SPARQL query: {}".format(str(e)))
 
 
 def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):

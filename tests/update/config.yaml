@@ -1,0 +1,19 @@
+name: SaGe update esting Server
+maintainer: Thomas Minier
+public_url: http://localhost:8000
+quota: 100000
+backends:
+-
+  # name of the new backend (used in the "backend" field when declaring a dataset)
+  name: memory
+  # source file containing the backend logic
+  path: tests.utils
+  # Connector class: a subclass of sage.database.db_connector.DatabaseConnector
+  connector: MemoryDatabase
+  # required parameters used to configure the backend
+  required: []
+datasets:
+-
+  name: update-test
+  description: Testing dataset
+  backend: memory
