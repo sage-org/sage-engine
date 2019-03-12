@@ -113,6 +113,14 @@ class Graph(object):
         """
         return self._connector.search(subject, predicate, obj, last_read)
 
+    def insert(self, subject, predicate, obj):
+        """Insert a RDF triple into the RDF graph"""
+        self._connector.insert(subject, predicate, obj)
+
+    def delete(self, subject, predicate, obj):
+        """Delete a RDF triple from the RDF graph"""
+        self._connector.delete(subject, predicate, obj)
+
     def describe(self, url):
         """Describe the RDF Dataset in JSON-LD format"""
         return {

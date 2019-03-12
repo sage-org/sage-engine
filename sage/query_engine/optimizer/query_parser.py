@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from rdflib import URIRef, BNode
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
-from rdflib.plugins.sparql.algebra import translateQuery
+from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.iterators.filter import FilterIterator
@@ -142,22 +142,24 @@ def parse_update(query, dataset, default_graph):
     """
         Parse a SPARQL INSERT DATA or DELETE DATA query, and returns a preemptable physical query execution plan to execute it.
     """
-    # TODO handle the 'prologue' field of the parsed query
-    operations = parseUpdate(query).request
+    operations = translateUpdate(parseUpdate(query))
     if len(operations) > 1:
         raise UnsupportedSPARQL("Only a single INSERT DATA/DELETE DATA is permitted by query. Consider sending yourt query in multiple SPARQL queries.")
     operation = operations[0]
     if operation.name == 'InsertData' or operation.name == 'DeleteData':
         # create RDF triples to insert into the default graph
-        quads = [(format_term(s), format_term(p), format_term(o), default_graph) for s, p, o in operation.quads.triples]
+        quads = list()
+        quads += [(format_term(s), format_term(p), format_term(o), default_graph) for s, p, o in operation.triples]
         # add also RDF triples to insert into a named graph
         # rdflib format: QuadsNotTriples_{'term': graphURI, 'triples': [...]}
-        quads += [(format_term(s), format_term(p), format_term(o), format_term(g)) for s, p, o, g in operation.quands.quadsNotTriples]
+        # TODO enable
+        # if operation.quands.quadsNotTriples is not None:
+        #     quads += [(format_term(s), format_term(p), format_term(o), format_term(g)) for s, p, o, g in operation.quands.quadsNotTriples]
 
         # build the preemptable update operator used to insert/delete RDF triples
         if operation.name == 'InsertData':
-            return InsertOperator(quads, dataset)
+            return InsertOperator(quads, dataset), dict()
         else:
-            return DeleteOperator(quads, dataset)
+            return DeleteOperator(quads, dataset), dict()
     else:
         raise UnsupportedSPARQL("Only INSERT DATA and DELETE DATA queries are supported by the SaGe server. For evaluating other type of SPARQL UPDATE queries, please use a Sage Smart Client.")

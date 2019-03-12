@@ -47,5 +47,5 @@ class InsertOperator(PreemptableIterator):
     def save(self):
         """Save the operator using protocol buffers"""
         saved = SavedInsertData()
-        saved.nb_inserted = pyDict_to_protoDict(self._inserted)
+        pyDict_to_protoDict(self._inserted, saved.nb_inserted)
         return saved

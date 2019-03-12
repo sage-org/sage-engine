@@ -47,5 +47,5 @@ class DeleteOperator(PreemptableIterator):
     def save(self):
         """Save the operator using protocol buffers"""
         saved = SavedDeleteData()
-        saved.nb_deleted = pyDict_to_protoDict(self._inserted)
+        pyDict_to_protoDict(self._inserted, saved.nb_inserted)
         return saved
