@@ -64,10 +64,22 @@ message SavedFilterIterator {
   map<string, string> mu = 6;
 }
 
+message SavedInsertData {
+  map<string, uint64> nb_inserted = 1;
+}
+
+message SavedDeleteData {
+  map<string, uint64> nb_inserted = 1;
+}
+
 message RootTree {
   oneof source {
-    SavedProjectionIterator proj_source = 1;
-    SavedBagUnionIterator union_source = 2;
-    SavedFilterIterator filter_source = 3;
+    SavedScanIterator scan_source = 1;
+    SavedProjectionIterator proj_source = 2;
+    SavedIndexJoinIterator join_source = 3;
+    SavedBagUnionIterator union_source = 4;
+    SavedFilterIterator filter_source = 5;
+    SavedInsertData insert_source = 6;
+    SavedDeleteData delete_source = 7;
   }
 }

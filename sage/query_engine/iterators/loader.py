@@ -12,11 +12,13 @@ from sage.query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIt
 def load(protoMsg, dataset):
     """Load a preemptable physical query execution plan from a saved state"""
     saved_plan = protoMsg
+    # unpack the plan from the serialized protobuf message
     if isinstance(protoMsg, bytes):
         root = RootTree()
         root.ParseFromString(protoMsg)
         sourceField = root.WhichOneof('source')
         saved_plan = getattr(root, sourceField)
+    # load the plan based on the current node
     if type(saved_plan) is SavedFilterIterator:
         return load_filter(saved_plan, dataset)
     if type(saved_plan) is SavedProjectionIterator:
@@ -25,7 +27,7 @@ def load(protoMsg, dataset):
         return load_scan(saved_plan, dataset)
     elif type(saved_plan) is SavedIndexJoinIterator:
         return load_nlj(saved_plan, dataset)
-    if type(saved_plan) is SavedBagUnionIterator:
+    elif type(saved_plan) is SavedBagUnionIterator:
         return load_union(saved_plan, dataset)
     else:
         raise Exception('Unknown iterator type "%s" when loading controls' % type(saved_plan))

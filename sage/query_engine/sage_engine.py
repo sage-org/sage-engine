@@ -3,9 +3,6 @@
 import uvloop
 from asyncio import Queue, get_event_loop, wait_for, sleep, set_event_loop_policy
 from asyncio import TimeoutError as asyncTimeoutError
-from sage.query_engine.iterators.projection import ProjectionIterator
-from sage.query_engine.iterators.union import BagUnionIterator
-from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.protobuf.iterators_pb2 import RootTree
 from math import inf
@@ -28,7 +25,9 @@ async def executor(plan, queue, limit):
         while plan.has_next():
             value = await plan.next()
             cpt += 1
-            await queue.put(value)
+            # discard null values
+            if value is not None:
+                await queue.put(value)
             if queue.qsize() >= limit:
                 raise TooManyResults()
             # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
@@ -76,12 +75,6 @@ class SageEngine(object):
             while not queue.empty():
                 results.append(queue.get_nowait())
         root = RootTree()
-        # source_field = plan.serialized_name() + '_source'
-        # getattr(root, source_field).CopyFrom(self._source.save())
-        if type(plan) is ProjectionIterator:
-            root.proj_source.CopyFrom(plan.save())
-        elif type(plan) is BagUnionIterator:
-            root.union_source.CopyFrom(plan.save())
-        elif type(plan) is FilterIterator:
-            root.filter_source.CopyFrom(plan.save())
+        source_field = plan.serialized_name() + '_source'
+        getattr(root, source_field).CopyFrom(plan.save())
         return (results, root, query_done)

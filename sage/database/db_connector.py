@@ -40,6 +40,20 @@ class DatabaseConnector(ABC):
         """Close the database connection"""
         pass
 
+    def insert(self, subject, predicate, obj):
+        """
+            Insert a RDF triple into the RDF Graph.
+            If not overrided, this method raises an exception as it consider the graph as read-only.
+        """
+        raise NotImplementedError("The RDF graph is read-only: INSERT DATA queries are not allowed")
+
+    def delete(self, subject, predicate, obj):
+        """
+            Delete a RDF triple into the RDF Graph.
+            If not overrided, this method raises an exception as it consider the graph as read-only.
+        """
+        raise NotImplementedError("The RDF graph is read-only: DELETE DATA queries are not allowed")
+
     def __enter__(self):
         """Implementation of the __enter__ method from the context manager spec"""
         self.open()
@@ -50,6 +64,7 @@ class DatabaseConnector(ABC):
         self.close()
 
     def __del__(self):
+        """Destructor"""
         self.close()
 
     @property
