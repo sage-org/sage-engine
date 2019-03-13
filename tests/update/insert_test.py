@@ -4,7 +4,6 @@ import pytest
 from sage.http_server.server import sage_app
 from tests.http.utils import jsonSparql
 
-app = sage_app('tests/update/config.yaml')
 
 # fixutre format: query, expected graph content
 fixtures = [
@@ -15,18 +14,28 @@ fixtures = [
             ("http://example.org#Thomas_Minier", "http://www.w3.org/2000/01/rdf-schema#label", "\"Thomas Minier\"@en"),
             ("http://example.org#Thomas_Minier", "http://xmlns.com/foaf/0.1/knows", "http://example.org#Arnaud_Grall")
         ]
+    ),
+    (
+        """INSERT DATA { GRAPH<http://localhost/sparql/update-test> {
+            <http://example.org#Thomas_Minier> <http://www.w3.org/2000/01/rdf-schema#label> "Thomas Minier"@en .
+            <http://example.org#Thomas_Minier> <http://xmlns.com/foaf/0.1/knows> <http://example.org#Arnaud_Grall> .} }""",
+        [
+            ("http://example.org#Thomas_Minier", "http://www.w3.org/2000/01/rdf-schema#label", "\"Thomas Minier\"@en"),
+            ("http://example.org#Thomas_Minier", "http://xmlns.com/foaf/0.1/knows", "http://example.org#Arnaud_Grall")
+        ]
     )
 ]
 
 
 class TestInsertDataInterface(object):
     @classmethod
-    def setup_class(self):
+    def setup_method(self):
+        app = sage_app('tests/update/config.yaml')
         app.testing = True
         self.app = app.test_client()
 
     @classmethod
-    def teardown_class(self):
+    def teardown_method(self):
         pass
 
     @pytest.mark.parametrize("query,expected_content", fixtures)

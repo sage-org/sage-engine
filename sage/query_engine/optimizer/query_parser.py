@@ -145,14 +145,15 @@ def parse_update(query, dataset, default_graph, server_url):
         raise UnsupportedSPARQL("Only a single INSERT DATA/DELETE DATA is permitted by query. Consider sending yourt query in multiple SPARQL queries.")
     operation = operations[0]
     if operation.name == 'InsertData' or operation.name == 'DeleteData':
-        # create RDF triples to insert into the default graph
+        # create RDF quads to insert/delete into/from the default graph
         quads = list()
         quads += [(format_term(s), format_term(p), format_term(o), default_graph) for s, p, o in operation.triples]
-        # add also RDF triples to insert into a named graph
-        # rdflib format: QuadsNotTriples_{'term': graphURI, 'triples': [...]}
-        # TODO enable
-        # if operation.quands.quadsNotTriples is not None:
-        #     quads += [(format_term(s), format_term(p), format_term(o), format_term(g)) for s, p, o, g in operation.quands.quadsNotTriples]
+        # then, add RDF quads to insert/delete into/from a named graph
+        if operation.quads is not None:
+            for g, triples in operation.quads.items():
+                if len(triples) > 0:
+                    graph_uri = format_graph_uri(format_term(g), server_url)
+                    quads += [(format_term(s), format_term(p), format_term(o), graph_uri) for s, p, o in triples]
 
         # build the preemptable update operator used to insert/delete RDF triples
         if operation.name == 'InsertData':
