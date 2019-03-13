@@ -1,6 +1,6 @@
 # cli.py
 # Author: Thomas MINIER - MIT License 2017-2019
-import argparse
+import click
 from os.path import isfile
 from sage.http_server.server import sage_app
 from gunicorn.app.base import BaseApplication
@@ -23,21 +23,21 @@ class StandaloneApplication(BaseApplication):
         return self.application
 
 
-def start_sage_server():
-    parser = argparse.ArgumentParser(description='Launch the Sage server using a configuration file')
-    parser.add_argument('config', metavar='config', help='Path to the configuration file')
-    parser.add_argument('-p', '--port', metavar='P', type=int, help='The port to bind (default: 8000)', default=8000)
-    parser.add_argument('-w', '--workers', metavar='W', type=int, help='The number of server workers (default: 4)', default=4)
-    parser.add_argument('--log-level', metavar='LEVEL', dest='log_level', help='The granularity of log outputs (default: info)', default='info')
-    args = parser.parse_args()
+@click.command()
+@click.argument("config")
+@click.option("-p", "--port", type=int, default=8000, show_default=True, help="The port to bind")
+@click.option("-w", "--workers", type=int, default=4, show_default=True, help="he number of server workers")
+@click.option("--log-level", type=click.Choice(["debug", "info", "warning", "error"]), default="info", show_default=True, help="The granularity of log outputs")
+def start_sage_server(config, port, workers, log_level):
+    """Launch the Sage server using the CONFIG configuration file"""
     # check if config file exists
-    if not isfile(args.config):
-        print("Error: Configuration file not found: '{}'".format(args.config))
+    if not isfile(config):
+        print("Error: Configuration file not found: '{}'".format(config))
         print("Error: Sage server could not start, aborting...")
     else:
         options = {
-            'bind': '%s:%s' % ('0.0.0.0', args.port),
-            'workers': args.workers,
-            'log-level': args.log_level
+            'bind': '%s:%s' % ('0.0.0.0', port),
+            'workers': workers,
+            'log-level': log_level
         }
-        StandaloneApplication(sage_app(args.config), options).run()
+        StandaloneApplication(sage_app(config), options).run()
