@@ -10,6 +10,7 @@ Python implementation of SaGe, a stable, responsive and unrestricted SPARQL quer
   * [Installation](#installation)
   * [Starting the server](#starting-the-server)
 * [Sage Docker image](#sage-docker-image)
+* [Command line utilities](#command-line-utilities)
 * [Documentation](#documentation)
 
 # Installation
@@ -95,6 +96,77 @@ In order to use it, do not forget to [mount in the container](https://docs.docke
 ```bash
 docker pull callidon/sage
 docker run -v path/to/config-file:/opt/data/ -p 8000:8000 callidon/sage sage /opt/data/config.yaml -w 4 -p 8000
+```
+
+# Command line utilities
+
+The SaGe server providers several command line utilities, alongside the `sage` command sued to start the server.
+
+## `sage-query`: send SPARQL queries through HTTP requests
+```
+Usage: sage-query [OPTIONS] ENTRYPOINT DEFAULT_GRAPH_URI
+
+  Send a SPARQL query to a SaGe server hosted at ENTRYPOINT, with
+  DEFAULT_GRAPH_URI as the default RDF Graph. It does not act as a Smart
+  client, so only queries supported by the server will be evaluated.
+
+  Example usage: sage-query http://sage.univ-nantes.fr/sparql
+  http://sage.univ-nantes.fr/sparql/dbpedia-2016-04 -q "SELECT * WHERE { ?s
+  ?p ?o }"
+
+Options:
+  -q, --query TEXT     SPARQL query to execute (passed in command-line)
+  -f, --file TEXT      File containing a SPARQL query to execute
+  --format [json|xml]  Format of the results set, formatted according to W3C
+                       SPARQL standards.
+  -l, --limit INTEGER  Maximum number of solutions bindings to fetch, similar
+                       to the SPARQL LIMIT modifier.
+  --help               Show this message and exit.
+```
+
+## `sage-postgre-init`: Initialize a PostgreSQL dataset with Sage
+```
+Usage: sage-postgre-init [OPTIONS] CONFIG DATASET_NAME
+
+  Initialize the RDF dataset DATASET_NAME with a PostgreSQL backend,
+  described in the configuration file CONFIG.
+
+Options:
+  --index / --no-index  Enable/disable indexing of SQL tables. The indexes can
+                        be created separately using the command sage-postgre-
+                        index
+  --help                Show this message and exit.
+```
+
+## `sage-postgre-put`: Efficiently insert RDF data into a Sage-PostgreSQL dataset
+```
+Usage: sage-postgre-put [OPTIONS] RDF_FILE CONFIG DATASET_NAME
+
+  Inert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME,
+  described in the configuration file CONFIG. The dataset must use the
+  PostgreSQL backend.
+
+Options:
+  -f, --format [nt|ttl|hdt]       Format of the input file. Supported: nt
+                                  (N-triples), ttl (Turtle) and hdt (HDT).
+                                  [default: nt]
+  -b, --block_size INTEGER        Block size used for the bulk loading
+                                  [default: 100]
+  -c, --commit_threshold INTEGER  Commit after sending this number of RDF
+                                  triples  [default: 500000]
+  --help                          Show this message and exit.
+```
+
+## `sage-postgre-index`: (Re)generate indexes to speed-up query processing with PostgreSQL
+```
+Usage: sage-postgre-index [OPTIONS] CONFIG DATASET_NAME
+
+  Create the additional B-tree indexes on the RDF dataset DATASET_NAME,
+  described in the configuration file CONFIG. The dataset must use the
+  PostgreSQL backend.
+
+Options:
+  --help  Show this message and exit.
 ```
 
 # Documentation
