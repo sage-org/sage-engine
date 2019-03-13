@@ -76,3 +76,8 @@ def get_resume_query(subj, pred, obj, last_read, table_name, fetch_size=100, sym
         raise Exception("Unkown pattern type: {}".format(kind))
     query += " LIMIT {}".format(fetch_size)
     return query, params
+
+
+def get_insert_query(table_name):
+    """Build a SQL query to insert a RDF triple into a PostgreSQL dataset"""
+    return "INSERT INTO {} (subject,predicate,object) VALUES (%s,%s,%s) ON CONFLICT (subject,predicate,object) DO NOTHING".format(table_name)
