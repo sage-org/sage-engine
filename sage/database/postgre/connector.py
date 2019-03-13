@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
-from sage.database.postgre.queries import get_start_query, get_resume_query, get_insert_query
+from sage.database.postgre.queries import get_start_query, get_resume_query, get_insert_query, get_delete_query
 from sage.database.estimators import pattern_shape_estimate
 import psycopg2
 import json
@@ -144,7 +144,6 @@ class PostgreConnector(DatabaseConnector):
     def insert(self, subject, predicate, obj):
         """
             Insert a RDF triple into the RDF Graph.
-            If not overrided, this method raises an exception as it consider the graph as read-only.
         """
         if self._connection is None:
             self.open()
@@ -158,6 +157,12 @@ class PostgreConnector(DatabaseConnector):
     def delete(self, subject, predicate, obj):
         """
             Delete a RDF triple into the RDF Graph.
-            If not overrided, this method raises an exception as it consider the graph as read-only.
         """
-        pass
+        if self._connection is None:
+            self.open()
+        if subject is not None and predicate is not None and obj is not None:
+            cursor = self._connection.cursor()
+            delete_query = get_delete_query(self._table_name)
+            cursor.execute(delete_query, (subject, predicate, obj))
+            self._connection.commit()
+            cursor.close()
