@@ -38,8 +38,8 @@ def connect_postgre(dataset):
 @click.command()
 @click.argument("config")
 @click.argument("dataset_name")
-@click.option('--index/--no-index', default=False, help="Enable/disable indexing of SQL tables. The indexes can be created separately using the command sage-postgre-index")
-def init_postgre(config, dataset_name, build_index):
+@click.option('--index/--no-index', default=True, help="Enable/disable indexing of SQL tables. The indexes can be created separately using the command sage-postgre-index")
+def init_postgre(config, dataset_name, index):
     """
         Initialize the RDF dataset DATASET_NAME with a PostgreSQL backend, described in the configuration file CONFIG.
     """
@@ -73,7 +73,7 @@ def init_postgre(config, dataset_name, build_index):
     # TODO
 
     # create the additional inexes on OSP and POS
-    if build_index:
+    if index:
         logger.info("Creating additional B-tree indexes...")
         for q in create_indexes_queries:
             cursor.execute(q)
