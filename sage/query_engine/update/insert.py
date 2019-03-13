@@ -14,10 +14,11 @@ class InsertOperator(PreemptableIterator):
         - graph :class:`sage.database.datasets.Dataset`: RDF dataset
     """
 
-    def __init__(self, quads, dataset):
+    def __init__(self, quads, dataset, server_url):
         super(InsertOperator, self).__init__()
         self._quads = quads
         self._dataset = dataset
+        self._server_url = server_url
         # we store how many triples were inserted in each RDF graph
         self._inserted = dict()
 
@@ -42,7 +43,7 @@ class InsertOperator(PreemptableIterator):
             self._inserted[g] += 1
         else:
             self._inserted[g] = 0
-        return None
+        return {"?s": s, "?p": p, "?o": o, "?graph": "{}/{}".format(self._server_url, g)}
 
     def save(self):
         """Save the operator using protocol buffers"""

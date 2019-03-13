@@ -61,7 +61,7 @@ def parse_query(query, dataset, default_graph, server_url):
         iterator = parse_query_node(logical_plan, dataset, [default_graph], server_url, cardinalities)
         return iterator, cardinalities
     except ParseException:
-        return parse_update(query, dataset, default_graph)
+        return parse_update(query, dataset, default_graph, server_url)
 
 
 def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):
@@ -136,7 +136,7 @@ def parse_filter_expr(expr):
         raise UnsupportedSPARQL("Unsupported SPARQL FILTER expression: {}".format(expr.name))
 
 
-def parse_update(query, dataset, default_graph):
+def parse_update(query, dataset, default_graph, server_url):
     """
         Parse a SPARQL INSERT DATA or DELETE DATA query, and returns a preemptable physical query execution plan to execute it.
     """
@@ -156,8 +156,8 @@ def parse_update(query, dataset, default_graph):
 
         # build the preemptable update operator used to insert/delete RDF triples
         if operation.name == 'InsertData':
-            return InsertOperator(quads, dataset), dict()
+            return InsertOperator(quads, dataset, server_url), dict()
         else:
-            return DeleteOperator(quads, dataset), dict()
+            return DeleteOperator(quads, dataset, server_url), dict()
     else:
         raise UnsupportedSPARQL("Only INSERT DATA and DELETE DATA queries are supported by the SaGe server. For evaluating other type of SPARQL UPDATE queries, please use a Sage Smart Client.")
