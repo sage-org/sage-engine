@@ -100,7 +100,7 @@ docker run -v path/to/config-file:/opt/data/ -p 8000:8000 callidon/sage sage /op
 
 # Command line utilities
 
-The SaGe server providers several command line utilities, alongside the `sage` command sued to start the server.
+The SaGe server providers several command line utilities, alongside the `sage` command used to start the server.
 
 ## `sage-query`: send SPARQL queries through HTTP requests
 ```
