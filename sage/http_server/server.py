@@ -12,10 +12,13 @@ from sage.http_server.utils import secure_url, generate_sitemap
 import datetime
 import logging
 import os
+from sys import setrecursionlimit
 
 
 def sage_app(config_file):
     """Build a Sage application with the given configuration file"""
+    # set recursion depth (due to pyparsing issues)
+    setrecursionlimit(3000)
     dataset = Dataset(config_file)
     app = Flask(__name__)
     start_date = datetime.datetime.now()

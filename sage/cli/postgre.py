@@ -148,7 +148,7 @@ def index_postgre(config, dataset_name):
               help="Commit after sending this number of RDF triples")
 def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_threshold):
     """
-        Inert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL backend.
+        Insert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL backend.
     """
     # install logger
     coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')

@@ -35,7 +35,8 @@ console_scripts = [
     'sage-query = sage.cli.commons:sage_query',
     'sage-postgre-init = sage.cli.postgre:init_postgre',
     'sage-postgre-index = sage.cli.postgre:index_postgre',
-    'sage-postgre-put = sage.cli.postgre:put_postgre'
+    'sage-postgre-put = sage.cli.postgre:put_postgre',
+    'sage-multiput = sage.cli.experimental:multiput_postgre'
 ]
 
 with open('README.rst') as file:
