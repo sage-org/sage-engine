@@ -2,9 +2,10 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
-from sage.database.postgre.queries import get_start_query, get_resume_query, get_insert_query, get_delete_query
+from sage.database.postgre.queries import get_start_query, get_resume_query, get_insert_query, get_insert_many_query, get_delete_query
 from sage.database.estimators import pattern_shape_estimate
 import psycopg2
+from psycopg2.extras import execute_values
 import json
 
 
@@ -154,9 +155,23 @@ class PostgreConnector(DatabaseConnector):
             self._connection.commit()
             cursor.close()
 
+    def insert_many(self, triples):
+        """
+            Insert a set of RDF triples into the RDF Graph.
+        """
+        if self._connection is None:
+            self.open()
+        to_insert = [(s, p, o) for s, p, o in triples if s is not None and p is not None and o is not None]
+        if len(to_insert) > 0:
+            cursor = self._connection.cursor()
+            insert_query = get_insert_many_query(self._table_name)
+            execute_values(cursor, insert_query, to_insert)
+            self._connection.commit()
+            cursor.close()
+
     def delete(self, subject, predicate, obj):
         """
-            Delete a RDF triple into the RDF Graph.
+            Delete a RDF triple from the RDF Graph.
         """
         if self._connection is None:
             self.open()
@@ -164,5 +179,20 @@ class PostgreConnector(DatabaseConnector):
             cursor = self._connection.cursor()
             delete_query = get_delete_query(self._table_name)
             cursor.execute(delete_query, (subject, predicate, obj))
+            self._connection.commit()
+            cursor.close()
+
+    def delete_many(self, triples):
+        """
+            Delete a set of RDF triples from the RDF Graph.
+        """
+        if self._connection is None:
+            self.open()
+        to_delete = [(s, p, o) for s, p, o in triples if s is not None and p is not None and o is not None]
+        if len(to_delete) > 0:
+            cursor = self._connection.cursor()
+            delete_query = get_delete_query(self._table_name)
+            for s, p, o in to_delete:
+                cursor.execute(delete_query, (s, p, o))
             self._connection.commit()
             cursor.close()

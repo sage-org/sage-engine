@@ -49,7 +49,7 @@ class DatabaseConnector(ABC):
 
     def delete(self, subject, predicate, obj):
         """
-            Delete a RDF triple into the RDF Graph.
+            Delete a RDF triple from the RDF Graph.
             If not overrided, this method raises an exception as it consider the graph as read-only.
         """
         raise NotImplementedError("The RDF graph is read-only: DELETE DATA queries are not allowed")

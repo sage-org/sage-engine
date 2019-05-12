@@ -83,6 +83,11 @@ def get_insert_query(table_name):
     return "INSERT INTO {} (subject,predicate,object) VALUES (%s,%s,%s) ON CONFLICT (subject,predicate,object) DO NOTHING".format(table_name)
 
 
+def get_insert_many_query(table_name):
+    """Build a SQL query to insert a RDF triple into a PostgreSQL dataset"""
+    return "INSERT INTO {} (subject,predicate,object) VALUES %s ON CONFLICT (subject,predicate,object) DO NOTHING".format(table_name)
+
+
 def get_delete_query(table_name):
     """Build a SQL query to delete a RDF triple form a PostgreSQL dataset"""
     return "DELETE FROM {} WHERE subject = %s AND predicate = %s AND object = %s".format(table_name)

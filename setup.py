@@ -17,7 +17,7 @@ __version__ = "2.0.0"
 # dependencies required for the HDT backend
 HDT_DEPS = [
     'pybind11==2.2.4',
-    'hdt==2.0'
+    'hdt==2.2.1'
 ]
 
 # dependencies required for the PostgreSQL backend
@@ -72,7 +72,7 @@ setup(
     # and the CLI commons
     extras_require={
         'hdt': HDT_DEPS,
-        'postgre': POSTGRESQL_DEPS,
+        'postgres': POSTGRESQL_DEPS,
         'commons': COMMONS_DEPS
     },
     entry_points={
