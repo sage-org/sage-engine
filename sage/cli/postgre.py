@@ -8,12 +8,14 @@ from psycopg2.extras import execute_values
 import coloredlogs
 import logging
 from time import time
+import datetime
 
 
-def bucketify(iterable, bucket_size):
+def bucketify(iterable, bucket_size, to_append=None):
     """Group items from an iterable by buckets"""
     bucket = list()
-    for item in iterable:
+    for s, p, o in iterable:
+        item = (s, p, o, to_append) if to_append is not None else (s, p, o)
         bucket.append(item)
         if len(bucket) >= bucket_size:
             yield bucket
@@ -49,6 +51,7 @@ def init_postgre(config, dataset_name, index):
 
     # load dataset from config file
     dataset = load_dataset(config, dataset_name, 'postgre', logger)
+    enable_mvcc = dataset['mvcc'] if 'mvcc' in dataset else False
 
     # init postgre connection
     connection = connect_postgre(dataset)
@@ -59,9 +62,8 @@ def init_postgre(config, dataset_name, index):
 
     # create all SQL queries used to init the dataset, using the dataset name
     table_name = dataset['name']
-    create_table_query = p_utils.get_postgre_create_table(table_name)
-    create_indexes_queries = p_utils.get_postgre_create_indexes(table_name)
-    create_cursors_queries = p_utils.get_postgre_functions(table_name)
+    create_table_query = p_utils.get_postgre_create_table(table_name, enable_mvcc=enable_mvcc)
+    create_indexes_queries = p_utils.get_postgre_create_indexes(table_name, enable_mvcc=enable_mvcc)
 
     cursor = connection.cursor()
     # create the main SQL table
@@ -80,12 +82,6 @@ def init_postgre(config, dataset_name, index):
         logger.info("Additional B-tree indexes successfully created")
     else:
         logger.info("Skipping additional indexes creation on user-demand")
-
-    # create the cursor functions used to perform index scans
-    logger.info("Creating utility PL-SQL functions...")
-    for q in create_cursors_queries:
-        cursor.execute(q)
-    logger.info("Utility PL-SQL functions successfully created")
 
     # commit and cleanup connection
     logger.info("Committing and cleaning up...")
@@ -156,6 +152,11 @@ def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_thres
 
     # load dataset from config file
     dataset = load_dataset(config, dataset_name, 'postgre', logger)
+    enable_mvcc = False
+    to_append = None
+    if 'mvcc' in dataset and dataset['mvcc']:
+        enable_mvcc = True
+        to_append = str(datetime.datetime.now())
 
     # init postgre connection
     logger.info("Connecting to PostgreSQL server...")
@@ -168,7 +169,7 @@ def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_thres
 
     # compute SQL table name and the bulk load SQL query
     table_name = dataset['name']
-    insert_into_query = p_utils.get_postgre_insert_into(table_name)
+    insert_into_query = p_utils.get_postgre_insert_into(table_name, enable_mvcc=enable_mvcc)
 
     logger.info("Reading RDF source file...")
     iterator, nb_triples = get_rdf_reader(rdf_file, format=format)
@@ -183,7 +184,7 @@ def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_thres
     # insert by bucket (and show a progress bar)
     with click.progressbar(length=nb_triples,
                            label="Inserting RDF triples".format(nb_triples)) as bar:
-        for bucket in bucketify(iterator, block_size):
+        for bucket in bucketify(iterator, block_size, to_append=to_append):
             to_commit += len(bucket)
             # bulk load the bucket of RDF triples, then update progress bar
             execute_values(cursor, insert_into_query, bucket, page_size=block_size)

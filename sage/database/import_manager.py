@@ -31,6 +31,21 @@ def postgre_backend():
     return import_backend(data['name'], data['path'], data['connector'], data['required'])
 
 
+def mvcc_backend():
+    """Get the loader for the PostgreSQL backend"""
+    data = {
+        'name': 'postgre-mvcc',
+        'path': 'sage.database.postgre.connector_mvcc',
+        'connector': 'SnapshotConnector',
+        'required': [
+            'dbname',
+            'user',
+            'password'
+        ]
+    }
+    return import_backend(data['name'], data['path'], data['connector'], data['required'])
+
+
 def import_backend(name, module_path, class_name, required_params):
     """Load a new backend from the config file"""
     # factory used to build new connector

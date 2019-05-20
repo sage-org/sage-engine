@@ -1,4 +1,4 @@
 include requirements.txt
 include README.md
-recursive-include http_server/static *
-recursive-include http_server/templates *
+recursive-include sage/http_server/static *
+recursive-include sage/http_server/templates *
