@@ -3,10 +3,27 @@
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
 from sage.database.postgre.queries import get_start_query, get_resume_query, get_insert_query, get_insert_many_query, get_delete_query
-from sage.database.estimators import pattern_shape_estimate
 import psycopg2
 from psycopg2.extras import execute_values
 import json
+from math import ceil
+
+
+def fetch_histograms(cursor, table_name, attribute_name):
+    """
+        Download PostgreSQL histograms from a given table and attribute
+    """
+    base_query = "SELECT null_frac, n_distinct, most_common_vals, most_common_freqs FROM pg_stats WHERE tablename = '{}' AND attname = '{}'".format(table_name, attribute_name)
+    cursor.execute(base_query)
+    record = cursor.fetchone()
+    null_frac, n_distinct, most_common_vals, most_common_freqs = record
+    # build selectivity table
+    selectivities = {}
+    cpt = 0
+    for common_val in most_common_vals[1:-1].split(","):
+        selectivities[common_val] = most_common_freqs[cpt]
+        cpt += 1
+    return (null_frac, n_distinct, selectivities, sum(most_common_freqs))
 
 
 class PostgreIterator(DBIterator):
@@ -82,11 +99,61 @@ class PostgreConnector(DatabaseConnector):
         self._port = port
         self._fetch_size = fetch_size
         self._connection = None
+        # Data used for cardinality estimation
+        # They are initialized when the connection is first open using PostgreSQL histograms
+        self._avg_row_count = 0
+        self._subject_histograms = {
+            'selectivities': dict(),
+            'null_frac': 0,
+            'n_distinct': 0,
+            'sum_freqs': 0
+        }
+        self._predicate_histograms = {
+            'selectivities': dict(),
+            'null_frac': 0,
+            'n_distinct': 0,
+            'sum_freqs': 0
+        }
+        self._object_histograms = {
+            'selectivities': dict(),
+            'null_frac': 0,
+            'n_distinct': 0,
+            'sum_freqs': 0
+        }
 
     def open(self):
         """Open the database connection"""
         if self._connection is None:
             self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
+            # fetch estimated table cardinality
+            cursor = self._connection.cursor()
+            cursor.execute("SELECT reltuples AS approximate_row_count FROM pg_class WHERE relname = '{}'".format(self._table_name))
+            self._avg_row_count = cursor.fetchone()[0]
+            # fetch subject histograms
+            (null_frac, n_distinct, selectivities, sum_freqs) = fetch_histograms(cursor, self._table_name, 'subject')
+            self._subject_histograms = {
+                'selectivities': selectivities,
+                'null_frac': null_frac,
+                'n_distinct': n_distinct,
+                'sum_freqs': sum_freqs
+            }
+            # fetch predicate histograms
+            (null_frac, n_distinct, selectivities, sum_freqs) = fetch_histograms(cursor, self._table_name, 'predicate')
+            self._predicate_histograms = {
+                'selectivities': selectivities,
+                'null_frac': null_frac,
+                'n_distinct': n_distinct,
+                'sum_freqs': sum_freqs
+            }
+            # fetch object histograms
+            (null_frac, n_distinct, selectivities, sum_freqs) = fetch_histograms(cursor, self._table_name, 'object')
+            self._object_histograms = {
+                'selectivities': selectivities,
+                'null_frac': null_frac,
+                'n_distinct': n_distinct,
+                'sum_freqs': sum_freqs
+            }
+            cursor.close()
 
     def close(self):
         """Close the database connection"""
@@ -95,6 +162,46 @@ class PostgreConnector(DatabaseConnector):
             self._connection.close()
             self._connection = None
 
+    def __estimate_cardinality(self, subject, predicate, obj):
+        """
+            Estimate the cardinality of a triple pattern using PostgreSQL histograms.
+
+            Args:
+                - subject ``string`` - Subject of the triple pattern
+                - predicate ``string`` - Predicate of the triple pattern
+                - obj ``string`` - Object of the triple pattern
+
+            Returns:
+                The estimated cardinality of the triple pattern
+        """
+        subject = subject if (subject is not None) and (not subject.startswith('?')) else None
+        predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else None
+        obj = obj if (obj is not None) and (not obj.startswith('?')) else None
+
+        # estimate the selectivity of the triple pattern using PostgreSQL histograms
+        selectivity = 1
+        # compute the selectivity of a bounded subject
+        if subject is not None:
+            if subject in self._subject_histograms['selectivities']:
+                selectivity *= self._subject_histograms['selectivities'][subject]
+            else:
+                selectivity *= (1 - self._subject_histograms['sum_freqs'])/(self._subject_histograms['n_distinct'] - len(self._subject_histograms['selectivities']))
+        # compute the selectivity of a bounded predicate
+        if predicate is not None:
+            if predicate in self._predicate_histograms['selectivities']:
+                selectivity *= self._predicate_histograms['selectivities'][predicate]
+            else:
+                selectivity *= (1 - self._predicate_histograms['sum_freqs'])/(self._predicate_histograms['n_distinct'] - len(self._predicate_histograms['selectivities']))
+        # compute the selectivity of a bounded object
+        if obj is not None:
+            if obj in self._object_histograms['selectivities']:
+                selectivity *= self._object_histograms['selectivities'][obj]
+            else:
+                selectivity *= (1 - self._object_histograms['sum_freqs'])/(self._object_histograms['n_distinct'] - len(self._object_histograms['selectivities']))
+        # estimate the cardinality from the estimated selectivity
+        cardinality = int(ceil(selectivity * self._avg_row_count))
+        return cardinality if cardinality > 0 else 1
+
     def search(self, subject, predicate, obj, last_read=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
@@ -102,7 +209,7 @@ class PostgreConnector(DatabaseConnector):
             Args:
                 - subject ``string`` - Subject of the triple pattern
                 - predicate ``string`` - Predicate of the triple pattern
-                - object ``string`` - Object of the triple pattern
+                - obj ``string`` - Object of the triple pattern
                 - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
 
             Returns:
@@ -130,11 +237,11 @@ class PostgreConnector(DatabaseConnector):
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name, fetch_size=self._fetch_size)
         # create the iterator to yield the matching RDF triples
         iterator = PostgreIterator(cursor, self._connection, start_query, start_params, self._table_name, pattern)
-        card = pattern_shape_estimate(subject, predicate, object) if iterator.has_next() else 0
+        card = self.__estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
     def from_config(config):
-        """Build a DatabaseConnector from a dictionnary"""
+        """Build a PostgreConnector from a configuration object"""
         if 'dbname' not in config or 'user' not in config or 'password' not in config:
             raise SyntaxError('A valid configuration for a PostgreSQL connector must contains the dbname, user and password fields')
         table_name = config['name']
