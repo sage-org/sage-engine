@@ -1,12 +1,14 @@
 {% extends "main.html" %}
 
+{% block title %}SPARQL 1.1 compliance - SaGe{% endblock %}
+
 {% block body %}
 		<div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1>Sage SPARQL 1.1 compliance results</h1>
+          <h1>SaGe SPARQL 1.1 compliance results</h1>
 
-          <p>Here you will find the results for the <a href="https://www.w3.org/2009/sparql/docs/tests/README.html">W3C SPARQL 1.1 compliance test</a> when using the Java or Javascript Sage client.</p>
+          <p>Here you will find the results for the <a href="https://www.w3.org/2009/sparql/docs/tests/README.html">W3C SPARQL 1.1 compliance test</a> when using the Java or Javascript SaGe client.</p>
           <p>The testing software is available <a href="https://github.com/sage-org/sage-benchmark">on Github</a>.</p>
 
           <h3>Overall results</h3>
@@ -18,9 +20,8 @@
 
           <h3>Unsupported SPARQL 1.1 features</h3>
           <ul>
-            <li><a href="https://www.w3.org/TR/sparql11-query/#propertypaths">Property Paths</a> (only with the Javascript client)</li>
             <li><a href="https://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/">SPARQL Entailment</a> (unless the original RDF Graph has been saturated beforehand)</li>
-            <li><a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">SPARQL 1.1 Update</a> (RDF datasets hosted by Sage are <em>read-only</em>)</li>
+            <li><a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">SPARQL 1.1 Update</a> (RDF datasets hosted by SaGe are <em>read-only</em>)</li>
           </ul>
 
           <h3>Detailed results</h3>
@@ -28,7 +29,7 @@
       			<thead>
       				<tr>
       					<th scope="col" rowspan=2>W3C SPARQL 1.1 Test</th>
-      					<th scope="col" colspan=2>Executable with Sage?</th>
+      					<th scope="col" colspan=2>Executable with SaGe?</th>
       				</tr>
               <tr>
       					<th scope="col"><a href="https://github.com/sage-org/sage-jena" target="_blank">Java client</a></th>
@@ -844,112 +845,112 @@
       				<tr>
       					<td>property-path/pp01</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp02</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp03</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp06</td>
       					<td class="table-danger">No</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp06</td>
       					<td class="table-danger">No</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp08</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp09</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp10</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp11</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp12</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp14</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp14</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-2-2</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-2-2</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-2-2</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-p2</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-p3</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-p4</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-ng-01</td>
       					<td class="table-danger">No</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/path-ng-02</td>
       					<td class="table-danger">No</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp36</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>property-path/pp37</td>
       					<td class="table-success">Yes</td>
-      					<td class="table-danger">No</td>
+      					<td class="table-success">Yes</td>
       				</tr>
       				<tr>
       					<td>service/service01</td>

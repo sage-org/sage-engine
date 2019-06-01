@@ -13,6 +13,7 @@ import datetime
 import logging
 import os
 from sys import setrecursionlimit
+import datetime
 
 
 def sage_app(config_file):
@@ -33,6 +34,8 @@ def sage_app(config_file):
         config = dict()
         if "google_analytics" in dataset._config:
             config["google_analytics"] = dataset._config["google_analytics"]
+        # inject current year
+        config["now_year"] = datetime.datetime.now().year
         return dict(config=config)
 
     @app.route('/')

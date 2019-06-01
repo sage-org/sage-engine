@@ -1,6 +1,6 @@
 {% extends "main.html" %}
 
-{% block title%}{{ dataset_info["schema:name"] }} dataset - Sage{% endblock %}
+{% block title%}{{ dataset_info["schema:name"] }} dataset - SaGe{% endblock %}
 
 {% block body %}
 <!-- JSON-LD description of the dataset -->
@@ -120,7 +120,7 @@
 
       <!-- simple queries -->
       <h4>Basic SPARQL queries</h4>
-      <p>The Sage server has a native support for evaluating <em>a subset of the SPARQL syntax</em>. It supports SPARQL queries with the following features:</p>
+      <p>The SaGe server has a native support for evaluating <em>a subset of the SPARQL syntax</em>. It supports SPARQL queries with the following features:</p>
       <ul>
         <li><a href="https://www.w3.org/TR/sparql11-query/#WritingSimpleQueries">Triple patterns</a></li>
         <li><a href="https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns">Basic Graph patterns</a></li>
@@ -141,9 +141,9 @@
 
       <!-- complex queries -->
       <h4>Complete SPARQL 1.1 queries</h4>
-      <p>To execute <em>complete SPARQL queries</em> using a Sage server, you have two options:</p>
+      <p>To execute <em>complete SPARQL queries</em> using a SaGe server, you have two options:</p>
       <ul>
-        <li>Take a look at <a href="{{ url_for('index') }}#software">existing Sage Smart Clients</a> to evaluate SPARQL queries on your computer.</li>
+        <li>Take a look at <a href="{{ url_for('index') }}#software">existing SaGe Smart Clients</a> to evaluate SPARQL queries on your computer.</li>
         <li>Use the online playground <strong>below</strong></li>
       </ul>
 
