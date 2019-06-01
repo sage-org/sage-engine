@@ -37,7 +37,10 @@ class DeleteOperator(PreemptableIterator):
             raise IteratorExhausted()
         s, p, o, g = self._quads.pop()
         if self._dataset.has_graph(g):
-            self._dataset.get_graph(g).delete(s, p, o)
+            try:
+                self._dataset.get_graph(g).delete(s, p, o)
+            except Exception:
+                pass
         # update counters
         if g in self._inserted:
             self._inserted[g] += 1
