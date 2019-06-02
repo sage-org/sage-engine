@@ -1,4 +1,5 @@
 include requirements.txt
 include README.md
+include README.rst
 recursive-include http_server/static *
 recursive-include http_server/templates *

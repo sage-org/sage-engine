@@ -45,7 +45,7 @@ setup(
     author="Thomas Minier",
     author_email="thomas.minier@univ-nantes.fr",
     url="https://github.com/sage-org/sage-engine",
-    description="Sage: a stable, responsive and unrestricted SPARQL query server",
+    description="Sage: a SPARQL query engine for public Linked Data providers",
     long_description=long_description,
     keywords=["rdf", "sparql", "query engine"],
     license="MIT",
@@ -53,7 +53,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     packages=find_packages(exclude=["tests", "tests.*"]),
-    # extras dependencies for the native backends (HDT, PostgreSQL and Cassandra)
+    # extras dependencies for the native backends
     extras_require={
         'hdt': HDT_DEPS
     },
