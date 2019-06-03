@@ -9,7 +9,7 @@ Sage: a SPARQL query engine for public Linked Data providers
 .. image:: https://travis-ci.com/sage-org/sage-engine.svg?branch=master
    :target: https://travis-ci.com/sage-org/sage-engine
    :alt: Build Status
- 
+
 .. image:: https://badge.fury.io/py/sage-engine.svg
    :target: https://badge.fury.io/py/sage-engine
    :alt: PyPI version
@@ -46,7 +46,7 @@ Requirements:
 * **Python Development headers**
   ..
 
-     You should have the ``Python.h`` header available on your system.\ :raw-html-m2r:`<br>`
+     You should have the ``Python.h`` header available on your system.
      For example, for Python 3.6, install the ``python3.6-dev`` package on Debian/Ubuntu systems.
 
 
@@ -113,7 +113,7 @@ The ``sage`` executable, installed alongside the Sage server, allows to easily s
 
 The full usage of the ``sage`` executable is detailed below:
 
-.. code-block::
+.. code-block:: bash
 
    usage: sage [-h] [-p P] [-w W] [--log-level LEVEL] config
 

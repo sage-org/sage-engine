@@ -38,7 +38,7 @@ class PostInstallCommand(install):
         install.run(self)
 
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 # dependencies required for the HDT backend
 HDT_DEPS = [
