@@ -5,8 +5,7 @@ POSTGRE_CREATE_TABLE = """
     CREATE TABLE {} (
         subject text,
         predicate text,
-        object text,
-        CONSTRAINT {}_spo_index_pkey PRIMARY KEY (subject, predicate, object)
+        object text
     );
     """
 
@@ -21,15 +20,18 @@ POSTGRE_CREATE_MVCC_TABLE = """
     );
     """
 # CREATE UNIQUE INDEX {}_spo_index_pkey ON {}(subject text_ops,predicate text_ops,object text_ops);
-
 POSTGRE_CREATE_INDEXES = [
+    # Create index of SPO
+    """
+    CREATE INDEX {}_spo_index ON {}(subject text_ops,predicate text_ops, md5(object) text_ops);
+    """,
     # Create index of OSP
     """
-    CREATE INDEX {}_osp_index ON {}(object text_ops,subject text_ops,predicate text_ops);
+    CREATE INDEX {}_osp_index ON {}(md5(object) text_ops,subject text_ops,predicate text_ops);
     """,
     # Create index on POS
     """
-    CREATE INDEX {}_pos_index ON {}(predicate text_ops,object text_ops,subject text_ops);
+    CREATE INDEX {}_pos_index ON {}(md5(object) text_ops,object text_ops,subject text_ops);
     """
 ]
 
@@ -214,4 +216,4 @@ def get_postgre_insert_into(table_name, enable_mvcc=False):
     """
     if enable_mvcc:
         return "INSERT INTO {} (subject,predicate,object,created_at) VALUES %s ON CONFLICT (subject,predicate,object,created_at,deleted_at) DO NOTHING".format(table_name)
-    return "INSERT INTO {} (subject,predicate,object) VALUES %s ON CONFLICT (subject,predicate,object) DO NOTHING".format(table_name)
+    return "INSERT INTO {} (subject,predicate,object) VALUES %s".format(table_name)
