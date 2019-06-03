@@ -13,7 +13,6 @@ import datetime
 import logging
 import os
 from sys import setrecursionlimit
-import datetime
 
 
 def sage_app(config_file):
