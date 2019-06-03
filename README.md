@@ -1,5 +1,5 @@
 # Sage: a SPARQL query engine for public Linked Data providers
-[![Build Status](https://travis-ci.com/sage-org/sage-engine.svg?branch=master)](https://travis-ci.com/sage-org/sage-engine)
+[![Build Status](https://travis-ci.com/sage-org/sage-engine.svg?branch=master)](https://travis-ci.com/sage-org/sage-engine) [![PyPI version](https://badge.fury.io/py/sage-engine.svg)](https://badge.fury.io/py/sage-engine)
 
 Python implementation of SaGe, a stable, responsive and unrestricted SPARQL query server.
 
@@ -7,27 +7,34 @@ Python implementation of SaGe, a stable, responsive and unrestricted SPARQL quer
 
 * [Installation](#installation)
 * [Getting started](#getting-started)
-  * [Installation](#installation)
+  * [Server configuration](#server-configuration)
   * [Starting the server](#starting-the-server)
-* [Sage Docker image](#sage-docker-image)
+* [SaGe Docker image](#sage-docker-image)
 * [Documentation](#documentation)
 
 # Installation
 
+## Installation using pip (with the HDT backend)
+
 Installation in a [virtualenv](https://virtualenv.pypa.io/en/stable/) is **strongly advised!**
 
 Requirements:
-* [git](https://git-scm.com/)
 * [pip](https://pip.pypa.io/en/stable/)
-* [npm](https://nodejs.org/en/) (shipped with Node.js on most systems)
 * **gcc/clang** with **c++11 support**
 * **Python Development headers**
 > You should have the `Python.h` header available on your system.   
 > For example, for Python 3.6, install the `python3.6-dev` package on Debian/Ubuntu systems.
 
-## Installing SaGe with the HDT backend
-
 The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org/) as a backend can be installed as follows:
+```bash
+pip install sage-engine[hdt]
+```
+
+## Manual installation (with the HDT backend)
+
+Additional requirements:
+* [git](https://git-scm.com/)
+* [npm](https://nodejs.org/en/) (shipped with Node.js on most systems)
 
 ```bash
 git clone https://github.com/sage-org/sage-engine
@@ -88,7 +95,7 @@ optional arguments:
   --log-level LEVEL  The granularity of log outputs (default: info)
 ```
 
-# Sage Docker image
+# SaGe Docker image
 
 The Sage server is also available through a [Docker image](https://hub.docker.com/r/callidon/sage/).
 In order to use it, do not forget to [mount in the container](https://docs.docker.com/storage/volumes/) the directory that contains you configuration file and your datasets.
@@ -115,4 +122,4 @@ make html
 open build/html/index.html
 ```
 
-Copyright 2017-2018 - [GDD Team](https://sites.google.com/site/gddlina/), [LS2N](https://www.ls2n.fr/?lang=en), [University of Nantes](http://www.univ-nantes.fr/)
+Copyright 2017-2019 - [GDD Team](https://sites.google.com/site/gddlina/), [LS2N](https://www.ls2n.fr/?lang=en), [University of Nantes](http://www.univ-nantes.fr/)

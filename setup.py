@@ -69,7 +69,7 @@ setup(
     install_requires=install_requires,
     include_package_data=True,
     zip_safe=False,
-    packages=find_packages(exclude=["tests", "tests.*", "node_modules"]),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     cmdclass={
         'develop': PostDevelopCommand,
         'install': PostInstallCommand,

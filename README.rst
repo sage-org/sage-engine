@@ -9,6 +9,10 @@ Sage: a SPARQL query engine for public Linked Data providers
 .. image:: https://travis-ci.com/sage-org/sage-engine.svg?branch=master
    :target: https://travis-ci.com/sage-org/sage-engine
    :alt: Build Status
+ 
+.. image:: https://badge.fury.io/py/sage-engine.svg
+   :target: https://badge.fury.io/py/sage-engine
+   :alt: PyPI version
 
 
 Python implementation of SaGe, a stable, responsive and unrestricted SPARQL query server.
@@ -20,33 +24,46 @@ Table of contents
 * `Installation <#installation>`_
 * `Getting started <#getting-started>`_
 
-  * `Installation <#installation>`_
+  * `Server configuration <#server-configuration>`_
   * `Starting the server <#starting-the-server>`_
 
-* `Sage Docker image <#sage-docker-image>`_
+* `SaGe Docker image <#sage-docker-image>`_
 * `Documentation <#documentation>`_
 
 Installation
 ============
+
+Installation using pip (with the HDT backend)
+---------------------------------------------
 
 Installation in a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_ is **strongly advised!**
 
 Requirements:
 
 
-* `git <https://git-scm.com/>`_
 * `pip <https://pip.pypa.io/en/stable/>`_
-* `npm <https://nodejs.org/en/>`_ (shipped with Node.js on most systems)
 * **gcc/clang** with **c++11 support**
 * **Python Development headers**
-     You should have the ``Python.h`` header available on your system.
+  ..
+
+     You should have the ``Python.h`` header available on your system.\ :raw-html-m2r:`<br>`
      For example, for Python 3.6, install the ``python3.6-dev`` package on Debian/Ubuntu systems.
 
 
-Installing SaGe with the HDT backend
-------------------------------------
-
 The core engine of the SaGe SPARQL query server with `HDT <http://www.rdfhdt.org/>`_ as a backend can be installed as follows:
+
+.. code-block:: bash
+
+   pip install sage-engine[hdt]
+
+Manual installation (with the HDT backend)
+------------------------------------------
+
+Additional requirements:
+
+
+* `git <https://git-scm.com/>`_
+* `npm <https://nodejs.org/en/>`_ (shipped with Node.js on most systems)
 
 .. code-block:: bash
 
@@ -96,7 +113,7 @@ The ``sage`` executable, installed alongside the Sage server, allows to easily s
 
 The full usage of the ``sage`` executable is detailed below:
 
-.. code-block:: bash
+.. code-block::
 
    usage: sage [-h] [-p P] [-w W] [--log-level LEVEL] config
 
@@ -111,7 +128,7 @@ The full usage of the ``sage`` executable is detailed below:
      -w W, --workers W  The number of server workers (default: 4)
      --log-level LEVEL  The granularity of log outputs (default: info)
 
-Sage Docker image
+SaGe Docker image
 =================
 
 The Sage server is also available through a `Docker image <https://hub.docker.com/r/callidon/sage/>`_.
@@ -139,4 +156,4 @@ Then, navigate in the ``docs`` directory and generate the documentation
    make html
    open build/html/index.html
 
-Copyright 2017-2018 - `GDD Team <https://sites.google.com/site/gddlina/>`_\ , `LS2N <https://www.ls2n.fr/?lang=en>`_\ , `University of Nantes <http://www.univ-nantes.fr/>`_
+Copyright 2017-2019 - `GDD Team <https://sites.google.com/site/gddlina/>`_\ , `LS2N <https://www.ls2n.fr/?lang=en>`_\ , `University of Nantes <http://www.univ-nantes.fr/>`_
