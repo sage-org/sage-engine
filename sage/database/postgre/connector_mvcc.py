@@ -104,6 +104,7 @@ class SnapshotConnector(PostgreConnector):
             # otherwise, create a SQL query to resume the index scan
             last_read = json.loads(last_read)
             t = (last_read["s"], last_read["p"], last_read["o"])
+            version = last_read["v"]
             start_query, start_params = get_resume_query_mvcc(subject, predicate, obj, t, last_read["v"], self._table_name, fetch_size=self._fetch_size)
         # create the iterator to yield the matching RDF triples
         iterator = SnapshotIterator(cursor, self._connection, version, start_query, start_params, self._table_name, pattern)

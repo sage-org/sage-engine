@@ -79,7 +79,7 @@ def get_resume_query_mvcc(subj, pred, obj, last_read, version, table_name, fetch
     return query, params
 
 
-def get_insert_query(table_name, version):
+def get_insert_query(table_name):
     """Build a SQL query to insert a RDF triple into a PostgreSQL dataset (at a specific version)"""
     return "INSERT INTO {} (subject,predicate,object,created_at) VALUES (%s,%s,%s,%s) ON CONFLICT (subject,predicate,object,created_at,deleted_at) DO NOTHING".format(table_name)
 
