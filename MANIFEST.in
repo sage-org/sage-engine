@@ -1,5 +1,9 @@
 include requirements.txt
 include README.md
 include README.rst
-recursive-include http_server/static *
-recursive-include http_server/templates *
+include sage/http_server/static/api.yaml
+include sage/http_server/static/package.json
+include sage/http_server/static/package-lock.json
+include sage/http_server/static/sage_logo.png
+include sage/http_server/static/sage-voc.ttl
+recursive-include sage/http_server/templates *

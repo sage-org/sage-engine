@@ -2,14 +2,40 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from setuptools import setup, find_packages
 from subprocess import run, SubprocessError
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 from os import getcwd
 from sys import exit
 
 
 def install_web_deps():
     """Install Sage web interface dependencies using npm"""
-    path = "{}/sage/http_server/static".format(getcwd())
-    run(["npm", "install", "--production"], cwd=path)
+    try:
+        print('Installing Sage Web interface dependencies using npm...')
+        path = "{}/sage/http_server/static".format(getcwd())
+        run(["npm", "install", "--production"], cwd=path)
+        print('Sage Web interface successfully installed')
+    except SubprocessError as e:
+        print('Error: cannot install Sage Web interface successfully installed')
+        print('Error: {}'.format(e))
+        exit(1)
+
+
+class PostDevelopCommand(develop):
+    """Post-installation for development mode."""
+
+    def run(self):
+        install_web_deps()
+        develop.run(self)
+
+
+class PostInstallCommand(install):
+    """Post-installation for installation mode."""
+
+    def run(self):
+        install_web_deps()
+        print("moo")
+        install.run(self)
 
 
 __version__ = "2.0.0"
@@ -30,15 +56,6 @@ with open('README.rst') as file:
 with open('requirements.txt') as file:
     install_requires = file.read().splitlines()
 
-try:
-    print('Installing Sage Web interface dependencies using npm...')
-    install_web_deps()
-    print('Sage Web interface successfully installed')
-except SubprocessError as e:
-    print('Error: cannot install Sage Web interface successfully installed')
-    print('Error: {}'.format(e))
-    exit(1)
-
 setup(
     name="sage-engine",
     version=__version__,
@@ -52,7 +69,11 @@ setup(
     install_requires=install_requires,
     include_package_data=True,
     zip_safe=False,
-    packages=find_packages(exclude=["tests", "tests.*"]),
+    packages=find_packages(exclude=["tests", "tests.*", "node_modules"]),
+    cmdclass={
+        'develop': PostDevelopCommand,
+        'install': PostInstallCommand,
+    },
     # extras dependencies for the native backends
     extras_require={
         'hdt': HDT_DEPS
