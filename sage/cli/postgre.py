@@ -50,8 +50,8 @@ def init_postgre(config, dataset_name, index):
     logger = logging.getLogger(__name__)
 
     # load dataset from config file
-    dataset = load_dataset(config, dataset_name, 'postgre', logger)
-    enable_mvcc = dataset['mvcc'] if 'mvcc' in dataset else False
+    dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgre', 'postgre-mvcc'])
+    enable_mvcc = kind == 'postgre-mvcc'
 
     # init postgre connection
     connection = connect_postgre(dataset)
@@ -151,12 +151,9 @@ def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_thres
     logger = logging.getLogger(__name__)
 
     # load dataset from config file
-    dataset = load_dataset(config, dataset_name, 'postgre', logger)
-    enable_mvcc = False
-    to_append = None
-    if 'mvcc' in dataset and dataset['mvcc']:
-        enable_mvcc = True
-        to_append = str(datetime.datetime.now())
+    dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgre', 'postgre-mvcc'])
+    enable_mvcc = kind == 'postgre-mvcc'
+    to_append = str(datetime.datetime.now())
 
     # init postgre connection
     logger.info("Connecting to PostgreSQL server...")

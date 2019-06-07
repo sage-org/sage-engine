@@ -7,7 +7,7 @@ from rdflib import Graph
 from hdt import HDTDocument
 
 
-def load_dataset(config_path, dataset_name, expected_backend, logger):
+def load_dataset(config_path, dataset_name, logger, backends=[]):
     """Load a dataset from a Sage config file"""
     if isfile(config_path):
         config = load(open(config_path))
@@ -16,14 +16,16 @@ def load_dataset(config_path, dataset_name, expected_backend, logger):
             exit(1)
         datasets = config['datasets']
         dataset = None
+        kind = None
         for d in datasets:
-            if d['name'] == dataset_name and d['backend'] == expected_backend:
+            if d['name'] == dataset_name and d['backend'] in backends:
                 dataset = d
+                kind = d['backend']
                 break
         if dataset is None:
             logger.error("No compatible RDF dataset named '{}' declared in the configuration provided".format(dataset_name))
             exit(1)
-        return dataset
+        return dataset, kind
     else:
         logger.error("Invalid configuration file supplied '{}'".format(config_path))
         exit(1)

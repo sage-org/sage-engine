@@ -21,7 +21,8 @@ def fetch_histograms(cursor, table_name, attribute_name):
     selectivities = {}
     cpt = 0
     for common_val in most_common_vals[1:-1].split(","):
-        selectivities[common_val] = most_common_freqs[cpt]
+        if cpt < len(most_common_freqs):
+            selectivities[common_val] = most_common_freqs[cpt]
         cpt += 1
     return (null_frac, n_distinct, selectivities, sum(most_common_freqs))
 
