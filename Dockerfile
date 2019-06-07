@@ -1,6 +1,6 @@
 FROM python:3.6.5-alpine3.7
 
-RUN apk add --no-cache git make g++ nodejs
+RUN apk add --no-cache git make g++
 
 WORKDIR /opt/sage-engine/
 
