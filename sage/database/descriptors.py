@@ -133,3 +133,14 @@ class VoidDescriptor(AbstractDescriptor):
             self._graph.add((q_node, RDF["type"], SAGE["ExampleQuery"]))
             self._graph.add((q_node, RDFS["label"], Literal(query["name"])))
             self._graph.add((q_node, RDF["value"], Literal(query["value"])))
+            # add shape based keywords
+            if "filter" in query["value"].lower():
+                self._graph.add((q_node, SAGE["hasKeyword"], Literal("FILTER")))
+            if "optional" in query["value"].lower():
+                self._graph.add((q_node, SAGE["hasKeyword"], Literal("OPTIONAL")))
+            if "service" in query["value"].lower():
+                self._graph.add((q_node, SAGE["hasKeyword"], Literal("SERVICE")))
+            # add custom keywords
+            if "keywords" in query and len(query["keywords"]) > 0:
+                for keyword in query["keywords"]:
+                    self._graph.add((q_node, SAGE["hasKeyword"], Literal(keyword)))

@@ -32,7 +32,7 @@ def void_blueprint(dataset, logger):
                 "application/n-quads", "application/trig",
                 "application/json", "application/json+ld"
             ])
-            url = secure_url(request.url_root)
+            url = dataset.uri if dataset.uri is not None else secure_url(request.url_root)
             if url.endswith('/'):
                 url = url[0:len(url) - 1]
             format, mimetype = choose_format(mimetype)
@@ -61,7 +61,7 @@ def void_blueprint(dataset, logger):
                 "application/n-quads", "application/trig",
                 "application/json", "application/json+ld"
             ])
-            url = secure_url(request.url_root)
+            url = dataset.uri if dataset.uri is not None else secure_url(request.url_root)
             if url.endswith('/'):
                 url = url[0:len(url) - 1]
             descriptor = VoidDescriptor(url, graph)

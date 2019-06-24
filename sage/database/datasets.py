@@ -158,6 +158,10 @@ class Dataset(object):
         return self._config["name"] if "name" in self._config else None
 
     @property
+    def uri(self):
+        return self._config['public_url'] if 'public_url' in self._config else None
+
+    @property
     def default_query(self):
         default = {
             "name": "",
