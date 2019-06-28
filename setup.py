@@ -11,7 +11,7 @@ HDT_DEPS = [
 ]
 
 console_scripts = [
-    'sage = sage.http_server.cli:cli_sage'
+    'sage = sage.cli.start_server:start_sage_server'
 ]
 
 with open('README.rst') as file:
