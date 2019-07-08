@@ -12,10 +12,10 @@ def get_start_query(subj, pred, obj, table_name, fetch_size=100):
     query = "SELECT * FROM {} ".format(table_name)
     params = None
     if kind == 'spo':
-        query += "WHERE subject = %s AND predicate = %s AND object = %s"
+        query += "WHERE subject = %s AND predicate = %s AND object = %s ORDER BY subject, predicate, object"
         params = (subj, pred, obj)
     elif kind == '???':
-        pass
+        query += ' ORDER BY subject, predicate, object'
     elif kind == 's??':
         query += "WHERE subject = %s ORDER BY subject, predicate, object"
         params = [subj]
@@ -52,7 +52,7 @@ def get_resume_query(subj, pred, obj, last_read, table_name, fetch_size=100, sym
     if kind == 'spo':
         return None, None
     elif kind == '???':
-        query += "WHERE (subject, predicate, object) {} (%s, %s, %s)".format(symbol)
+        query += "WHERE (subject, predicate, object) {} (%s, %s, %s) ORDER BY subject, predicate, object".format(symbol)
         params = (last_s, last_p, last_o)
     elif kind == 's??':
         query += "WHERE subject = %s AND (predicate, object) {} (%s, %s) ORDER BY subject, predicate, object".format(symbol)

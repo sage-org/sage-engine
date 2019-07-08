@@ -152,7 +152,7 @@ def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_thres
 
     # load dataset from config file
     dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgre', 'postgre-mvcc'])
-    enable_mvcc = kind == 'postgre-mvcc'
+    enable_mvcc = False
     to_append = str(datetime.datetime.now())
 
     # init postgre connection
