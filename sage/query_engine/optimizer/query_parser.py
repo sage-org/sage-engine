@@ -126,4 +126,7 @@ def parse_filter_expr(expr):
             for other in expr.other:
                 expression = "({} || {})".format(expression, parse_filter_expr(other))
             return expression
+        elif expr.name.startswith('Builtin_') and 'arg' in expr:
+            fn_name = expr.name[8:]
+            return "{}({})".format(fn_name, parse_filter_expr(expr.arg))
         raise UnsupportedSPARQL("Unsupported SPARQL FILTER expression: {}".format(expr.name))

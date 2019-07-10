@@ -56,6 +56,12 @@ queries = [
     """, 1),
     ("""
     SELECT * WHERE {
+        <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> ?p ?o .
+        FILTER(?p = iri("http://purl.org/goodrelations/price"))
+    }
+    """, 1),
+    ("""
+    SELECT * WHERE {
         ?s <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
         GRAPH <http://localhost:8000/sparql/watdiv100> {
             ?s <http://purl.org/goodrelations/includes> ?includes .
