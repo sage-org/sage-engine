@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from setuptools import setup, find_packages
 
-__version__ = "2.0.1"
+__version__ = "2.1.0"
 
 # dependencies required for the HDT backend
 HDT_DEPS = [
