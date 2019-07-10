@@ -1,11 +1,11 @@
-Flask==1.0.2
+Flask==1.1.1
 uvloop==0.12
 marshmallow==2.19
-PyYAML==3.13
+PyYAML==5.1.1
 rdflib==4.2.2
 rdflib-jsonld==0.4.0
 gunicorn==19.7.1
-flask-cors==3.0.3
+flask-cors==3.0.8
 protobuf==3.8.0
 coloredlogs==10.0
 click==7.0

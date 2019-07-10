@@ -1,6 +1,6 @@
 # datasets.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from yaml import load
+from yaml import load, FullLoader
 from sage.database.import_manager import import_backend, hdt_backend
 from math import inf
 from urllib.parse import quote_plus
@@ -28,7 +28,7 @@ def load_config(config_file="config.yaml"):
         format: nt
         file: /home/chuck-norris/facts.nt
     """
-    config = load(open(config_file))
+    config = load(open(config_file), Loader=FullLoader)
     # available backends (populated with sage's native backends)
     backends = {
         'hdt-file': hdt_backend()
