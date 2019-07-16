@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+
+  sage-engine:
+    container_name: sage-engine
+    image: callidon/sage
+    volumes:
+      - .:/opt/data/
+    tty: true         # to have nice outputs
+    stdin_open: true  # to be able to use CTRL+C to stop the container
+    ports:
+      - 8000:8000
+    command: sage /opt/data/config.yaml -w 4 -p 8000
+
