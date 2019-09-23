@@ -16,27 +16,12 @@ def hdt_backend():
     return import_backend(data['name'], data['path'], data['connector'], data['required'])
 
 
-def postgre_backend():
+def postgres_backend():
     """Get the loader for the PostgreSQL backend"""
     data = {
-        'name': 'postgre',
-        'path': 'sage.database.postgre.connector',
-        'connector': 'PostgreConnector',
-        'required': [
-            'dbname',
-            'user',
-            'password'
-        ]
-    }
-    return import_backend(data['name'], data['path'], data['connector'], data['required'])
-
-
-def mvcc_backend():
-    """Get the loader for the PostgreSQL backend"""
-    data = {
-        'name': 'postgre-mvcc',
-        'path': 'sage.database.postgre.connector_mvcc',
-        'connector': 'SnapshotConnector',
+        'name': 'postgres',
+        'path': 'sage.database.postgres.connector',
+        'connector': 'PostgresConnector',
         'required': [
             'dbname',
             'user',

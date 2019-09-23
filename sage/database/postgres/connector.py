@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
-from sage.database.postgre.queries import get_start_query, get_resume_query, get_insert_query, get_insert_many_query, get_delete_query
+from sage.database.postgres.queries import get_start_query, get_resume_query, get_insert_query, get_insert_many_query, get_delete_query
 import psycopg2
 from psycopg2.extras import execute_values
 import json
@@ -27,11 +27,11 @@ def fetch_histograms(cursor, table_name, attribute_name):
     return (null_frac, n_distinct, selectivities, sum(most_common_freqs))
 
 
-class PostgreIterator(DBIterator):
-    """An PostgreIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file"""
+class PostgresIterator(DBIterator):
+    """An PostgresIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file"""
 
     def __init__(self, cursor, connection, start_query, start_params, table_name, pattern):
-        super(PostgreIterator, self).__init__(pattern)
+        super(PostgresIterator, self).__init__(pattern)
         self._cursor = cursor
         self._connection = connection
         self._current_query = start_query
@@ -77,9 +77,9 @@ class PostgreIterator(DBIterator):
         return self._last_read is not None
 
 
-class PostgreConnector(DatabaseConnector):
+class PostgresConnector(DatabaseConnector):
     """
-        A PostgreConnector search for RDF triples in a PostgreSQL database.
+        A PostgresConnector search for RDF triples in a PostgreSQL database.
 
         Constructor arguments:
             - table_name `str`: Name of the SQL table containing RDF data.
@@ -91,7 +91,7 @@ class PostgreConnector(DatabaseConnector):
     """
 
     def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=100):
-        super(PostgreConnector, self).__init__()
+        super(PostgresConnector, self).__init__()
         self._table_name = table_name
         self._dbname = dbname
         self._user = user
@@ -237,18 +237,18 @@ class PostgreConnector(DatabaseConnector):
             t = (last_read["s"], last_read["p"], last_read["o"])
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name, fetch_size=self._fetch_size)
         # create the iterator to yield the matching RDF triples
-        iterator = PostgreIterator(cursor, self._connection, start_query, start_params, self._table_name, pattern)
+        iterator = PostgresIterator(cursor, self._connection, start_query, start_params, self._table_name, pattern)
         card = self.__estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
     def from_config(config):
-        """Build a PostgreConnector from a configuration object"""
+        """Build a PostgresConnector from a configuration object"""
         if 'dbname' not in config or 'user' not in config or 'password' not in config:
             raise SyntaxError('A valid configuration for a PostgreSQL connector must contains the dbname, user and password fields')
         table_name = config['name']
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
-        return PostgreConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port)
+        return PostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port)
 
     def insert(self, subject, predicate, obj):
         """
