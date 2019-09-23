@@ -33,6 +33,9 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
     max_results = graph.max_results
     bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
 
+    # commit (if necessary)
+    graph.commit()
+
     # compute controls for the next page
     start = time()
     next_page = None
@@ -134,6 +137,9 @@ def sparql_blueprint(dataset, logger):
             plan, cardinalities = build_query_plan(post_query["query"], dataset, graph_name, next_link)
             loading_time = (time() - start) * 1000  # convert in milliseconds
             bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
+
+            # commit (if necessary)
+            graph.commit()
 
             # compute controls for the next page
             start = time()

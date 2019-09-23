@@ -54,6 +54,14 @@ class DatabaseConnector(ABC):
         """
         raise NotImplementedError("The RDF graph is read-only: DELETE DATA queries are not allowed")
 
+    def start_transaction(self):
+        """Start a transaction (if required by this type of connector)"""
+        pass
+
+    def commit_transaction(self):
+        """Commit any ongoing transaction (if required by this type of connector)"""
+        pass
+
     def __enter__(self):
         """Implementation of the __enter__ method from the context manager spec"""
         self.open()

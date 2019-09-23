@@ -121,6 +121,10 @@ class Graph(object):
         """Delete a RDF triple from the RDF graph"""
         self._connector.delete(subject, predicate, obj)
 
+    def commit(self):
+        """Commit any ongoing transaction (at the database level)"""
+        self._connector.commit_transaction()
+
     def describe(self, url):
         """Describe the RDF Dataset in JSON-LD format"""
         return {

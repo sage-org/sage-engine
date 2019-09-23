@@ -99,7 +99,9 @@ class PostgresConnector(DatabaseConnector):
         self._host = host
         self._port = port
         self._fetch_size = fetch_size
+        self._warmup = True
         self._connection = None
+        self._update_cursor = None
         # Data used for cardinality estimation
         # They are initialized when the connection is first open using PostgreSQL histograms
         self._avg_row_count = 0
@@ -125,7 +127,7 @@ class PostgresConnector(DatabaseConnector):
     def open(self):
         """Open the database connection"""
         if self._connection is None:
-            self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
+            self.start_transaction()
             # fetch estimated table cardinality
             cursor = self._connection.cursor()
             cursor.execute("SELECT reltuples AS approximate_row_count FROM pg_class WHERE relname = '{}'".format(self._table_name))
@@ -154,7 +156,10 @@ class PostgresConnector(DatabaseConnector):
                 'n_distinct': n_distinct,
                 'sum_freqs': sum_freqs
             }
+            self._connection.commit()
             cursor.close()
+            self._connection.close()
+            self._connection = None
 
     def close(self):
         """Close the database connection"""
@@ -162,6 +167,21 @@ class PostgresConnector(DatabaseConnector):
             self._connection.commit()
             self._connection.close()
             self._connection = None
+
+    def start_transaction(self):
+        """Start a PostgreSQL transaction"""
+        if self._connection is None:
+            self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
+            self._update_cursor = self._connection.cursor()
+
+    def commit_transaction(self):
+        """Commit any ongoing transaction"""
+        if self._connection is not None:
+            self._connection.commit()
+            self._update_cursor.close()
+            self._connection.close()
+            self._connection = None
+            self._update_cursor = None
 
     def __estimate_cardinality(self, subject, predicate, obj):
         """
@@ -216,8 +236,13 @@ class PostgresConnector(DatabaseConnector):
             Returns:
                 A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
         """
-        if self._connection is None:
+        # do warmup if necessary
+        if self._warmup:
             self.open()
+        # start transaction
+        self.start_transaction()
+
+        # format triple patterns for the PostgreSQL API
         subject = subject if (subject is not None) and (not subject.startswith('?')) else None
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else None
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
@@ -254,53 +279,30 @@ class PostgresConnector(DatabaseConnector):
         """
             Insert a RDF triple into the RDF Graph.
         """
-        if self._connection is None:
+        # do warmup if necessary
+        if self._warmup:
             self.open()
+        # start transaction
+        self.start_transaction()
         if subject is not None and predicate is not None and obj is not None:
-            cursor = self._connection.cursor()
+            # cursor = self._connection.cursor()
             insert_query = get_insert_query(self._table_name)
-            cursor.execute(insert_query, (subject, predicate, obj))
-            self._connection.commit()
-            cursor.close()
-
-    def insert_many(self, triples):
-        """
-            Insert a set of RDF triples into the RDF Graph.
-        """
-        if self._connection is None:
-            self.open()
-        to_insert = [(s, p, o) for s, p, o in triples if s is not None and p is not None and o is not None]
-        if len(to_insert) > 0:
-            cursor = self._connection.cursor()
-            insert_query = get_insert_many_query(self._table_name)
-            execute_values(cursor, insert_query, to_insert)
-            self._connection.commit()
-            cursor.close()
+            self._update_cursor.execute(insert_query, (subject, predicate, obj))
+            # self._connection.commit()
+            # cursor.close()
 
     def delete(self, subject, predicate, obj):
         """
             Delete a RDF triple from the RDF Graph.
         """
-        if self._connection is None:
+        # do warmup if necessary
+        if self._warmup:
             self.open()
+        # start transaction
+        self.start_transaction()
         if subject is not None and predicate is not None and obj is not None:
-            cursor = self._connection.cursor()
+            # cursor = self._connection.cursor()
             delete_query = get_delete_query(self._table_name)
-            cursor.execute(delete_query, (subject, predicate, obj))
-            self._connection.commit()
-            cursor.close()
-
-    def delete_many(self, triples):
-        """
-            Delete a set of RDF triples from the RDF Graph.
-        """
-        if self._connection is None:
-            self.open()
-        to_delete = [(s, p, o) for s, p, o in triples if s is not None and p is not None and o is not None]
-        if len(to_delete) > 0:
-            cursor = self._connection.cursor()
-            delete_query = get_delete_query(self._table_name)
-            for s, p, o in to_delete:
-                cursor.execute(delete_query, (s, p, o))
-            self._connection.commit()
-            cursor.close()
+            self._update_cursor.execute(delete_query, (subject, predicate, obj))
+            # self._connection.commit()
+            # cursor.close()
