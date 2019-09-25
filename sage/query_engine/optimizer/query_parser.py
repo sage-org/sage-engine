@@ -1,5 +1,7 @@
 # query_parser.py
 # Author: Thomas MINIER - MIT License 2017-2018
+# import pyparsing
+# pyparsing.ParserElement.enablePackrat()
 from rdflib import URIRef, BNode
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
 from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
