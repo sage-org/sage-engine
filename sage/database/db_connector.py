@@ -55,11 +55,15 @@ class DatabaseConnector(ABC):
         raise NotImplementedError("The RDF graph is read-only: DELETE DATA queries are not allowed")
 
     def start_transaction(self):
-        """Start a transaction (if required by this type of connector)"""
+        """Start a transaction (if supported by this type of connector)"""
         pass
 
     def commit_transaction(self):
-        """Commit any ongoing transaction (if required by this type of connector)"""
+        """Commit any ongoing transaction (if supported by this type of connector)"""
+        pass
+
+    def abort_transaction(self):
+        """Abort any ongoing transaction (if supported by this type of connector)"""
         pass
 
     def __enter__(self):

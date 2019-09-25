@@ -14,45 +14,56 @@ from time import time
 
 
 def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
-    """Execute a query using the SageEngine and returns the appropriate HTTP response"""
-    graph_name = format_graph_uri(default_graph_uri, url)
-    if not dataset.has_graph(graph_name):
-        return sage_http_error("No RDF graph matching the default URI provided was found.")
-    graph = dataset.get_graph(graph_name)
-    # decode next_link or build query execution plan
-    cardinalities = dict()
-    start = time()
-    if next_link is not None:
-        plan = load(decode_saved_plan(next_link), dataset)
-    else:
-        plan, cardinalities = parse_query(query, dataset, graph_name, url)
-    loading_time = (time() - start) * 1000
-    # execute query
-    engine = SageEngine()
-    quota = graph.quota / 1000
-    max_results = graph.max_results
-    bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
+    """
+        Execute a query using the SageEngine and returns the appropriate HTTP response.
+        Any failure will results in a rollback/abort on the current query execution.
+    """
+    graph = None
+    try:
+        graph_name = format_graph_uri(default_graph_uri, url)
+        if not dataset.has_graph(graph_name):
+            return sage_http_error("No RDF graph matching the default URI provided was found.")
+        graph = dataset.get_graph(graph_name)
+        # decode next_link or build query execution plan
+        cardinalities = dict()
+        start = time()
+        if next_link is not None:
+            plan = load(decode_saved_plan(next_link), dataset)
+        else:
+            plan, cardinalities = parse_query(query, dataset, graph_name, url)
+        loading_time = (time() - start) * 1000
+        # execute query
+        engine = SageEngine()
+        quota = graph.quota / 1000
+        max_results = graph.max_results
+        bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
 
-    # commit (if necessary)
-    graph.commit()
+        # commit (if necessary)
+        graph.commit()
 
-    # compute controls for the next page
-    start = time()
-    next_page = None
-    if not is_done:
-        next_page = encode_saved_plan(saved_plan)
-    exportTime = (time() - start) * 1000
-    stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
+        # compute controls for the next page
+        start = time()
+        next_page = None
+        if not is_done:
+            next_page = encode_saved_plan(saved_plan)
+        exportTime = (time() - start) * 1000
+        stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
-    # send response
-    if mimetype == "application/sparql-results+json":
-        return Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
-    if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
-        return Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
-    if mimetype == "application/json":
-        return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
-    # otherwise, return the HTML version
-    return render_template("sage_page.html", query=query, default_graph_uri=default_graph_uri, bindings=bindings, next_page=next_page, stats=stats)
+        # send response
+        if mimetype == "application/sparql-results+json":
+            return Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+        if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
+            return Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
+        if mimetype == "application/json":
+            return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+        # otherwise, return the HTML version
+        return render_template("sage_page.html", query=query, default_graph_uri=default_graph_uri, bindings=bindings, next_page=next_page, stats=stats)
+    except Exception as e:
+        # abort all ongoing transactions (if required)
+        # then forward the exception to the main loop
+        if graph is not None:
+            graph.abort()
+        raise e
 
 
 def sparql_blueprint(dataset, logger):

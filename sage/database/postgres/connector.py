@@ -38,15 +38,17 @@ class PostgresIterator(DBIterator):
         self._table_name = table_name
         # resume query execution with a SQL query
         self._cursor.execute(self._current_query, start_params)
-        # self._connection.commit()
         # always keep the current row buffered inside the iterator
         self._last_read = self._cursor.fetchone()
+
+    def __del__(self):
+        """Destructor"""
+        self._cursor.close()
 
     def __advance_iteration(self, last_read):
         query, params = get_resume_query(self._pattern["subject"], self._pattern["predicate"], self._pattern["object"], last_read, self._table_name, symbol=">")
         if query is not None and params is not None:
             self._current_query = query
-            # self._connection.commit()
             self._cursor.execute(self._current_query, params)
 
     def last_read(self):
@@ -90,7 +92,7 @@ class PostgresConnector(DatabaseConnector):
             - port `int`: connection port number (defaults to 5432 if not provided)
     """
 
-    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=100):
+    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=500):
         super(PostgresConnector, self).__init__()
         self._table_name = table_name
         self._dbname = dbname
@@ -99,11 +101,12 @@ class PostgresConnector(DatabaseConnector):
         self._host = host
         self._port = port
         self._fetch_size = fetch_size
-        self._warmup = True
         self._connection = None
         self._update_cursor = None
+        self._warmup = True
+
         # Data used for cardinality estimation
-        # They are initialized when the connection is first open using PostgreSQL histograms
+        # They are initialized using PostgreSQL histograms, after the 1st connection to the DB
         self._avg_row_count = 0
         self._subject_histograms = {
             'selectivities': dict(),
@@ -127,9 +130,12 @@ class PostgresConnector(DatabaseConnector):
     def open(self):
         """Open the database connection"""
         if self._connection is None:
-            self.start_transaction()
-            # fetch estimated table cardinality
+            self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
+
+        # Do warmup phase if required, i.e., gather stats for query execution
+        if self._warmup:
             cursor = self._connection.cursor()
+            # fetch estimated table cardinality
             cursor.execute("SELECT reltuples AS approximate_row_count FROM pg_class WHERE relname = '{}'".format(self._table_name))
             self._avg_row_count = cursor.fetchone()[0]
             # fetch subject histograms
@@ -156,13 +162,16 @@ class PostgresConnector(DatabaseConnector):
                 'n_distinct': n_distinct,
                 'sum_freqs': sum_freqs
             }
+            # commit & close cursor
             self._connection.commit()
             cursor.close()
-            self._connection.close()
-            self._connection = None
+            self._warmup = False
 
     def close(self):
         """Close the database connection"""
+        if self._update_cursor is not None:
+            self._update_cursor.close()
+            self._update_cursor = None
         if self._connection is not None:
             self._connection.commit()
             self._connection.close()
@@ -171,16 +180,24 @@ class PostgresConnector(DatabaseConnector):
     def start_transaction(self):
         """Start a PostgreSQL transaction"""
         if self._connection is None:
-            self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
+            self.open()
+        if self._update_cursor is None:
             self._update_cursor = self._connection.cursor()
 
     def commit_transaction(self):
         """Commit any ongoing transaction"""
         if self._connection is not None:
             self._connection.commit()
+        if self._update_cursor is not None:
             self._update_cursor.close()
-            self._connection.close()
-            self._connection = None
+            self._update_cursor = None
+
+    def abort_transaction(self):
+        """Abort any ongoing transaction"""
+        if self._connection is not None:
+            self._connection.rollback()
+        if self._update_cursor is not None:
+            self._update_cursor.close()
             self._update_cursor = None
 
     def __estimate_cardinality(self, subject, predicate, obj):
@@ -237,10 +254,7 @@ class PostgresConnector(DatabaseConnector):
                 A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
         """
         # do warmup if necessary
-        if self._warmup:
-            self.open()
-        # start transaction
-        self.start_transaction()
+        self.open()
 
         # format triple patterns for the PostgreSQL API
         subject = subject if (subject is not None) and (not subject.startswith('?')) else None
@@ -248,8 +262,11 @@ class PostgresConnector(DatabaseConnector):
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
 
-        # cursor used to create the query cursor
+        # dedicated cursor used to scan this triple pattern
+        # WARNING: we need to use a dedicated cursor per triple pattern iterator
+        # otherwise, we might reset a cursor whose results were not fully consumed
         cursor = self._connection.cursor()
+
         # create a SQL query to start a new index scan
         if last_read is None:
             start_query, start_params = get_start_query(subject, predicate, obj, self._table_name, fetch_size=self._fetch_size)
@@ -261,6 +278,7 @@ class PostgresConnector(DatabaseConnector):
             last_read = json.loads(last_read)
             t = (last_read["s"], last_read["p"], last_read["o"])
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name, fetch_size=self._fetch_size)
+
         # create the iterator to yield the matching RDF triples
         iterator = PostgresIterator(cursor, self._connection, start_query, start_params, self._table_name, pattern)
         card = self.__estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
@@ -280,8 +298,7 @@ class PostgresConnector(DatabaseConnector):
             Insert a RDF triple into the RDF Graph.
         """
         # do warmup if necessary
-        if self._warmup:
-            self.open()
+        self.open()
         # start transaction
         self.start_transaction()
         if subject is not None and predicate is not None and obj is not None:
@@ -296,8 +313,7 @@ class PostgresConnector(DatabaseConnector):
             Delete a RDF triple from the RDF Graph.
         """
         # do warmup if necessary
-        if self._warmup:
-            self.open()
+        self.open()
         # start transaction
         self.start_transaction()
         if subject is not None and predicate is not None and obj is not None:

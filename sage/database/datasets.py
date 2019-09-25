@@ -125,6 +125,10 @@ class Graph(object):
         """Commit any ongoing transaction (at the database level)"""
         self._connector.commit_transaction()
 
+    def abort(self):
+        """Abort any ongoing transaction (at the database level)"""
+        self._connector.abort_transaction()
+
     def describe(self, url):
         """Describe the RDF Dataset in JSON-LD format"""
         return {
