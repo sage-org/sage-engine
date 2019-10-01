@@ -28,10 +28,12 @@ class ProjectionIterator(PreemptableIterator):
         """
         if not self.has_next():
             raise IteratorExhausted()
-        value = await self._source.next()
-        if self._values is None:
-            return value
-        return {k: v for k, v in value.items() if k in self._values}
+        mappings = await self._source.next()
+        if mappings is None:
+            return None
+        elif self._values is None:
+            return mappings
+        return {k: v for k, v in mappings.items() if k in self._values}
 
     def save(self):
         """Save and serialize the iterator as a machine-readable format"""

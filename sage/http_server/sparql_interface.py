@@ -117,59 +117,59 @@ def sparql_blueprint(dataset, logger):
             "application/sparql-results+json", "application/sparql-results+xml"
         ])
         url = secure_url(request.url)
-        try:
-            # A GET request always returns the homepage of the dataset
-            if request.method == "GET" or (not request.is_json):
-                dinfo = graph.describe(url)
-                to_publish = dumps(dinfo) if graph.config()['publish'] else None
-                dinfo['@id'] = url
-                void_desc = {
-                    "nt": VoidDescriptor(url, graph).describe("ntriples"),
-                    "ttl": VoidDescriptor(url, graph).describe("turtle"),
-                    "xml": VoidDescriptor(url, graph).describe("xml")
-                }
-                queries = [q for q in graph.example_queries if q["publish"]]
-                return render_template("website/sage_dataset.html", dataset_info=dinfo, void_desc=void_desc, to_publish=to_publish, queries=queries)
+        # try:
+        # A GET request always returns the homepage of the dataset
+        if request.method == "GET" or (not request.is_json):
+            dinfo = graph.describe(url)
+            to_publish = dumps(dinfo) if graph.config()['publish'] else None
+            dinfo['@id'] = url
+            void_desc = {
+                "nt": VoidDescriptor(url, graph).describe("ntriples"),
+                "ttl": VoidDescriptor(url, graph).describe("turtle"),
+                "xml": VoidDescriptor(url, graph).describe("xml")
+            }
+            queries = [q for q in graph.example_queries if q["publish"]]
+            return render_template("website/sage_dataset.html", dataset_info=dinfo, void_desc=void_desc, to_publish=to_publish, queries=queries)
 
-            engine = SageEngine()
-            post_query, err = QueryRequest().load(request.get_json())
-            if err is not None and len(err) > 0:
-                return Response(format_marshmallow_errors(err), status=400)
-            quota = graph.quota / 1000
-            max_results = graph.max_results
+        engine = SageEngine()
+        post_query, err = QueryRequest().load(request.get_json())
+        if err is not None and len(err) > 0:
+            return Response(format_marshmallow_errors(err), status=400)
+        quota = graph.quota / 1000
+        max_results = graph.max_results
 
-            # Load next link
-            next_link = None
-            if 'next' in post_query:
-                next_link = decode_saved_plan(post_query["next"])
+        # Load next link
+        next_link = None
+        if 'next' in post_query:
+            next_link = decode_saved_plan(post_query["next"])
 
-            # build physical query plan, then execute it with the given quota
-            start = time()
-            plan, cardinalities = build_query_plan(post_query["query"], dataset, graph_name, next_link)
-            loading_time = (time() - start) * 1000  # convert in milliseconds
-            bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
+        # build physical query plan, then execute it with the given quota
+        start = time()
+        plan, cardinalities = build_query_plan(post_query["query"], dataset, graph_name, next_link)
+        loading_time = (time() - start) * 1000  # convert in milliseconds
+        bindings, saved_plan, is_done = engine.execute(plan, quota, max_results)
 
-            # commit (if necessary)
-            graph.commit()
+        # commit (if necessary)
+        graph.commit()
 
-            # compute controls for the next page
-            start = time()
-            next_page = None
-            if not is_done:
-                next_page = encode_saved_plan(saved_plan)
-            exportTime = (time() - start) * 1000  # convert in milliseconds
-            stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
+        # compute controls for the next page
+        start = time()
+        next_page = None
+        if not is_done:
+            next_page = encode_saved_plan(saved_plan)
+        exportTime = (time() - start) * 1000  # convert in milliseconds
+        stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
-            if mimetype == "application/sparql-results+json":
-                res = Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
-            if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
-                res = Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
-            else:
-                res = Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
-            # set deprecation warning in headers
-            res.headers.add("Warning", "199 SaGe/2.0 \"You are using a deprecated API. Consider uppgrading to the SaGe SPARQL query API. See http://sage.univ-nantes.fr/documentation fore more details.\"")
-            return res
-        except Exception as e:
-            logger.error(e)
-            abort(500)
+        if mimetype == "application/sparql-results+json":
+            res = Response(responses.w3c_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+        if mimetype == "application/xml" or mimetype == "application/sparql-results+xml":
+            res = Response(responses.w3c_xml(bindings, next_page, stats), content_type="application/xml")
+        else:
+            res = Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
+        # set deprecation warning in headers
+        res.headers.add("Warning", "199 SaGe/2.0 \"You are using a deprecated API. Consider uppgrading to the SaGe SPARQL query API. See http://sage.univ-nantes.fr/documentation fore more details.\"")
+        return res
+        # except Exception as e:
+        #     logger.error(e)
+        #     abort(500)
     return s_blueprint

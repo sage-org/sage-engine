@@ -49,6 +49,8 @@ class IndexJoinIterator(PreemptableIterator):
         return self._source.has_next() or (self._currentIter is not None and self._currentIter.has_next())
 
     def _initInnerLoop(self, triple, mappings, last_read=None):
+        if mappings is None:
+            return EmptyIterator(triple)
         (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))
         iterator, card = self._hdtDocument.search(s, p, o, last_read=last_read)
         if card == 0:
@@ -58,6 +60,8 @@ class IndexJoinIterator(PreemptableIterator):
     async def _innerLoop(self):
         """Execute one loop of the inner loop"""
         mu = await self._currentIter.next()
+        if mu is None:
+            return None
         return {**self._currentBinding, **mu}
 
     async def next(self):

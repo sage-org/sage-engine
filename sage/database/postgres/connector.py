@@ -46,6 +46,7 @@ class PostgresIterator(DBIterator):
         self._cursor.close()
 
     def __advance_iteration(self, last_read):
+        """Advance iteration by fetching the next page of results using a SQL query"""
         query, params = get_resume_query(self._pattern["subject"], self._pattern["predicate"], self._pattern["object"], last_read, self._table_name, symbol=">")
         if query is not None and params is not None:
             self._current_query = query
@@ -200,7 +201,7 @@ class PostgresConnector(DatabaseConnector):
             self._update_cursor.close()
             self._update_cursor = None
 
-    def __estimate_cardinality(self, subject, predicate, obj):
+    def _estimate_cardinality(self, subject, predicate, obj):
         """
             Estimate the cardinality of a triple pattern using PostgreSQL histograms.
 
@@ -281,7 +282,7 @@ class PostgresConnector(DatabaseConnector):
 
         # create the iterator to yield the matching RDF triples
         iterator = PostgresIterator(cursor, self._connection, start_query, start_params, self._table_name, pattern)
-        card = self.__estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
+        card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
     def from_config(config):

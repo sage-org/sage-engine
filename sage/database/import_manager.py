@@ -3,33 +3,42 @@
 from importlib import import_module
 
 
-def hdt_backend():
-    """Get the loader for the HDT backend"""
-    data = {
-        'name': 'hdt-file',
-        'path': 'sage.database.hdt_file_connector',
-        'connector': 'HDTFileConnector',
-        'required': [
-            'file'
-        ]
-    }
-    return import_backend(data['name'], data['path'], data['connector'], data['required'])
-
-
-def postgres_backend():
-    """Get the loader for the PostgreSQL backend"""
-    data = {
-        'name': 'postgres',
-        'path': 'sage.database.postgres.connector',
-        'connector': 'PostgresConnector',
-        'required': [
-            'dbname',
-            'user',
-            'password'
-        ]
-    }
-    return import_backend(data['name'], data['path'], data['connector'], data['required'])
-
+def builtin_backends():
+    """Load the built-in backends: HDT, PostgreSQL and MVCC-PostgreSQL"""
+    data = [
+        # HDT backend (read-only)
+        {
+            'name': 'hdt-file',
+            'path': 'sage.database.hdt_file_connector',
+            'connector': 'HDTFileConnector',
+            'required': [
+                'file'
+            ]
+        },
+        # PostgreSQL backend (optimised for read-only)
+        {
+            'name': 'postgres',
+            'path': 'sage.database.postgres.connector',
+            'connector': 'PostgresConnector',
+            'required': [
+                'dbname',
+                'user',
+                'password'
+            ]
+        },
+        # MVCC-PostgreSQL (read-write)
+        {
+            'name': 'postgres-mvcc',
+            'path': 'sage.database.postgres.mvcc_connector',
+            'connector': 'MVCCPostgresConnector',
+            'required': [
+                'dbname',
+                'user',
+                'password'
+            ]
+        }
+    ]
+    return {item['name']: import_backend(item['name'], item['path'], item['connector'], item['required']) for item in data}
 
 def import_backend(name, module_path, class_name, required_params):
     """Load a new backend from the config file"""

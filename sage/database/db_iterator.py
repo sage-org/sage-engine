@@ -48,7 +48,7 @@ class DBIterator(ABC):
 
 
 class EmptyIterator(DBIterator):
-    """docstring for EmptyIterator."""
+    """An iterator that yields nothing and completes immediatly"""
 
     def last_read(self):
         """Return the index ID of the last element read"""
