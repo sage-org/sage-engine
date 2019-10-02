@@ -59,9 +59,9 @@ COMMONS_DEPS = HDT_DEPS + POSTGRESQL_DEPS + [
 console_scripts = [
     'sage = sage.cli.start_server:start_sage_server',
     'sage-query = sage.cli.commons:sage_query',
-    'sage-postgres-init = sage.cli.postgres:init_postgre',
-    'sage-postgres-index = sage.cli.postgres:index_postgre',
-    'sage-postgres-put = sage.cli.postgres:put_postgre'
+    'sage-postgres-init = sage.cli.postgres:init_postgres',
+    'sage-postgres-index = sage.cli.postgres:index_postgres',
+    'sage-postgres-put = sage.cli.postgres:put_postgres'
 ]
 
 with open('README.rst') as file:

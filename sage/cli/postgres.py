@@ -1,6 +1,6 @@
-# postgre.py
+# postgres.py
 # Author: Thomas MINIER - MIT License 2017-2019
-import sage.cli.postgre_utils as p_utils
+import sage.cli.postgres_utils as p_utils
 from sage.cli.utils import load_dataset, get_rdf_reader
 import click
 import psycopg2
@@ -11,12 +11,11 @@ from time import time
 import datetime
 
 
-def bucketify(iterable, bucket_size, to_append=None):
+def bucketify(iterable, bucket_size):
     """Group items from an iterable by buckets"""
     bucket = list()
     for s, p, o in iterable:
-        item = (s, p, o, to_append) if to_append is not None else (s, p, o)
-        bucket.append(item)
+        bucket.append((s, p, o))
         if len(bucket) >= bucket_size:
             yield bucket
             bucket = list()
@@ -24,10 +23,10 @@ def bucketify(iterable, bucket_size, to_append=None):
         yield bucket
 
 
-def connect_postgre(dataset):
-    """Try to connect to a PostGre server"""
+def connect_postgres(dataset):
+    """Try to connect to a PostgreSQL server"""
     if 'dbname' not in dataset or 'user' not in dataset or 'password' not in dataset:
-        print("Error: a valid PostGre dataset must be declared with fields 'dbname', 'user' and 'password'")
+        print("Error: a valid PostgreSQL dataset must be declared with fields 'dbname', 'user' and 'password'")
         return None
     dbname = dataset['dbname']
     user = dataset['user']
@@ -41,20 +40,20 @@ def connect_postgre(dataset):
 @click.argument("config")
 @click.argument("dataset_name")
 @click.option('--index/--no-index', default=True, help="Enable/disable indexing of SQL tables. The indexes can be created separately using the command sage-postgre-index")
-def init_postgre(config, dataset_name, index):
+def init_postgres(config, dataset_name, index):
     """
-        Initialize the RDF dataset DATASET_NAME with a PostgreSQL backend, described in the configuration file CONFIG.
+        Initialize the RDF dataset DATASET_NAME with a PostgreSQL/PostgreSQL-MVCC backend, described in the configuration file CONFIG.
     """
     # install logger
     coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
     logger = logging.getLogger(__name__)
 
     # load dataset from config file
-    dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgre', 'postgre-mvcc'])
-    enable_mvcc = kind == 'postgre-mvcc'
+    dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgres', 'postgres-mvcc'])
+    enable_mvcc = kind == 'postgres-mvcc'
 
     # init postgre connection
-    connection = connect_postgre(dataset)
+    connection = connect_postgres(dataset)
     if connection is None:
         exit(1)
     # turn off autocommit
@@ -62,17 +61,14 @@ def init_postgre(config, dataset_name, index):
 
     # create all SQL queries used to init the dataset, using the dataset name
     table_name = dataset['name']
-    create_table_query = p_utils.get_postgre_create_table(table_name, enable_mvcc=enable_mvcc)
-    create_indexes_queries = p_utils.get_postgre_create_indexes(table_name, enable_mvcc=enable_mvcc)
+    create_table_query = p_utils.get_postgres_create_table(table_name, enable_mvcc=enable_mvcc)
+    create_indexes_queries = p_utils.get_postgres_create_indexes(table_name, enable_mvcc=enable_mvcc)
 
     cursor = connection.cursor()
     # create the main SQL table
     logger.info("Creating SQL table {}...".format(table_name))
     cursor.execute(create_table_query)
     logger.info("SPARQL table {} successfully created".format(table_name))
-
-    # load additional data
-    # TODO
 
     # create the additional inexes on OSP and POS
     if index:
@@ -94,26 +90,27 @@ def init_postgre(config, dataset_name, index):
 @click.command()
 @click.argument("config")
 @click.argument("dataset_name")
-def index_postgre(config, dataset_name):
+def index_postgres(config, dataset_name):
     """
-        Create the additional B-tree indexes on the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL backend.
+        Create the additional B-tree indexes on the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL or PostgreSQL-MVCC backend.
     """
     # install logger
     coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
     logger = logging.getLogger(__name__)
 
     # load dataset from config file
-    dataset = load_dataset(config, dataset_name, 'postgre', logger)
+    dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgres', 'postgres-mvcc'])
+    enable_mvcc = kind == 'postgres-mvcc'
 
-    # init postgre connection
-    connection = connect_postgre(dataset)
+    # init PostgreSQL connection
+    connection = connect_postgres(dataset)
     if connection is None:
         exit(1)
     # turn off autocommit
     connection.autocommit = False
     # create all SQL queries used to init the dataset, using the dataset name
     table_name = dataset['name']
-    create_indexes_queries = p_utils.get_postgre_create_indexes(table_name)
+    create_indexes_queries = p_utils.get_postgres_create_indexes(table_name, enable_mvcc=enable_mvcc)
 
     # create indexes
     cursor = connection.cursor()
@@ -142,22 +139,21 @@ def index_postgre(config, dataset_name):
               help="Block size used for the bulk loading")
 @click.option("-c", "--commit_threshold", type=int, default=500000, show_default=True,
               help="Commit after sending this number of RDF triples")
-def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_threshold):
+def put_postgres(config, dataset_name, rdf_file, format, block_size, commit_threshold):
     """
-        Insert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL backend.
+        Insert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME, described in the configuration file CONFIG. The dataset must use the PostgreSQL or PostgreSQL-MVCC backend.
     """
     # install logger
     coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
     logger = logging.getLogger(__name__)
 
     # load dataset from config file
-    dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgre', 'postgre-mvcc'])
-    enable_mvcc = False
-    to_append = str(datetime.datetime.now())
+    dataset, kind = load_dataset(config, dataset_name, logger, backends=['postgres', 'postgres-mvcc'])
+    enable_mvcc = kind == 'postgres-mvcc'
 
-    # init postgre connection
+    # init PostgreSQL connection
     logger.info("Connecting to PostgreSQL server...")
-    connection = connect_postgre(dataset)
+    connection = connect_postgres(dataset)
     logger.info("Connected to PostgreSQL server")
     if connection is None:
         exit(1)
@@ -166,7 +162,7 @@ def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_thres
 
     # compute SQL table name and the bulk load SQL query
     table_name = dataset['name']
-    insert_into_query = p_utils.get_postgre_insert_into(table_name, enable_mvcc=enable_mvcc)
+    insert_into_query = p_utils.get_postgres_insert_into(table_name, enable_mvcc=enable_mvcc)
 
     logger.info("Reading RDF source file...")
     iterator, nb_triples = get_rdf_reader(rdf_file, format=format)
@@ -181,7 +177,7 @@ def put_postgre(config, dataset_name, rdf_file, format, block_size, commit_thres
     # insert by bucket (and show a progress bar)
     with click.progressbar(length=nb_triples,
                            label="Inserting RDF triples".format(nb_triples)) as bar:
-        for bucket in bucketify(iterator, block_size, to_append=to_append):
+        for bucket in bucketify(iterator, block_size):
             to_commit += len(bucket)
             # bulk load the bucket of RDF triples, then update progress bar
             execute_values(cursor, insert_into_query, bucket, page_size=block_size)

@@ -132,6 +132,8 @@ class PostgresConnector(DatabaseConnector):
         """Open the database connection"""
         if self._connection is None:
             self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
+            # disable autocommit
+            self._connection.autocommit = False
 
         # Do warmup phase if required, i.e., gather stats for query execution
         if self._warmup:
