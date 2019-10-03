@@ -109,31 +109,9 @@ docker run -v path/to/config-file:/opt/data/ -p 8000:8000 callidon/sage sage /op
 
 The SaGe server providers several command line utilities, alongside the `sage` command used to start the server.
 
-## `sage-query`: send SPARQL queries through HTTP requests
+## `sage-postgres-init`: Initialize a PostgreSQL dataset with Sage
 ```
-Usage: sage-query [OPTIONS] ENTRYPOINT DEFAULT_GRAPH_URI
-
-  Send a SPARQL query to a SaGe server hosted at ENTRYPOINT, with
-  DEFAULT_GRAPH_URI as the default RDF Graph. It does not act as a Smart
-  client, so only queries supported by the server will be evaluated.
-
-  Example usage: sage-query http://sage.univ-nantes.fr/sparql
-  http://sage.univ-nantes.fr/sparql/dbpedia-2016-04 -q "SELECT * WHERE { ?s
-  ?p ?o }"
-
-Options:
-  -q, --query TEXT     SPARQL query to execute (passed in command-line)
-  -f, --file TEXT      File containing a SPARQL query to execute
-  --format [json|xml]  Format of the results set, formatted according to W3C
-                       SPARQL standards.
-  -l, --limit INTEGER  Maximum number of solutions bindings to fetch, similar
-                       to the SPARQL LIMIT modifier.
-  --help               Show this message and exit.
-```
-
-## `sage-postgre-init`: Initialize a PostgreSQL dataset with Sage
-```
-Usage: sage-postgre-init [OPTIONS] CONFIG DATASET_NAME
+Usage: sage-postgres-init [OPTIONS] CONFIG DATASET_NAME
 
   Initialize the RDF dataset DATASET_NAME with a PostgreSQL backend,
   described in the configuration file CONFIG.
@@ -145,9 +123,9 @@ Options:
   --help                Show this message and exit.
 ```
 
-## `sage-postgre-put`: Efficiently insert RDF data into a Sage-PostgreSQL dataset
+## `sage-postgres-put`: Efficiently insert RDF data into a Sage-PostgreSQL dataset
 ```
-Usage: sage-postgre-put [OPTIONS] RDF_FILE CONFIG DATASET_NAME
+Usage: sage-postgres-put [OPTIONS] RDF_FILE CONFIG DATASET_NAME
 
   Inert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME,
   described in the configuration file CONFIG. The dataset must use the
@@ -164,9 +142,9 @@ Options:
   --help                          Show this message and exit.
 ```
 
-## `sage-postgre-index`: (Re)generate indexes to speed-up query processing with PostgreSQL
+## `sage-postgres-index`: (Re)generate indexes to speed-up query processing with PostgreSQL
 ```
-Usage: sage-postgre-index [OPTIONS] CONFIG DATASET_NAME
+Usage: sage-postgres-index [OPTIONS] CONFIG DATASET_NAME
 
   Create the additional B-tree indexes on the RDF dataset DATASET_NAME,
   described in the configuration file CONFIG. The dataset must use the
