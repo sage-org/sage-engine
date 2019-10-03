@@ -34,7 +34,7 @@ class HDTFileConnector(DatabaseConnector):
         super(HDTFileConnector, self).__init__()
         self._hdt = HDTDocument(file)
 
-    def search(self, subject, predicate, obj, last_read=None):
+    def search(self, subject, predicate, obj, last_read=None, as_of=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
 

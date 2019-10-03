@@ -4,18 +4,11 @@ import uvloop
 from asyncio import Queue, get_event_loop, wait_for, sleep, set_event_loop_policy
 from asyncio import TimeoutError as asyncTimeoutError
 from sage.query_engine.iterators.utils import IteratorExhausted
+from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
 from sage.query_engine.protobuf.iterators_pb2 import RootTree
 from math import inf
 
 set_event_loop_policy(uvloop.EventLoopPolicy())
-
-
-class TooManyResults(Exception):
-    """
-        Exception raised when the max. number of results for a query execution
-        has been exceeded
-    """
-    pass
 
 
 async def executor(plan, queue, limit):
@@ -37,6 +30,8 @@ async def executor(plan, queue, limit):
                 await sleep(0)
     except IteratorExhausted:
         pass
+    except StopIteration:
+        pass
 
 
 class SageEngine(object):
@@ -54,15 +49,18 @@ class SageEngine(object):
                 - quota ``float`` - The time quota used for query execution
 
             Returns:
-                A tuple (``results``, ``saved_plan``, ``is_done``) where:
+                A tuple (``results``, ``saved_plan``, ``is_done``, ``abort_reason``) where:
                 - ``results`` is a list of solution mappings found during query execution
                 - ``saved_plan`` is the state of the plan saved using protocol-buffers
                 - ``is_done`` is True when the plan has completed query evalution, False otherwise
+                - ``abort_reason`` is True if the query was aborted due a to concurrency control issue
         """
         results = list()
         queue = Queue()
         loop = get_event_loop()
         query_done = False
+        root = None
+        abort_reason = None
         try:
             task = wait_for(executor(plan, queue, limit), timeout=quota)
             loop.run_until_complete(task)
@@ -71,10 +69,14 @@ class SageEngine(object):
             pass
         except TooManyResults:
             pass
+        except DeleteInsertConflict:
+            abort_reason = "An abort has occurred"
         finally:
             while not queue.empty():
                 results.append(queue.get_nowait())
-        root = RootTree()
-        source_field = plan.serialized_name() + '_source'
-        getattr(root, source_field).CopyFrom(plan.save())
-        return (results, root, query_done)
+        # save the plan if query execution is not done yet and no abort has occurred
+        if (not query_done) and abort_reason is None:
+            root = RootTree()
+            source_field = plan.serialized_name() + '_source'
+            getattr(root, source_field).CopyFrom(plan.save())
+        return (results, root, query_done, abort_reason)

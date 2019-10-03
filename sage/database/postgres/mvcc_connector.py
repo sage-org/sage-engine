@@ -111,7 +111,7 @@ class MVCCPostgresConnector(PostgresConnector):
     def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=500):
         super(MVCCPostgresConnector, self).__init__(table_name, dbname, user, password, host, port, fetch_size)
 
-    def search(self, subject, predicate, obj, last_read=None):
+    def search(self, subject, predicate, obj, last_read=None, as_of=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
 
@@ -120,6 +120,7 @@ class MVCCPostgresConnector(PostgresConnector):
                 - predicate ``string`` - Predicate of the triple pattern
                 - obj ``string`` - Object of the triple pattern
                 - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
+                - as_of ``datetime=None`` ``optional`` - Perform all reads against a consistent snapshot represented by a timestamp.
 
             Returns:
                 A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
@@ -135,7 +136,7 @@ class MVCCPostgresConnector(PostgresConnector):
 
         # pick a start transaction timestamp
         # NB: It will be overwritten if we reload a scan from a saved state
-        timestamp = datetime.now()
+        timestamp = datetime.now() if as_of is None else as_of
 
         # dedicated cursor used to scan this triple pattern
         # WARNING: we need to use a dedicated cursor per triple pattern iterator
@@ -171,8 +172,9 @@ class MVCCPostgresConnector(PostgresConnector):
         table_name = config['name']
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
+        fetch_size = config['fetch_size'] if 'fetch_size' in config else 500
 
-        return MVCCPostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port)
+        return MVCCPostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
 
     def insert(self, subject, predicate, obj):
         """

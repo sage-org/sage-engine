@@ -42,7 +42,7 @@ class PostgresIterator(DBIterator):
         self._last_read = self._cursor.fetchone()
 
     def __del__(self):
-        """Destructor"""
+        """Destructor (close the database cursor)"""
         self._cursor.close()
 
     def __advance_iteration(self, last_read):
@@ -106,8 +106,8 @@ class PostgresConnector(DatabaseConnector):
         self._update_cursor = None
         self._warmup = True
 
-        # Data used for cardinality estimation
-        # They are initialized using PostgreSQL histograms, after the 1st connection to the DB
+        # Data used for cardinality estimation.
+        # They are initialized using PostgreSQL histograms, after the 1st connection to the DB.
         self._avg_row_count = 0
         self._subject_histograms = {
             'selectivities': dict(),
@@ -135,7 +135,7 @@ class PostgresConnector(DatabaseConnector):
             # disable autocommit
             self._connection.autocommit = False
 
-        # Do warmup phase if required, i.e., gather stats for query execution
+        # Do warmup phase if required, i.e., fetch stats for query execution
         if self._warmup:
             cursor = self._connection.cursor()
             # fetch estimated table cardinality
@@ -172,11 +172,13 @@ class PostgresConnector(DatabaseConnector):
 
     def close(self):
         """Close the database connection"""
+        # commit, then close the cursor and the connection
+        if self._connection is not None:
+            self._connection.commit()
         if self._update_cursor is not None:
             self._update_cursor.close()
             self._update_cursor = None
         if self._connection is not None:
-            self._connection.commit()
             self._connection.close()
             self._connection = None
 
@@ -243,7 +245,7 @@ class PostgresConnector(DatabaseConnector):
         cardinality = int(ceil(selectivity * self._avg_row_count))
         return cardinality if cardinality > 0 else 1
 
-    def search(self, subject, predicate, obj, last_read=None):
+    def search(self, subject, predicate, obj, last_read=None, as_of=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
 
@@ -266,8 +268,8 @@ class PostgresConnector(DatabaseConnector):
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
 
         # dedicated cursor used to scan this triple pattern
-        # WARNING: we need to use a dedicated cursor per triple pattern iterator
-        # otherwise, we might reset a cursor whose results were not fully consumed
+        # WARNING: we need to use a dedicated cursor per triple pattern iterator.
+        # Otherwise, we might reset a cursor whose results were not fully consumed.
         cursor = self._connection.cursor()
 
         # create a SQL query to start a new index scan
@@ -291,37 +293,34 @@ class PostgresConnector(DatabaseConnector):
         """Build a PostgresConnector from a configuration object"""
         if 'dbname' not in config or 'user' not in config or 'password' not in config:
             raise SyntaxError('A valid configuration for a PostgreSQL connector must contains the dbname, user and password fields')
+
         table_name = config['name']
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
-        return PostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port)
+        fetch_size = config['fetch_size'] if 'fetch_size' in config else 500
+
+        return PostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
 
     def insert(self, subject, predicate, obj):
         """
             Insert a RDF triple into the RDF Graph.
         """
-        # do warmup if necessary
+        # do warmup if necessary, then start a new transaction
         self.open()
-        # start transaction
         self.start_transaction()
         if subject is not None and predicate is not None and obj is not None:
-            # cursor = self._connection.cursor()
             insert_query = get_insert_query(self._table_name)
             self._update_cursor.execute(insert_query, (subject, predicate, obj))
-            # self._connection.commit()
-            # cursor.close()
+            self._connection.commit()
 
     def delete(self, subject, predicate, obj):
         """
             Delete a RDF triple from the RDF Graph.
         """
-        # do warmup if necessary
+        # do warmup if necessary, then start a new transaction
         self.open()
-        # start transaction
         self.start_transaction()
         if subject is not None and predicate is not None and obj is not None:
-            # cursor = self._connection.cursor()
             delete_query = get_delete_query(self._table_name)
             self._update_cursor.execute(delete_query, (subject, predicate, obj))
-            # self._connection.commit()
-            # cursor.close()
+            self._connection.commit()

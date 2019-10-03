@@ -97,7 +97,7 @@ class Graph(object):
         """Get the underlying DatabaseConnector for this dataset"""
         return self._connector
 
-    def search(self, subject, predicate, obj, last_read=None):
+    def search(self, subject, predicate, obj, last_read=None, as_of=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
             Args:
@@ -105,10 +105,11 @@ class Graph(object):
                 - predicate [string] - Preicate of the triple pattern
                 - object [string] - Object of the triple pattern
                 - last_read ``[string=None]`` ``optional`` -  OFFSET ID used to resume scan
+                - as_of ``datetime=None`` ``optional`` - Perform all reads against a consistent snapshot represented by a timestamp.
             Returns:
-                A Python iterator over RDF triples matching the given triples pattern
+                A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
         """
-        return self._connector.search(subject, predicate, obj, last_read)
+        return self._connector.search(subject, predicate, obj, last_read=last_read, as_of=as_of)
 
     def insert(self, subject, predicate, obj):
         """Insert a RDF triple into the RDF graph"""
