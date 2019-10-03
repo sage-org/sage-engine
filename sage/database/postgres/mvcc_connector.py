@@ -108,7 +108,7 @@ class MVCCPostgresConnector(PostgresConnector):
             - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 500)
     """
 
-    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=5):
+    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=500):
         super(MVCCPostgresConnector, self).__init__(table_name, dbname, user, password, host, port, fetch_size)
 
     def search(self, subject, predicate, obj, last_read=None):
