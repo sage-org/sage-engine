@@ -7,7 +7,7 @@ from sage.query_engine.exceptions import DeleteInsertConflict
 class UpdateSequenceOperator(PreemptableIterator):
     """
         An UpdateSequenceOperator evaluates a "IF_EXISTS {} DELETE {} INSERT {}" query.
-        It is used by the query engine to provide serializability per solution group.
+        It is used to provide serializability per solution group.
         To do so, it sequentually evaluates a IfExistsOperator, then a DeleteOperator and finally an InsertOperator.
     """
 
@@ -21,13 +21,16 @@ class UpdateSequenceOperator(PreemptableIterator):
         return "update_sequence"
 
     def has_next(self):
-        return (not self._if_exists_op.missing_nquads) and (self._if_exists_op.has_next() or self._delete_op.has_next() or self._insert_op.has_next())
+        # abort if a conflict was detected
+        if self._if_exists_op.missing_nquads:
+            raise DeleteInsertConflict('A read-write conflict has been detected. It seems that a concurrent SPARQL query has already deleted some RDF triples that you previously read.')
+        return self._if_exists_op.has_next() or self._delete_op.has_next() or self._insert_op.has_next()
 
     async def next(self):
         """Advance in the sequence of operations"""
         # abort if a conflict was detected
         if self._if_exists_op.missing_nquads:
-            raise DeleteInsertConflict()
+            raise DeleteInsertConflict('A read-write conflict has been detected. It seems that a concurrent SPARQL query has already deleted some RDF triples that you previously read.')
         if not self.has_next():
             raise StopIteration()
 

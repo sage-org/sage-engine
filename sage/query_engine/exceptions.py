@@ -14,3 +14,7 @@ class TooManyResults(Exception):
         has been exceeded
     """
     pass
+
+class UnsupportedSPARQL(Exception):
+    """Thrown when a SPARQL feature is not supported by the Sage query engine"""
+    pass

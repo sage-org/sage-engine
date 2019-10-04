@@ -5,6 +5,7 @@ from sage.query_engine.sage_engine import SageEngine
 from sage.query_engine.optimizer.plan_builder import build_query_plan
 from sage.query_engine.optimizer.query_parser import parse_query
 from sage.query_engine.iterators.loader import load
+from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.http_server.schema import QueryRequest, SageSparqlQuery
 from sage.http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors, sage_http_error
 from sage.database.descriptors import VoidDescriptor
@@ -43,7 +44,7 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
         # commit or abort (if necessary)
         if abort_reason is not None:
             graph.abort()
-            return sage_http_error("The SPARQL queyr has been aborted for the following reason: '{}'".format(abort_reason))
+            return sage_http_error("The SPARQL query has been aborted for the following reason: '{}'".format(abort_reason))
         else:
             graph.commit()
 
@@ -64,11 +65,11 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
             return Response(responses.raw_json_streaming(bindings, next_page, stats, url), content_type='application/json')
         # otherwise, return the HTML version
         return render_template("sage_page.html", query=query, default_graph_uri=default_graph_uri, bindings=bindings, next_page=next_page, stats=stats)
-    except Exception as e:
+    except Exception as err:
         # abort all ongoing transactions, then forward the exception to the main loop
         if graph is not None:
             graph.abort()
-        raise e
+        raise err
 
 
 def sparql_blueprint(dataset, logger):
@@ -105,8 +106,11 @@ def sparql_blueprint(dataset, logger):
                 return sage_http_error("Invalid request sent to server: a GET request must contains both parameters 'query' and 'default-graph-uri'. See <a href='http://sage.univ-nantes.fr/documentation'>the API documentation</a> for reference.")
             # execute query
             return execute_query(query, default_graph_uri, next_link, dataset, mimetype, url)
-        except Exception as e:
-            logger.error(e)
+        except UnsupportedSPARQL as err:
+            logger.error(err)
+            return sage_http_error(str(err))
+        except Exception as err:
+            logger.error(err)
             abort(500)
 
     @s_blueprint.route("/sparql/<graph_name>", methods=["GET", "POST"])
@@ -157,7 +161,7 @@ def sparql_blueprint(dataset, logger):
             # commit or abort (if necessary)
             if abort_reason is not None:
                 graph.abort()
-                return sage_http_error("The SPARQL queyr has been aborted for the following reason: '{}'".format(abort_reason))
+                return sage_http_error("The SPARQL query has been aborted for the following reason: '{}'".format(abort_reason))
             else:
                 graph.commit()
 
@@ -178,9 +182,9 @@ def sparql_blueprint(dataset, logger):
             # set deprecation warning in headers
             res.headers.add("Warning", "199 SaGe/2.0 \"You are using a deprecated API. Consider uppgrading to the SaGe SPARQL query API. See http://sage.univ-nantes.fr/documentation fore more details.\"")
             return res
-        except Exception as e:
+        except Exception as err:
             # abort all ongoing transactions, then abort the HTTP request
             graph.abort()
-            logger.error(e)
+            logger.error(err)
             abort(500)
     return s_blueprint

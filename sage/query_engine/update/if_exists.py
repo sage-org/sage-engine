@@ -4,7 +4,10 @@ from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
 
 class IfExistsOperator(PreemptableIterator):
-    """A IfExistsOperator checks if all N-Quads in a set exist in the database."""
+    """
+        A IfExistsOperator checks if all N-Quads in a set exist in the database.
+        It is used to provide the "serializability per solution group" consistency level.
+    """
 
     def __init__(self, quads, dataset, start_time):
         super(IfExistsOperator, self).__init__()
@@ -31,15 +34,16 @@ class IfExistsOperator(PreemptableIterator):
         """Check if the next n-quad exists in the dataset."""
         if not self.has_next():
             raise StopIteration()
-        s, p, o, g = self._quads.pop()
-        if self._dataset.has_graph(g):
+        triple = self._quads.pop()
+        if self._dataset.has_graph(triple['graph']):
             try:
-                _, card = self._dataset.get_graph(g).search(s, p, o, as_of=self._start_time)
-                self._found_missing = card > 0
+                s, p, o = triple['subject'], triple['predicate'], triple['object']
+                iterator, _ = self._dataset.get_graph(triple['graph']).search(s, p, o, as_of=self._start_time)
+                self._found_missing = not iterator.has_next()
             except Exception:
-                self._found_missing = False
+                self._found_missing = True
         else:
-            self._found_missing = False
+            self._found_missing = True
         return None
 
     def save(self):

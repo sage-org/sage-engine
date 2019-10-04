@@ -69,8 +69,8 @@ class SageEngine(object):
             pass
         except TooManyResults:
             pass
-        except DeleteInsertConflict:
-            abort_reason = "An abort has occurred"
+        except DeleteInsertConflict as err:
+            abort_reason = str(err)
         finally:
             while not queue.empty():
                 results.append(queue.get_nowait())
