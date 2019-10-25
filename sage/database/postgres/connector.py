@@ -2,13 +2,14 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
+from sage.database.postgres.transaction_manager import TransactionManager
 from sage.database.postgres.queries import get_start_query, get_resume_query, get_insert_query, get_insert_many_query, get_delete_query
 from sage.database.postgres.utils import predicate_to_id, id_to_predicate
 import psycopg2
 from psycopg2.extras import execute_values
 import json
 from math import ceil
-
+import os
 
 def fetch_histograms(cursor, table_name, attribute_name):
     """
@@ -99,14 +100,15 @@ class PostgresConnector(DatabaseConnector):
     def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=500):
         super(PostgresConnector, self).__init__()
         self._table_name = table_name
-        self._dbname = dbname
-        self._user = user
-        self._password = password
-        self._host = host
-        self._port = port
+        self._manager = TransactionManager(dbname, user, password, host=host, port=port)
+        # self._dbname = dbname
+        # self._user = user
+        # self._password = password
+        # self._host = host
+        # self._port = port
         self._fetch_size = fetch_size
-        self._connection = None
-        self._update_cursor = None
+        # self._connection = None
+        # self._update_cursor = None
         self._warmup = True
 
         # Data used for cardinality estimation.
@@ -133,14 +135,16 @@ class PostgresConnector(DatabaseConnector):
 
     def open(self):
         """Open the database connection"""
-        if self._connection is None:
-            self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
+        if self._manager.is_open():
+            self._manager.open_connection()
+            # self._connection = psycopg2.connect(dbname=self._dbname, user=self._user, password=self._password, host=self._host, port=self._port)
             # disable autocommit
-            self._connection.autocommit = False
+            # self._connection.autocommit = False
+            # self._connection.isolation_level = ISOLATION_LEVEL_SERIALIZABLE
 
         # Do warmup phase if required, i.e., fetch stats for query execution
         if self._warmup:
-            cursor = self._connection.cursor()
+            cursor = self._manager.start_transaction()
             # fetch estimated table cardinality
             cursor.execute("SELECT reltuples AS approximate_row_count FROM pg_class WHERE relname = '{}'".format(self._table_name))
             self._avg_row_count = cursor.fetchone()[0]
@@ -169,44 +173,45 @@ class PostgresConnector(DatabaseConnector):
                 'sum_freqs': sum_freqs
             }
             # commit & close cursor
-            self._connection.commit()
-            cursor.close()
+            self._manager.commit()
             self._warmup = False
 
     def close(self):
         """Close the database connection"""
         # commit, then close the cursor and the connection
-        if self._connection is not None:
-            self._connection.commit()
-        if self._update_cursor is not None:
-            self._update_cursor.close()
-            self._update_cursor = None
-        if self._connection is not None:
-            self._connection.close()
-            self._connection = None
+        self._manager.close_connection()
 
     def start_transaction(self):
         """Start a PostgreSQL transaction"""
-        if self._connection is None:
-            self.open()
-        if self._update_cursor is None:
-            self._update_cursor = self._connection.cursor()
+        # print("Process {} called start_transaction".format(os.getpid()))
+        self._manager.start_transaction()
+        # if self._connection is None:
+        #     self.open()
+        # if self._update_cursor is None:
+        #     print("Process {} started a transaction".format(os.getpid()))
+        #     self._update_cursor = self._connection.cursor()
 
     def commit_transaction(self):
         """Commit any ongoing transaction"""
-        if self._connection is not None:
-            self._connection.commit()
-        if self._update_cursor is not None:
-            self._update_cursor.close()
-            self._update_cursor = None
+        self._manager.commit()
+        # print("Process {} called commit_transaction".format(os.getpid()))
+        # if self._connection is not None:
+        #     print("Process {} committed a transaction".format(os.getpid()))
+        #     self._connection.commit()
+        # if self._update_cursor is not None:
+        #     self._update_cursor.close()
+        #     self._update_cursor = None
 
     def abort_transaction(self):
         """Abort any ongoing transaction"""
-        if self._connection is not None:
-            self._connection.rollback()
-        if self._update_cursor is not None:
-            self._update_cursor.close()
-            self._update_cursor = None
+        self._manager.abort()
+        # print("Process {} calledd abort_transaction".format(os.getpid()))
+        # if self._connection is not None:
+        #     print("Process {} aborted a transaction".format(os.getpid()))
+        #     self._connection.rollback()
+        # if self._update_cursor is not None:
+        #     self._update_cursor.close()
+        #     self._update_cursor = None
 
     def _estimate_cardinality(self, subject, predicate, obj):
         """
@@ -283,7 +288,7 @@ class PostgresConnector(DatabaseConnector):
         # dedicated cursor used to scan this triple pattern
         # WARNING: we need to use a dedicated cursor per triple pattern iterator.
         # Otherwise, we might reset a cursor whose results were not fully consumed.
-        cursor = self._connection.cursor()
+        cursor = self._manager.get_connection().cursor()
 
         # create a SQL query to start a new index scan
         if last_read is None:
@@ -298,7 +303,7 @@ class PostgresConnector(DatabaseConnector):
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name, fetch_size=self._fetch_size)
 
         # create the iterator to yield the matching RDF triples
-        iterator = PostgresIterator(cursor, self._connection, start_query, start_params, self._table_name, pattern)
+        iterator = PostgresIterator(cursor, self._manager.get_connection(), start_query, start_params, self._table_name, pattern)
         card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
@@ -320,11 +325,11 @@ class PostgresConnector(DatabaseConnector):
         """
         # do warmup if necessary, then start a new transaction
         self.open()
-        self.start_transaction()
+        transaction = self._manager.start_transaction()
         if subject is not None and predicate is not None and obj is not None:
             insert_query = get_insert_query(self._table_name)
-            self._update_cursor.execute(insert_query, (subject, predicate, obj))
-            self._connection.commit()
+            transaction.execute(insert_query, (subject, predicate, obj))
+            self._manager.commit()
 
     def delete(self, subject, predicate, obj):
         """
@@ -332,8 +337,8 @@ class PostgresConnector(DatabaseConnector):
         """
         # do warmup if necessary, then start a new transaction
         self.open()
-        self.start_transaction()
+        transaction = self._manager.start_transaction()
         if subject is not None and predicate is not None and obj is not None:
             delete_query = get_delete_query(self._table_name)
-            self._update_cursor.execute(delete_query, (subject, predicate, obj))
-            self._connection.commit()
+            transaction.execute(delete_query, (subject, predicate, obj))
+            self._manager.commit()

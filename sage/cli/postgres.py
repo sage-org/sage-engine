@@ -17,7 +17,7 @@ def bucketify(iterable, bucket_size):
     bucket = list()
     for s, p, o in iterable:
         # try to encode the predicate (if it is a general predicate)
-        p = predicate_to_id(p)
+        # p = predicate_to_id(p)
         bucket.append((s, p, o))
         if len(bucket) >= bucket_size:
             yield bucket
