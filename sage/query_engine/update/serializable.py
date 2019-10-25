@@ -4,19 +4,27 @@ from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from rdflib import Variable
 
 
-def apply_templates(mapping, templates):
-    """Apply a set of mappings to a set of Quads templates"""
-    res = set()
-    for s, p, o, g in templates:
-        subj, pred, obj = s, p, o
-        if s.startswith('?') and s in mapping:
-            subj = mapping[s]
-        if p.startswith('?') and p in mapping:
-            pred = mapping[p]
-        if o.startswith('?') and o in mapping:
-            obj = mapping[o]
-        res.add((subj, pred, obj, g))
-    return res
+def apply_templates(mappings, templates):
+    """
+        Returns an iterator that applies each mapping in a set to a set of quads templates
+        and returns the distinct quads produced.
+    """
+    # a set used for deduplication
+    seen_before = set()
+    for mapping in mappings:
+        for s, p, o, g in templates:
+            subj, pred, obj = s, p, o
+            if s.startswith('?') and s in mapping:
+                subj = mapping[s]
+            if p.startswith('?') and p in mapping:
+                pred = mapping[p]
+            if o.startswith('?') and o in mapping:
+                obj = mapping[o]
+            quad = (subj, pred, obj, g)
+            # deduplicate quads
+            if quad not in seen_before:
+                seen_before.add(quad)
+                yield quad
 
 
 class SerializableUpdate(PreemptableIterator):
@@ -28,8 +36,6 @@ class SerializableUpdate(PreemptableIterator):
         self._read_input = read_input
         self._delete_templates = delete_templates
         self._insert_templates = insert_templates
-        self._delete_set = set()
-        self._insert_set = set()
 
     def serialized_name(self):
         return "serializable_update"
@@ -41,29 +47,26 @@ class SerializableUpdate(PreemptableIterator):
                 - all deletes have not been performed, or
                 - all insert have not been performed.
         """
-        return self._read_input.has_next() or len(self._delete_set) > 0 or len(self._insert_set) > 0
+        return self._read_input.has_next()
 
     async def next(self):
         """Advance in the update execution"""
         if not self.has_next():
             raise StopIteration()
 
-        if self._read_input.has_next():
-            # read a mapping from the predecessor
+        # read all mappings from the predecessor
+        mappings = list()
+        while self._read_input.has_next():
             mu = await self._read_input.next()
-            # apply delete/insert templates to produce new quads to delete/insert
-            if len(self._delete_templates) > 0:
-                self._delete_set.update(apply_templates(mu, self._delete_templates))
-            if len(self._insert_templates) > 0:
-                self._insert_set.update(apply_templates(mu, self._insert_templates))
-        elif len(self._delete_set) > 0:
-            # delete a quad
-            s, p, o, g = self._delete_set.pop()
+            mappings.append(mu)
+
+        # apply all deletes
+        for s, p, o, g in apply_templates(mappings, self._delete_templates):
             if self._dataset.has_graph(g):
                 self._dataset.get_graph(g).delete(s, p, o)
-        else:
-            # insert a new quad
-            s, p, o, g = self._insert_set.pop()
+
+        # apply all inserts
+        for s, p, o, g in apply_templates(mappings, self._insert_templates):
             if self._dataset.has_graph(g):
                 self._dataset.get_graph(g).insert(s, p, o)
         return None
