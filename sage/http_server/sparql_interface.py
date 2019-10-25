@@ -10,6 +10,7 @@ from sage.http_server.schema import QueryRequest, SageSparqlQuery
 from sage.http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan, secure_url, format_marshmallow_errors, sage_http_error
 from sage.database.descriptors import VoidDescriptor
 import sage.http_server.responses as responses
+import logging
 from json import dumps
 from time import time
 
@@ -72,7 +73,7 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
         raise err
 
 
-def sparql_blueprint(dataset, logger):
+def sparql_blueprint(dataset):
     """Get a Blueprint that implement a SPARQL interface with quota on /sparql/<dataset-name>"""
     s_blueprint = Blueprint("sparql-interface", __name__)
 
@@ -107,10 +108,10 @@ def sparql_blueprint(dataset, logger):
             # execute query
             return execute_query(query, default_graph_uri, next_link, dataset, mimetype, url)
         except UnsupportedSPARQL as err:
-            logger.error(err)
+            logging.error(err)
             return sage_http_error(str(err))
         except Exception as err:
-            logger.error(err)
+            logging.error(err)
             abort(500)
 
     @s_blueprint.route("/sparql/<graph_name>", methods=["GET", "POST"])
@@ -120,7 +121,7 @@ def sparql_blueprint(dataset, logger):
         if graph is None:
             abort(404)
 
-        logger.debug('[/sparql/] Corresponding dataset found')
+        logging.debug('[/sparql/] Corresponding dataset found')
         mimetype = request.accept_mimetypes.best_match([
             "application/json", "application/xml",
             "application/sparql-results+json", "application/sparql-results+xml"
@@ -185,6 +186,6 @@ def sparql_blueprint(dataset, logger):
         except Exception as err:
             # abort all ongoing transactions, then abort the HTTP request
             graph.abort()
-            logger.error(err)
+            logging.error(err)
             abort(500)
     return s_blueprint

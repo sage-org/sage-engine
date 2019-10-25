@@ -5,6 +5,7 @@ from os.path import isfile
 from sage.http_server.server import sage_app
 from gunicorn.app.base import BaseApplication
 from gunicorn.six import iteritems
+import coloredlogs
 
 
 class StandaloneApplication(BaseApplication):
@@ -30,6 +31,7 @@ class StandaloneApplication(BaseApplication):
 @click.option("--log-level", type=click.Choice(["debug", "info", "warning", "error"]), default="info", show_default=True, help="The granularity of log outputs")
 def start_sage_server(config, port, workers, log_level):
     """Launch the Sage server using the CONFIG configuration file"""
+    coloredlogs.install(fmt='[%(asctime)s] [%(levelname)s] %(message)s')
     # check if config file exists
     if not isfile(config):
         print("Error: Configuration file not found: '{}'".format(config))
@@ -38,6 +40,7 @@ def start_sage_server(config, port, workers, log_level):
         options = {
             'bind': '%s:%s' % ('0.0.0.0', port),
             'workers': workers,
-            'log-level': log_level
+            'log-level': log_level,
+            'timeout': 300
         }
         StandaloneApplication(sage_app(config), options).run()

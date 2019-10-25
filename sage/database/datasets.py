@@ -4,6 +4,7 @@ from yaml import load
 from sage.database.import_manager import builtin_backends
 from math import inf
 from urllib.parse import quote_plus
+import logging
 
 
 def load_config(config_file="config.yaml"):
@@ -39,7 +40,11 @@ def load_config(config_file="config.yaml"):
             backends[b['name']] = import_backend(b['name'], b['path'], b['connector'], b['required'])
     # set time quantum
     if 'quota' in config:
-        quota = config['quota'] if config['quota'] != 'inf' else inf
+        if config['quota'] == 'inf':
+            logging.warning("You are using SaGe with an infinite time quantum. Be sure to configure the Worker timeout of Gunicorn accordingly, otherwise long-running queries might be terminated.")
+            quota = inf
+        else:
+            quota = config['quota']
     else:
         quota = 75
     config['quota'] = quota

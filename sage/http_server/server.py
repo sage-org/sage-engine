@@ -19,14 +19,19 @@ def sage_app(config_file):
     """Build a Sage application with the given configuration file"""
     # set recursion depth (due to pyparsing issues)
     setrecursionlimit(3000)
-    dataset = Dataset(config_file)
+
+    # Initialize the HTTP application with COTS enabled
     app = Flask(__name__)
     start_date = datetime.datetime.now()
     CORS(app)
 
+    # get Gunicorn logger
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
+
+    # Build RDF dataset from the configuration file
+    dataset = Dataset(config_file)
 
     @app.context_processor
     def inject_user():
@@ -80,7 +85,7 @@ def sage_app(config_file):
     def sitemap():
         return Response(generate_sitemap(dataset, start_date.strftime("%Y-%m-%d")), content_type="application/xml")
 
-    app.register_blueprint(sparql_blueprint(dataset, gunicorn_logger))
+    app.register_blueprint(sparql_blueprint(dataset))
     app.register_blueprint(lookup_blueprint(dataset, gunicorn_logger))
     app.register_blueprint(void_blueprint(dataset, gunicorn_logger))
     app.register_blueprint(publish_query_blueprint(dataset, gunicorn_logger))
