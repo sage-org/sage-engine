@@ -15,7 +15,7 @@ def apply_templates(mapping, templates):
             pred = mapping[p]
         if o.startswith('?') and o in mapping:
             obj = mapping[o]
-        res.add((s, p, o, g))
+        res.add((subj, pred, obj, g))
     return res
 
 
