@@ -61,8 +61,8 @@ class MVCCPostgresIterator(DBIterator):
             's': triple[0],
             'p': triple[1],
             'o': triple[2],
-            'ins': triple[3],
-            'del': triple[4],
+            'ins': triple[3].isoformat(),
+            'del': triple[4].isoformat(),
             'ts': self._start_time.isoformat()
         }, separators=(',', ':'))
 
@@ -79,8 +79,8 @@ class MVCCPostgresIterator(DBIterator):
             self._last_read = self._cursor.fetchone()
 
         # extract timestamps from the RDF triple
-        insert_t = parse_date(triple[3])
-        delete_t = parse_date(triple[4])
+        insert_t = triple[3]
+        delete_t = triple[4]
 
         # case 1: the current triple is in the valid version, so it is a match
         if insert_t <= self._start_time and self._start_time < delete_t:
@@ -153,8 +153,12 @@ class MVCCPostgresConnector(PostgresConnector):
 
             # decode the saved state to get the timestamp & the last RDF triple read
             last_read = json.loads(last_read)
+            # parse ISO timestamps into datetime objects
             timestamp = datetime.fromisoformat(last_read["ts"])
-            last_triple = (last_read["s"], last_read["p"], last_read["o"], last_read["ins"], last_read["del"])
+            last_ins_t = datetime.fromisoformat(last_read["ins"])
+            last_del_t = datetime.fromisoformat(last_read["del"])
+
+            last_triple = (last_read["s"], last_read["p"], last_read["o"], last_ins_t, last_del_t)
 
             # create a SQL query to resume the index scan
             start_query, start_params = get_resume_query(subject, predicate, obj, last_triple, self._table_name, fetch_size=self._fetch_size)

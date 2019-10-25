@@ -12,11 +12,20 @@ from sage.query_engine.update.insert import InsertOperator
 from sage.query_engine.update.delete import DeleteOperator
 from sage.query_engine.update.if_exists import IfExistsOperator
 from sage.query_engine.update.update_sequence import UpdateSequenceOperator
+from sage.query_engine.update.serializable import SerializableUpdate
 from sage.query_engine.optimizer.plan_builder import build_left_plan
 from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.http_server.utils import format_graph_uri
 from datetime import datetime
 from pyparsing import ParseException
+from enum import Enum
+
+
+class ConsistencyLevel(Enum):
+    """The consistency level choosen for executing the query"""
+    ATOMIC_PER_ROW = 1
+    SERIALIZABLE = 2
+    ATOMIC_PER_QUANTUM = 3
 
 
 def localize_triples(triples, graphs):
@@ -151,7 +160,7 @@ def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):
         raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))
 
 
-def parse_update(query, dataset, default_graph, server_url):
+def parse_update(query, dataset, default_graph, server_url, consistency=ConsistencyLevel.ATOMIC_PER_ROW):
     """
         Parse a SPARQL INSERT DATA or DELETE DATA query, and returns a preemptable physical query execution plan to execute it.
     """
@@ -168,10 +177,6 @@ def parse_update(query, dataset, default_graph, server_url):
         else:
             return DeleteOperator(quads, dataset, server_url), dict()
     elif operation.name == 'Modify':
-        # build the IF EXISTS operation from a WHERE clause with bounded RDF triples
-        # This is a trick to avoid extending the SPARQL update parser with a new IF_EXISTS/ASK clause
-        # Moving toward a dedicated parser with custom keywords would be a nice thing to do (later)
-
         where_root = operation.where
         # unravel shitty things chained together
         if where_root.name == 'Join':
@@ -180,28 +185,47 @@ def parse_update(query, dataset, default_graph, server_url):
             elif where_root.p2.name == 'BGP' and len(where_root.p2.triples) == 0:
                 where_root = where_root.p1
 
-        # assert that all RDF triples from the WHERE clause are bounded
-        if_exists_quads = where_root.triples
-        for s, p, o in if_exists_quads:
-            if type(s) is Variable or type(s) is BNode or type(p) is Variable or type(p) is BNode or type(o) is Variable or type(o) is BNode:
-                raise UnsupportedSPARQL("Only INSERT DATA and DELETE DATA queries are supported by the SaGe server. For evaluating other type of SPARQL UPDATE queries, please use a Sage Smart Client.")
-        # localize all triples in the default graph
-        # TODO change that????
-        if_exists_quads = list(localize_triples(where_root.triples, [default_graph]))
+        # for consistency = serializable, use a SerializableUpdate iterator
+        if consistency == ConsistencyLevel.SERIALIZABLE:
+            # build the read iterator
+            read_iterator = parse_query_node(where_root, dataset, [default_graph], server_url, dict())
+            # get the delete and/or insert templates
+            delete_templates = list()
+            insert_templates = list()
+            if operation.delete is not None:
+                delete_templates = get_quads_from_update(operation.delete, default_graph, server_url)
+            if operation.insert is not None:
+                insert_templates = get_quads_from_update(operation.insert, default_graph, server_url)
 
-        # get the delete and/or insert triples
-        delete_quads = list()
-        insert_quads = list()
-        if operation.delete is not None:
-            delete_quads = get_quads_from_update(operation.delete, default_graph, server_url)
-        if operation.insert is not None:
-            delete_quads = get_quads_from_update(operation.insert, default_graph, server_url)
+            # build the SerializableUpdate iterator
+            return SerializableUpdate(dataset, read_iterator, delete_templates, insert_templates)
+        else:
+            # build the IF EXISTS operation from a WHERE clause with bounded RDF triples
+            # This is a trick to avoid extending the SPARQL update parser with a new IF_EXISTS/ASK clause
+            # Moving toward a dedicated parser with custom keywords would be a nice thing to do (later)
 
-        # build the UpdateSequenceOperator operator
-        start_timestamp = datetime.now()
-        if_exists_op = IfExistsOperator(if_exists_quads, dataset, start_timestamp)
-        delete_op = DeleteOperator(delete_quads, dataset, server_url)
-        insert_op = DeleteOperator(insert_quads, dataset, server_url)
-        return UpdateSequenceOperator(if_exists_op, delete_op, insert_op), dict()
+            # assert that all RDF triples from the WHERE clause are bounded
+            if_exists_quads = where_root.triples
+            for s, p, o in if_exists_quads:
+                if type(s) is Variable or type(s) is BNode or type(p) is Variable or type(p) is BNode or type(o) is Variable or type(o) is BNode:
+                    raise UnsupportedSPARQL("Only INSERT DATA and DELETE DATA queries are supported by the SaGe server. For evaluating other type of SPARQL UPDATE queries, please use a Sage Smart Client.")
+            # localize all triples in the default graph
+            # TODO change that????
+            if_exists_quads = list(localize_triples(where_root.triples, [default_graph]))
+
+            # get the delete and/or insert triples
+            delete_quads = list()
+            insert_quads = list()
+            if operation.delete is not None:
+                delete_quads = get_quads_from_update(operation.delete, default_graph, server_url)
+            if operation.insert is not None:
+                insert_quads = get_quads_from_update(operation.insert, default_graph, server_url)
+
+            # build the UpdateSequenceOperator operator
+            start_timestamp = datetime.now()
+            if_exists_op = IfExistsOperator(if_exists_quads, dataset, start_timestamp)
+            delete_op = DeleteOperator(delete_quads, dataset, server_url)
+            insert_op = DeleteOperator(insert_quads, dataset, server_url)
+            return UpdateSequenceOperator(if_exists_op, delete_op, insert_op), dict()
     else:
         raise UnsupportedSPARQL("Only INSERT DATA and DELETE DATA queries are supported by the SaGe server. For evaluating other type of SPARQL UPDATE queries, please use a Sage Smart Client.")
