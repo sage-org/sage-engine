@@ -3,6 +3,7 @@
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
 from sage.database.postgres.queries import get_start_query, get_resume_query, get_insert_query, get_insert_many_query, get_delete_query
+from sage.database.postgres.utils import predicate_to_id, id_to_predicate
 import psycopg2
 from psycopg2.extras import execute_values
 import json
@@ -73,6 +74,8 @@ class PostgresIterator(DBIterator):
         if self._last_read is None:
             self.__advance_iteration(triple)
             self._last_read = self._cursor.fetchone()
+        # decode the triple's predicate (if needed)
+        triple = triple[0], id_to_predicate(triple[1]), triple[2]
         return triple
 
     def has_next(self):
@@ -220,6 +223,9 @@ class PostgresConnector(DatabaseConnector):
         subject = subject if (subject is not None) and (not subject.startswith('?')) else None
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else None
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
+        # try to encode predicate if needed
+        if predicate is not None:
+            predicate = predicate_to_id(predicate)
 
         # estimate the selectivity of the triple pattern using PostgreSQL histograms
         selectivity = 1
@@ -266,6 +272,9 @@ class PostgresConnector(DatabaseConnector):
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else None
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
+        # try to encode predicate (if needed)
+        if predicate is not None:
+            predicate = predicate_to_id(predicate)
 
         # dedicated cursor used to scan this triple pattern
         # WARNING: we need to use a dedicated cursor per triple pattern iterator.

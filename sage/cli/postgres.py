@@ -2,6 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 import sage.cli.postgres_utils as p_utils
 from sage.cli.utils import load_dataset, get_rdf_reader
+from sage.database.postgres.utils import predicate_to_id
 import click
 import psycopg2
 from psycopg2.extras import execute_values
@@ -15,6 +16,8 @@ def bucketify(iterable, bucket_size):
     """Group items from an iterable by buckets"""
     bucket = list()
     for s, p, o in iterable:
+        # try to encode the predicate (if it is a general predicate)
+        p = predicate_to_id(p)
         bucket.append((s, p, o))
         if len(bucket) >= bucket_size:
             yield bucket

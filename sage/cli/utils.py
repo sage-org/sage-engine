@@ -32,6 +32,7 @@ def load_dataset(config_path, dataset_name, logger, backends=[]):
 
 
 def __n3_to_str(triple):
+    """Convert a rdflib RDF triple into a tuple of strings (in N3 format)"""
     s, p, o = triple
     s = s.n3()
     p = p.n3()
@@ -49,14 +50,15 @@ def get_rdf_reader(file_path, format='nt'):
     """Get an iterator over RDF triples from a file"""
     iterator = None
     nb_triples = 0
-    # load using rdflib
+    # load standard RDF formats using rdflib
     if format == 'nt' or format == 'ttl':
         g = Graph()
         g.parse(file_path, format=format)
         nb_triples = len(g)
         iterator = map(__n3_to_str, g.triples((None, None, None)))
     elif format == 'hdt':
-        # load HDTDocument without additional indexes (not needed since we do a ?s ?p ?o)
-        doc = HDTDocument(file_path, False)
+        # load HDTDocument without additional indexes
+        # they are not needed since we only search by "?s ?p ?o"
+        doc = HDTDocument(file_path, indexed=False)
         iterator, nb_triples = doc.search_triples("", "", "")
     return iterator, nb_triples

@@ -14,8 +14,8 @@ POSTGRES_CREATE_MVCC_TABLE = """
         subject text,
         predicate text,
         object text,
-        insert_t abstime DEFAULT transaction_timestamp(),
-        delete_t abstime DEFAULT 'infinity'
+        insert_t timestamp DEFAULT transaction_timestamp(),
+        delete_t timestamp DEFAULT 'infinity'
     );
     """
 
@@ -37,15 +37,15 @@ POSTGRES_CREATE_INDEXES = [
 POSTGRES_CREATE_MVCC_INDEXES = [
     # Create index of SPO
     """
-    CREATE INDEX {}_spo_index ON {}(subject text_ops,predicate text_ops, object text_ops, insert_t abstime_ops,delete_t abstime_ops);
+    CREATE INDEX {}_spo_index ON {}(subject text_ops,predicate text_ops, object text_ops, insert_t timestamp_ops,delete_t timestamp_ops);
     """,
     # Create index of OSP
     """
-    CREATE INDEX {}_osp_index ON {}(object text_ops,subject text_ops,predicate text_ops, insert_t abstime_ops,delete_t abstime_ops);
+    CREATE INDEX {}_osp_index ON {}(object text_ops,subject text_ops,predicate text_ops, insert_t timestamp_ops,delete_t timestamp_ops);
     """,
     # Create index on POS
     """
-    CREATE INDEX {}_pos_index ON {}(predicate text_ops,object text_ops,subject text_ops, insert_t abstime_ops,delete_t abstime_ops);
+    CREATE INDEX {}_pos_index ON {}(predicate text_ops,object text_ops,subject text_ops, insert_t timestamp_ops,delete_t timestamp_ops);
     """
 ]
 
@@ -59,8 +59,8 @@ def get_postgres_create_table(table_name, enable_mvcc=False):
 
 def get_postgres_create_indexes(table_name, enable_mvcc=False):
     """Format all postgre CREATE INDEXE with the name of a SQL table"""
-    def __mapper(fn):
-        return fn.format(table_name, table_name)
+    def __mapper(query):
+        return query.format(table_name, table_name)
 
     if enable_mvcc:
         return map(__mapper, POSTGRES_CREATE_MVCC_INDEXES)
@@ -69,7 +69,7 @@ def get_postgres_create_indexes(table_name, enable_mvcc=False):
 
 def get_postgres_insert_into(table_name, enable_mvcc=False):
     """
-        Get an INSERT INTO query, compatible with `psycopg2.extras.execute_values` to support bulk loading
+        Get an INSERT INTO query compatible with `psycopg2.extras.execute_values` (to support bulk loading).
     """
     if enable_mvcc:
         return "INSERT INTO {} (subject,predicate,object) VALUES %s".format(table_name)
