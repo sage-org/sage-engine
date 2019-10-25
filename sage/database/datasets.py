@@ -37,10 +37,16 @@ def load_config(config_file="config.yaml"):
             if 'name' not in b or 'path' not in b or 'connector' not in b or 'required' not in b:
                 raise SyntaxError('Invalid backend declared. Each custom backend must be declared with properties "name", "path", "connector" and "required"')
             backends[b['name']] = import_backend(b['name'], b['path'], b['connector'], b['required'])
-    # set page size, i.e. the number of triples per page
-    quota = config['quota'] if 'quota' in config else 75
-    max_results = config['max_results'] if 'max_results' in config else inf
+    # set time quantum
+    if 'quota' in config:
+        quota = config['quota'] if config['quota'] != 'inf' else inf
+    else:
+        quota = 75
+    quota = config['quota']  else 75
     config['quota'] = quota
+    # set page size, i.e. the number of triples per page
+    max_results = config['max_results'] if 'max_results' in config else inf
+    # recopy default config. options in all config objects when they are missing
     for c in config["datasets"]:
         if 'quota' not in c:
             c['quota'] = quota
