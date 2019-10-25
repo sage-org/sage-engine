@@ -83,6 +83,7 @@ class Graph(object):
                 query['description'] = query['name']
             if 'publish' not in query:
                 query['publish'] = False
+        logging.info("RDF Graph '{}' (backend: {}) successfully loaded".format(self._config["name"], self._config["backend"]))
 
     def config(self):
         return self._config
