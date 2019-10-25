@@ -160,10 +160,13 @@ def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):
         raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))
 
 
-def parse_update(query, dataset, default_graph, server_url, consistency=ConsistencyLevel.ATOMIC_PER_ROW):
+def parse_update(query, dataset, default_graph, server_url):
     """
         Parse a SPARQL INSERT DATA or DELETE DATA query, and returns a preemptable physical query execution plan to execute it.
     """
+    # TODO change that, only used for testing
+    consistency_level = "serializable"
+    # consistency_level = dataset._config["consistency"] if "consistency" in dataset._config else "atomic_per_row"
     operations = translateUpdate(parseUpdate(query))
     if len(operations) > 1:
         raise UnsupportedSPARQL("Only a single INSERT DATA/DELETE DATA is permitted by query. Consider sending yourt query in multiple SPARQL queries.")
@@ -186,9 +189,10 @@ def parse_update(query, dataset, default_graph, server_url, consistency=Consiste
                 where_root = where_root.p1
 
         # for consistency = serializable, use a SerializableUpdate iterator
-        if consistency == ConsistencyLevel.SERIALIZABLE:
+        if consistency_level == "serializable":
             # build the read iterator
-            read_iterator = parse_query_node(where_root, dataset, [default_graph], server_url, dict())
+            cardinalities = list()
+            read_iterator = parse_query_node(where_root, dataset, [default_graph], server_url, cardinalities)
             # get the delete and/or insert templates
             delete_templates = list()
             insert_templates = list()
@@ -198,7 +202,7 @@ def parse_update(query, dataset, default_graph, server_url, consistency=Consiste
                 insert_templates = get_quads_from_update(operation.insert, default_graph, server_url)
 
             # build the SerializableUpdate iterator
-            return SerializableUpdate(dataset, read_iterator, delete_templates, insert_templates)
+            return SerializableUpdate(dataset, read_iterator, delete_templates, insert_templates), cardinalities
         else:
             # build the IF EXISTS operation from a WHERE clause with bounded RDF triples
             # This is a trick to avoid extending the SPARQL update parser with a new IF_EXISTS/ASK clause

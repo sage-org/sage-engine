@@ -42,7 +42,6 @@ def load_config(config_file="config.yaml"):
         quota = config['quota'] if config['quota'] != 'inf' else inf
     else:
         quota = 75
-    quota = config['quota']  else 75
     config['quota'] = quota
     # set page size, i.e. the number of triples per page
     max_results = config['max_results'] if 'max_results' in config else inf

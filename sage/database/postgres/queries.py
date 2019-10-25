@@ -80,12 +80,12 @@ def get_resume_query(subj, pred, obj, last_read, table_name, fetch_size=100, sym
 
 def get_insert_query(table_name):
     """Build a SQL query to insert a RDF triple into a PostgreSQL dataset"""
-    return "INSERT INTO {} (subject,predicate,object) VALUES (%s,%s,%s) ON CONFLICT (subject,predicate,object) DO NOTHING".format(table_name)
+    return "INSERT INTO {} (subject,predicate,object) VALUES (%s,%s,%s)".format(table_name)
 
 
 def get_insert_many_query(table_name):
     """Build a SQL query to insert a RDF triple into a PostgreSQL dataset"""
-    return "INSERT INTO {} (subject,predicate,object) VALUES %s ON CONFLICT (subject,predicate,object) DO NOTHING".format(table_name)
+    return "INSERT INTO {} (subject,predicate,object) VALUES %s".format(table_name)
 
 
 def get_delete_query(table_name):

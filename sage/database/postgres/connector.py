@@ -224,29 +224,33 @@ class PostgresConnector(DatabaseConnector):
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else None
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
         # try to encode predicate if needed
-        if predicate is not None:
-            predicate = predicate_to_id(predicate)
+        # if predicate is not None:
+        #     predicate = predicate_to_id(predicate)
 
         # estimate the selectivity of the triple pattern using PostgreSQL histograms
         selectivity = 1
-        # compute the selectivity of a bounded subject
-        if subject is not None:
-            if subject in self._subject_histograms['selectivities']:
-                selectivity *= self._subject_histograms['selectivities'][subject]
-            else:
-                selectivity *= (1 - self._subject_histograms['sum_freqs'])/(self._subject_histograms['n_distinct'] - len(self._subject_histograms['selectivities']))
-        # compute the selectivity of a bounded predicate
-        if predicate is not None:
-            if predicate in self._predicate_histograms['selectivities']:
-                selectivity *= self._predicate_histograms['selectivities'][predicate]
-            else:
-                selectivity *= (1 - self._predicate_histograms['sum_freqs'])/(self._predicate_histograms['n_distinct'] - len(self._predicate_histograms['selectivities']))
-        # compute the selectivity of a bounded object
-        if obj is not None:
-            if obj in self._object_histograms['selectivities']:
-                selectivity *= self._object_histograms['selectivities'][obj]
-            else:
-                selectivity *= (1 - self._object_histograms['sum_freqs'])/(self._object_histograms['n_distinct'] - len(self._object_histograms['selectivities']))
+        # avoid division per zero when some histograms are not fully up-to-date
+        try:
+            # compute the selectivity of a bounded subject
+            if subject is not None:
+                if subject in self._subject_histograms['selectivities']:
+                    selectivity *= self._subject_histograms['selectivities'][subject]
+                else:
+                    selectivity *= (1 - self._subject_histograms['sum_freqs'])/(self._subject_histograms['n_distinct'] - len(self._subject_histograms['selectivities']))
+            # compute the selectivity of a bounded predicate
+            if predicate is not None:
+                if predicate in self._predicate_histograms['selectivities']:
+                    selectivity *= self._predicate_histograms['selectivities'][predicate]
+                else:
+                    selectivity *= (1 - self._predicate_histograms['sum_freqs'])/(self._predicate_histograms['n_distinct'] - len(self._predicate_histograms['selectivities']))
+            # compute the selectivity of a bounded object
+            if obj is not None:
+                if obj in self._object_histograms['selectivities']:
+                    selectivity *= self._object_histograms['selectivities'][obj]
+                else:
+                    selectivity *= (1 - self._object_histograms['sum_freqs'])/(self._object_histograms['n_distinct'] - len(self._object_histograms['selectivities']))
+        except ZeroDivisionError:
+            pass
         # estimate the cardinality from the estimated selectivity
         cardinality = int(ceil(selectivity * self._avg_row_count))
         return cardinality if cardinality > 0 else 1
@@ -273,8 +277,8 @@ class PostgresConnector(DatabaseConnector):
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
         # try to encode predicate (if needed)
-        if predicate is not None:
-            predicate = predicate_to_id(predicate)
+        # if predicate is not None:
+        #     predicate = predicate_to_id(predicate)
 
         # dedicated cursor used to scan this triple pattern
         # WARNING: we need to use a dedicated cursor per triple pattern iterator.
