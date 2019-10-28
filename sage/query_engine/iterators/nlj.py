@@ -3,10 +3,10 @@
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.utils import apply_bindings, tuple_to_triple
+from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.protobuf.iterators_pb2 import TriplePattern, SavedIndexJoinIterator
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 from sage.query_engine.iterators.utils import IteratorExhausted
-from asyncio import sleep
 
 
 class IndexJoinIterator(PreemptableIterator):
@@ -70,16 +70,11 @@ class IndexJoinIterator(PreemptableIterator):
         """Get the next element from the join"""
         if not self.has_next():
             raise IteratorExhausted()
-        cpt = 0
-        while self._currentIter is None or (not self._currentIter.has_next()):
-            cpt += 1
-            self._currentBinding = await self._source.next()
-            self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
-            # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
-            # Additionnaly, there may be other call to await sleep(0) in index join in the pipeline.
-            if cpt > 50:
-                cpt = 0
-                await sleep(0)
+        with PreemptiveLoop() as loop:
+            while self._currentIter is None or (not self._currentIter.has_next()):
+                self._currentBinding = await self._source.next()
+                self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
+                await loop.tick()
         return await self._innerLoop()
 
     def save(self):

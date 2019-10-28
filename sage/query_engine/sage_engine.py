@@ -1,8 +1,9 @@
 # sage_engine.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import uvloop
-from asyncio import Queue, get_event_loop, wait_for, sleep, set_event_loop_policy
+from asyncio import Queue, get_event_loop, wait_for, set_event_loop_policy
 from asyncio import TimeoutError as asyncTimeoutError
+from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
 from sage.query_engine.protobuf.iterators_pb2 import RootTree
@@ -14,20 +15,15 @@ set_event_loop_policy(uvloop.EventLoopPolicy())
 async def executor(plan, queue, limit):
     """Executor used to evaluated a plan under a time quota"""
     try:
-        cpt = 0
-        while plan.has_next():
-            value = await plan.next()
-            cpt += 1
-            # discard null values
-            if value is not None:
-                await queue.put(value)
-            if queue.qsize() >= limit:
-                raise TooManyResults()
-            # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
-            # additionnaly, there may be other call to await sleep(0) in index join in the pipeline.
-            if cpt > 50:
-                cpt = 0
-                await sleep(0)
+        with PreemptiveLoop() as loop:
+            while plan.has_next():
+                value = await plan.next()
+                # discard null values
+                if value is not None:
+                    await queue.put(value)
+                if queue.qsize() >= limit:
+                    raise TooManyResults()
+                await loop.tick()
     except IteratorExhausted:
         pass
     except StopIteration:

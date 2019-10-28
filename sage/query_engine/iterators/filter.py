@@ -2,6 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
+from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 from rdflib import URIRef, Variable
@@ -9,7 +10,6 @@ from rdflib.plugins.sparql.parser import parseQuery
 from rdflib.plugins.sparql.algebra import translateQuery
 from rdflib.plugins.sparql.sparql import QueryContext, Bindings
 from rdflib.util import from_n3
-from asyncio import sleep
 
 
 def to_rdflib_term(value):
@@ -53,13 +53,10 @@ class FilterIterator(PreemptableIterator):
             raise IteratorExhausted()
         if self._mu is None:
             self._mu = await self._source.next()
-        cpt = 0
-        while not self._evaluate(self._mu):
-            cpt += 1
-            self._mu = await self._source.next()
-            if cpt > 50:
-                cpt = 0
-                await sleep(0)
+        with PreemptiveLoop() as loop:
+            while not self._evaluate(self._mu):
+                self._mu = await self._source.next()
+                await loop.tick()
         if not self.has_next():
             raise IteratorExhausted()
         mu = self._mu
