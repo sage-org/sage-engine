@@ -2,6 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 import logging
 from urllib.parse import quote_plus
+from math import inf
 
 class Graph(object):
     """A RDF Graph with a dedicated backend"""

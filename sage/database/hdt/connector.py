@@ -1,38 +1,24 @@
 # hdt_file_connector.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2019
 from hdt import HDTDocument
 from sage.database.db_connector import DatabaseConnector
-from sage.database.db_iterator import DBIterator
+from sage.database.hdt.iterator import HDTIterator
 import os.path
-
-
-class HDTIterator(DBIterator):
-    """An HDTIterator implements a DBIterator for a triple pattern evaluated using an HDT file"""
-
-    def __init__(self, source, pattern, start_offset=0):
-        super(HDTIterator, self).__init__(pattern)
-        self._source = source
-        self._start_offset = start_offset
-
-    def last_read(self):
-        """Return the ID of the last element read"""
-        return str(self._source.nb_reads + self._start_offset)
-
-    def next(self):
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        return next(self._source)
-
-    def has_next(self):
-        """Return True if there is still results to read, and False otherwise"""
-        return self._source.has_next()
 
 
 class HDTFileConnector(DatabaseConnector):
     """A HDTFileConnector search for RDF triples in a HDT file"""
 
-    def __init__(self, file):
+    def __init__(self, file, mapped=True, indexed=True):
+        """
+            Constructor.
+            Args:
+                - file ``str`` - Path to the HDT file
+                - mapped ``boolean=False`` ``optional`` - True maps the HDT file (faster), False loads everything in memory
+                - indexed ``boolean=True`` ``optional`` -  True if the HDT must be loaded with indexes, False otherwise
+        """
         super(HDTFileConnector, self).__init__()
-        self._hdt = HDTDocument(file)
+        self._hdt = HDTDocument(file, map=mapped, indexed=indexed)
 
     def search(self, subject, predicate, obj, last_read=None, as_of=None):
         """
@@ -79,4 +65,6 @@ class HDTFileConnector(DatabaseConnector):
         """Build a HDTFileFactory from a config file"""
         if not os.path.isfile(config["file"]):
             raise Exception("Configuration file not found: {}".format(config["file"]))
-        return HDTFileConnector(config["file"])
+        mapped = config['mapped'] if 'mapped' in config else True
+        indexed = config['indexed'] if 'indexed' in config else True
+        return HDTFileConnector(config["file"], mapped=mapped, indexed=indexed)

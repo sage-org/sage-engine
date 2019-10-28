@@ -43,7 +43,7 @@ __version__ = "2.0.1"
 # dependencies required for the HDT backend
 HDT_DEPS = [
     'pybind11==2.2.4',
-    'hdt==2.2.1'
+    'hdt==2.3'
 ]
 
 # dependencies required for the PostgreSQL backend

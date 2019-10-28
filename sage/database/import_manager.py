@@ -9,7 +9,7 @@ def builtin_backends():
         # HDT backend (read-only)
         {
             'name': 'hdt-file',
-            'path': 'sage.database.hdt_file_connector',
+            'path': 'sage.database.hdt.connector',
             'connector': 'HDTFileConnector',
             'required': [
                 'file'
