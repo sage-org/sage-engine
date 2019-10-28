@@ -3,7 +3,7 @@
 from markdown import markdown
 from flask import Flask, Markup, render_template, request, abort, Response
 from flask_cors import CORS
-from sage.database.datasets import Dataset
+from sage.database.core.dataset import Dataset
 from sage.http_server.sparql_interface import sparql_blueprint
 from sage.http_server.void_interface import void_blueprint
 from sage.http_server.lookup_interface import lookup_blueprint
