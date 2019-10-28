@@ -102,18 +102,20 @@ def parse_filter_expr(expr):
 
 def parse_query(query, dataset, default_graph, server_url):
     """Parse a regular SPARQL query into a query execution plan"""
+    # transaction timestamp
+    start_timestamp = datetime.now()
     # rdflib has no tool for parsing both read and update query,
     # so we must rely on a try/catch dirty trick...
     try:
         logical_plan = translateQuery(parseQuery(query)).algebra
         cardinalities = list()
-        iterator = parse_query_node(logical_plan, dataset, [default_graph], server_url, cardinalities)
+        iterator = parse_query_node(logical_plan, dataset, [default_graph], server_url, cardinalities, as_of=start_timestamp)
         return iterator, cardinalities
     except ParseException:
-        return parse_update(query, dataset, default_graph, server_url)
+        return parse_update(query, dataset, default_graph, server_url, as_of=start_timestamp)
 
 
-def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):
+def parse_query_node(node, dataset, current_graphs, server_url, cardinalities, as_of=None):
     """
         Recursively parse node in the query logical plan to build a preemptable physical query execution plan.
 
@@ -129,25 +131,25 @@ def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):
         graphs = current_graphs
         if node.datasetClause is not None:
             graphs = [format_graph_uri(format_term(graph_iri.default), server_url) for graph_iri in node.datasetClause]
-        return parse_query_node(node.p, dataset, graphs, server_url, cardinalities)
+        return parse_query_node(node.p, dataset, graphs, server_url, cardinalities, as_of=as_of)
     elif node.name == 'Project':
         query_vars = list(map(lambda t: '?' + str(t), node._vars))
-        child = parse_query_node(node.p, dataset, current_graphs, server_url, cardinalities)
+        child = parse_query_node(node.p, dataset, current_graphs, server_url, cardinalities, as_of=as_of)
         return ProjectionIterator(child, query_vars)
     elif node.name == 'BGP':
         # bgp_vars = node._vars
         triples = list(localize_triples(node.triples, current_graphs))
-        iterator, query_vars, c = build_left_plan(triples, dataset, current_graphs)
+        iterator, query_vars, c = build_left_plan(triples, dataset, current_graphs, as_of=as_of)
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator
     elif node.name == 'Union':
-        left = parse_query_node(node.p1, dataset, current_graphs, server_url, cardinalities)
-        right = parse_query_node(node.p2, dataset, current_graphs, server_url, cardinalities)
+        left = parse_query_node(node.p1, dataset, current_graphs, server_url, cardinalities, as_of=as_of)
+        right = parse_query_node(node.p2, dataset, current_graphs, server_url, cardinalities, as_of=as_of)
         return BagUnionIterator(left, right)
     elif node.name == 'Filter':
         expression = parse_filter_expr(node.expr)
-        iterator = parse_query_node(node.p, dataset, current_graphs, server_url, cardinalities)
+        iterator = parse_query_node(node.p, dataset, current_graphs, server_url, cardinalities, as_of=as_of)
         return FilterIterator(iterator, expression)
     elif node.name == 'Join':
         # only allow for joining BGPs from different GRAPH clauses
@@ -160,7 +162,7 @@ def parse_query_node(node, dataset, current_graphs, server_url, cardinalities):
         raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))
 
 
-def parse_update(query, dataset, default_graph, server_url):
+def parse_update(query, dataset, default_graph, server_url, as_of=None):
     """
         Parse a SPARQL INSERT DATA or DELETE DATA query, and returns a preemptable physical query execution plan to execute it.
     """
@@ -192,7 +194,7 @@ def parse_update(query, dataset, default_graph, server_url):
         if consistency_level == "serializable":
             # build the read iterator
             cardinalities = list()
-            read_iterator = parse_query_node(where_root, dataset, [default_graph], server_url, cardinalities)
+            read_iterator = parse_query_node(where_root, dataset, [default_graph], server_url, cardinalities, as_of=as_of)
             # get the delete and/or insert templates
             delete_templates = list()
             insert_templates = list()
@@ -226,8 +228,7 @@ def parse_update(query, dataset, default_graph, server_url):
                 insert_quads = get_quads_from_update(operation.insert, default_graph, server_url)
 
             # build the UpdateSequenceOperator operator
-            start_timestamp = datetime.now()
-            if_exists_op = IfExistsOperator(if_exists_quads, dataset, start_timestamp)
+            if_exists_op = IfExistsOperator(if_exists_quads, dataset, as_of)
             delete_op = DeleteOperator(delete_quads, dataset, server_url)
             insert_op = DeleteOperator(insert_quads, dataset, server_url)
             return UpdateSequenceOperator(if_exists_op, delete_op, insert_op), dict()

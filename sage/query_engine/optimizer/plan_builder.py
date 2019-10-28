@@ -8,6 +8,7 @@ from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.iterators.loader import load
 from sage.query_engine.iterators.utils import EmptyIterator
 from sage.query_engine.optimizer.utils import find_connected_pattern, get_vars, equality_variables
+from datetime import datetime
 from functools import reduce
 
 
@@ -17,11 +18,13 @@ def build_query_plan(query, dataset, default_graph, saved_plan=None):
     if saved_plan is not None:
         return load(saved_plan, dataset), []
 
+    start_timestamp = datetime.now()
+
     root = None
     if query['type'] == 'union':
-        root, cardinalities = build_union_plan(query['union'], dataset, default_graph)
+        root, cardinalities = build_union_plan(query['union'], dataset, default_graph, as_of=start_timestamp)
     elif query['type'] == 'bgp':
-        root, cardinalities = build_join_plan(query['bgp'], dataset, default_graph)
+        root, cardinalities = build_join_plan(query['bgp'], dataset, default_graph, as_of=start_timestamp)
     else:
         raise Exception('Unkown query type found during query optimization')
 
@@ -36,7 +39,7 @@ def build_query_plan(query, dataset, default_graph, saved_plan=None):
     return root, cardinalities
 
 
-def build_union_plan(union, dataset, default_graph):
+def build_union_plan(union, dataset, default_graph, as_of=None):
     """Build a Bushy tree of Unions, where leaves are BGPs, from a list of BGPS"""
 
     def chunks(l, n):
@@ -52,7 +55,7 @@ def build_union_plan(union, dataset, default_graph):
     sources = []
     cardinalities = []
     for bgp in union:
-        iterator, cards = build_join_plan(bgp, dataset, default_graph)
+        iterator, cards = build_join_plan(bgp, dataset, default_graph, as_of=as_of)
         sources.append(iterator)
         cardinalities += cards
     if len(sources) == 1:
@@ -62,13 +65,13 @@ def build_union_plan(union, dataset, default_graph):
     return sources[0], cardinalities
 
 
-def build_join_plan(bgp, dataset, default_graph):
+def build_join_plan(bgp, dataset, default_graph, as_of=None):
     """Build a join plan with a projection at the end"""
-    iterator, query_vars, cardinalities = build_left_plan(bgp, dataset, default_graph)
+    iterator, query_vars, cardinalities = build_left_plan(bgp, dataset, default_graph, as_of=as_of)
     return ProjectionIterator(iterator, query_vars), cardinalities
 
 
-def build_left_plan(bgp, dataset, default_graph):
+def build_left_plan(bgp, dataset, default_graph, as_of=None):
     """Build a Left-linear tree of joins from a BGP"""
     # gather metadata about triple patterns
     triples = []
@@ -81,7 +84,7 @@ def build_left_plan(bgp, dataset, default_graph):
         triple['graph'] = graph_uri
         # get iterator and statistics about the pattern
         if dataset.has_graph(graph_uri):
-            it, c = dataset.get_graph(graph_uri).search(triple['subject'], triple['predicate'], triple['object'])
+            it, c = dataset.get_graph(graph_uri).search(triple['subject'], triple['predicate'], triple['object'], as_of=as_of)
         else:
             it, c = EmptyIterator(), 0
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
@@ -120,6 +123,6 @@ def build_left_plan(bgp, dataset, default_graph):
             query_vars = query_vars | get_vars(pattern['triple'])
             pos = 0
         graph_uri = pattern['triple']['graph']
-        pipeline = IndexJoinIterator(pipeline, pattern['triple'], dataset.get_graph(graph_uri))
+        pipeline = IndexJoinIterator(pipeline, pattern['triple'], dataset.get_graph(graph_uri), as_of=as_of)
         triples.pop(pos)
     return pipeline, query_vars, cardinalities

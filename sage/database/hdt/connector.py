@@ -29,6 +29,7 @@ class HDTFileConnector(DatabaseConnector):
                 - predicate ``string`` - Predicate of the triple pattern
                 - object ``string`` - Object of the triple pattern
                 - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
+                - as_of ``datetime=None`` ``optional`` - Perform all reads against a consistent snapshot represented by a timestamp.
 
             Returns:
                 A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern

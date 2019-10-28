@@ -7,6 +7,7 @@ from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.protobuf.utils import protoTriple_to_dict
 from sage.query_engine.protobuf.iterators_pb2 import RootTree, SavedProjectionIterator, SavedScanIterator, SavedIndexJoinIterator, SavedBagUnionIterator, SavedFilterIterator
+from datetime import datetime
 
 
 def load(protoMsg, dataset):
@@ -65,10 +66,14 @@ def load_nlj(saved_plan, dataset):
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), dataset)
     innerTriple = protoTriple_to_dict(saved_plan.inner)
+    if saved_plan.timestamp is not None:
+        as_of = datetime.fromisoformat(saved_plan.timestamp)
+    else:
+        as_of = None
     if len(saved_plan.muc) > 0:
         currentBinding = saved_plan.muc
     dataset = dataset.get_graph(innerTriple['graph'])
-    return IndexJoinIterator(source, innerTriple, dataset, currentBinding=currentBinding, iterOffset=saved_plan.last_read)
+    return IndexJoinIterator(source, innerTriple, dataset, currentBinding=currentBinding, iterOffset=saved_plan.last_read, as_of=as_of)
 
 
 def load_union(saved_plan, dataset):

@@ -13,20 +13,22 @@ class IndexJoinIterator(PreemptableIterator):
     """A IndexJoinIterator implements an Index Join using the iterator paradigm.
 
     Args:
-        - source :class:`.ScanIterator` | :class:`.IndexJoinIterator` - The outer relation of the join: an iterator that yields solution mappings.
+        - source :class:`.PreemptableIterator` - The outer relation of the join: an iterator that yields solution mappings.
         - innerTriple ``dict``- The inner relation, i.e., a triple pattern.
         - hdtDocument :class:`.DatabaseConnector` - The document scanned by inner loops.
         - currentBinding ``dict=None`` - A set of solution mappings used to resume join processing.
-        - iterOffset ``[string=None]`` - An offset ID used to resume processing of an inner loop.
+        - iterOffset ``string=None`` - An offset ID used to resume processing of an inner loop.
+        - as_of ``datetime=None`` ``optional`` - Perform all reads against a consistent snapshot represented by a timestamp.
     """
 
-    def __init__(self, source, innerTriple, hdtDocument, currentBinding=None, iterOffset=None):
+    def __init__(self, source, innerTriple, hdtDocument, currentBinding=None, iterOffset=None, as_of=None):
         super(IndexJoinIterator, self).__init__()
         self._source = source
         self._innerTriple = innerTriple
         self._currentBinding = currentBinding
         self._hdtDocument = hdtDocument
         self._iterOffset = iterOffset
+        self._start_timestamp = as_of
         self._currentIter = None
         if self._currentBinding is not None:
             self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding, last_read=iterOffset)
@@ -52,7 +54,7 @@ class IndexJoinIterator(PreemptableIterator):
         if mappings is None:
             return EmptyIterator(triple)
         (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))
-        iterator, card = self._hdtDocument.search(s, p, o, last_read=last_read)
+        iterator, card = self._hdtDocument.search(s, p, o, last_read=last_read, as_of=self._start_timestamp)
         if card == 0:
             return None
         return ScanIterator(iterator, tuple_to_triple(s, p, o), card)
@@ -74,7 +76,7 @@ class IndexJoinIterator(PreemptableIterator):
             self._currentBinding = await self._source.next()
             self._currentIter = self._initInnerLoop(self._innerTriple, self._currentBinding)
             # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
-            # additionnaly, there may be other call to await sleep(0) in index join in the pipeline.
+            # Additionnaly, there may be other call to await sleep(0) in index join in the pipeline.
             if cpt > 50:
                 cpt = 0
                 await sleep(0)
@@ -97,4 +99,6 @@ class IndexJoinIterator(PreemptableIterator):
             pyDict_to_protoDict(self._currentBinding, saved_join.muc)
         if self._currentIter is not None:
             saved_join.last_read = self._currentIter.last_read()
+        if self._start_timestamp is not None:
+            saved_join.timestamp = self._start_timestamp.isoformat()
         return saved_join
