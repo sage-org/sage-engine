@@ -1,23 +1,22 @@
 # dataset.py
 # Author: Thomas MINIER - MIT License 2017-2019
-from sage.database.core.yaml_config import load_config
+# from sage.database.core.yaml_config import load_config
 
 class Dataset(object):
     """A collection of RDF graphs"""
 
-    def __init__(self, config_file):
+    def __init__(self, name, description, graphs, public_url=None, default_query=None, analytics=None):
         super(Dataset, self).__init__()
-        self._config_file = config_file
-        (self._config, self._datasets, self._backends) = load_config(self._config_file)
-        if "long_description" in self._config:
-            with open(self._config["long_description"], "r") as file:
-                self._long_description = file.read()
-        else:
-            self._long_description = ""
+        self._name = name
+        self._desciption = description
+        self._graphs = graphs
+        self._public_url = public_url
+        self._default_query = default_query
+        self._analytics = analytics
 
     @property
     def name(self):
-        return self._config["name"] if "name" in self._config else None
+        return self._name
 
     @property
     def default_query(self):
@@ -25,30 +24,34 @@ class Dataset(object):
             "name": "",
             "value": ""
         }
-        return self._config["default_query"] if "default_query" in self._config else default
+        return self._default_query if self._default_query is not None else default
 
     @property
     def long_description(self):
-        return self._long_description
+        return self._desciption
 
     @property
     def public_url(self):
-        return self._config["public_url"] if "public_url" in self._config else None
+        return self._public_url
+
+    @property
+    def analytics(self):
+        return self._analytics
 
     @property
     def maintainer(self):
-        return self._config["maintainer"] if "maintainer" in self._config else None
+        # DEPRECATED
+        return None
 
     def describe(self, url):
         """Gives a generator over dataset descriptions"""
-        for name, dataset in self._datasets.items():
+        for name, dataset in self._graphs.items():
             yield dataset.describe(url)
 
-    def get_graph(self, dataset_name):
-        """Get a dataset given its name"""
-        dataset = self._datasets[dataset_name] if dataset_name in self._datasets else None
-        return dataset
+    def get_graph(self, graph_uri):
+        """Get a RDF graph given its URI, otherwise returns None"""
+        return self._graphs[graph_uri] if graph_uri in self._graphs else None
 
-    def has_graph(self, dataset_name):
-        """Test fi a graph exist"""
-        return dataset_name in self._datasets
+    def has_graph(self, graph_uri):
+        """Test if a RDF graph exists in the RDF dataset"""
+        return graph_uri in self._graphs

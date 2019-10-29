@@ -17,6 +17,7 @@ class PreemptiveLoop(object):
         pass
 
     async def tick(self):
+        """Move to the next iteration and allow interruption of the current loop."""
         self._cpt += 1
         # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
         # Additionnaly, there may be other call to await sleep(0) in index join in the pipeline.

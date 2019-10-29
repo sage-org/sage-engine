@@ -85,7 +85,7 @@ def generate_sitemap(dataset, last_mod):
     ElementTree.SubElement(gvoid_xml, "lastmod").text = last_mod
 
     # add dataset and queries
-    for graph_name, graph in dataset._datasets.items():
+    for graph_name, graph in dataset._graphs.items():
         # add dataset homepage
         graph_xml = ElementTree.SubElement(root, "url")
         ElementTree.SubElement(graph_xml, "loc").text = url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True)

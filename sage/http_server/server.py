@@ -3,7 +3,7 @@
 from markdown import markdown
 from flask import Flask, Markup, render_template, request, abort, Response
 from flask_cors import CORS
-from sage.database.core.dataset import Dataset
+from sage.database.core.yaml_config import load_config
 from sage.http_server.sparql_interface import sparql_blueprint
 from sage.http_server.void_interface import void_blueprint
 from sage.http_server.lookup_interface import lookup_blueprint
@@ -31,13 +31,13 @@ def sage_app(config_file):
     app.logger.setLevel(gunicorn_logger.level)
 
     # Build RDF dataset from the configuration file
-    dataset = Dataset(config_file)
+    dataset = load_config(config_file)
 
     @app.context_processor
     def inject_user():
         config = dict()
-        if "google_analytics" in dataset._config:
-            config["google_analytics"] = dataset._config["google_analytics"]
+        if dataset.analytics is not None:
+            config["google_analytics"] = dataset.analytics
         # inject current year
         config["now_year"] = datetime.datetime.now().year
         return dict(config=config)

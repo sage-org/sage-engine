@@ -1,39 +1,35 @@
 # graph.py
 # Author: Thomas MINIER - MIT License 2017-2019
-import logging
-from urllib.parse import quote_plus
+# from urllib.parse import quote_plus
 from math import inf
 
 class Graph(object):
     """A RDF Graph with a dedicated backend"""
 
-    def __init__(self, config, backends):
+    def __init__(self, name, description, connector, quantum=75, max_results=inf, default_queries=list()):
         super(Graph, self).__init__()
-        self._config = config
-        # build database connector
-        if self._config['backend'] in backends:
-            self._connector = backends[self._config['backend']](self._config)
-        else:
-            raise SyntaxError('Unknown backend {} encountered'.format(self._config['backend']))
-        # format preset queries
-        for query in self.example_queries:
-            query['@id'] = quote_plus(query['name'])
-            if 'description' not in query:
-                query['description'] = query['name']
-            if 'publish' not in query:
-                query['publish'] = False
-        logging.info("RDF Graph '{}' (backend: {}) successfully loaded".format(self._config["name"], self._config["backend"]))
+        self._name = name
+        self._description = description
+        self._connector = connector
+        self._quantum = quantum
+        self._max_results = max_results
+        self._example_queries = default_queries
 
-    def config(self):
-        return self._config
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def description(self):
+        return self._description
 
     @property
     def quota(self):
-        return self._config['quota']
+        return self._quantum
 
     @property
     def max_results(self):
-        return self._config['max_results']
+        return self._max_results
 
     @property
     def nb_triples(self):
@@ -41,7 +37,7 @@ class Graph(object):
 
     @property
     def example_queries(self):
-        return self._config['queries']
+        return self._example_queries
 
     def connector(self):
         """Get the underlying DatabaseConnector for this dataset"""
@@ -87,13 +83,13 @@ class Graph(object):
             },
             "@type": "http://schema.org/Dataset",
             "schema:url": url,
-            "schema:name": self._config["name"],
-            "schema:description": self._config["description"],
+            "schema:name": self._name,
+            "schema:description": self._description,
             "void:triples": self.nb_triples,
             "void:distinctSubjects": self._connector.nb_subjects if self._connector.nb_subjects is not None else "unknown",
             "void:properties": self._connector.nb_predicates if self._connector.nb_predicates is not None else "unknown",
             "void:distinctObjects": self._connector.nb_objects if self._connector.nb_objects is not None else "unknown",
-            "sage:timeQuota": self.quota,
+            "sage:timeQuota": self._quantum,
             "sage:maxResults": self.max_results if self.max_results is not inf else 'inf'
         }
 
