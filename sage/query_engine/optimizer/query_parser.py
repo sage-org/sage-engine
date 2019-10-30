@@ -1,7 +1,7 @@
 # query_parser.py
 # Author: Thomas MINIER - MIT License 2017-2018
-# import pyparsing
-# pyparsing.ParserElement.enablePackrat()
+import pyparsing
+pyparsing.ParserElement.enablePackrat()
 from rdflib import URIRef, BNode, Variable
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
 from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
@@ -206,9 +206,8 @@ def parse_update(query, dataset, default_graph, server_url, as_of=None):
             # build the SerializableUpdate iterator
             return SerializableUpdate(dataset, read_iterator, delete_templates, insert_templates), cardinalities
         else:
-            # build the IF EXISTS operation from a WHERE clause with bounded RDF triples
-            # This is a trick to avoid extending the SPARQL update parser with a new IF_EXISTS/ASK clause
-            # Moving toward a dedicated parser with custom keywords would be a nice thing to do (later)
+            # Build the IF EXISTS style query from an UPDATE query with bounded RDF triples
+            # in the WHERE, INSERT and DELETE clause.
 
             # assert that all RDF triples from the WHERE clause are bounded
             if_exists_quads = where_root.triples
@@ -216,7 +215,6 @@ def parse_update(query, dataset, default_graph, server_url, as_of=None):
                 if type(s) is Variable or type(s) is BNode or type(p) is Variable or type(p) is BNode or type(o) is Variable or type(o) is BNode:
                     raise UnsupportedSPARQL("Only INSERT DATA and DELETE DATA queries are supported by the SaGe server. For evaluating other type of SPARQL UPDATE queries, please use a Sage Smart Client.")
             # localize all triples in the default graph
-            # TODO change that????
             if_exists_quads = list(localize_triples(where_root.triples, [default_graph]))
 
             # get the delete and/or insert triples

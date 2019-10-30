@@ -11,7 +11,7 @@ class DeleteOperator(PreemptableIterator):
 
     Constructor args:
         - quads `list`: List of RDF quads (subject, predicate, object, graph_uri) to insert into the graph
-        - graph :class:`sage.database.datasets.Dataset`: RDF dataset
+        - dataset :class:`sage.database.core.Dataset`: RDF dataset
     """
 
     def __init__(self, quads, dataset, server_url):
@@ -37,16 +37,14 @@ class DeleteOperator(PreemptableIterator):
             raise IteratorExhausted()
         s, p, o, g = self._quads.pop()
         if self._dataset.has_graph(g):
-            try:
-                self._dataset.get_graph(g).delete(s, p, o)
-            except Exception:
-                pass
-        # update counters
-        if g in self._inserted:
-            self._inserted[g] += 1
-        else:
-            self._inserted[g] = 0
-        return {"?s": s, "?p": p, "?o": o, "?graph": "{}/{}".format(self._server_url, g)}
+            self._dataset.get_graph(g).delete(s, p, o)
+            # update counters
+            if g in self._inserted:
+                self._inserted[g] += 1
+            else:
+                self._inserted[g] = 0
+            return {"?s": s, "?p": p, "?o": o, "?graph": "{}/{}".format(self._server_url, g)}
+        return None
 
     def save(self):
         """Save the operator using protocol buffers"""

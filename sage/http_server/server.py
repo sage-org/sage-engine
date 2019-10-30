@@ -6,7 +6,6 @@ from flask_cors import CORS
 from sage.database.core.yaml_config import load_config
 from sage.http_server.sparql_interface import sparql_blueprint
 from sage.http_server.void_interface import void_blueprint
-from sage.http_server.lookup_interface import lookup_blueprint
 from sage.http_server.publish_query_interface import publish_query_blueprint
 from sage.http_server.utils import secure_url, generate_sitemap
 import datetime
@@ -86,7 +85,6 @@ def sage_app(config_file):
         return Response(generate_sitemap(dataset, start_date.strftime("%Y-%m-%d")), content_type="application/xml")
 
     app.register_blueprint(sparql_blueprint(dataset))
-    app.register_blueprint(lookup_blueprint(dataset, gunicorn_logger))
     app.register_blueprint(void_blueprint(dataset, gunicorn_logger))
     app.register_blueprint(publish_query_blueprint(dataset, gunicorn_logger))
     return app
