@@ -141,7 +141,9 @@ class MVCCPostgresConnector(PostgresConnector):
         # dedicated cursor used to scan this triple pattern
         # WARNING: we need to use a dedicated cursor per triple pattern iterator
         # otherwise, we might reset a cursor whose results were not fully consumed
-        cursor = self._connection.cursor()
+        if not self._manager.is_open():
+            self._manager.open_connection()
+        cursor = self._manager.get_connection().cursor()
 
         # create a SQL query to start a new index scan
         if last_read is None:
