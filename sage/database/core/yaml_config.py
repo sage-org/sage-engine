@@ -1,9 +1,10 @@
 # yaml_config.py
 # Author: Thomas MINIER - MIT License 2017-2019
 from yaml import load
-from sage.database.import_manager import builtin_backends
+from sage.database.import_manager import builtin_backends, import_backend
 from sage.database.core.graph import Graph
 from sage.database.core.dataset import Dataset
+from sage.database.statefull.hashmap_manager import HashMapManager
 from math import inf
 from uuid import uuid4
 import logging
@@ -52,6 +53,19 @@ def load_config(config_file):
     else:
         dataset_description = "A RDF dataset hosted by a SaGe server"
 
+    # load the mode of the server: stateless or statefull
+    if 'stateless' in config:
+        is_stateless = config['stateless']
+    else:
+        is_stateless = True
+
+    # if statefull, load the saved plan storage backend to use
+    statefull_manager = None
+    if not is_stateless:
+        # TODO allow use of custom backend for saved plans
+        # same kind of usage than custom DB backends
+        statefull_manager = HashMapManager()
+
     # get default time quantum & maximum number of results per page
     if 'quota' in config:
         if config['quota'] == 'inf':
@@ -88,4 +102,4 @@ def load_config(config_file):
         graphs[g_name] = Graph(g_name, g_description, g_connector, quantum=g_quantum, max_results=g_max_results, default_queries=g_queries)
         logging.info("RDF Graph '{}' (backend: {}) successfully loaded".format(g_name, g_config["backend"]))
 
-    return Dataset(dataset_name, dataset_description, graphs, public_url=public_url, default_query=default_query, analytics=analytics)
+    return Dataset(dataset_name, dataset_description, graphs, public_url=public_url, default_query=default_query, analytics=analytics, stateless=is_stateless, statefull_manager=statefull_manager)

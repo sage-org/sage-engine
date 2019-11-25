@@ -40,6 +40,7 @@ def builtin_backends():
     ]
     return {item['name']: import_backend(item['name'], item['path'], item['connector'], item['required']) for item in data}
 
+
 def import_backend(name, module_path, class_name, required_params):
     """Load a new backend from the config file"""
     # factory used to build new connector

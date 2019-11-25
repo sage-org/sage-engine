@@ -2,10 +2,11 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 # from sage.database.core.yaml_config import load_config
 
+
 class Dataset(object):
     """A collection of RDF graphs"""
 
-    def __init__(self, name, description, graphs, public_url=None, default_query=None, analytics=None):
+    def __init__(self, name, description, graphs, public_url=None, default_query=None, analytics=None, stateless=True, statefull_manager=None):
         super(Dataset, self).__init__()
         self._name = name
         self._desciption = description
@@ -13,10 +14,23 @@ class Dataset(object):
         self._public_url = public_url
         self._default_query = default_query
         self._analytics = analytics
+        self._stateless = stateless
+        self._statefull_manager = statefull_manager
+        # open the statefull manager (if needed)
+        if (not self._stateless) and self._statefull_manager is not None:
+            self._statefull_manager.open()
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def is_stateless(self):
+        return self._stateless
+
+    @property
+    def statefull_manager(self):
+        return self._statefull_manager
 
     @property
     def default_query(self):

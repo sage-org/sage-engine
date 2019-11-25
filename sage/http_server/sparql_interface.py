@@ -13,6 +13,7 @@ import sage.http_server.responses as responses
 import logging
 from json import dumps
 from time import time
+from uuid import uuid4
 
 
 def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
@@ -31,7 +32,11 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
         cardinalities = dict()
         start = time()
         if next_link is not None:
-            plan = load(decode_saved_plan(next_link), dataset)
+            if dataset.is_stateless:
+                saved_plan = next_link
+            else:
+                saved_plan = dataset.statefull_manager.get_plan(next_link)
+            plan = load(decode_saved_plan(saved_plan), dataset)
         else:
             plan, cardinalities = parse_query(query, dataset, graph_name, url)
         loading_time = (time() - start) * 1000
@@ -54,6 +59,15 @@ def execute_query(query, default_graph_uri, next_link, dataset, mimetype, url):
         next_page = None
         if (not is_done) and abort_reason is None:
             next_page = encode_saved_plan(saved_plan)
+            if not dataset.is_stateless:
+                # generate the plan id if this is the first time we execute this plan
+                plan_id = next_link if next_link is not None else str(uuid4())
+                dataset.statefull_manager.save_plan(plan_id, next_page)
+                next_page = plan_id
+        elif is_done and (not dataset.is_stateless) and next_link is not None:
+            # delete the saved plan, as it will not be reloaded anymore
+            dataset.statefull_manager.delete_plan(next_link)
+
         exportTime = (time() - start) * 1000
         stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
@@ -150,8 +164,12 @@ def sparql_blueprint(dataset):
 
             # Load next link
             next_link = None
-            if 'next' in post_query:
-                next_link = decode_saved_plan(post_query["next"])
+            if 'next' in post_query and post_query["next"] is not None:
+                if dataset.is_stateless:
+                    saved_plan = post_query["next"]
+                else:
+                    saved_plan = dataset.statefull_manager.get_plan(post_query["next"])
+                plan = load(decode_saved_plan(saved_plan), dataset)
 
             # build physical query plan, then execute it with the given quota
             start = time()
@@ -171,6 +189,15 @@ def sparql_blueprint(dataset):
             next_page = None
             if (not is_done) and abort_reason is None:
                 next_page = encode_saved_plan(saved_plan)
+                if not dataset.is_stateless:
+                    # generate the plan id if this is the first time we execute this plan
+                    plan_id = next_link if next_link is not None else str(uuid4())
+                    dataset.statefull_manager.save_plan(plan_id, next_page)
+                    next_page = plan_id
+            elif is_done and (not dataset.is_stateless) and next_link is not None:
+                # delete the saved plan, as it will not be reloaded anymore
+                dataset.statefull_manager.delete_plan(next_link)
+
             exportTime = (time() - start) * 1000  # convert in milliseconds
             stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 

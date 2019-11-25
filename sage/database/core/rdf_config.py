@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 from rdflib import Graph as RGraph
 from rdflib.plugins.sparql import prepareQuery
-from sage.database.import_manager import builtin_backends
+from sage.database.import_manager import builtin_backends, import_backend
 from sage.database.core.graph import Graph
 from sage.database.core.dataset import Dataset
 from math import inf
