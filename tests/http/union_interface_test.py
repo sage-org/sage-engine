@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
 from sage.http_server.server import sage_app
-from tests.http.utils import jsonSparql
+from tests.http.utils import post_sparql
 
 app = sage_app('tests/data/test_config.yaml')
 
@@ -49,7 +49,7 @@ class TestUnionInterface(object):
         hasNext = True
         next_link = None
         while hasNext:
-            response = jsonSparql(self.app, query, next_link, 'http://localhost/sparql/watdiv100')
+            response = post_sparql(self.app, query, next_link, 'http://localhost/sparql/watdiv100')
             nbResults += len(response['bindings'])
             hasNext = response['hasNext']
             next_link = response['next']

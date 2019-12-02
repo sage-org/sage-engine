@@ -3,7 +3,7 @@
 from werkzeug.datastructures import Headers
 
 
-def jsonSparql(client, query, next_link, graph_uri):
+def post_sparql(client, query, next_link, graph_uri):
     headers = Headers()
     headers.add('Accept', 'application/json')
     data = {

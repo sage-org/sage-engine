@@ -1,6 +1,6 @@
 # yaml_config.py
 # Author: Thomas MINIER - MIT License 2017-2019
-from yaml import load
+from yaml import load, FullLoader
 from sage.database.import_manager import builtin_backends, import_backend
 from sage.database.core.graph import Graph
 from sage.database.core.dataset import Dataset
@@ -31,7 +31,7 @@ def load_config(config_file):
             format: nt
             file: /home/chuck-norris/facts.nt
     """
-    config = load(open(config_file))
+    config = load(open(config_file), Loader=FullLoader)
 
     # available backends (populated with sage's native backends)
     backends = builtin_backends()

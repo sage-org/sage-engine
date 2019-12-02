@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
 from sage.http_server.server import sage_app
-from tests.http.utils import jsonSparql
+from tests.http.utils import post_sparql
 
 
 # fixutre format: query, expected graph content
@@ -41,14 +41,14 @@ class TestInsertDataInterface(object):
     @pytest.mark.parametrize("query,expected_content", fixtures)
     def test_insert_interface(self, query, expected_content):
         # insert data
-        response = jsonSparql(self.app, query, None, 'http://localhost/sparql/update-test')
+        response = post_sparql(self.app, query, None, 'http://localhost/sparql/update-test')
         # fetch graph content to assert that data was inserted
         fetch_query = "SELECT * WHERE {?s ?p ?o}"
         has_next = True
         next_link = None
         results = list()
         while has_next:
-            response = jsonSparql(self.app, fetch_query, next_link, 'http://localhost/sparql/update-test')
+            response = post_sparql(self.app, fetch_query, next_link, 'http://localhost/sparql/update-test')
             has_next = response['hasNext']
             next_link = response['next']
             results += response['bindings']

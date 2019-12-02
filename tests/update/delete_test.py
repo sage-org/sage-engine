@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
 from sage.http_server.server import sage_app
-from tests.http.utils import jsonSparql
+from tests.http.utils import post_sparql
 
 # fixutre format: query, initial INSERT DATA query, expected graph content
 fixtures = [
@@ -37,16 +37,16 @@ class TestDeleteDataInterface(object):
     @pytest.mark.parametrize("query,initial_insert,expected_content", fixtures)
     def test_delete_interface(self, query, initial_insert, expected_content):
         # first, populate database
-        response = jsonSparql(self.app, initial_insert, None, 'http://localhost/sparql/update-test')
+        response = post_sparql(self.app, initial_insert, None, 'http://localhost/sparql/update-test')
         # then, execute delete
-        response = jsonSparql(self.app, query, None, 'http://localhost/sparql/update-test')
+        response = post_sparql(self.app, query, None, 'http://localhost/sparql/update-test')
         # finally, fetch graph content to assert that data was deleted
         fetch_query = "SELECT * WHERE {?s ?p ?o}"
         has_next = True
         next_link = None
         results = list()
         while has_next:
-            response = jsonSparql(self.app, fetch_query, next_link, 'http://localhost/sparql/update-test')
+            response = post_sparql(self.app, fetch_query, next_link, 'http://localhost/sparql/update-test')
             has_next = response['hasNext']
             next_link = response['next']
             results += response['bindings']

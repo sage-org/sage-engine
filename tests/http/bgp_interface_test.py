@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
 from sage.http_server.server import sage_app
-from tests.http.utils import jsonSparql
+from tests.http.utils import post_sparql
 
 bgp_queries = [
     ("""
@@ -12,25 +12,25 @@ bgp_queries = [
             ?s <http://purl.org/goodrelations/validThrough> ?validity .
         }
     """, 2180),
-    # ("""
-    #     SELECT * WHERE {
-    #         ?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
-    #         ?v0 <http://purl.org/goodrelations/includes> ?v1 .
-    #         ?v1 <http://schema.org/contentSize> ?v3.
-    #     }
-    # """, 531),
-    # ("""
-    #     SELECT * WHERE {
-    #         ?s <http://xmlns.com/foaf/age> <http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup3> .
-    #         ?s <http://schema.org/nationality> <http://db.uwaterloo.ca/~galuc/wsdbm/Country1> .
-    #         ?s <http://db.uwaterloo.ca/~galuc/wsdbm/gender> <http://db.uwaterloo.ca/~galuc/wsdbm/Gender1> .
-    #     }
-    # """, 93),
-    # ("""
-    #     SELECT * WHERE {
-    #         ?s <http://xmlns.com/foaf/age> ?s .
-    #     }
-    # """, 0),
+    ("""
+        SELECT * WHERE {
+            ?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
+            ?v0 <http://purl.org/goodrelations/includes> ?v1 .
+            ?v1 <http://schema.org/contentSize> ?v3.
+        }
+    """, 531),
+    ("""
+        SELECT * WHERE {
+            ?s <http://xmlns.com/foaf/age> <http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup3> .
+            ?s <http://schema.org/nationality> <http://db.uwaterloo.ca/~galuc/wsdbm/Country1> .
+            ?s <http://db.uwaterloo.ca/~galuc/wsdbm/gender> <http://db.uwaterloo.ca/~galuc/wsdbm/Gender1> .
+        }
+    """, 93),
+    ("""
+        SELECT * WHERE {
+            ?s <http://xmlns.com/foaf/age> ?s .
+        }
+    """, 0)
 ]
 
 
@@ -53,7 +53,7 @@ class TestBGPInterface(object):
         hasNext = True
         next_link = None
         while hasNext:
-            response = jsonSparql(self.client, query, next_link, 'http://localhost/sparql/watdiv100')
+            response = post_sparql(self.client, query, next_link, 'http://localhost/sparql/watdiv100')
             nbResults += len(response['bindings'])
             hasNext = response['hasNext']
             next_link = response['next']
