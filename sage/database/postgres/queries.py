@@ -3,7 +3,7 @@
 from sage.database.utils import get_kind
 
 
-def get_start_query(subj, pred, obj, table_name, fetch_size=100):
+def get_start_query(subj, pred, obj, table_name):
     """
         Get a prepared SQL query which starts scanning for a triple pattern
         and the parameters used to execute it.
@@ -36,11 +36,10 @@ def get_start_query(subj, pred, obj, table_name, fetch_size=100):
         params = [obj]
     else:
         raise Exception("Unkown pattern type: {}".format(kind))
-    query += " LIMIT {}".format(fetch_size)
     return query, params
 
 
-def get_resume_query(subj, pred, obj, last_read, table_name, fetch_size=100, symbol=">="):
+def get_resume_query(subj, pred, obj, last_read, table_name, symbol=">="):
     """
         Get a prepared SQL query which resumes scanning for a triple pattern
         and the parameters used to execute it.
@@ -74,7 +73,6 @@ def get_resume_query(subj, pred, obj, last_read, table_name, fetch_size=100, sym
         params = (last_o, last_s, last_p)
     else:
         raise Exception("Unkown pattern type: {}".format(kind))
-    query += " LIMIT {}".format(fetch_size)
     return query, params
 
 

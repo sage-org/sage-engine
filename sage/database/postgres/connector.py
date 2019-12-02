@@ -3,13 +3,12 @@
 from sage.database.db_connector import DatabaseConnector
 from sage.database.db_iterator import DBIterator, EmptyIterator
 from sage.database.postgres.transaction_manager import TransactionManager
-from sage.database.postgres.queries import get_start_query, get_resume_query, get_insert_query, get_insert_many_query, get_delete_query
-from sage.database.postgres.utils import predicate_to_id, id_to_predicate
-import psycopg2
-from psycopg2.extras import execute_values
+from sage.database.postgres.queries import get_start_query, get_resume_query, get_insert_query, get_delete_query
+from sage.database.postgres.utils import id_to_predicate
 import json
 from math import ceil
-import os
+from uuid import uuid4
+
 
 def fetch_histograms(cursor, table_name, attribute_name):
     """
@@ -32,33 +31,27 @@ def fetch_histograms(cursor, table_name, attribute_name):
 class PostgresIterator(DBIterator):
     """An PostgresIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file"""
 
-    def __init__(self, cursor, connection, start_query, start_params, table_name, pattern):
+    def __init__(self, cursor, connection, start_query, start_params, table_name, pattern, fetch_size=2000):
         super(PostgresIterator, self).__init__(pattern)
         self._cursor = cursor
         self._connection = connection
         self._current_query = start_query
         self._table_name = table_name
+        self._fetch_size = fetch_size
         # resume query execution with a SQL query
         self._cursor.execute(self._current_query, start_params)
-        # always keep the current row buffered inside the iterator
-        self._last_read = self._cursor.fetchone()
+        # always keep the current set of rows buffered inside the iterator
+        self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
 
     def __del__(self):
         """Destructor (close the database cursor)"""
         self._cursor.close()
 
-    def __advance_iteration(self, last_read):
-        """Advance iteration by fetching the next page of results using a SQL query"""
-        query, params = get_resume_query(self._pattern["subject"], self._pattern["predicate"], self._pattern["object"], last_read, self._table_name, symbol=">")
-        if query is not None and params is not None:
-            self._current_query = query
-            self._cursor.execute(self._current_query, params)
-
     def last_read(self):
         """Return the index ID of the last element read"""
-        triple = self._last_read
-        if triple is None:
+        if not self.has_next():
             return ''
+        triple = self._last_reads[0]
         return json.dumps({
             's': triple[0],
             'p': triple[1],
@@ -67,21 +60,18 @@ class PostgresIterator(DBIterator):
 
     def next(self):
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        triple = self._last_read
-        if triple is None:
+        if not self.has_next():
             return None
-        self._last_read = self._cursor.fetchone()
-        # truy to fetch the next page
-        if self._last_read is None:
-            self.__advance_iteration(triple)
-            self._last_read = self._cursor.fetchone()
+        triple = self._last_reads.pop(0)
         # decode the triple's predicate (if needed)
         triple = triple[0], id_to_predicate(triple[1]), triple[2]
         return triple
 
     def has_next(self):
         """Return True if there is still results to read, and False otherwise"""
-        return self._last_read is not None
+        if len(self._last_reads) == 0:
+            self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
+        return len(self._last_reads) > 0
 
 
 class PostgresConnector(DatabaseConnector):
@@ -95,9 +85,10 @@ class PostgresConnector(DatabaseConnector):
             - password `str`: password used to authenticate
             - host `str`: database host address (defaults to UNIX socket if not provided)
             - port `int`: connection port number (defaults to 5432 if not provided)
+            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 2000)
     """
 
-    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=500):
+    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=2000):
         super(PostgresConnector, self).__init__()
         self._table_name = table_name
         self._manager = TransactionManager(dbname, user, password, host=host, port=port)
@@ -259,11 +250,11 @@ class PostgresConnector(DatabaseConnector):
         # dedicated cursor used to scan this triple pattern
         # WARNING: we need to use a dedicated cursor per triple pattern iterator.
         # Otherwise, we might reset a cursor whose results were not fully consumed.
-        cursor = self._manager.get_connection().cursor()
+        cursor = self._manager.get_connection().cursor(str(uuid4()))
 
         # create a SQL query to start a new index scan
         if last_read is None:
-            start_query, start_params = get_start_query(subject, predicate, obj, self._table_name, fetch_size=self._fetch_size)
+            start_query, start_params = get_start_query(subject, predicate, obj, self._table_name)
         else:
             # empty last_read key => the scan has already been completed
             if len(last_read) == 0:
@@ -271,10 +262,10 @@ class PostgresConnector(DatabaseConnector):
             # otherwise, create a SQL query to resume the index scan
             last_read = json.loads(last_read)
             t = (last_read["s"], last_read["p"], last_read["o"])
-            start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name, fetch_size=self._fetch_size)
+            start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name)
 
         # create the iterator to yield the matching RDF triples
-        iterator = PostgresIterator(cursor, self._manager.get_connection(), start_query, start_params, self._table_name, pattern)
+        iterator = PostgresIterator(cursor, self._manager.get_connection(), start_query, start_params, self._table_name, pattern, fetch_size=self._fetch_size)
         card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
@@ -286,7 +277,7 @@ class PostgresConnector(DatabaseConnector):
         table_name = config['name']
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
-        fetch_size = config['fetch_size'] if 'fetch_size' in config else 500
+        fetch_size = config['fetch_size'] if 'fetch_size' in config else 2000
 
         return PostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
 
