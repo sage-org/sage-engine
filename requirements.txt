@@ -1,4 +1,4 @@
-Flask==1.0.2
+Flask==1.1.1
 uvloop==0.11.3
 marshmallow==3.2.2
 PyYAML==5.1.2
