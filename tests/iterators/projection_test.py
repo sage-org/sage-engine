@@ -3,7 +3,7 @@
 from sage.query_engine.sage_engine import SageEngine
 from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
-from sage.database.hdt_file_connector import HDTFileConnector
+from sage.database.hdt.connector import HDTFileConnector
 
 hdtDoc = HDTFileConnector('tests/data/test.hdt')
 engine = SageEngine()
@@ -19,7 +19,7 @@ def test_projection_read():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     proj = ProjectionIterator(scan, ['?common'])
-    (results, saved, done) = engine.execute(proj, 10e7)
+    (results, saved, done, _) = engine.execute(proj, 10e7)
     assert len(results) == card
     for res in results:
         assert '?common' in res and '?s1' not in res
@@ -30,7 +30,7 @@ def test_projection_read_stopped():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     proj = ProjectionIterator(scan, ['?common'])
-    (results, saved, done) = engine.execute(proj, 10e-4)
+    (results, saved, done, _) = engine.execute(proj, 10e-4)
     assert len(results) <= card
     for res in results:
         assert '?common' in res and '?s1' not in res

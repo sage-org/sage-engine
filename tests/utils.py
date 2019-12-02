@@ -46,7 +46,7 @@ class MemoryDatabase(DatabaseConnector):
     def from_config(config):
         return MemoryDatabase()
 
-    def search(self, subject, predicate, obj, last_read=None):
+    def search(self, subject, predicate, obj, last_read=None, as_of=None):
         def __filter(triple):
             s, p, o = triple
             return (subject.startswith('?') or subject == s) and (predicate.startswith('?') or predicate == p) and (obj.startswith('?') or obj == o)

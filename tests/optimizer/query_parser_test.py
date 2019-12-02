@@ -3,7 +3,7 @@
 import pytest
 from sage.query_engine.sage_engine import SageEngine
 from sage.query_engine.optimizer.query_parser import parse_query
-from sage.database.hdt_file_connector import HDTFileConnector
+from sage.database.hdt.connector import HDTFileConnector
 from tests.utils import DummyDataset
 import math
 
@@ -70,6 +70,6 @@ class TestQueryParser(object):
     def test_query_parser(self, query, cardinality):
         iterator, cards = parse_query(query, dataset, 'watdiv100', 'http://localhost:8000/sparql/')
         assert len(cards) > 0
-        (results, saved, done) = engine.execute(iterator, math.inf)
+        (results, saved, done, _) = engine.execute(iterator, math.inf)
         assert len(results) == cardinality
         assert done

@@ -1,7 +1,7 @@
 Flask==1.0.2
 uvloop==0.11.3
-marshmallow==2.15.1
-PyYAML==4.2b1
+marshmallow==3.2.2
+PyYAML==5.1.2
 rdflib==4.2.2
 rdflib-jsonld==0.4.0
 gunicorn==19.7.1

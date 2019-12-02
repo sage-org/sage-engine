@@ -1,6 +1,6 @@
 # optimizer_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from sage.database.hdt_file_connector import HDTFileConnector
+from sage.database.hdt.connector import HDTFileConnector
 from sage.query_engine.optimizer.plan_builder import build_query_plan
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.scan import ScanIterator

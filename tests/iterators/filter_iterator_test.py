@@ -5,7 +5,7 @@ from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.loader import load
-from sage.database.hdt_file_connector import HDTFileConnector
+from sage.database.hdt.connector import HDTFileConnector
 from tests.utils import DummyDataset
 import math
 
@@ -25,7 +25,7 @@ def test_simple_filter_iterator():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
-    (results, saved, done) = engine.execute(iterator, math.inf)
+    (results, saved, done, _) = engine.execute(iterator, math.inf)
     assert len(results) == 4
     for b in results:
         assert b['?p'] == 'http://schema.org/eligibleRegion'
@@ -42,7 +42,7 @@ def test_and_or_filter_iterator():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
-    (results, saved, done) = engine.execute(iterator, math.inf)
+    (results, saved, done, _) = engine.execute(iterator, math.inf)
     assert len(results) == 2
     for b in results:
         assert b['?p'] == 'http://schema.org/eligibleRegion'
@@ -57,7 +57,7 @@ def test_operation_filter_iterator():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
-    (results, saved, done) = engine.execute(iterator, math.inf)
+    (results, saved, done, _) = engine.execute(iterator, math.inf)
     assert len(results) == 9
 
 
@@ -66,7 +66,7 @@ def test_function_filter_iterator():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
-    (results, saved, done) = engine.execute(iterator, math.inf)
+    (results, saved, done, _) = engine.execute(iterator, math.inf)
     assert len(results) == 1
 
 
@@ -75,7 +75,7 @@ def test_filter_iterator_interrupt():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ProjectionIterator(ScanIterator(iterator, triple, card))
     iterator = FilterIterator(scan, expression)
-    (results, saved, done) = engine.execute(iterator, 10e-7, 2)
+    (results, saved, done, _) = engine.execute(iterator, 10e-7, 2)
     assert len(results) <= 4
     for b in results:
         assert b['?p'] == 'http://schema.org/eligibleRegion'
@@ -87,7 +87,7 @@ def test_filter_iterator_interrupt():
         ]
     tmp = len(results)
     reloaded = load(saved.SerializeToString(), DummyDataset(hdtDoc, 'watdiv100'))
-    (results, saved, done) = engine.execute(reloaded, 10e7)
+    (results, saved, done, _) = engine.execute(reloaded, 10e7)
     assert len(results) + tmp == 4
     for b in results:
         assert b['?p'] == 'http://schema.org/eligibleRegion'

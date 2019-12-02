@@ -1,7 +1,7 @@
 # hdt_backend_test.py
 # Author: Thomas MINIER - MIT License 2017-2019
 import pytest
-from sage.database.hdt_file_connector import HDTFileConnector
+from sage.database.hdt.connector import HDTFileConnector
 from tests.database.fixtures import index_scan_fixtures
 
 

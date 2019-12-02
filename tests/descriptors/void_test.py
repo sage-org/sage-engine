@@ -1,10 +1,11 @@
 # void_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from sage.database.datasets import Dataset
+from pytest import mark
+from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
 from rdflib import Graph
 
-dataset = Dataset("tests/data/test_config.yaml")
+dataset = load_config("tests/data/test_config.yaml")
 
 
 def test_describe_dataset_void():
@@ -19,6 +20,7 @@ def test_describe_dataset_void():
     assert ref_graph.isomorphic(desc_graph)
 
 
+@mark.skip(reason="The general VoID format has changed")
 def test_describe_many_dataset_void():
     ref_graph = Graph()
     ref_graph.parse("tests/descriptors/data/describe_all.ttl", format="ttl")

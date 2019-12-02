@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 import pytest
 from sage.database.import_manager import import_backend
-from sage.database.datasets import Dataset
+from sage.database.core.yaml_config import load_config
 
 
 def test_import_backend():
@@ -20,16 +20,16 @@ def test_import_backend_missing_param():
 
 
 def test_custom_backend_config():
-    dataset = Dataset('tests/database/config.yaml')
+    dataset = load_config('tests/database/config.yaml')
     assert dataset.has_graph('foo-dataset')
     assert dataset.get_graph('foo-dataset').search(None, None, None) == 'moo'
 
 
 def test_custom_backend_missing_params_config():
     with pytest.raises(SyntaxError):
-        Dataset('tests/database/missing_params.yaml')
+        load_config('tests/database/missing_params.yaml')
 
 
 def test_custom_backend_invalid_declaration_config():
     with pytest.raises(SyntaxError):
-        Dataset('tests/database/invalid_declaration.yaml')
+        load_config('tests/database/invalid_declaration.yaml')
