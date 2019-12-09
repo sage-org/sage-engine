@@ -1,15 +1,12 @@
 # sage_engine.py
-# Author: Thomas MINIER - MIT License 2017-2018
-import uvloop
-from asyncio import Queue, get_event_loop, wait_for, set_event_loop_policy
+# Author: Thomas MINIER - MIT License 2017-2020
+from asyncio import Queue, get_event_loop, wait_for
 from asyncio import TimeoutError as asyncTimeoutError
 from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
 from sage.query_engine.protobuf.iterators_pb2 import RootTree
 from math import inf
-
-set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 async def executor(plan, queue, limit):
@@ -36,7 +33,7 @@ class SageEngine(object):
     def __init__(self):
         super(SageEngine, self).__init__()
 
-    def execute(self, plan, quota, limit=inf):
+    async def execute(self, plan, quota, limit=inf):
         """
             Execute a preemptable physical query execution plan under a time quota.
 
@@ -58,8 +55,8 @@ class SageEngine(object):
         root = None
         abort_reason = None
         try:
-            task = wait_for(executor(plan, queue, limit), timeout=quota)
-            loop.run_until_complete(task)
+            await wait_for(executor(plan, queue, limit), timeout=quota)
+            # loop.run_until_complete(task)
             query_done = True
         except asyncTimeoutError:
             pass
