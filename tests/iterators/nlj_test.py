@@ -1,5 +1,6 @@
 # scan_test.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
+import pytest
 from sage.query_engine.sage_engine import SageEngine
 from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
@@ -21,20 +22,22 @@ innerTriple = {
 }
 
 
-def test_nlj_read():
+@pytest.mark.asyncio
+async def test_nlj_read():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     join = IndexJoinIterator(scan, innerTriple, hdtDoc)
-    (results, saved, done, _) = engine.execute(join, 10e7)
+    (results, saved, done, _) = await engine.execute(join, 10e7)
     assert len(results) == 20
     for res in results:
         assert '?s1' in res and '?s2' in res and '?common' in res
     assert done
 
 
-def test_nlj_interrupt():
+@pytest.mark.asyncio
+async def test_nlj_interrupt():
     iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
     scan = ScanIterator(iterator, triple, card)
     join = IndexJoinIterator(scan, innerTriple, hdtDoc)
-    (results, saved, done, _) = engine.execute(join, 10e-5)
+    (results, saved, done, _) = await engine.execute(join, 10e-5)
     assert len(results) <= 20
