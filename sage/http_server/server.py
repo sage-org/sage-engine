@@ -1,13 +1,12 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse, Response, StreamingResponse
+from starlette.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
 from starlette.middleware.cors import CORSMiddleware
 from sage.database.core.yaml_config import load_config
 from sage.query_engine.sage_engine import SageEngine
-from sage.query_engine.optimizer.plan_builder import build_query_plan
 from sage.query_engine.optimizer.query_parser import parse_query
 from sage.query_engine.iterators.loader import load
 from sage.http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan
