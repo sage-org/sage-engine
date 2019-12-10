@@ -1,10 +1,9 @@
 # bgp_interface_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
-from sage.http_server.server import sage_app
+from sage.http_server.fastapi import run_app
+from starlette.testclient import TestClient
 from tests.http.utils import post_sparql
-
-app = sage_app('tests/data/test_config.yaml')
 
 union_queries = [
     ("""
@@ -35,8 +34,8 @@ union_queries = [
 class TestUnionInterface(object):
     @classmethod
     def setup_class(self):
-        app.testing = True
-        self.app = app.test_client()
+        self._app = run_app('tests/data/test_config.yaml')
+        self._client = TestClient(self._app)
 
     @classmethod
     def teardown_class(self):
@@ -49,7 +48,9 @@ class TestUnionInterface(object):
         hasNext = True
         next_link = None
         while hasNext:
-            response = post_sparql(self.app, query, next_link, 'http://localhost/sparql/watdiv100')
+            response = post_sparql(self._client, query, next_link, 'http://testserver/sparql/watdiv100')
+            assert response.status_code == 200
+            response = response.json()
             nbResults += len(response['bindings'])
             hasNext = response['hasNext']
             next_link = response['next']

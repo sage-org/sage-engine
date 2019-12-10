@@ -22,8 +22,8 @@ from uuid import uuid4
 class SagePostQuery(BaseModel):
     """Data model for the body of POST SPARQL queries"""
     query: str = Field(..., description="The SPARQL query to execute.")
-    default_graph_uri: str = Field(..., description="The URI of the default RDF graph queried.")
-    next_link: str = Field(None, alias="next", description="(Optional) A next link used to resume query execution from a saved state.")
+    defaultGraph: str = Field(..., description="The URI of the default RDF graph queried.")
+    next: str = Field(None, description="(Optional) A next link used to resume query execution from a saved state.")
 
 def choose_void_format(mimetypes):
     if "text/turtle" in mimetypes:
@@ -151,19 +151,23 @@ def run_app(config_file: str):
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
             bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset, server_url)
             return create_response(mimetypes, bindings, next_page, stats, server_url)
+        except HTTPException as err:
+            raise err
         except Exception as err:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))
 
 
     @app.post("/sparql")
-    async def sparql_post(request: Request, body: SagePostQuery = Body(..., embed=True)):
+    async def sparql_post(request: Request, item: SagePostQuery):
         """Execute a SPARQL query using the Web Preemption model"""
         try:
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(body.query, body.default_graph_uri, body.next_link, dataset, server_url)
+            bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset, server_url)
             return create_response(mimetypes, bindings, next_page, stats, server_url)
+        except HTTPException as err:
+            raise err
         except Exception as err:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))

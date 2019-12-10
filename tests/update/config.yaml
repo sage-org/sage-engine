@@ -1,6 +1,5 @@
 name: SaGe update esting Server
 maintainer: Thomas Minier
-public_url: http://localhost:8000
 quota: 100000
 backends:
 -

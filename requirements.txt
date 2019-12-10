@@ -7,3 +7,4 @@ protobuf==3.11.0
 click==7.0
 fastapi==0.44.1
 uvicorn==0.10.8
+requests==2.22.0
