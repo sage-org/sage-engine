@@ -1,6 +1,6 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from sage.http_server.fastapi import SagePostQuery
+from sage.http_server.server import SagePostQuery
 
 
 def post_sparql(client, query, next_link, graph_uri):

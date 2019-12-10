@@ -5,7 +5,7 @@ import uvicorn
 import uvloop
 from asyncio import set_event_loop_policy
 from os.path import isfile
-from sage.http_server.fastapi import run_app
+from sage.http_server.server import run_app
 
 set_event_loop_policy(uvloop.EventLoopPolicy())
 

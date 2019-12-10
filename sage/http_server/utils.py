@@ -52,38 +52,3 @@ def encode_saved_plan(savedPlan):
 def decode_saved_plan(bytes):
     return b64decode(bytes) if bytes is not None else None
 
-
-# def generate_sitemap(dataset, last_mod):
-#     """Generate a XML sitemap from the datasets & queries hosted on the server"""
-#     root = ElementTree.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-#     # add basic navigation links
-#     home_xml = ElementTree.SubElement(root, "url")
-#     ElementTree.SubElement(home_xml, "loc").text = url_for('index', _external=True)
-#     ElementTree.SubElement(home_xml, "lastmod").text = last_mod
-
-#     # add server VoID
-#     gvoid_xml = ElementTree.SubElement(root, "url")
-#     ElementTree.SubElement(gvoid_xml, "loc").text = url_for('void-interface.void_all', _external=True)
-#     ElementTree.SubElement(gvoid_xml, "lastmod").text = last_mod
-
-#     # add dataset and queries
-#     for graph_name, graph in dataset._graphs.items():
-#         # add dataset homepage
-#         graph_xml = ElementTree.SubElement(root, "url")
-#         ElementTree.SubElement(graph_xml, "loc").text = url_for('sparql-interface.sparql_query', graph_name=graph_name, _external=True)
-#         ElementTree.SubElement(graph_xml, "lastmod").text = last_mod
-
-#         # add dataset VoID
-#         void_xml = ElementTree.SubElement(root, "url")
-#         ElementTree.SubElement(void_xml, "loc").text = url_for('void-interface.void_dataset', graph_name=graph_name, _external=True)
-#         ElementTree.SubElement(void_xml, "lastmod").text = last_mod
-
-#         # add dataset queries
-#         for query in graph.example_queries:
-#             if query["publish"]:
-#                 query_xml = ElementTree.SubElement(root, "url")
-#                 # location
-#                 ElementTree.SubElement(query_xml, "loc").text = url_for('publish-query-interface.publish_query', graph_name=graph_name, query_name=query["@id"], _external=True)
-#                 # last_mod
-#                 ElementTree.SubElement(query_xml, "lastmod").text = last_mod
-#     return ElementTree.tostring(root, encoding="utf8", method="xml").decode("utf-8")

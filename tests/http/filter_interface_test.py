@@ -1,7 +1,7 @@
 # bgp_interface_test.py
 # Author: Thomas MINIER - MIT License 2017-2018
 import pytest
-from sage.http_server.fastapi import run_app
+from sage.http_server.server import run_app
 from starlette.testclient import TestClient
 from tests.http.utils import post_sparql
 
