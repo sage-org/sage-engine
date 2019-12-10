@@ -37,11 +37,6 @@ def format_graph_uri(uri, server_url):
     return '_:UnkownGraph'
 
 
-def format_marshmallow_errors(errors):
-    """Format mashmallow validation errors in string format"""
-    return dumps(errors, indent=2)
-
-
 def encode_saved_plan(savedPlan):
     if savedPlan is None:
         return None

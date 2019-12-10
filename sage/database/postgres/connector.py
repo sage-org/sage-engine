@@ -1,13 +1,15 @@
 # postgre_connector.py
-# Author: Thomas MINIER - MIT License 2017-2019
-from sage.database.db_connector import DatabaseConnector
-from sage.database.db_iterator import DBIterator, EmptyIterator
-from sage.database.postgres.transaction_manager import TransactionManager
-from sage.database.postgres.queries import get_start_query, get_resume_query, get_insert_query, get_delete_query
-from sage.database.postgres.utils import id_to_predicate
+# Author: Thomas MINIER - MIT License 2017-2020
 import json
 from math import ceil
 from uuid import uuid4
+
+from sage.database.db_connector import DatabaseConnector
+from sage.database.db_iterator import DBIterator, EmptyIterator
+from sage.database.postgres.queries import (get_delete_query, get_insert_query,
+                                            get_resume_query, get_start_query)
+from sage.database.postgres.transaction_manager import TransactionManager
+from sage.database.postgres.utils import id_to_predicate
 
 
 def fetch_histograms(cursor, table_name, attribute_name):

@@ -1,7 +1,8 @@
 # serializable.py
-# Author: Thomas MINIER - MIT License 2017-2019
-from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
+# Author: Thomas MINIER - MIT License 2017-2020
 from rdflib import Variable
+
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
 
 def apply_templates(mappings, templates):

@@ -1,11 +1,15 @@
 # mvcc_connector.py
-# Author: Thomas MINIER - MIT License 2017-2019
-from sage.database.db_iterator import DBIterator, EmptyIterator
-from sage.database.postgres.connector import PostgresConnector
-from sage.database.postgres.mvcc_queries import get_start_query, get_resume_query, get_insert_query, get_delete_query
+# Author: Thomas MINIER - MIT License 2017-2020
 import json
 from datetime import datetime
 from uuid import uuid4
+
+from sage.database.db_iterator import DBIterator, EmptyIterator
+from sage.database.postgres.connector import PostgresConnector
+from sage.database.postgres.mvcc_queries import (get_delete_query,
+                                                 get_insert_query,
+                                                 get_resume_query,
+                                                 get_start_query)
 
 
 def parse_date(str_date):

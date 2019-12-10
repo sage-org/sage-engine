@@ -1,9 +1,10 @@
 # descriptors.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
-from rdflib import Graph, BNode, URIRef, Literal, Namespace
-from rdflib.namespace import DCTERMS, FOAF, RDF, RDFS, VOID, XSD
 from math import isinf
+
+from rdflib import BNode, Graph, Literal, Namespace, URIRef
+from rdflib.namespace import DCTERMS, FOAF, RDF, RDFS, VOID, XSD
 
 HYDRA = Namespace("http://www.w3.org/ns/hydra/core#")
 SAGE = Namespace("http://sage.univ-nantes.fr/sage-voc#")

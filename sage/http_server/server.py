@@ -1,22 +1,23 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2020
+import logging
+from sys import setrecursionlimit
+from time import time
+from urllib.parse import urlunparse
+from uuid import uuid4
+
+import sage.http_server.responses as responses
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
+from sage.database.core.yaml_config import load_config
+from sage.database.descriptors import VoidDescriptor, many_void
+from sage.http_server.utils import decode_saved_plan, encode_saved_plan, format_graph_uri
+from sage.query_engine.iterators.loader import load
+from sage.query_engine.optimizer.query_parser import parse_query
+from sage.query_engine.sage_engine import SageEngine
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
-from starlette.middleware.cors import CORSMiddleware
-from sage.database.core.yaml_config import load_config
-from sage.query_engine.sage_engine import SageEngine
-from sage.query_engine.optimizer.query_parser import parse_query
-from sage.query_engine.iterators.loader import load
-from sage.http_server.utils import format_graph_uri, encode_saved_plan, decode_saved_plan
-from sage.database.descriptors import VoidDescriptor, many_void
-import sage.http_server.responses as responses
-from urllib.parse import urlunparse
-import logging
-from time import time
-from uuid import uuid4
-from sys import setrecursionlimit
 
 
 class SagePostQuery(BaseModel):
@@ -214,4 +215,3 @@ def run_app(config_file: str):
             raise HTTPException(status_code=500, detail=str(err))
     
     return app
-    

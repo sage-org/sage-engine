@@ -1,9 +1,10 @@
 # scan.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.iterators.utils import vars_positions, selection
-from sage.query_engine.protobuf.iterators_pb2 import TriplePattern, SavedScanIterator
-from sage.query_engine.iterators.utils import IteratorExhausted
+from sage.query_engine.iterators.utils import (IteratorExhausted, selection,
+                                               vars_positions)
+from sage.query_engine.protobuf.iterators_pb2 import (SavedScanIterator,
+                                                      TriplePattern)
 
 
 class ScanIterator(PreemptableIterator):

@@ -1,9 +1,10 @@
 # responses.py
-# Author: Thomas MINIER - MIT License 2017-2018
-from sage.http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageStatistics, SageResponse
-from sage.query_engine.formatters import sparql_xml, binding_to_json
+# Author: Thomas MINIER - MIT License 2017-2020
 from json import dumps
 from xml.etree import ElementTree
+
+from sage.http_server.protobuf.sage_response_pb2 import Binding, BindingBag, SageResponse, SageStatistics
+from sage.query_engine.formatters import binding_to_json, sparql_xml
 
 
 def stream_json_list(iterator):

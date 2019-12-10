@@ -1,13 +1,15 @@
 # yaml_config.py
-# Author: Thomas MINIER - MIT License 2017-2019
-from yaml import load, FullLoader
-from sage.database.import_manager import builtin_backends, import_backend
-from sage.database.core.graph import Graph
-from sage.database.core.dataset import Dataset
-from sage.database.statefull.hashmap_manager import HashMapManager
+# Author: Thomas MINIER - MIT License 2017-2020
+import logging
 from math import inf
 from uuid import uuid4
-import logging
+
+from yaml import FullLoader, load
+
+from sage.database.core.dataset import Dataset
+from sage.database.core.graph import Graph
+from sage.database.import_manager import builtin_backends, import_backend
+from sage.database.statefull.hashmap_manager import HashMapManager
 
 
 def load_config(config_file):

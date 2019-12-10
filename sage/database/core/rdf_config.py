@@ -1,12 +1,14 @@
 # rdf_config.py
-# Author: Thomas MINIER - MIT License 2017-2019
+# Author: Thomas MINIER - MIT License 2017-2020
+import logging
+from math import inf
+
 from rdflib import Graph as RGraph
 from rdflib.plugins.sparql import prepareQuery
-from sage.database.import_manager import builtin_backends, import_backend
-from sage.database.core.graph import Graph
+
 from sage.database.core.dataset import Dataset
-from math import inf
-import logging
+from sage.database.core.graph import Graph
+from sage.database.import_manager import builtin_backends, import_backend
 
 
 def load_config(config_file, format="ttl"):

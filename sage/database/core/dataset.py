@@ -1,6 +1,5 @@
 # dataset.py
-# Author: Thomas MINIER - MIT License 2017-2019
-# from sage.database.core.yaml_config import load_config
+# Author: Thomas MINIER - MIT License 2017-2020
 
 
 class Dataset(object):

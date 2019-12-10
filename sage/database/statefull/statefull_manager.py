@@ -1,5 +1,5 @@
 # statefull_manager.py
-# Author: Thomas MINIER - MIT License 2017-2019
+# Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
 
 

@@ -1,6 +1,7 @@
 # hdt_file_connector.py
-# Author: Thomas MINIER - MIT License 2017-2019
+# Author: Thomas MINIER - MIT License 2017-2020
 from sage.database.db_iterator import DBIterator
+
 
 class HDTIterator(DBIterator):
     """An HDTIterator implements a DBIterator for a triple pattern evaluated using an HDT file"""

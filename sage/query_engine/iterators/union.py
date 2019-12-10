@@ -1,8 +1,9 @@
 # union.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
+from random import random
+
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedBagUnionIterator
-from random import random
 
 
 class BagUnionIterator(PreemptableIterator):

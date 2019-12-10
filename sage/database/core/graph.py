@@ -1,6 +1,6 @@
 # graph.py
-# Author: Thomas MINIER - MIT License 2017-2019
-# from urllib.parse import quote_plus
+# Author: Thomas MINIER - MIT License 2017-2020
+
 from math import inf
 
 class Graph(object):

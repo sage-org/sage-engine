@@ -1,24 +1,27 @@
 # query_parser.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
+from datetime import datetime
+from enum import Enum
+
 import pyparsing
-pyparsing.ParserElement.enablePackrat()
-from rdflib import URIRef, BNode, Variable
-from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
+from pyparsing import ParseException
+from rdflib import BNode, URIRef, Variable
 from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
+from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
+
+from sage.http_server.utils import format_graph_uri
+from sage.query_engine.exceptions import UnsupportedSPARQL
+from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.union import BagUnionIterator
-from sage.query_engine.iterators.filter import FilterIterator
-from sage.query_engine.update.insert import InsertOperator
+from sage.query_engine.optimizer.plan_builder import build_left_plan
 from sage.query_engine.update.delete import DeleteOperator
 from sage.query_engine.update.if_exists import IfExistsOperator
-from sage.query_engine.update.update_sequence import UpdateSequenceOperator
+from sage.query_engine.update.insert import InsertOperator
 from sage.query_engine.update.serializable import SerializableUpdate
-from sage.query_engine.optimizer.plan_builder import build_left_plan
-from sage.query_engine.exceptions import UnsupportedSPARQL
-from sage.http_server.utils import format_graph_uri
-from datetime import datetime
-from pyparsing import ParseException
-from enum import Enum
+from sage.query_engine.update.update_sequence import UpdateSequenceOperator
+
+pyparsing.ParserElement.enablePackrat()
 
 
 class ConsistencyLevel(Enum):

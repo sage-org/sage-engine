@@ -1,5 +1,5 @@
 # utils.py
-# Author: Thomas MINIER - MIT License 2017-2019
+# Author: Thomas MINIER - MIT License 2017-2020
 
 
 def is_var(term):

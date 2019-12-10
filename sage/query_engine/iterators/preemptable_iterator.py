@@ -1,5 +1,5 @@
 # preemptable_iterator.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
 
 

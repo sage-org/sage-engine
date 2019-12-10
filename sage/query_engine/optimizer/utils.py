@@ -1,5 +1,5 @@
 # utils.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
 
 
 def get_vars(triple):

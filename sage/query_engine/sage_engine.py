@@ -1,12 +1,14 @@
 # sage_engine.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from asyncio import Queue, get_event_loop, wait_for
+from asyncio import Queue
 from asyncio import TimeoutError as asyncTimeoutError
-from sage.query_engine.primitives import PreemptiveLoop
-from sage.query_engine.iterators.utils import IteratorExhausted
-from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
-from sage.query_engine.protobuf.iterators_pb2 import RootTree
+from asyncio import get_event_loop, wait_for
 from math import inf
+
+from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
+from sage.query_engine.iterators.utils import IteratorExhausted
+from sage.query_engine.primitives import PreemptiveLoop
+from sage.query_engine.protobuf.iterators_pb2 import RootTree
 
 
 async def executor(plan, queue, limit):

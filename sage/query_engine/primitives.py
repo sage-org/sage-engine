@@ -1,5 +1,5 @@
 # primitives.py
-# Author: Thomas MINIER - MIT License 2017-2019
+# Author: Thomas MINIER - MIT License 2017-2020
 from asyncio import sleep
 
 class PreemptiveLoop(object):

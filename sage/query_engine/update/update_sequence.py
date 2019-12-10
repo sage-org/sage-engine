@@ -1,7 +1,7 @@
 # update_sequence.py
-# Author: Thomas MINIER - MIT License 2017-2019
-from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
+# Author: Thomas MINIER - MIT License 2017-2020
 from sage.query_engine.exceptions import DeleteInsertConflict
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
 
 class UpdateSequenceOperator(PreemptableIterator):

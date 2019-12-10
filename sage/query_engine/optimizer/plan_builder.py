@@ -1,15 +1,18 @@
 # plan_builder.py
-# Author: Thomas MINIER - MIT License 2017-2018
-from sage.query_engine.iterators.projection import ProjectionIterator
-from sage.query_engine.iterators.scan import ScanIterator
-from sage.query_engine.iterators.nlj import IndexJoinIterator
-from sage.query_engine.iterators.filter import FilterIterator
-from sage.query_engine.iterators.union import BagUnionIterator
-from sage.query_engine.iterators.loader import load
-from sage.query_engine.iterators.utils import EmptyIterator
-from sage.query_engine.optimizer.utils import find_connected_pattern, get_vars, equality_variables
+# Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
 from functools import reduce
+
+from sage.query_engine.iterators.filter import FilterIterator
+from sage.query_engine.iterators.loader import load
+from sage.query_engine.iterators.nlj import IndexJoinIterator
+from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.union import BagUnionIterator
+from sage.query_engine.iterators.utils import EmptyIterator
+from sage.query_engine.optimizer.utils import (equality_variables,
+                                               find_connected_pattern,
+                                               get_vars)
 
 
 def build_query_plan(query, dataset, default_graph, saved_plan=None):

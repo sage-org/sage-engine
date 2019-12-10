@@ -1,12 +1,13 @@
 # nlj.py
-# Author: Thomas MINIER - MIT License 2017-2018
+# Author: Thomas MINIER - MIT License 2017-2020
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.scan import ScanIterator
-from sage.query_engine.iterators.utils import apply_bindings, tuple_to_triple
+from sage.query_engine.iterators.utils import (IteratorExhausted,
+                                               apply_bindings, tuple_to_triple)
 from sage.query_engine.primitives import PreemptiveLoop
-from sage.query_engine.protobuf.iterators_pb2 import TriplePattern, SavedIndexJoinIterator
+from sage.query_engine.protobuf.iterators_pb2 import (SavedIndexJoinIterator,
+                                                      TriplePattern)
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
-from sage.query_engine.iterators.utils import IteratorExhausted
 
 
 class IndexJoinIterator(PreemptableIterator):
