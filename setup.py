@@ -19,7 +19,6 @@ POSTGRESQL_DEPS = [
 
 console_scripts = [
     'sage = sage.cli.http_server:start_sage_server',
-    'sage-query = sage.cli.commons:sage_query',
     'sage-postgres-init = sage.cli.postgres:init_postgres',
     'sage-postgres-index = sage.cli.postgres:index_postgres',
     'sage-postgres-put = sage.cli.postgres:put_postgres'
