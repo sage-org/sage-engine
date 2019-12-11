@@ -15,34 +15,34 @@ Python implementation of SaGe, a stable, responsive and unrestricted SPARQL quer
 
 # Installation
 
-## Installation using pip (with the HDT backend)
-
 Installation in a [virtualenv](https://virtualenv.pypa.io/en/stable/) is **strongly advised!**
 
 Requirements:
+* Python 3.7 (*or higher*)
 * [pip](https://pip.pypa.io/en/stable/)
 * **gcc/clang** with **c++11 support**
 * **Python Development headers**
 > You should have the `Python.h` header available on your system.   
 > For example, for Python 3.6, install the `python3.6-dev` package on Debian/Ubuntu systems.
 
+## Installation using pip
+
 The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org/) as a backend can be installed as follows:
 ```bash
-pip install sage-engine[hdt]
+pip install sage-engine[hdt,postgres]
 ```
+The SaGe query engine uses various **backends** to load RDF datasets.
+The various backends available are installed as extras dependencies. The above command install both the HDT and PostgreSQL backends.
 
-## Manual installation (with the HDT backend)
+## Manual Installation using poetry
 
-Additional requirements:
-* [git](https://git-scm.com/)
-* [npm](https://nodejs.org/en/) (shipped with Node.js on most systems)
-
+The SaGe SPARQL query server can also be manually installed using the [poetry](https://github.com/sdispater/poetry) dependency manager.
 ```bash
 git clone https://github.com/sage-org/sage-engine
-cd sage-engine/
-pip install -r requirements.txt
-pip install -e .[hdt]
+cd sage-engine
+poetry install --extras "hdt postgre"
 ```
+As with pip, the various SaGe backends are installed as extras dependencies, using the  `--extras` flag.
 
 # Getting started
 
