@@ -1,9 +1,9 @@
 # formatters.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from xml.etree import ElementTree
+from typing import List, Dict, Optional, Tuple
 
-
-def get_binding_type(value):
+def get_binding_type(value: str) -> Tuple[str, str, Optional[str], Optional[str]]:
     # literal case
     if value.startswith("\""):
         extra_label, extra_value = None, None
@@ -25,7 +25,7 @@ def get_binding_type(value):
         return value, "uri", None, None
 
 
-def binding_to_json(binding):
+def binding_to_json(binding: Dict[str, str]) -> dict:
     """Format a set of solutions bindings in the W3C SPARQL JSON format"""
     json_binding = dict()
     for variable, value in binding.items():
@@ -39,7 +39,7 @@ def binding_to_json(binding):
     return json_binding
 
 
-def sparql_xml(bindings_list):
+def sparql_xml(bindings_list: List[Dict[str, str]]) -> ElementTree.Element:
     """Formats a set of bindings into SPARQL results in JSON formats."""
     def convert_binding(b, root):
         result_node = ElementTree.SubElement(root, "result")

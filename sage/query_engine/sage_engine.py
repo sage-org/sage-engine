@@ -4,14 +4,19 @@ from asyncio import Queue
 from asyncio import TimeoutError as asyncTimeoutError
 from asyncio import get_event_loop, wait_for
 from math import inf
+from typing import Dict, List, Optional, Tuple
 
 from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
+from sage.query_engine.iterators.preemptable_iterator import \
+    PreemptableIterator
 from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.protobuf.iterators_pb2 import RootTree
 
+ExecutionResults = Tuple[List[Dict[str, str]], Optional[RootTree], bool, Optional[str]]
 
-async def executor(plan, queue, limit):
+
+async def executor(plan: PreemptableIterator, queue: Queue, limit: int) -> None:
     """Executor used to evaluated a plan under a time quota"""
     try:
         with PreemptiveLoop() as loop:
@@ -35,7 +40,7 @@ class SageEngine(object):
     def __init__(self):
         super(SageEngine, self).__init__()
 
-    async def execute(self, plan, quota, limit=inf):
+    async def execute(self, plan: PreemptableIterator, quota: int, limit=inf) -> ExecutionResults:
         """
             Execute a preemptable physical query execution plan under a time quota.
 
@@ -50,7 +55,7 @@ class SageEngine(object):
                 - ``is_done`` is True when the plan has completed query evalution, False otherwise
                 - ``abort_reason`` is True if the query was aborted due a to concurrency control issue
         """
-        results = list()
+        results: List[Dict[str, str]] = list()
         queue = Queue()
         loop = get_event_loop()
         query_done = False

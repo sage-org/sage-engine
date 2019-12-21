@@ -16,7 +16,7 @@ class PreemptiveLoop(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    async def tick(self):
+    async def tick(self) -> None:
         """Move to the next iteration and allow interruption of the current loop."""
         self._cpt += 1
         # WARNING: await sleep(0) cost a lot, so we only trigger it every 50 cycle.
