@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sage-engine"
-version = "0.1.0"
+version = "2.0.0"
 description = "Sage: a SPARQL query engine for public Linked Data providers"
 repository = "https://github.com/sage-org/sage-engine"
 authors = [ "Thomas Minier <tminier01@gmail.com>" ]
@@ -19,6 +19,7 @@ exclude = [ "tests" ]
 
 [tool.poetry.scripts]
 sage = "sage.cli.http_server:start_sage_server"
+sage-grpc = "sage.cli.grpc_server:start_grpc_server"
 sage-postgres-init = "sage.cli.postgres:init_postgres"
 sage-postgres-index = "sage.cli.postgres:index_postgres"
 sage-postgres-put = "sage.cli.postgres:put_postgres"
