@@ -12,7 +12,7 @@ from sage.database.import_manager import builtin_backends, import_backend
 from sage.database.statefull.hashmap_manager import HashMapManager
 
 
-def load_config(config_file):
+def load_config(config_file: str) -> Dataset:
     """Load YAML configuration file to build a RDF dataset.
 
     Example config file:

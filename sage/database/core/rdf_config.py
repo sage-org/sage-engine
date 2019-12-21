@@ -11,7 +11,7 @@ from sage.database.core.graph import Graph
 from sage.database.import_manager import builtin_backends, import_backend
 
 
-def load_config(config_file, format="ttl"):
+def load_config(config_file: str, format="ttl") -> Dataset:
     """
         Parse a SaGe configuration file written in RDF
         and load a set of RDF graphs.

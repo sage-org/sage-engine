@@ -1,12 +1,17 @@
 # graph.py
 # Author: Thomas MINIER - MIT License 2017-2020
-
+from datetime import datetime
 from math import inf
+from typing import List, Optional, Tuple
+
+from sage.database.db_connector import DatabaseConnector
+from sage.database.db_iterator import DBIterator
+
 
 class Graph(object):
     """A RDF Graph with a dedicated backend"""
 
-    def __init__(self, name, description, connector, quantum=75, max_results=inf, default_queries=list()):
+    def __init__(self, name: str, description: str, connector: DatabaseConnector, quantum=75, max_results=inf, default_queries: List[dict] = list()):
         super(Graph, self).__init__()
         self._name = name
         self._description = description
@@ -16,34 +21,34 @@ class Graph(object):
         self._example_queries = default_queries
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def description(self):
+    def description(self) -> str:
         return self._description
 
     @property
-    def quota(self):
+    def quota(self) -> float:
         return self._quantum
 
     @property
-    def max_results(self):
+    def max_results(self) -> float:
         return self._max_results
 
     @property
-    def nb_triples(self):
+    def nb_triples(self) -> int:
         return self._connector.nb_triples
 
     @property
-    def example_queries(self):
+    def example_queries(self) -> List[dict]:
         return self._example_queries
 
-    def connector(self):
+    def connector(self) -> DatabaseConnector:
         """Get the underlying DatabaseConnector for this dataset"""
         return self._connector
 
-    def search(self, subject, predicate, obj, last_read=None, as_of=None):
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[DBIterator, int]:
         """
             Get an iterator over all RDF triples matching a triple pattern.
             Args:
@@ -57,23 +62,23 @@ class Graph(object):
         """
         return self._connector.search(subject, predicate, obj, last_read=last_read, as_of=as_of)
 
-    def insert(self, subject, predicate, obj):
+    def insert(self, subject: str, predicate: str, obj: str):
         """Insert a RDF triple into the RDF graph"""
         self._connector.insert(subject, predicate, obj)
 
-    def delete(self, subject, predicate, obj):
+    def delete(self, subject: str, predicate: str, obj: str):
         """Delete a RDF triple from the RDF graph"""
         self._connector.delete(subject, predicate, obj)
 
-    def commit(self):
+    def commit(self) -> None:
         """Commit any ongoing transaction (at the database level)"""
         self._connector.commit_transaction()
 
-    def abort(self):
+    def abort(self) -> None:
         """Abort any ongoing transaction (at the database level)"""
         self._connector.abort_transaction()
 
-    def describe(self, url):
+    def describe(self, url: str) -> dict:
         """Describe the RDF Dataset in JSON-LD format"""
         return {
             "@context": {
@@ -93,7 +98,7 @@ class Graph(object):
             "sage:maxResults": self.max_results if self.max_results is not inf else 'inf'
         }
 
-    def get_query(self, q_id):
+    def get_query(self, q_id: str) -> Optional[str]:
         """Get an example SPARQL query associated with the graph, or None if it was not found"""
         for query in self.example_queries:
             if query['@id'] == q_id:

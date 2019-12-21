@@ -1,11 +1,15 @@
 # dataset.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from typing import Iterable, List, Optional
+
+from sage.database.core.graph import Graph
+from sage.database.statefull.statefull_manager import StatefullManager
 
 
 class Dataset(object):
     """A collection of RDF graphs"""
 
-    def __init__(self, name, description, graphs, public_url=None, default_query=None, analytics=None, stateless=True, statefull_manager=None):
+    def __init__(self, name: str, description: str, graphs: List[Graph], public_url: Optional[str] = None, default_query: Optional[str] = None, analytics=None, stateless=True, statefull_manager: Optional[StatefullManager] = None):
         super(Dataset, self).__init__()
         self._name = name
         self._desciption = description
@@ -20,15 +24,15 @@ class Dataset(object):
             self._statefull_manager.open()
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def is_stateless(self):
+    def is_stateless(self) -> bool:
         return self._stateless
 
     @property
-    def statefull_manager(self):
+    def statefull_manager(self) -> StatefullManager:
         return self._statefull_manager
 
     @property
@@ -40,11 +44,11 @@ class Dataset(object):
         return self._default_query if self._default_query is not None else default
 
     @property
-    def long_description(self):
+    def long_description(self) -> str:
         return self._desciption
 
     @property
-    def public_url(self):
+    def public_url(self) -> str:
         return self._public_url
 
     @property
@@ -56,15 +60,15 @@ class Dataset(object):
         # DEPRECATED
         return None
 
-    def describe(self, url):
+    def describe(self, url: str) -> Iterable[dict]:
         """Gives a generator over dataset descriptions"""
-        for name, dataset in self._graphs.items():
-            yield dataset.describe(url)
+        for name, graph in self._graphs.items():
+            yield graph.describe(url)
 
-    def get_graph(self, graph_uri):
+    def get_graph(self, graph_uri: str) -> Optional[Graph]:
         """Get a RDF graph given its URI, otherwise returns None"""
         return self._graphs[graph_uri] if graph_uri in self._graphs else None
 
-    def has_graph(self, graph_uri):
+    def has_graph(self, graph_uri: str) -> bool:
         """Test if a RDF graph exists in the RDF dataset"""
         return graph_uri in self._graphs
