@@ -1,13 +1,17 @@
 # db_connector.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Optional, Tuple
+
+from sage.database.db_iterator import DBIterator
 
 
 class DatabaseConnector(ABC):
     """A DatabaseConnector is an abstract class for creating connectors to a database"""
 
     @abstractmethod
-    def search(self, subject, predicate, obj, last_read=None, as_of=None):
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[DBIterator, int]:
         """
             Get an iterator over all RDF triples matching a triple pattern.
 
@@ -24,46 +28,41 @@ class DatabaseConnector(ABC):
         pass
 
     @abstractmethod
-    def from_config(config):
+    def from_config(config: dict):
         """Build a DatabaseConnector from a dictionnary"""
         pass
 
-    @property
-    def nb_triples(self):
-        """Get the number of RDF triples in the database"""
-        return 0
-
-    def open(self):
+    def open(self) -> None:
         """Open the database connection"""
         pass
 
-    def close(self):
+    def close(self) -> None:
         """Close the database connection"""
         pass
 
-    def insert(self, subject, predicate, obj):
+    def insert(self, subject: str, predicate: str, obj: str) -> None:
         """
             Insert a RDF triple into the RDF Graph.
             If not overrided, this method raises an exception as it consider the graph as read-only.
         """
         raise NotImplementedError("The RDF graph is read-only: INSERT DATA queries are not allowed")
 
-    def delete(self, subject, predicate, obj):
+    def delete(self, ssubject: str, predicate: str, obj: str) -> None:
         """
             Delete a RDF triple from the RDF Graph.
             If not overrided, this method raises an exception as it consider the graph as read-only.
         """
         raise NotImplementedError("The RDF graph is read-only: DELETE DATA queries are not allowed")
 
-    def start_transaction(self):
+    def start_transaction(self) -> None:
         """Start a transaction (if supported by this type of connector)"""
         pass
 
-    def commit_transaction(self):
+    def commit_transaction(self) -> None:
         """Commit any ongoing transaction (if supported by this type of connector)"""
         pass
 
-    def abort_transaction(self):
+    def abort_transaction(self) -> None:
         """Abort any ongoing transaction (if supported by this type of connector)"""
         pass
 
@@ -79,18 +78,23 @@ class DatabaseConnector(ABC):
     def __del__(self):
         """Destructor"""
         self.close()
+    
+    @property
+    def nb_triples(self) -> int:
+        """Get the number of RDF triples in the database"""
+        return 0
 
     @property
-    def nb_subjects(self):
+    def nb_subjects(self) -> int:
         """Get the number of subjects in the database"""
         return 0
 
     @property
-    def nb_predicates(self):
+    def nb_predicates(self) -> int:
         """Get the number of predicates in the database"""
         return 0
 
     @property
-    def nb_objects(self):
+    def nb_objects(self) -> int:
         """Get the number of objects in the database"""
         return 0

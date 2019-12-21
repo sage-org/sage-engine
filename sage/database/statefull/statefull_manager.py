@@ -1,36 +1,37 @@
 # statefull_manager.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
+from typing import Dict
 
 
 class StatefullManager(ABC):
     """A StatefullManager is an abstract class for storing saved SPARQL query execution plans"""
 
     @abstractmethod
-    def get_plan(self, plan_id):
+    def get_plan(self, plan_id: str) -> str:
         """Get a saved plan by ID"""
         pass
 
     @abstractmethod
-    def save_plan(self, id, plan):
+    def save_plan(self, id, plan: str) -> None:
         """Store a saved plan by ID"""
         pass
 
     @abstractmethod
-    def delete_plan(self, plan_id):
+    def delete_plan(self, plan_id: str) -> None:
         """Delete a saved plan by ID"""
         pass
 
     @abstractmethod
-    def from_config(config):
+    def from_config(config: Dict[str, str]):
         """Build a StatefullManager from a config dictionnary"""
         pass
 
-    def open(self):
+    def open(self) -> None:
         """Open the StatefullManager connection"""
         pass
 
-    def close(self):
+    def close(self) -> None:
         """Close the StatefullManager connection"""
         pass
 

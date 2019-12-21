@@ -6,13 +6,16 @@ from math import isinf
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DCTERMS, FOAF, RDF, RDFS, VOID, XSD
 
+from sage.database.core.dataset import Dataset
+from sage.database.core.graph import Graph as SageGraph
+
 HYDRA = Namespace("http://www.w3.org/ns/hydra/core#")
 SAGE = Namespace("http://sage.univ-nantes.fr/sage-voc#")
 SD = Namespace("http://www.w3.org/ns/sparql-service-description#")
 W3C_FORMATS = Namespace("http://www.w3.org/ns/formats/")
 
 
-def bind_prefixes(graph):
+def bind_prefixes(graph: Graph) -> None:
     """
         Bind commodity prefixes to a rdflib Graph.
         Generate readable prefixes when serializing the graph to turtle.
@@ -25,7 +28,7 @@ def bind_prefixes(graph):
     graph.bind("void", "http://rdfs.org/ns/void#")
 
 
-def many_void(endpoint_uri, dataset, format, encoding="utf-8"):
+def many_void(endpoint_uri: str, dataset: Dataset, format: str, encoding: str = "utf-8") -> str:
     """
         Describe a collection of RDF dataset using VOID + SPARQL Description languages.
         Supported formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
@@ -69,7 +72,7 @@ class AbstractDescriptor(ABC):
         super(AbstractDescriptor, self).__init__()
 
     @abstractmethod
-    def describe(self, format, encoding="utf-8"):
+    def describe(self, format: str, encoding="utf-8") -> str:
         """
             Describe the dataset using the given format, and returns the description as a string.
 
@@ -83,7 +86,7 @@ class AbstractDescriptor(ABC):
 class VoidDescriptor(AbstractDescriptor):
     """A descriptor that describes a Sage dataset using the VOID standard"""
 
-    def __init__(self, url, graph):
+    def __init__(self, url: str, graph: SageGraph):
         super(VoidDescriptor, self).__init__()
         self._graph = graph
         self._graph_url = URIRef(url)
@@ -91,7 +94,7 @@ class VoidDescriptor(AbstractDescriptor):
         bind_prefixes(self._rdf_graph)
         self.__populate_graph()
 
-    def describe(self, format, encoding="utf-8"):
+    def describe(self, format: str, encoding="utf-8") -> str:
         """
             Describe the dataset using the given format, and returns the description as a string.
             Supported formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
@@ -102,7 +105,7 @@ class VoidDescriptor(AbstractDescriptor):
         """
         return self._rdf_graph.serialize(format=format).decode(encoding)
 
-    def __populate_graph(self):
+    def __populate_graph(self) -> None:
         """Fill the local triple store with dataset's metadata"""
         # main metadata
         self._rdf_graph.add((self._graph_url, RDF["type"], SAGE["SageDataset"]))

@@ -1,9 +1,14 @@
 # import_manager.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from importlib import import_module
+from typing import Callable, Dict, List
+
+from sage.database.db_connector import DatabaseConnector
+
+BackendFactory = Callable[[Dict[str, str]], DatabaseConnector]
 
 
-def builtin_backends():
+def builtin_backends() -> Dict[str, BackendFactory]:
     """Load the built-in backends: HDT, PostgreSQL and MVCC-PostgreSQL"""
     data = [
         # HDT backend (read-only)
@@ -41,10 +46,10 @@ def builtin_backends():
     return {item['name']: import_backend(item['name'], item['path'], item['connector'], item['required']) for item in data}
 
 
-def import_backend(name, module_path, class_name, required_params):
+def import_backend(name: str, module_path: str, class_name: str, required_params: List[str]) -> BackendFactory:
     """Load a new backend from the config file"""
     # factory used to build new connector
-    def __factory(params):
+    def __factory(params: Dict[str, str]) -> DatabaseConnector:
         # load module dynamically
         module = import_module(module_path)
         if not hasattr(module, class_name):
