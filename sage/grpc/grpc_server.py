@@ -4,6 +4,7 @@ import logging
 from asyncio import run
 from concurrent.futures import ThreadPoolExecutor
 from time import time
+from typing import Dict, List
 from uuid import uuid4
 
 import grpc
@@ -19,7 +20,7 @@ from sage.query_engine.optimizer.query_parser import parse_query
 from sage.query_engine.sage_engine import SageEngine
 
 
-def create_bindings(bindings):
+def create_bindings(bindings: List[Dict[str, str]]):
   """Create an iterator that converts a set of dict-based bindings to a set of protobuf-based bindings"""
   for binding in bindings:
     binding_set = BindingSet()
