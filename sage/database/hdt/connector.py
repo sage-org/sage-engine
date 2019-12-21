@@ -1,8 +1,10 @@
 # hdt_file_connector.py
 # Author: Thomas MINIER - MIT License 2017-2020
 import os.path
+from typing import Optional, Tuple
 
 from hdt import HDTDocument
+
 from sage.database.db_connector import DatabaseConnector
 from sage.database.hdt.iterator import HDTIterator
 
@@ -10,7 +12,7 @@ from sage.database.hdt.iterator import HDTIterator
 class HDTFileConnector(DatabaseConnector):
     """A HDTFileConnector search for RDF triples in a HDT file"""
 
-    def __init__(self, file, mapped=True, indexed=True):
+    def __init__(self, file: str, mapped=True, indexed=True):
         """
             Constructor.
             Args:
@@ -21,7 +23,7 @@ class HDTFileConnector(DatabaseConnector):
         super(HDTFileConnector, self).__init__()
         self._hdt = HDTDocument(file, map=mapped, indexed=indexed)
 
-    def search(self, subject, predicate, obj, last_read=None, as_of=None):
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[HDTIterator, int]:
         """
             Get an iterator over all RDF triples matching a triple pattern.
 
@@ -45,25 +47,25 @@ class HDTFileConnector(DatabaseConnector):
         return HDTIterator(iterator, pattern, start_offset=offset), card
 
     @property
-    def nb_triples(self):
+    def nb_triples(self) -> int:
         return self._hdt.total_triples
 
     @property
-    def nb_subjects(self):
+    def nb_subjects(self) -> int:
         """Get the number of subjects in the database"""
         return self._hdt.nb_subjects
 
     @property
-    def nb_predicates(self):
+    def nb_predicates(self) -> int:
         """Get the number of predicates in the database"""
         return self._hdt.nb_predicates
 
     @property
-    def nb_objects(self):
+    def nb_objects(self) -> int:
         """Get the number of objects in the database"""
         return self._hdt.nb_objects
 
-    def from_config(config):
+    def from_config(config: dict):
         """Build a HDTFileFactory from a config file"""
         if not os.path.isfile(config["file"]):
             raise Exception("Configuration file not found: {}".format(config["file"]))
