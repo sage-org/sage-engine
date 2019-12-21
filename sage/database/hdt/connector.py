@@ -8,6 +8,7 @@ from hdt import HDTDocument
 from sage.database.db_connector import DatabaseConnector
 from sage.database.hdt.iterator import HDTIterator
 
+from datetime import datetime
 
 class HDTFileConnector(DatabaseConnector):
     """A HDTFileConnector search for RDF triples in a HDT file"""
