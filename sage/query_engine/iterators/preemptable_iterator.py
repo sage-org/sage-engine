@@ -1,18 +1,19 @@
 # preemptable_iterator.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional
 
 
 class PreemptableIterator(ABC):
     """An abstract class for a preemptable iterator"""
 
     @abstractmethod
-    def serialized_name(self):
+    def serialized_name(self) -> str:
         """Get the name of the operator when serialized"""
         pass
 
     @abstractmethod
-    async def next(self):
+    async def next(self) -> Optional[Dict[str, str]]:
         """
         Get the next item from the iterator, following the iterator protocol.
         Raise `StopIteration` is the iterator cannot produce more items.
@@ -21,11 +22,11 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
-    def has_next(self):
+    def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
         pass
 
     @abstractmethod
-    def save(self):
+    def save(self) -> Any:
         """Save and serialize the iterator as a machine-readable format"""
         pass

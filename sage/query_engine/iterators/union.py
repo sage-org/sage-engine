@@ -1,5 +1,6 @@
 # union.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from typing import Dict, Optional
 from random import random
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -9,21 +10,21 @@ from sage.query_engine.protobuf.iterators_pb2 import SavedBagUnionIterator
 class BagUnionIterator(PreemptableIterator):
     """BagUnionIterator performs a Bag Union between two input iterators"""
 
-    def __init__(self, left, right):
+    def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
         super(BagUnionIterator, self).__init__()
         self._left = left
         self._right = right
 
     def __repr__(self):
-        return '<BagUnionIterator {%s} UNION {%s}>' % (self._left, self._right)
+        return f"<BagUnionIterator {self._left} UNION {self._right}>"
 
-    def serialized_name(self):
+    def serialized_name(self) -> str:
         return "union"
 
-    def has_next(self):
+    def has_next(self) -> bool:
         return self._left.has_next() or self._right.has_next()
 
-    async def next(self):
+    async def next(self) -> Optional[Dict[str, str]]:
         """
         Get the next item from the iterator, reading from the left source and then the right source
         """
@@ -34,7 +35,7 @@ class BagUnionIterator(PreemptableIterator):
         else:
             return await self._right.next()
 
-    def save(self):
+    def save(self) -> SavedBagUnionIterator:
         """Save and serialize the iterator as a machine-readable format"""
         saved_union = SavedBagUnionIterator()
         # export left source
@@ -51,12 +52,12 @@ class RandomBagUnionIterator(BagUnionIterator):
     and randomly select the iterator to read at each call to next()
     """
 
-    def __init__(self, left, right):
+    def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
         super(BagUnionIterator, self).__init__()
         self._left = left
         self._right = right
 
-    async def next(self):
+    async def next(self) -> Optional[Dict[str, str]]:
         """
         Get the next item from the iterator, reading from a source randomly selected
         """

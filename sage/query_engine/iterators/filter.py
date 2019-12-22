@@ -1,6 +1,8 @@
 # filter.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from rdflib import URIRef, Variable
+from typing import Dict, Optional, Union
+
+from rdflib import Literal, URIRef, Variable
 from rdflib.plugins.sparql.algebra import translateQuery
 from rdflib.plugins.sparql.parser import parseQuery
 from rdflib.plugins.sparql.sparql import Bindings, QueryContext
@@ -13,7 +15,7 @@ from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 
 
-def to_rdflib_term(value):
+def to_rdflib_term(value: Union[Literal, URIRef, Variable]) -> str:
     """Convert a N3 term to a RDFLib Term"""
     if value.startswith('http'):
         return URIRef(value)
@@ -26,7 +28,7 @@ def to_rdflib_term(value):
 class FilterIterator(PreemptableIterator):
     """A FilterIterator evaluates a FILTER clause on set of mappings"""
 
-    def __init__(self, source, expression, mu=None):
+    def __init__(self, source: PreemptableIterator, expression: str, mu: Optional[Dict[str, str]] = None):
         super(FilterIterator, self).__init__()
         self._source = source
         self._raw_expression = expression
@@ -36,20 +38,25 @@ class FilterIterator(PreemptableIterator):
         compiled_expr = translateQuery(compiled_expr)
         self._compiled_expression = compiled_expr.algebra.p.p.expr
 
-    def __repr__(self):
-        return "<FilterIterator '{}' on {}>".format(self._raw_expression, self._source)
+    def __repr__(self) -> str:
+        return f"<FilterIterator '{self._raw_expression}' on {self._source}>"
 
-    def serialized_name(self):
+    def serialized_name(self) -> str:
         return "filter"
 
-    def _evaluate(self, bindings):
+    def _evaluate(self, bindings: Dict[str, str]) -> bool:
         """Evaluate the FILTER expression with a set mappings"""
         d = {Variable(key[1:]): to_rdflib_term(value) for key, value in bindings.items()}
         b = Bindings(d=d)
         context = QueryContext(bindings=b)
         return self._compiled_expression.eval(context)
 
-    async def next(self):
+    async def next(self) -> Optional[Dict[str, str]]:
+        """
+        Get the next item from the iterator, following the iterator protocol.
+        Raise `StopIteration` is the iterator cannot produce more items.
+        Warning: this function may contains `non interruptible` clauses.
+        """
         if not self.has_next():
             raise IteratorExhausted()
         if self._mu is None:
@@ -64,11 +71,11 @@ class FilterIterator(PreemptableIterator):
         self._mu = None
         return mu
 
-    def has_next(self):
+    def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
         return self._mu is not None or self._source.has_next()
 
-    def save(self):
+    def save(self) -> SavedFilterIterator:
         """Save and serialize the iterator as a machine-readable format"""
         saved_filter = SavedFilterIterator()
         source_field = self._source.serialized_name() + '_source'
