@@ -2,19 +2,22 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
 from enum import Enum
+from typing import Dict, List, Optional, Tuple, Union
 
 import pyparsing
 from pyparsing import ParseException
-from rdflib import BNode, URIRef, Variable
+from rdflib import BNode, Literal, URIRef, Variable
 from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
 
+from sage.database.core.dataset import Dataset
 from sage.http_server.utils import format_graph_uri
 from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.iterators.filter import FilterIterator
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.union import BagUnionIterator
-from sage.query_engine.optimizer.plan_builder import build_left_plan
+from sage.query_engine.optimizer.join_builder import build_left_join_tree
 from sage.query_engine.update.delete import DeleteOperator
 from sage.query_engine.update.if_exists import IfExistsOperator
 from sage.query_engine.update.insert import InsertOperator
@@ -31,7 +34,7 @@ class ConsistencyLevel(Enum):
     ATOMIC_PER_QUANTUM = 3
 
 
-def localize_triples(triples, graphs):
+def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> List[Dict[str, str]]:
     """Using a set of RDF graphs, performs data localization of a set of RDF triples"""
     for t in triples:
         s, p, o = format_term(t[0]), format_term(t[1]), format_term(t[2])
@@ -44,7 +47,7 @@ def localize_triples(triples, graphs):
             }
 
 
-def format_term(term):
+def format_term(term: Union[BNode,Literal,URIRef,Variable]) -> str:
     """Convert a rdflib RDF Term into the format used by SaGe"""
     if type(term) is URIRef:
         return str(term)
@@ -54,7 +57,7 @@ def format_term(term):
         return term.n3()
 
 
-def get_triples_from_graph(node, current_graphs, server_url):
+def get_triples_from_graph(node: dict, current_graphs: List[str], server_url: str) -> List[Dict[str, str]]:
     """Fetch triples in a BGP or a BGP nested in a GRAPH clause"""
     if node.name == 'Graph' and node.p.name == 'BGP':
         graph_uri = format_graph_uri(format_term(node.term), server_url)
@@ -64,7 +67,7 @@ def get_triples_from_graph(node, current_graphs, server_url):
     else:
         raise UnsupportedSPARQL('Unsupported SPARQL Feature: a Sage engine can only perform joins between Graphs and BGPs')
 
-def get_quads_from_update(operation, default_graph, server_url):
+def get_quads_from_update(operation: dict, default_graph: str, server_url: str) -> List[Tuple[str, str, str, str]]:
     """Get all quads from a SPARQL update operation (Delete or Insert)"""
     quads = list()
     # first, gell all regular RDF triples, localized on the default RDF graph
@@ -78,7 +81,7 @@ def get_quads_from_update(operation, default_graph, server_url):
                 quads += [(format_term(s), format_term(p), format_term(o), graph_uri) for s, p, o in triples]
     return quads
 
-def parse_filter_expr(expr):
+def parse_filter_expr(expr: dict) -> str:
     """Stringify a rdflib Filter expression"""
     if not hasattr(expr, 'name'):
         return format_term(expr)
@@ -103,7 +106,7 @@ def parse_filter_expr(expr):
         raise UnsupportedSPARQL("Unsupported SPARQL FILTER expression: {}".format(expr.name))
 
 
-def parse_query(query, dataset, default_graph, server_url):
+def parse_query(query: str, dataset: Dataset, default_graph: str, server_url: str) -> Tuple[PreemptableIterator, dict]:
     """Parse a regular SPARQL query into a query execution plan"""
     # transaction timestamp
     start_timestamp = datetime.now()
@@ -118,7 +121,7 @@ def parse_query(query, dataset, default_graph, server_url):
         return parse_update(query, dataset, default_graph, server_url, as_of=start_timestamp)
 
 
-def parse_query_node(node, dataset, current_graphs, server_url, cardinalities, as_of=None):
+def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], server_url: str, cardinalities: dict, as_of: Optional[datetime] = None) -> PreemptableIterator:
     """
         Recursively parse node in the query logical plan to build a preemptable physical query execution plan.
 
@@ -142,7 +145,7 @@ def parse_query_node(node, dataset, current_graphs, server_url, cardinalities, a
     elif node.name == 'BGP':
         # bgp_vars = node._vars
         triples = list(localize_triples(node.triples, current_graphs))
-        iterator, query_vars, c = build_left_plan(triples, dataset, current_graphs, as_of=as_of)
+        iterator, query_vars, c = build_left_join_tree(triples, dataset, current_graphs, as_of=as_of)
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator
@@ -157,7 +160,7 @@ def parse_query_node(node, dataset, current_graphs, server_url, cardinalities, a
     elif node.name == 'Join':
         # only allow for joining BGPs from different GRAPH clauses
         triples = get_triples_from_graph(node.p1, current_graphs, server_url) + get_triples_from_graph(node.p2, current_graphs, server_url)
-        iterator, query_vars, c = build_left_plan(triples, dataset, current_graphs)
+        iterator, query_vars, c = build_left_join_tree(triples, dataset, current_graphs)
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator
@@ -165,7 +168,7 @@ def parse_query_node(node, dataset, current_graphs, server_url, cardinalities, a
         raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))
 
 
-def parse_update(query, dataset, default_graph, server_url, as_of=None):
+def parse_update(query: dict, dataset: Dataset, default_graph: str, server_url: str, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, dict]:
     """
         Parse a SPARQL INSERT DATA or DELETE DATA query, and returns a preemptable physical query execution plan to execute it.
     """
