@@ -56,7 +56,7 @@ class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
             saved_plan = self._dataset.statefull_manager.get_plan(next_link)
         plan = load(decode_saved_plan(saved_plan), self._dataset)
       else:
-        plan, cardinalities = parse_query(query, self._dataset, graph_name, '')
+        plan, cardinalities = parse_query(query, self._dataset, graph_name)
       loading_time = (time() - start) * 1000
 
       # execute query

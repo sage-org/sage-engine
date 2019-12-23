@@ -53,15 +53,14 @@ def many_void(endpoint_uri: str, dataset: Dataset, format: str, encoding: str = 
     g.add((sage_uri, SD["availableGraphs"], graph_collec))
     g.add((graph_collec, RDF["type"], SD["GraphCollection"]))
     # describe each dataset available
-    for d_name, dataset in dataset._graphs.items():
+    for g_uri, graph in dataset._graphs.items():
         d_node = BNode()
-        u = f"{endpoint_uri}/sparql/{d_name}"
         # add relation between dataset collection and the current dataset
         g.add((graph_collec, SD["namedGraph"], d_node))
-        g.add((d_node, SD["name"], URIRef(u)))
-        g.add((d_node, SD["graph"], URIRef(u)))
+        g.add((d_node, SD["name"], URIRef(graph.name)))
+        g.add((d_node, SD["graph"], URIRef(g_uri)))
         # add all triples from the dataset's description itself
-        g += VoidDescriptor(u, dataset)._rdf_graph
+        g += VoidDescriptor(g_uri, graph)._rdf_graph
     return g.serialize(format=format).decode(encoding)
 
 

@@ -17,11 +17,10 @@ class DeleteOperator(PreemptableIterator):
         - dataset :class:`sage.database.core.Dataset`: RDF dataset
     """
 
-    def __init__(self, quads: List[Tuple[str, str, str, str]], dataset: Dataset, server_url: str):
+    def __init__(self, quads: List[Tuple[str, str, str, str]], dataset: Dataset):
         super(DeleteOperator, self).__init__()
         self._quads = quads
         self._dataset = dataset
-        self._server_url = server_url
         # we store how many triples were inserted in each RDF graph
         self._inserted = dict()
 
@@ -46,7 +45,7 @@ class DeleteOperator(PreemptableIterator):
                 self._inserted[g] += 1
             else:
                 self._inserted[g] = 0
-            return {"?s": s, "?p": p, "?o": o, "?graph": f"{self._server_url}/{g}"}
+            return {"?s": s, "?p": p, "?o": o, "?graph": g}
         return None
 
     def save(self) -> SavedDeleteData:

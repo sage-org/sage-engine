@@ -14,6 +14,6 @@ backends:
 graphs:
 -
   name: update-test
-  uri: http://localhost:8000/sparql/update-test
+  uri: http://testserver/sparql/update-test
   description: Testing dataset
   backend: memory

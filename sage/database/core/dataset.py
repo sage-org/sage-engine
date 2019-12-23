@@ -9,7 +9,7 @@ from sage.database.statefull.statefull_manager import StatefullManager
 class Dataset(object):
     """A collection of RDF graphs"""
 
-    def __init__(self, name: str, description: str, graphs: Dict[Graph], public_url: Optional[str] = None, default_query: Optional[str] = None, analytics=None, stateless=True, statefull_manager: Optional[StatefullManager] = None):
+    def __init__(self, name: str, description: str, graphs: Dict[str, Graph], public_url: Optional[str] = None, default_query: Optional[str] = None, analytics=None, stateless=True, statefull_manager: Optional[StatefullManager] = None):
         super(Dataset, self).__init__()
         self._name = name
         self._desciption = description

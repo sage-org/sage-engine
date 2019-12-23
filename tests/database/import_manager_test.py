@@ -21,8 +21,8 @@ def test_import_backend_missing_param():
 
 def test_custom_backend_config():
     dataset = load_config('tests/database/config.yaml')
-    assert dataset.has_graph('foo-dataset')
-    assert dataset.get_graph('foo-dataset').search(None, None, None) == 'moo'
+    assert dataset.has_graph('http://localhost:8000/sparql/foo-graph')
+    assert dataset.get_graph('http://localhost:8000/sparql/foo-graph').search(None, None, None) == 'moo'
 
 
 def test_custom_backend_missing_params_config():

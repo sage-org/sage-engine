@@ -11,8 +11,8 @@ backends:
   required: [ "foo" ]
 graphs:
 -
-  name: foo-dataset
-  uri: http://localhost:8000/sparql/foo-dataset
+  name: foo-graph
+  uri: http://localhost:8000/sparql/foo-graph
   description: A foo dataset
   backend: custom-backend
   foo: moo

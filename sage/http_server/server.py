@@ -3,21 +3,26 @@
 import logging
 from sys import setrecursionlimit
 from time import time
+from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlunparse
 from uuid import uuid4
 
-import sage.http_server.responses as responses
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
+from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
+from starlette.responses import (JSONResponse, RedirectResponse, Response,
+                                 StreamingResponse)
+
+import sage.http_server.responses as responses
+from sage.database.core.dataset import Dataset
 from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
-from sage.http_server.utils import decode_saved_plan, encode_saved_plan, format_graph_uri
+from sage.http_server.utils import (decode_saved_plan, encode_saved_plan,
+                                    format_graph_uri)
 from sage.query_engine.iterators.loader import load
 from sage.query_engine.optimizer.query_parser import parse_query
 from sage.query_engine.sage_engine import SageEngine
-from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
 
 
 class SagePostQuery(BaseModel):
@@ -39,17 +44,17 @@ def choose_void_format(mimetypes):
         return "json-ld", "application/json"
     return "ntriples", "application/n-triples"
 
-async def execute_query(query, default_graph_uri, next_link, dataset, url):
+async def execute_query(query: str, default_graph_uri: str, next_link: Optional[str], dataset: Dataset) -> Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]:
     """
         Execute a query using the SageEngine and returns the appropriate HTTP response.
         Any failure will results in a rollback/abort on the current query execution.
     """
     graph = None
     try:
-        graph_name = format_graph_uri(default_graph_uri, url)
-        if not dataset.has_graph(graph_name):
-            raise HTTPException(status_code=404, detail=f"RDF Graph {graph_name} not found on the server.")
-        graph = dataset.get_graph(graph_name)
+        # graph_name = format_graph_uri(default_graph_uri, url)
+        if not dataset.has_graph(default_graph_uri):
+            raise HTTPException(status_code=404, detail=f"RDF Graph {default_graph_uri} not found on the server.")
+        graph = dataset.get_graph(default_graph_uri)
 
         # decode next_link or build query execution plan
         cardinalities = dict()
@@ -61,7 +66,7 @@ async def execute_query(query, default_graph_uri, next_link, dataset, url):
                 saved_plan = dataset.statefull_manager.get_plan(next_link)
             plan = load(decode_saved_plan(saved_plan), dataset)
         else:
-            plan, cardinalities = parse_query(query, dataset, graph_name, url)
+            plan, cardinalities = parse_query(query, dataset, default_graph_uri)
         loading_time = (time() - start) * 1000
 
         # execute query
@@ -153,7 +158,7 @@ def run_app(config_file: str):
         try:
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset, server_url)
+            bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset)
             return create_response(mimetypes, bindings, next_page, stats, server_url)
         except HTTPException as err:
             raise err
@@ -168,7 +173,7 @@ def run_app(config_file: str):
         try:
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset, server_url)
+            bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset)
             return create_response(mimetypes, bindings, next_page, stats, server_url)
         except HTTPException as err:
             raise err

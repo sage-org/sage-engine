@@ -10,14 +10,8 @@ graphs:
   backend: hdt-file
   file: tests/data/test.hdt
 -
-  name: foo
-  uri: http://localhost:8000/sparql/foo
-  description: Sample dataset used for testing entity lookup
-  backend: hdt-file
-  file: tests/data/entity.hdt
--
   name: watdiv100
-  uri: http://localhost:8000/sparql/watdiv100
+  uri: http://testserver/sparql/watdiv100
   description: Sample dataset in HDT format, used for testing
   backend: hdt-file
   file: tests/data/watdiv.10M.hdt

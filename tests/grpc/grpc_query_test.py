@@ -50,7 +50,7 @@ class TestGRPCInterface(object):
     def test_grpc_interface(self, query, cardinality):
       with grpc.insecure_channel('localhost:8000') as channel:
         client = service_pb2_grpc.SageSPARQLStub(channel)
-        grpc_query = SageQuery(query = query, default_graph_uri = 'watdiv100')
+        grpc_query = SageQuery(query = query, default_graph_uri = 'http://testserver/sparql/watdiv100')
         nbResults = 0
         nbCalls = 0
         is_done = False
@@ -62,6 +62,6 @@ class TestGRPCInterface(object):
             next_link = response.next_link
             nbCalls += 1
             # prepare next query
-            grpc_query = SageQuery(query = query, default_graph_uri = 'watdiv100', next_link = next_link)
+            grpc_query = SageQuery(query = query, default_graph_uri = 'http://testserver/sparql/watdiv100', next_link = next_link)
         assert nbResults == cardinality
         assert nbCalls >= 1
