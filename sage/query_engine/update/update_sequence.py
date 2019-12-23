@@ -1,5 +1,7 @@
 # update_sequence.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from typing import Dict, Optional
+
 from sage.query_engine.exceptions import DeleteInsertConflict
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
@@ -11,22 +13,22 @@ class UpdateSequenceOperator(PreemptableIterator):
         To do so, it sequentually evaluates a IfExistsOperator, then a DeleteOperator and finally an InsertOperator.
     """
 
-    def __init__(self, if_exists_op, delete_op, insert_op):
+    def __init__(self, if_exists_op: PreemptableIterator, delete_op: PreemptableIterator, insert_op: PreemptableIterator):
         super(UpdateSequenceOperator, self).__init__()
         self._if_exists_op = if_exists_op
         self._delete_op = delete_op
         self._insert_op = insert_op
 
-    def serialized_name(self):
+    def serialized_name(self) -> str:
         return "update_sequence"
 
-    def has_next(self):
+    def has_next(self) -> bool:
         # abort if a conflict was detected
         if self._if_exists_op.missing_nquads:
             raise DeleteInsertConflict('A read-write conflict has been detected. It seems that a concurrent SPARQL query has already deleted some RDF triples that you previously read.')
         return self._if_exists_op.has_next() or self._delete_op.has_next() or self._insert_op.has_next()
 
-    async def next(self):
+    async def next(self) -> Optional[Dict[str, str]]:
         """Advance in the sequence of operations"""
         # abort if a conflict was detected
         if self._if_exists_op.missing_nquads:
@@ -43,6 +45,6 @@ class UpdateSequenceOperator(PreemptableIterator):
             await self._insert_op.next()
         return None
 
-    def save(self):
+    def save(self) -> str:
         """Useless for this operator, as it MUST run completely inside a quantum"""
         return ''

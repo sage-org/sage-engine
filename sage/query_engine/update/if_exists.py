@@ -1,5 +1,9 @@
 # if_exists.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from datetime import datetime
+from typing import Dict, List, Optional
+
+from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
 
@@ -9,28 +13,28 @@ class IfExistsOperator(PreemptableIterator):
         It is used to provide the "serializability per solution group" consistency level.
     """
 
-    def __init__(self, quads, dataset, start_time):
+    def __init__(self, quads: List[Dict[str, str]], dataset: Dataset, start_time: datetime):
         super(IfExistsOperator, self).__init__()
         self._quads = quads
         self._dataset = dataset
         self._found_missing = False
         self._start_time = start_time
 
-    def __repr__(self):
-        return "<IfExistsOperator quads={}>".format(self._quads)
+    def __repr__(self) -> str:
+        return f"<IfExistsOperator quads={self._quads}>"
 
     @property
-    def missing_nquads(self):
+    def missing_nquads(self) -> bool:
         """Returns True if, at the time of invocation, at least one n-quad was not found in the RDF dataset."""
         return self._found_missing
 
-    def serialized_name(self):
+    def serialized_name(self) -> str:
         return "ifexists"
 
-    def has_next(self):
+    def has_next(self) -> bool:
         return (not self._found_missing) and len(self._quads) > 0
 
-    async def next(self):
+    async def next(self) -> Optional[Dict[str, str]]:
         """Check if the next n-quad exists in the dataset."""
         if not self.has_next():
             raise StopIteration()
@@ -46,6 +50,6 @@ class IfExistsOperator(PreemptableIterator):
             self._found_missing = True
         return None
 
-    def save(self):
+    def save(self) -> str:
         """Useless for this operator, as it MUST run completely inside a quantum"""
         return ''

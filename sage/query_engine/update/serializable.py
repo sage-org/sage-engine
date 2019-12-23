@@ -1,11 +1,16 @@
 # serializable.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from typing import Dict, Iterable, List, Tuple
+
 from rdflib import Variable
 
+from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
+Quad = Tuple[str, str, str, str]
 
-def apply_templates(mappings, templates):
+
+def apply_templates(mappings: List[Dict[str, str]], templates: List[Quad]) -> Iterable[Quad]:
     """
         Returns an iterator that applies each mapping in a set to a set of quads templates
         and returns the distinct quads produced.
@@ -31,17 +36,17 @@ def apply_templates(mappings, templates):
 class SerializableUpdate(PreemptableIterator):
     """A SerializableUpdate iterator evaluates a SPARQL Update query under serializability."""
 
-    def __init__(self, dataset, read_input, delete_templates, insert_templates):
+    def __init__(self, dataset: Dataset, read_input: PreemptableIterator, delete_templates: List[Quad], insert_templates: List[Quad]):
         super(SerializableUpdate, self).__init__()
         self._dataset = dataset
         self._read_input = read_input
         self._delete_templates = delete_templates
         self._insert_templates = insert_templates
 
-    def serialized_name(self):
+    def serialized_name(self) -> str:
         return "serializable_update"
 
-    def has_next(self):
+    def has_next(self) -> bool:
         """
             Query execution is not finished iff:
                 - the read set is not entierly built, or
@@ -50,7 +55,7 @@ class SerializableUpdate(PreemptableIterator):
         """
         return self._read_input.has_next()
 
-    async def next(self):
+    async def next(self) -> None:
         """Advance in the update execution"""
         if not self.has_next():
             raise StopIteration()
@@ -72,6 +77,6 @@ class SerializableUpdate(PreemptableIterator):
                 self._dataset.get_graph(g).insert(s, p, o)
         return None
 
-    def save(self):
+    def save(self) -> str:
         """Useless for this operator, as it MUST run completely inside a quantum"""
         return ''

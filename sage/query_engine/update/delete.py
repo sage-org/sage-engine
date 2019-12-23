@@ -1,5 +1,8 @@
 # insert.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from typing import Dict, List, Optional, Tuple
+
+from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.protobuf.iterators_pb2 import SavedDeleteData
@@ -14,7 +17,7 @@ class DeleteOperator(PreemptableIterator):
         - dataset :class:`sage.database.core.Dataset`: RDF dataset
     """
 
-    def __init__(self, quads, dataset, server_url):
+    def __init__(self, quads: List[Tuple[str, str, str, str]], dataset: Dataset, server_url: str):
         super(DeleteOperator, self).__init__()
         self._quads = quads
         self._dataset = dataset
@@ -22,16 +25,16 @@ class DeleteOperator(PreemptableIterator):
         # we store how many triples were inserted in each RDF graph
         self._inserted = dict()
 
-    def __repr__(self):
-        return "<DeleteOperator quads={}>".format(self._quads)
+    def __repr__(self) -> str:
+        return f"<DeleteOperator quads={self._quads}>"
 
-    def serialized_name(self):
+    def serialized_name(self) -> str:
         return "delete"
 
-    def has_next(self):
+    def has_next(self) -> bool:
         return len(self._quads) > 0
 
-    async def next(self):
+    async def next(self) -> Optional[Dict[str, str]]:
         """Delete one RDF triple from the RDF graph"""
         if not self.has_next():
             raise IteratorExhausted()
@@ -46,7 +49,7 @@ class DeleteOperator(PreemptableIterator):
             return {"?s": s, "?p": p, "?o": o, "?graph": "{}/{}".format(self._server_url, g)}
         return None
 
-    def save(self):
+    def save(self) -> SavedDeleteData:
         """Save the operator using protocol buffers"""
         saved = SavedDeleteData()
         pyDict_to_protoDict(self._inserted, saved.nb_inserted)
