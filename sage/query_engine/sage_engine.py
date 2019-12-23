@@ -7,8 +7,7 @@ from math import inf
 from typing import Dict, List, Optional, Tuple
 
 from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
-from sage.query_engine.iterators.preemptable_iterator import \
-    PreemptableIterator
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.protobuf.iterators_pb2 import RootTree

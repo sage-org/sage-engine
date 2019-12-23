@@ -9,7 +9,7 @@ def get_start_query(subj, pred, obj, table_name):
         and the parameters used to execute it.
     """
     kind = get_kind(subj, pred, obj)
-    query = "SELECT * FROM {} ".format(table_name)
+    query = f"SELECT * FROM {table_name} "
     params = None
     if kind == 'spo':
         query += "WHERE subject = %s AND predicate = %s AND object = %s ORDER BY subject, predicate, object, insert_t, delete_t"
@@ -35,7 +35,7 @@ def get_start_query(subj, pred, obj, table_name):
         query += "WHERE object = %s ORDER BY object, subject, predicate, insert_t, delete_t"
         params = [obj]
     else:
-        raise Exception("Unkown pattern type: {}".format(kind))
+        raise Exception(f"Unkown pattern type: {kind}")
     return query, params
 
 
@@ -46,33 +46,33 @@ def get_resume_query(subj, pred, obj, last_read, table_name, symbol=">="):
     """
     last_s, last_p, last_o, last_insert_t, last_delete_t = last_read
     kind = get_kind(subj, pred, obj)
-    query = "SELECT * FROM {} ".format(table_name)
+    query = f"SELECT * FROM {table_name} "
     params = None
     if kind == 'spo':
         return None, None
     elif kind == '???':
-        query += "WHERE (subject, predicate, object, insert_t, delete_t) {} (%s, %s, %s, %s, %s) ORDER BY subject, predicate, object, insert_t, delete_t".format(symbol)
+        query += f"WHERE (subject, predicate, object, insert_t, delete_t) {symbol} (%s, %s, %s, %s, %s) ORDER BY subject, predicate, object, insert_t, delete_t"
         params = (last_s, last_p, last_o, last_insert_t, last_delete_t)
     elif kind == 's??':
-        query += "WHERE subject = %s AND (predicate, object, insert_t, delete_t) {} (%s, %s, %s, %s) ORDER BY subject, predicate, object, insert_t, delete_t".format(symbol)
+        query += f"WHERE subject = %s AND (predicate, object, insert_t, delete_t) {symbol} (%s, %s, %s, %s) ORDER BY subject, predicate, object, insert_t, delete_t"
         params = (last_s, last_p, last_o, last_insert_t, last_delete_t)
     elif kind == 'sp?':
-        query += "WHERE subject = %s AND predicate = %s AND (object, insert_t, delete_t) {} (%s, %s, %s) ORDER BY subject, predicate, object, insert_t, delete_t".format(symbol)
+        query += f"WHERE subject = %s AND predicate = %s AND (object, insert_t, delete_t) {symbol} (%s, %s, %s) ORDER BY subject, predicate, object, insert_t, delete_t"
         params = (last_s, last_p, last_o, last_insert_t, last_delete_t)
     elif kind == '?p?':
-        query += "WHERE predicate = %s AND (object, subject, insert_t, delete_t) {} (%s, %s, %s, %s) ORDER BY predicate, object, subject, insert_t, delete_t".format(symbol)
+        query += f"WHERE predicate = %s AND (object, subject, insert_t, delete_t) {symbol} (%s, %s, %s, %s) ORDER BY predicate, object, subject, insert_t, delete_t"
         params = (last_p, last_o, last_s, last_insert_t, last_delete_t)
     elif kind == '?po':
-        query += "WHERE predicate = %s AND object = %s AND (subject, insert_t, delete_t) {} (%s, %s, %s) ORDER BY predicate, object, subject, insert_t, delete_t".format(symbol)
+        query += f"WHERE predicate = %s AND object = %s AND (subject, insert_t, delete_t) {symbol} (%s, %s, %s) ORDER BY predicate, object, subject, insert_t, delete_t"
         params = (last_p, last_o, last_s, last_insert_t, last_delete_t)
     elif kind == 's?o':
-        query += "WHERE subject = %s AND object = %s AND (predicate, insert_t, delete_t) {} (%s, %s, %s) ORDER BY object, subject, predicate, insert_t, delete_t".format(symbol)
+        query += f"WHERE subject = %s AND object = %s AND (predicate, insert_t, delete_t) {symbol} (%s, %s, %s) ORDER BY object, subject, predicate, insert_t, delete_t"
         params = (last_s, last_o, last_p, last_insert_t, last_delete_t)
     elif kind == '??o':
-        query += "WHERE object = %s AND (subject, predicate, insert_t, delete_t) {} (%s, %s, %s, %s) ORDER BY object, subject, predicate, insert_t, delete_t".format(symbol)
+        query += f"WHERE object = %s AND (subject, predicate, insert_t, delete_t) {symbol} (%s, %s, %s, %s) ORDER BY object, subject, predicate, insert_t, delete_t"
         params = (last_o, last_s, last_p, last_insert_t, last_delete_t)
     else:
-        raise Exception("Unkown pattern type: {}".format(kind))
+        raise Exception(f"Unkown pattern type: {kind}")
     return query, params
 
 
@@ -84,12 +84,12 @@ def get_insert_query(table_name):
             - predicate: RDF triple predicate
             - object: RDF triple object
     """
-    return "INSERT INTO {} (subject, predicate, object, insert_t, delete_t) VALUES (%s, %s, %s, transaction_timestamp(), 'infinity'::timestamp)".format(table_name)
+    return f"INSERT INTO {table_name} (subject, predicate, object, insert_t, delete_t) VALUES (%s, %s, %s, transaction_timestamp(), 'infinity'::timestamp)"
 
 
 def get_insert_many_query(table_name):
     """Build a SQL query to insert a RDF triple into a PostgreSQL dataset"""
-    return "INSERT INTO {} (subject, predicate, object, insert_t, delete_t) VALUES %s".format(table_name)
+    return f"INSERT INTO {table_name} (subject, predicate, object, insert_t, delete_t) VALUES %s"
 
 
 def get_delete_query(table_name):
@@ -100,4 +100,4 @@ def get_delete_query(table_name):
             - predicate: RDF triple predicate
             - object: RDF triple object
     """
-    return "UPDATE {} SET delete_t = transaction_timestamp() WHERE subject = %s AND predicate = %s AND object = %s AND delete_t = 'infinity'::timestamp".format(table_name)
+    return f"UPDATE {table_name} SET delete_t = transaction_timestamp() WHERE subject = %s AND predicate = %s AND object = %s AND delete_t = 'infinity'::timestamp"

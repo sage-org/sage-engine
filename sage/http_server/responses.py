@@ -45,7 +45,7 @@ def protobuf(bindings, next_page, stats):
 
 
 def skolemize_one(value, url):
-    return "{}/bnode#{}".format(url, value[2:]) if value.startswith("_:") else value
+    return f"{url}/bnode#{value[2:]}" if value.startswith("_:") else value
 
 
 def skolemize(bindings, url):
@@ -59,10 +59,10 @@ def skolemize(bindings, url):
 
 def ntriples_streaming(triples):
     for s, p, o in triples:
-        subj = "<{}>".format(s) if not s.startswith("\"") else s
-        pred = "<{}>".format(p)
-        obj = "<{}>".format(o) if not o.startswith("\"") else o
-        yield "{} {} {} .\n".format(subj, pred, obj)
+        subj = f"<{s}>" if not s.startswith("\"") else s
+        pred = f"<{p}>"
+        obj = f"<{o}>" if not o.startswith("\"") else o
+        yield f"{subj} {pred} {obj} .\n"
 
 
 def w3c_json_streaming(bindings, next_link, stats, url):
@@ -71,10 +71,10 @@ def w3c_json_streaming(bindings, next_link, stats, url):
     vars = list(map(lambda x: x[1:], bindings[0].keys()))
     # generate headers
     yield "{\"head\":{\"vars\":["
-    yield ",".join(map(lambda x: "\"{}\"".format(x), vars))
-    yield "],\"pageSize\":{},\"hasNext\":{},".format(len(bindings), hasNext)
+    yield ",".join(map(lambda x: f"\"{x}\"", vars))
+    yield f"],\"pageSize\":{len(bindings)},\"hasNext\":{hasNext},"
     if next_link is not None:
-        yield "\"next\":\"{}\",".format(next_link)
+        yield f"\"next\":\"{next_link}\","
     yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "},\"results\":{\"bindings\":["
     # generate results
     b_iter = map(binding_to_json, skolemize(bindings, url))
@@ -88,9 +88,9 @@ def raw_json_streaming(bindings, next_link, stats, url):
     yield "{\"bindings\":["
     b_iter = skolemize(bindings, url)
     yield from stream_json_list(b_iter)
-    yield "],\"pageSize\":{},\"hasNext\":{},".format(len(bindings), hasNext)
+    yield f"],\"pageSize\":{len(bindings)},\"hasNext\":{hasNext},"
     if next_link is not None:
-        yield "\"next\":\"{}\",".format(next_link)
+        yield f"\"next\":\"{next_link}\","
     else:
         yield "\"next\":null,"
     yield "\"stats\":" + dumps(stats, separators=(',', ':')) + "}"

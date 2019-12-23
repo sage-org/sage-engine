@@ -88,7 +88,7 @@ def load_config(config_file: str) -> Dataset:
     for g_config in config["datasets"]:
         # load basic information about the graph
         g_name = g_config["name"] if "name" in g_config else str(uuid4())
-        g_description = g_config["description"] if "description" in g_config else "Unnamed RDF graph with id {}".format(g_name)
+        g_description = g_config["description"] if "description" in g_config else f"Unnamed RDF graph with id {g_name}"
         g_quantum = g_config["quota"] if "quota" in g_config else quantum
         g_max_results = g_config["max_results"] if "max_results" in g_config else max_results
         g_queries = g_config["queries"] if "queries" in g_config else list()
@@ -97,11 +97,11 @@ def load_config(config_file: str) -> Dataset:
         if "backend" in g_config and g_config["backend"] in backends:
             g_connector = backends[g_config["backend"]](g_config)
         else:
-            logging.error("Impossible to find the backend with name {}, declared for the RDF Graph {}".format(g_config["backend"], g_name))
+            logging.error(f"Impossible to find the backend with name {g_config['backend']}, declared for the RDF Graph {g_name}")
             continue
 
         # build the graph and register it
         graphs[g_name] = Graph(g_name, g_description, g_connector, quantum=g_quantum, max_results=g_max_results, default_queries=g_queries)
-        logging.info("RDF Graph '{}' (backend: {}) successfully loaded".format(g_name, g_config["backend"]))
+        logging.info(f"RDF Graph '{g_name}' (backend: {g_config['backend']}) successfully loaded")
 
     return Dataset(dataset_name, dataset_description, graphs, public_url=public_url, default_query=default_query, analytics=analytics, stateless=is_stateless, statefull_manager=statefull_manager)

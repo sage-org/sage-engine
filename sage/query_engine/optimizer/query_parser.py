@@ -87,23 +87,23 @@ def parse_filter_expr(expr: dict) -> str:
         return format_term(expr)
     else:
         if expr.name == 'RelationalExpression':
-            return "({} {} {})".format(parse_filter_expr(expr.expr), expr.op, parse_filter_expr(expr.other))
+            return f"({parse_filter_expr(expr.expr)} {expr.op} {parse_filter_expr(expr.other)})"
         elif expr.name == 'AdditiveExpression':
             expression = parse_filter_expr(expr.expr)
             for i in range(len(expr.op)):
-                expression = "({} {} {})".format(expression, expr.op[i], parse_filter_expr(expr.other[i]))
+                expression = f"({expression} {expr.op[i]} {parse_filter_expr(expr.other[i])})"
             return expression
         elif expr.name == 'ConditionalAndExpression':
             expression = parse_filter_expr(expr.expr)
             for other in expr.other:
-                expression = "({} && {})".format(expression, parse_filter_expr(other))
+                expression = f"({expression} && {parse_filter_expr(other)})"
             return expression
         elif expr.name == 'ConditionalOrExpression':
             expression = parse_filter_expr(expr.expr)
             for other in expr.other:
-                expression = "({} || {})".format(expression, parse_filter_expr(other))
+                expression = f"({expression} || {parse_filter_expr(other)})"
             return expression
-        raise UnsupportedSPARQL("Unsupported SPARQL FILTER expression: {}".format(expr.name))
+        raise UnsupportedSPARQL(f"Unsupported SPARQL FILTER expression: {expr.name}")
 
 
 def parse_query(query: str, dataset: Dataset, default_graph: str, server_url: str) -> Tuple[PreemptableIterator, dict]:
@@ -165,7 +165,7 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], se
         cardinalities += c
         return iterator
     else:
-        raise UnsupportedSPARQL("Unsupported SPARQL feature: {}".format(node.name))
+        raise UnsupportedSPARQL(f"Unsupported SPARQL feature: {node.name}")
 
 
 def parse_update(query: dict, dataset: Dataset, default_graph: str, server_url: str, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, dict]:

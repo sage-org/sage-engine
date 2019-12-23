@@ -53,11 +53,11 @@ def import_backend(name: str, module_path: str, class_name: str, required_params
         # load module dynamically
         module = import_module(module_path)
         if not hasattr(module, class_name):
-            raise RuntimeError("Connector class {} not found in module {}".format(class_name, module_path))
+            raise RuntimeError(f"Connector class {class_name} not found in module {module_path}")
         connector = getattr(module, class_name)
         # check that all required params are present
         for key in required_params:
             if key not in params:
-                raise SyntaxError('Missing required parameters for backend {}. Expected to see {}'.format(name, required_params))
+                raise SyntaxError(f"Missing required parameters for backend {name}. Expected to see {required_params}")
         return connector.from_config(params)
     return __factory

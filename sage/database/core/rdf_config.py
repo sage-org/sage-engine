@@ -131,7 +131,7 @@ def load_config(config_file: str, format="ttl") -> Dataset:
         # fetch backend config. parameters first
         backend_res = graph.query(backend_query, initBindings = { "backend": row.backend })
         if len(backend_res) == 0:
-            logging.error("Graph with name '{}' has a backend declared with an invalid syntax. Please check your configuration file using the documentation.".format(g_name))
+            logging.error(f"Graph with name '{g_name}' has a backend declared with an invalid syntax. Please check your configuration file using the documentation.")
         else:
             for b_row in backend_res:
                 backend_name = str(b_row.name)
@@ -140,7 +140,7 @@ def load_config(config_file: str, format="ttl") -> Dataset:
             if backend_name in backends:
                 g_connector = backends[backend_name](backend_config)
             else:
-                logging.error("Impossible to find the backend with name {}, declared for the RDF Graph {}".format(backend_name, g_name))
+                logging.error(f"Impossible to find the backend with name {backend_name}, declared for the RDF Graph {g_name}")
                 continue
             # build the graph and register it
             graphs[g_name] = Graph(g_name, g_description, g_connector, quantum=g_quantum, max_results=g_max_results, default_queries=g_queries)

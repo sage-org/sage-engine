@@ -24,9 +24,9 @@ def equality_variables(subject: str, predicate: str, obj: str) -> Tuple[str, Tup
         Find all variables from triple pattern with the same name, and then returns the equality expression + the triple pattern used to evaluate correctly the pattern.
     """
     if subject == predicate:
-        return "{} = {}".format(subject, predicate + '__2'), (subject, predicate + '__2', obj), ""
+        return f"{subject} = {predicate + '__2'}", (subject, predicate + '__2', obj), ""
     elif subject == obj:
-        return "{} = {}".format(subject, obj + '__2'), (subject, predicate, obj + '__2')
+        return f"{subject} = {obj + '__2'}", (subject, predicate, obj + '__2')
     elif predicate == obj:
-        return "{} = {}".format(predicate, obj + '__2'), (subject, predicate, obj + '__2')
+        return f"{predicate} = {obj + '__2'}", (subject, predicate, obj + '__2')
     return None, (subject, predicate, obj)

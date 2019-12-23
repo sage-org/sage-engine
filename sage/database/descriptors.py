@@ -55,7 +55,7 @@ def many_void(endpoint_uri: str, dataset: Dataset, format: str, encoding: str = 
     # describe each dataset available
     for d_name, dataset in dataset._graphs.items():
         d_node = BNode()
-        u = "{}/sparql/{}".format(endpoint_uri, d_name)
+        u = f"{endpoint_uri}/sparql/{d_name}"
         # add relation between dataset collection and the current dataset
         g.add((graph_collec, SD["namedGraph"], d_node))
         g.add((d_node, SD["name"], URIRef(u)))

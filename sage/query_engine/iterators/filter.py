@@ -21,7 +21,7 @@ def to_rdflib_term(value: Union[Literal, URIRef, Variable]) -> str:
         return URIRef(value)
     elif '"^^http' in value:
         index = value.find('"^^http')
-        value = "{}<{}>".format(value[0:index+3], value[index+3:])
+        value = f"{value[0:index+3]}<{value[index+3:]}>"
     return from_n3(value)
 
 

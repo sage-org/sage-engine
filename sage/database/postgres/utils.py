@@ -1,8 +1,6 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2020
 
-COMPRESSED_PREDICATE = "_P{}"
-
 GENERAL_PREDICATES = [
     # RDF type
     (1, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
@@ -104,9 +102,9 @@ IDS_TO_PREDICATES = dict()
 
 # build compressed general predicates
 for idx, predicate in GENERAL_PREDICATES:
-    id = COMPRESSED_PREDICATE.format(idx)
-    PREDICATES_TO_IDS[predicate] = id
-    IDS_TO_PREDICATES[id] = predicate
+    idc = f"_P{idx}"
+    PREDICATES_TO_IDS[predicate] = idc
+    IDS_TO_PREDICATES[idc] = predicate
 
 
 def predicate_to_id(predicate):
@@ -119,11 +117,11 @@ def predicate_to_id(predicate):
     return predicate
 
 
-def id_to_predicate(id):
+def id_to_predicate(idc):
     """
         Try to convert an unique identifier into a predicate.
         If it is already a decompressed predicate, do nothing.
     """
-    if id in IDS_TO_PREDICATES:
-        return IDS_TO_PREDICATES[id]
-    return id
+    if idc in IDS_TO_PREDICATES:
+        return IDS_TO_PREDICATES[idc]
+    return idc

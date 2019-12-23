@@ -69,7 +69,7 @@ class HDTFileConnector(DatabaseConnector):
     def from_config(config: dict):
         """Build a HDTFileFactory from a config file"""
         if not os.path.isfile(config["file"]):
-            raise Exception("Configuration file not found: {}".format(config["file"]))
+            raise Exception(f"Configuration file not found: {config['file']}")
         mapped = config['mapped'] if 'mapped' in config else True
         indexed = config['indexed'] if 'indexed' in config else True
         return HDTFileConnector(config["file"], mapped=mapped, indexed=indexed)

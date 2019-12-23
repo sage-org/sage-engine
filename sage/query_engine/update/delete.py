@@ -46,7 +46,7 @@ class DeleteOperator(PreemptableIterator):
                 self._inserted[g] += 1
             else:
                 self._inserted[g] = 0
-            return {"?s": s, "?p": p, "?o": o, "?graph": "{}/{}".format(self._server_url, g)}
+            return {"?s": s, "?p": p, "?o": o, "?graph": f"{self._server_url}/{g}"}
         return None
 
     def save(self) -> SavedDeleteData:

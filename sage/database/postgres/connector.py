@@ -16,7 +16,7 @@ def fetch_histograms(cursor, table_name, attribute_name):
     """
         Download PostgreSQL histograms from a given table and attribute
     """
-    base_query = "SELECT null_frac, n_distinct, most_common_vals, most_common_freqs FROM pg_stats WHERE tablename = '{}' AND attname = '{}'".format(table_name, attribute_name)
+    base_query = f"SELECT null_frac, n_distinct, most_common_vals, most_common_freqs FROM pg_stats WHERE tablename = '{table_name}' AND attname = '{attribute_name}'"
     cursor.execute(base_query)
     record = cursor.fetchone()
     null_frac, n_distinct, most_common_vals, most_common_freqs = record
@@ -128,7 +128,7 @@ class PostgresConnector(DatabaseConnector):
         if self._warmup:
             cursor = self._manager.start_transaction()
             # fetch estimated table cardinality
-            cursor.execute("SELECT reltuples AS approximate_row_count FROM pg_class WHERE relname = '{}'".format(self._table_name))
+            cursor.execute(f"SELECT reltuples AS approximate_row_count FROM pg_class WHERE relname = '{self._table_name}'")
             self._avg_row_count = cursor.fetchone()[0]
             # fetch subject histograms
             (null_frac, n_distinct, selectivities, sum_freqs) = fetch_histograms(cursor, self._table_name, 'subject')
@@ -165,7 +165,6 @@ class PostgresConnector(DatabaseConnector):
 
     def start_transaction(self):
         """Start a PostgreSQL transaction"""
-        # print("Process {} called start_transaction".format(os.getpid()))
         self._manager.start_transaction()
 
     def commit_transaction(self):
