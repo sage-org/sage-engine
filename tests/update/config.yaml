@@ -11,8 +11,9 @@ backends:
   connector: MemoryDatabase
   # required parameters used to configure the backend
   required: []
-datasets:
+graphs:
 -
   name: update-test
+  uri: http://localhost:8000/sparql/update-test
   description: Testing dataset
   backend: memory

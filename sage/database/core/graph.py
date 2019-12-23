@@ -11,14 +11,19 @@ from sage.database.db_iterator import DBIterator
 class Graph(object):
     """A RDF Graph with a dedicated backend"""
 
-    def __init__(self, name: str, description: str, connector: DatabaseConnector, quantum=75, max_results=inf, default_queries: List[dict] = list()):
+    def __init__(self, uri: str, name: str, description: str, connector: DatabaseConnector, quantum=75, max_results=inf, default_queries: List[dict] = list()):
         super(Graph, self).__init__()
+        self._uri = uri
         self._name = name
         self._description = description
         self._connector = connector
         self._quantum = quantum
         self._max_results = max_results
         self._example_queries = default_queries
+    
+    @property
+    def uri(self) -> str:
+        return self._uri
 
     @property
     def name(self) -> str:
@@ -86,6 +91,7 @@ class Graph(object):
                 "void": "http://rdfs.org/ns/void#",
                 'sage': 'http://sage.univ-nantes.fr/sage-voc#'
             },
+            "@id": self._uri,
             "@type": "http://schema.org/Dataset",
             "schema:url": url,
             "schema:name": self._name,

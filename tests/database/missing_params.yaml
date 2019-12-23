@@ -9,9 +9,10 @@ backends:
   path: tests.database.custom_backend
   connector: SillyConnector
   required: [ "foo", "bar" ]
-datasets:
+graphs:
 -
   name: foo
+  uri: http://localhost:8000/sparql/foo
   description: A foo dataset
   backend: custom-backend
   foo: moo

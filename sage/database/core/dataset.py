@@ -1,6 +1,6 @@
 # dataset.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Iterable, List, Optional
+from typing import Dict, Iterable, Optional
 
 from sage.database.core.graph import Graph
 from sage.database.statefull.statefull_manager import StatefullManager
@@ -9,7 +9,7 @@ from sage.database.statefull.statefull_manager import StatefullManager
 class Dataset(object):
     """A collection of RDF graphs"""
 
-    def __init__(self, name: str, description: str, graphs: List[Graph], public_url: Optional[str] = None, default_query: Optional[str] = None, analytics=None, stateless=True, statefull_manager: Optional[StatefullManager] = None):
+    def __init__(self, name: str, description: str, graphs: Dict[Graph], public_url: Optional[str] = None, default_query: Optional[str] = None, analytics=None, stateless=True, statefull_manager: Optional[StatefullManager] = None):
         super(Dataset, self).__init__()
         self._name = name
         self._desciption = description

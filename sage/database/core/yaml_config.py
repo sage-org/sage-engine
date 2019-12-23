@@ -85,8 +85,13 @@ def load_config(config_file: str) -> Dataset:
 
     # build all RDF graphs found in the configuration file
     graphs = dict()
-    for g_config in config["datasets"]:
+    if "graphs" not in config:
+        raise SyntaxError("Np RDF graphs found in the configuration file. Please refers to the documentation to see how to declare RDF graphs in a SaGe YAML configuration file.")
+    for g_config in config["graphs"]:
+        if "uri" not in g_config:
+            raise SyntaxError(f"Error: the RDF Graph {g_config} has no URI declared!")
         # load basic information about the graph
+        g_uri = g_config["uri"]
         g_name = g_config["name"] if "name" in g_config else str(uuid4())
         g_description = g_config["description"] if "description" in g_config else f"Unnamed RDF graph with id {g_name}"
         g_quantum = g_config["quota"] if "quota" in g_config else quantum
@@ -100,8 +105,8 @@ def load_config(config_file: str) -> Dataset:
             logging.error(f"Impossible to find the backend with name {g_config['backend']}, declared for the RDF Graph {g_name}")
             continue
 
-        # build the graph and register it
-        graphs[g_name] = Graph(g_name, g_description, g_connector, quantum=g_quantum, max_results=g_max_results, default_queries=g_queries)
+        # build the graph and register it using its URI
+        graphs[g_name] = Graph(g_uri, g_name, g_description, g_connector, quantum=g_quantum, max_results=g_max_results, default_queries=g_queries)
         logging.info(f"RDF Graph '{g_name}' (backend: {g_config['backend']}) successfully loaded")
 
     return Dataset(dataset_name, dataset_description, graphs, public_url=public_url, default_query=default_query, analytics=analytics, stateless=is_stateless, statefull_manager=statefull_manager)
