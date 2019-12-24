@@ -9,7 +9,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://localhost:8000/sparql/watdiv100> a sage:SageDataset ;
+<http://testserver/sparql/watdiv100> a sage:SageDataset ;
     dcterms:description "Sample dataset in HDT format, used for testing" ;
     dcterms:title "watdiv100" ;
     void:distinctObjects 1005832 ;
@@ -36,5 +36,4 @@ WHERE {
     sage:quota 75 ;
     hydra:entrypoint <http://localhost:8000/sparql/watdiv100> ;
     hydra:itemsPerPage 500 ;
-    sd:endpoint <http://localhost:8000/sparql/watdiv100> ;
-    foaf:homepage <http://localhost:8000/sparql/watdiv100> .
+    sd:endpoint <http://localhost:8000/sparql/watdiv100> .
