@@ -1,11 +1,15 @@
 # grpc_server.py
 # Author: Thomas MINIER - MIT License 2017-2020
-import click
-import uvloop
 import signal
 from asyncio import set_event_loop_policy
 from os.path import isfile
+from time import time
+
+import click
+import uvloop
+
 from sage.grpc.grpc_server import get_server
+
 
 def stop_server(server, grace=None):
   """Stop server on a CTRL-C event"""

@@ -32,7 +32,7 @@ def create_bindings(bindings: List[Dict[str, str]]) -> Iterable[BindingSet]:
 class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
 
   def __init__(self, dataset: Dataset):
-    super().__init__()
+    super(SageQueryService).__init__()
     self._dataset = dataset
     self._engine = SageEngine()
   
