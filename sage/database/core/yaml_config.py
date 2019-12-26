@@ -13,25 +13,13 @@ from sage.database.statefull.hashmap_manager import HashMapManager
 
 
 def load_config(config_file: str) -> Dataset:
-    """Load YAML configuration file to build a RDF dataset.
+    """Parse a SaGe configuration file written in YAML and load the corresponding RDF dataset.
 
-    Example config file:
-        # config.yaml
-        name: My LDF server
-        maintainer: chuck Norris <me@gmail.com>
-
-        datasets:
-        -
-            name: DBpedia-2016-04
-            description: DBpedia dataset, version 2016-04
-            backend: hdt-file
-            file: /home/chuck-norris/dbpedia-2016-04.hdt
-        -
-            name: Chuck-Norris-facts
-            description: Best Chuck Norris facts ever
-            backend: rdf-file
-            format: nt
-            file: /home/chuck-norris/facts.nt
+    Args:
+      * config_file: Path to the SaGe configuration file (in YAML format) to load.
+    
+    Returns:
+      A RDF dataset built according to the input configuration file.
     """
     config = load(open(config_file), Loader=FullLoader)
 

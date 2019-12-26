@@ -12,9 +12,14 @@ from sage.database.import_manager import builtin_backends, import_backend
 
 
 def load_config(config_file: str, format="ttl") -> Dataset:
-    """
-        Parse a SaGe configuration file written in RDF
-        and load a set of RDF graphs.
+    """Parse a SaGe configuration file written in RDF and load the corresponding RDF dataset.
+
+    Args:
+      * config_file: Path to the SaGe configuration file (in RDF format) to load.
+      * format: Format of the RDF configuration file (ttl, nt, n3). Defaults to Turtle (ttl).
+    
+    Returns:
+      A RDF dataset built according to the input configuration file.
     """
     # load config usinf rdflib
     graph = RGraph()

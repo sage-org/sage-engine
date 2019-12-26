@@ -9,8 +9,7 @@ from sage.grpc.service_pb2 import SageQuery
 
 
 class SageClient(object):
-  """
-    A SaGe client allows to execute SPARQL queries using a SaGe server deployed with gRPC.
+  """A SaGe client allows to execute SPARQL queries using a SaGe server deployed with gRPC.
 
     Args:
       * url: URL of the SaGe gRPC server.
@@ -52,8 +51,9 @@ class SageClient(object):
       Args:
         * sparql_query: SPARQL query to execute.
         * default_graph_uri: URI of the default RDF Graph to query.
-      Returns:
-        An iterable that yield set of solution mappings
+
+      Yields:
+        Set of solution mappings
 
       Example:
         >>> sparql_query = "SELECT * WHERE { ?s ?p ?o }"
