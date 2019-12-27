@@ -11,32 +11,30 @@ from sage.database.hdt.iterator import HDTIterator
 from datetime import datetime
 
 class HDTFileConnector(DatabaseConnector):
-    """A HDTFileConnector search for RDF triples in a HDT file"""
+    """A HDTFileConnector search for RDF triples in a HDT file.
+    
+    Args:
+      * file: Path to the HDT file.
+      * mapped: True maps the HDT file on disk (faster), False loads everything in memory.
+      * indexed: True if the HDT must be loaded with indexes, False otherwise.
+    """
 
     def __init__(self, file: str, mapped=True, indexed=True):
-        """
-            Constructor.
-            Args:
-                - file ``str`` - Path to the HDT file
-                - mapped ``boolean=False`` ``optional`` - True maps the HDT file (faster), False loads everything in memory
-                - indexed ``boolean=True`` ``optional`` -  True if the HDT must be loaded with indexes, False otherwise
-        """
         super(HDTFileConnector, self).__init__()
         self._hdt = HDTDocument(file, map=mapped, indexed=indexed)
 
     def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[HDTIterator, int]:
-        """
-            Get an iterator over all RDF triples matching a triple pattern.
+        """Get an iterator over all RDF triples matching a triple pattern.
 
-            Args:
-                - subject ``string`` - Subject of the triple pattern
-                - predicate ``string`` - Predicate of the triple pattern
-                - object ``string`` - Object of the triple pattern
-                - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
-                - as_of ``datetime=None`` ``optional`` - Perform all reads against a consistent snapshot represented by a timestamp.
-
-            Returns:
-                A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
+        Args:
+          * subject: Subject of the triple pattern.
+          * predicate: Predicate of the triple pattern.
+          * object: Object of the triple pattern.
+          * last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.
+          * as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.
+          
+        Returns:
+          A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern.
         """
         subject = subject if (subject is not None) and (not subject.startswith('?')) else ""
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else ""
@@ -67,9 +65,18 @@ class HDTFileConnector(DatabaseConnector):
         return self._hdt.nb_objects
 
     def from_config(config: dict):
-        """Build a HDTFileFactory from a config file"""
+        """Build a HDTFileFactory from a configuration object.
+        
+        Args:
+          * config: configuration object. Must contains the 'file' field.
+        
+        Example:
+          >>> config = { "file": "./dbpedia.hdt" }
+          >>> connector = HDTFileConnector.from_config(config)
+          >>> print(f"The HDT file contains {connector.nb_triples} RDF triples")
+        """
         if not os.path.isfile(config["file"]):
-            raise Exception(f"Configuration file not found: {config['file']}")
+            raise Exception(f"HDT file not found: {config['file']}")
         mapped = config['mapped'] if 'mapped' in config else True
         indexed = config['indexed'] if 'indexed' in config else True
         return HDTFileConnector(config["file"], mapped=mapped, indexed=indexed)

@@ -2,6 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 import json
 from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 from uuid import uuid4
 
 from sage.database.db_iterator import DBIterator, EmptyIterator
@@ -12,28 +13,27 @@ from sage.database.postgres.mvcc_queries import (get_delete_query,
                                                  get_start_query)
 
 
-def parse_date(str_date):
-    """Convert a PostgreSQL date into a Python datetime object"""
+def parse_date(str_date: str) -> datetime:
+    """Convert a PostgreSQL date into a Python datetime object."""
     if str_date == 'infinity':
         return datetime.max
     return datetime.strptime(str_date, '%Y-%m-%d %H:%M:%S+%f')
 
 
 class MVCCPostgresIterator(DBIterator):
-    """
-        An MVCCPostgresIterator implements a DBIterator for a triple pattern evaluated using a MVCC-enabled PostgreSQL database.
+    """A MVCCPostgresIterator fetches RDF triples from a versionned PostgreSQL table using batch queries and lazy loading.
 
-        Constructor args:
-            - cursor `psycopg.cursor` - Psycopg cursor used to query the database
-            - start_time `datetime` - Timestamp at which the iterator should read
-            - start_query `str` - Prepared SQL query used to start iteration
-            - start_params `tuple` - SQL params to apply to the `start_query`
-            - table_name `str` - Name of the SQL table to scan
-            - pattern `dict` - Triple pattern evaluated
-            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 500)
+    Args:
+      * cursor: Psycopg cursor used to query the database.
+      * start_time: Timestamp at which the iterator should read.
+      * start_query: Prepared SQL query used to start iteration.
+      * start_params: SQL params to apply to the prepared SQL query.
+      * table_name: Name of the SQL table to scan.
+      * pattern: Triple pattern scanned.
+      * fetch_size: The number of SQL rows/RDF triples to fetch per batch.
     """
 
-    def __init__(self, cursor, start_time, start_query, start_params, table_name, pattern, fetch_size=2000):
+    def __init__(self, cursor, start_time: datetime, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 2000):
         super(MVCCPostgresIterator, self).__init__(pattern)
         self._cursor = cursor
         self._start_time = start_time
@@ -49,7 +49,7 @@ class MVCCPostgresIterator(DBIterator):
         """Destructor"""
         self._cursor.close()
 
-    def last_read(self):
+    def last_read(self) -> str:
         """Return the index ID of the last element read"""
         if not self.has_next():
             return ''
@@ -63,7 +63,7 @@ class MVCCPostgresIterator(DBIterator):
             'ts': self._start_time.isoformat()
         }, separators=(',', ':'))
 
-    def next(self):
+    def next(self) -> Optional[Dict[str, str]]:
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
         if not self.has_next():
             return None
@@ -80,7 +80,7 @@ class MVCCPostgresIterator(DBIterator):
         # to find a matching RDF triple
         return None
 
-    def has_next(self):
+    def has_next(self) -> bool:
         """Return True if there is still results to read, and False otherwise"""
         if len(self._last_reads) == 0:
             self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
@@ -88,35 +88,33 @@ class MVCCPostgresIterator(DBIterator):
 
 
 class MVCCPostgresConnector(PostgresConnector):
-    """
-        A MVCCPostgresConnector search for RDF triples in a PostgreSQL database using a timestamp-based multi-version concurrency control protocol.
+    """A MVCCPostgresConnector search for RDF triples in a PostgreSQL database using a timestamp-based multi-version concurrency control protocol.
 
-        Constructor arguments:
-            - table_name `str`: Name of the SQL table containing RDF data.
-            - dbname `str`: the database name
-            - user `str`: user name used to authenticate
-            - password `str`: password used to authenticate
-            - host `str`: database host address (default to UNIX socket if not provided)
-            - port `int`: connection port number (default to 5432 if not provided)
-            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 2000)
+    Args:
+      * table_name: Name of the SQL table containing RDF data.
+      * dbname: the database name.
+      * user: user name used to authenticate.
+      * password: password used to authenticate.
+      * host: database host address (default to UNIX socket if not provided).
+      * port: connection port number (default to 5432 if not provided).
+      * fetch_size: The number of SQL rows/RDF triples to fetch per batch.
     """
 
-    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=2000):
+    def __init__(self, table_name: str, dbname: str, user: str, password: str, host: str = '', port: int = 5432, fetch_size: int = 2000):
         super(MVCCPostgresConnector, self).__init__(table_name, dbname, user, password, host, port, fetch_size)
 
-    def search(self, subject, predicate, obj, last_read=None, as_of=None):
-        """
-            Get an iterator over all RDF triples matching a triple pattern.
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[MVCCPostgresIterator, int]:
+        """Get an iterator over all RDF triples matching a triple pattern.
 
-            Args:
-                - subject ``string`` - Subject of the triple pattern
-                - predicate ``string`` - Predicate of the triple pattern
-                - obj ``string`` - Object of the triple pattern
-                - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
-                - as_of ``datetime=None`` ``optional`` - Perform all reads against a consistent snapshot represented by a timestamp.
-
-            Returns:
-                A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
+        Args:
+          * subject: Subject of the triple pattern.
+          * predicate: Predicate of the triple pattern.
+          * object: Object of the triple pattern.
+          * last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.
+          * as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.
+          
+        Returns:
+          A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern.
         """
         # do warmup if necessary
         self.open()
@@ -163,21 +161,28 @@ class MVCCPostgresConnector(PostgresConnector):
         card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
-    def from_config(config):
-        """Build a MVCCPostgresConnector from a configuration object"""
-        if 'dbname' not in config or 'user' not in config or 'password' not in config:
-            raise SyntaxError('A valid configuration for a PostgreSQL connector must contains the dbname, user and password fields')
+    def from_config(config: dict):
+        """Build a MVCCPostgresConnector from a configuration object.
+        
+        The configuration object must contains the following fields: 'dbname', 'name', 'user' and 'password'.
+        Optional fields are: 'host', 'port' and 'fetch_size'.
+        """
+        if 'dbname' not in config or 'name' not in config or 'user' not in config or 'password' not in config:
+            raise SyntaxError('A valid configuration for a MVCC-PostgreSQL connector must contains the dbname, name, user and password fields')
 
-        table_name = config['name']
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
         fetch_size = config['fetch_size'] if 'fetch_size' in config else 2000
 
-        return MVCCPostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
+        return MVCCPostgresConnector(config['name'], config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
 
     def insert(self, subject, predicate, obj):
-        """
-            Insert a RDF triple into the RDF Graph.
+        """Insert a RDF triple into the RDF graph.
+        
+        Args:
+          * subject: Subject of the RDF triple.
+          * predicate: Predicate of the RDF triple.
+          * obj: Object of the RDF triple.
         """
         # do warmup if necessary
         self.open()
@@ -188,8 +193,12 @@ class MVCCPostgresConnector(PostgresConnector):
             self._update_cursor.execute(insert_query, (subject, predicate, obj))
 
     def delete(self, subject, predicate, obj):
-        """
-            Delete a RDF triple from the RDF Graph.
+        """Delete a RDF triple from the RDF graph.
+        
+        Args:
+          * subject: Subject of the RDF triple.
+          * predicate: Predicate of the RDF triple.
+          * obj: Object of the RDF triple.
         """
         # do warmup if necessary
         self.open()

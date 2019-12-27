@@ -1,7 +1,9 @@
 # postgre_connector.py
 # Author: Thomas MINIER - MIT License 2017-2020
 import json
+from datetime import datetime
 from math import ceil
+from typing import Dict, List, Optional, Tuple
 from uuid import uuid4
 
 from sage.database.db_connector import DatabaseConnector
@@ -12,9 +14,20 @@ from sage.database.postgres.transaction_manager import TransactionManager
 from sage.database.postgres.utils import id_to_predicate
 
 
-def fetch_histograms(cursor, table_name, attribute_name):
-    """
-        Download PostgreSQL histograms from a given table and attribute
+def fetch_histograms(cursor, table_name: str, attribute_name: str) -> Tuple[int, int, Dict[str, float], int]:
+    """Download PostgreSQL histograms from a given table and attribute.
+
+    Args:
+      * cursor: A psycopg cursor.
+      * table_name: Name of the SQL table from which we should retrieve histograms.
+      * attribute_name: Table attribute from which we should retrieve histograms.
+    
+    Returns:
+      A tuple (`null_frac`, `n_distinct`, `selectivities`, `sum_most_common_freqs`) where:
+      * `null_frac` is the fraction of null values in the histogram.
+      * `n_distinct` is the estimated number of distinct values for this attribute.
+      * `selectivities` is the estimated selectivities of the attribute's values in the table.
+      * `sum_most_common_freqs` is the num of the frequencies of the most common values for this attribute.
     """
     base_query = f"SELECT null_frac, n_distinct, most_common_vals, most_common_freqs FROM pg_stats WHERE tablename = '{table_name}' AND attname = '{attribute_name}'"
     cursor.execute(base_query)
@@ -31,25 +44,33 @@ def fetch_histograms(cursor, table_name, attribute_name):
 
 
 class PostgresIterator(DBIterator):
-    """An PostgresIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file"""
+    """A PostgresIterator fetches RDF triples from a PostgreSQL table using batch queries and lazy loading.
+    
+    Args:
+      * cursor: A psycopg cursor. This cursor must only be used for this iterator, to avoid side-effects.
+      * connection: A psycopg connection.
+      * start_query: Prepared SQL query executed to fetch RDF triples as SQL rows.
+      * start_params: Parameters to use with the prepared SQL query.
+      * pattern: Triple pattern scanned.
+      * fetch_size: The number of SQL rows/RDF triples to fetch per batch.
+    """
 
-    def __init__(self, cursor, connection, start_query, start_params, table_name, pattern, fetch_size=2000):
+    def __init__(self, cursor, connection, start_query: str, start_params: List[str], pattern: Dict[str, str], fetch_size: int = 2000):
         super(PostgresIterator, self).__init__(pattern)
         self._cursor = cursor
         self._connection = connection
         self._current_query = start_query
-        self._table_name = table_name
         self._fetch_size = fetch_size
         # resume query execution with a SQL query
         self._cursor.execute(self._current_query, start_params)
         # always keep the current set of rows buffered inside the iterator
         self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Destructor (close the database cursor)"""
         self._cursor.close()
 
-    def last_read(self):
+    def last_read(self) -> str:
         """Return the index ID of the last element read"""
         if not self.has_next():
             return ''
@@ -60,7 +81,7 @@ class PostgresIterator(DBIterator):
             'o': triple[2]
         }, separators=(',', ':'))
 
-    def next(self):
+    def next(self) -> Optional[Dict[str, str]]:
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
         if not self.has_next():
             return None
@@ -69,28 +90,27 @@ class PostgresIterator(DBIterator):
         triple = triple[0], id_to_predicate(triple[1]), triple[2]
         return triple
 
-    def has_next(self):
-        """Return True if there is still results to read, and False otherwise"""
+    def has_next(self) -> bool:
+        """Return True if there is still results to read, False otherwise"""
         if len(self._last_reads) == 0:
             self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
         return len(self._last_reads) > 0
 
 
 class PostgresConnector(DatabaseConnector):
-    """
-        A PostgresConnector search for RDF triples in a PostgreSQL database.
+    """A PostgresConnector search for RDF triples in a PostgreSQL database.
 
-        Constructor arguments:
-            - table_name `str`: Name of the SQL table containing RDF data.
-            - dbname `str`: the database name
-            - user `str`: user name used to authenticate
-            - password `str`: password used to authenticate
-            - host `str`: database host address (defaults to UNIX socket if not provided)
-            - port `int`: connection port number (defaults to 5432 if not provided)
-            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 2000)
+    Args:
+      * table_name: Name of the SQL table containing RDF data.
+      * dbname: the database name.
+      * user: user name used to authenticate.
+      * password: password used to authenticate.
+      * host: database host address (defaults to UNIX socket if not provided).
+      * port: connection port number (defaults to 5432 if not provided).
+      * fetch_size: The number of SQL rows/RDF triples to fetch per batch (defaults to 2000).
     """
 
-    def __init__(self, table_name, dbname, user, password, host='', port=5432, fetch_size=2000):
+    def __init__(self, table_name: str, dbname: str, user: str, password: str, host: str = '', port: int = 5432, fetch_size: int = 2000):
         super(PostgresConnector, self).__init__()
         self._table_name = table_name
         self._manager = TransactionManager(dbname, user, password, host=host, port=port)
@@ -119,8 +139,8 @@ class PostgresConnector(DatabaseConnector):
             'sum_freqs': 0
         }
 
-    def open(self):
-        """Open the database connection"""
+    def open(self) -> None:
+        """Open the connection to the PostgreSQL database and initialize histograms."""
         if self._manager.is_open():
             self._manager.open_connection()
 
@@ -158,34 +178,33 @@ class PostgresConnector(DatabaseConnector):
             self._manager.commit()
             self._warmup = False
 
-    def close(self):
+    def close(self) -> None:
         """Close the database connection"""
         # commit, then close the cursor and the connection
         self._manager.close_connection()
 
-    def start_transaction(self):
+    def start_transaction(self) -> None:
         """Start a PostgreSQL transaction"""
         self._manager.start_transaction()
 
-    def commit_transaction(self):
+    def commit_transaction(self) -> None:
         """Commit any ongoing transaction"""
         self._manager.commit()
 
-    def abort_transaction(self):
+    def abort_transaction(self) -> None:
         """Abort any ongoing transaction"""
         self._manager.abort()
 
-    def _estimate_cardinality(self, subject, predicate, obj):
-        """
-            Estimate the cardinality of a triple pattern using PostgreSQL histograms.
+    def _estimate_cardinality(self, subject: Optional[str], predicate: Optional[str], obj: Optional[str]) -> int:
+        """Estimate the cardinality of a triple pattern using PostgreSQL histograms.
 
-            Args:
-                - subject ``string`` - Subject of the triple pattern
-                - predicate ``string`` - Predicate of the triple pattern
-                - obj ``string`` - Object of the triple pattern
+        Args:
+          * subject: Subject of the triple pattern.
+          * predicate: Predicate of the triple pattern.
+          * obj: Object of the triple pattern.
 
-            Returns:
-                The estimated cardinality of the triple pattern
+        Returns:
+          The estimated cardinality of the triple pattern.
         """
         subject = subject if (subject is not None) and (not subject.startswith('?')) else None
         predicate = predicate if (predicate is not None) and (not predicate.startswith('?')) else None
@@ -222,19 +241,18 @@ class PostgresConnector(DatabaseConnector):
         cardinality = int(ceil(selectivity * self._avg_row_count))
         return cardinality if cardinality > 0 else 1
 
-    def search(self, subject, predicate, obj, last_read=None, as_of=None):
-        """
-            Get an iterator over all RDF triples matching a triple pattern.
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[PostgresIterator, int]:
+        """Get an iterator over all RDF triples matching a triple pattern.
 
-            Args:
-                - subject ``string`` - Subject of the triple pattern
-                - predicate ``string`` - Predicate of the triple pattern
-                - obj ``string`` - Object of the triple pattern
-                - last_read ``string=None`` ``optional`` -  OFFSET ID used to resume scan
-                - as_of ``datetime=None`` ``optional`` - Perform all reads against a consistent snapshot represented by a timestamp.
-
-            Returns:
-                A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern
+        Args:
+          * subject: Subject of the triple pattern.
+          * predicate: Predicate of the triple pattern.
+          * object: Object of the triple pattern.
+          * last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.
+          * as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.
+          
+        Returns:
+          A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern.
         """
         # do warmup if necessary
         self.open()
@@ -266,25 +284,32 @@ class PostgresConnector(DatabaseConnector):
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name)
 
         # create the iterator to yield the matching RDF triples
-        iterator = PostgresIterator(cursor, self._manager.get_connection(), start_query, start_params, self._table_name, pattern, fetch_size=self._fetch_size)
+        iterator = PostgresIterator(cursor, self._manager.get_connection(), start_query, start_params, pattern, fetch_size=self._fetch_size)
         card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
-    def from_config(config):
-        """Build a PostgresConnector from a configuration object"""
-        if 'dbname' not in config or 'user' not in config or 'password' not in config:
+    def from_config(config: dict):
+        """Build a PostgresConnector from a configuration object.
+        
+        The configuration object must contains the following fields: 'dbname', 'name', 'user' and 'password'.
+        Optional fields are: 'host', 'port' and 'fetch_size'.
+        """
+        if 'dbname' not in config or 'name' not in config or 'user' not in config or 'password' not in config:
             raise SyntaxError('A valid configuration for a PostgreSQL connector must contains the dbname, user and password fields')
 
-        table_name = config['name']
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
         fetch_size = config['fetch_size'] if 'fetch_size' in config else 2000
 
-        return PostgresConnector(table_name, config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
+        return PostgresConnector(config['name'], config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
 
-    def insert(self, subject, predicate, obj):
-        """
-            Insert a RDF triple into the RDF Graph.
+    def insert(self, subject: str, predicate: str, obj: str) -> None:
+        """Insert a RDF triple into the RDF graph.
+        
+        Args:
+          * subject: Subject of the RDF triple.
+          * predicate: Predicate of the RDF triple.
+          * obj: Object of the RDF triple.
         """
         # do warmup if necessary, then start a new transaction
         self.open()
@@ -294,9 +319,13 @@ class PostgresConnector(DatabaseConnector):
             transaction.execute(insert_query, (subject, predicate, obj))
             self._manager.commit()
 
-    def delete(self, subject, predicate, obj):
-        """
-            Delete a RDF triple from the RDF Graph.
+    def delete(self, subject: str, predicate: str, obj: str) -> None:
+        """Delete a RDF triple from the RDF graph.
+        
+        Args:
+          * subject: Subject of the RDF triple.
+          * predicate: Predicate of the RDF triple.
+          * obj: Object of the RDF triple.
         """
         # do warmup if necessary, then start a new transaction
         self.open()

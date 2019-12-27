@@ -1,7 +1,9 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2020
 
-GENERAL_PREDICATES = [
+from typing import Dict, List, Tuple
+
+GENERAL_PREDICATES: List[Tuple[int, str]] = [
     # RDF type
     (1, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
     # RDFS namespace
@@ -97,8 +99,9 @@ GENERAL_PREDICATES = [
     (86, "http://schema.org/maxValue"),
     (87, "http://schema.org/minValue")
 ]
-PREDICATES_TO_IDS = dict()
-IDS_TO_PREDICATES = dict()
+
+PREDICATES_TO_IDS: Dict[str, str] = dict()
+IDS_TO_PREDICATES: Dict[str, str] = dict()
 
 # build compressed general predicates
 for idx, predicate in GENERAL_PREDICATES:
@@ -107,20 +110,28 @@ for idx, predicate in GENERAL_PREDICATES:
     IDS_TO_PREDICATES[idc] = predicate
 
 
-def predicate_to_id(predicate):
-    """
-        Try to convert a predicate to an unique identifier.
-        It will only compress general predicates (rdf:type, rdfs:label, etc), as they are shared in almost every RDF dataset. Otherwise, it will simply returns the predicate value.
+def predicate_to_id(predicate: str) -> str:
+    """Try to convert a predicate to an unique identifier.
+    
+    This method will only compress general predicates (rdf:type, rdfs:label, etc), as they are shared in almost every RDF dataset. Otherwise, it will simply returns the predicate value.
+
+    Argument: A RDF term used as a predicate in a RDF triple.
+
+    Returns: An unique ID that encode the input RDF term.
     """
     if predicate in PREDICATES_TO_IDS:
         return PREDICATES_TO_IDS[predicate]
     return predicate
 
 
-def id_to_predicate(idc):
-    """
-        Try to convert an unique identifier into a predicate.
-        If it is already a decompressed predicate, do nothing.
+def id_to_predicate(idc: str) -> str:
+    """Try to convert an unique identifier into a predicate. 
+    
+    If it is already a decompressed predicate, do nothing.
+
+    Argument: An unique ID that encode a RDF term as a predicate in a RDF triple.
+
+    Returns: A RDF term that corresponds to the input ID.
     """
     if idc in IDS_TO_PREDICATES:
         return IDS_TO_PREDICATES[idc]
