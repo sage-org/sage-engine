@@ -21,7 +21,12 @@ from sage.query_engine.sage_engine import SageEngine
 
 
 def create_bindings(bindings: List[Dict[str, str]]) -> Iterable[BindingSet]:
-  """Create an iterator that converts a set of dict-based bindings to a set of protobuf-based bindings"""
+  """Create an iterator that converts a set of dict-based bindings to a set of protobuf-based bindings.
+  
+  Argument: List of solutions bindings, encoded as dictionaries.
+
+  Yields: Set of solutions bindings, encoded in a Protobuf format.
+  """
   for binding in bindings:
     binding_set = BindingSet()
     for variable, value in binding.items():
@@ -30,6 +35,10 @@ def create_bindings(bindings: List[Dict[str, str]]) -> Iterable[BindingSet]:
 
 
 class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
+  """A SageQueryService implements a gRPC service that evaluates SPARQL queries using Web preemption
+  
+  Argument: RDF dataset hosted by the gRPC server.
+  """
 
   def __init__(self, dataset: Dataset):
     super(SageQueryService).__init__()
@@ -99,7 +108,16 @@ class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
 
 
 def get_server(config_file: str, port=8000, workers=10) -> grpc.Server:
-  """Create a SaGe SPARQL query server powered by GRPC"""
+  """Create a SaGe SPARQL query server powered by gRPC.
+  
+  Args:
+    * config_file: Path to the SaGe configuration file, in YAML format.
+    * port: Host port to run the gRPC server.
+    * workers: Number of thread workers used by the gRPC server.
+  
+  Returns:
+    A SaGe gRPC server built from the input configuration file.
+  """
   logging.basicConfig()
 
   dataset = load_config(config_file)
