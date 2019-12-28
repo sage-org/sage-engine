@@ -39,7 +39,7 @@ class DBIterator(ABC):
 
     @abstractmethod
     def next(self) -> Tuple[str, str, str]:
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
+        """Return the next RDF triple or raise `StopIteration` if there are no more triples to scan"""
         pass
 
     @abstractmethod
@@ -51,14 +51,14 @@ class DBIterator(ABC):
 class EmptyIterator(DBIterator):
     """An iterator that yields nothing and completes immediatly"""
 
-    def last_read(self):
+    def last_read(self) -> str:
         """Return the index ID of the last element read"""
         return ''
 
-    def next(self):
+    def next(self) -> None:
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
         return None
 
-    def has_next(self):
+    def has_next(self) -> bool:
         """Return True if there is still results to read, and False otherwise"""
         return False

@@ -9,17 +9,30 @@ class StatefullManager(ABC):
 
     @abstractmethod
     def get_plan(self, plan_id: str) -> str:
-        """Get a saved plan by ID"""
+        """Get a saved plan by ID.
+        
+        Argument: ID of the saved plan to retrieve.
+
+        Returns: The saved plan corresponding to the input ID.
+        """
         pass
 
     @abstractmethod
     def save_plan(self, id, plan: str) -> None:
-        """Store a saved plan by ID"""
+        """Store a saved plan by ID.
+        
+        Args:
+          * id: Unique ID associated with the saved plan.
+          * plan: Plan to save.
+        """
         pass
 
     @abstractmethod
     def delete_plan(self, plan_id: str) -> None:
-        """Delete a saved plan by ID"""
+        """Delete a saved plan by ID.
+        
+        Argument: ID of the saved plan to delete.
+        """
         pass
 
     @abstractmethod
