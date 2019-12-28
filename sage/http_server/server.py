@@ -18,8 +18,7 @@ import sage.http_server.responses as responses
 from sage.database.core.dataset import Dataset
 from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
-from sage.http_server.utils import (decode_saved_plan, encode_saved_plan,
-                                    format_graph_uri)
+from sage.http_server.utils import decode_saved_plan, encode_saved_plan
 from sage.query_engine.iterators.loader import load
 from sage.query_engine.optimizer.query_parser import parse_query
 from sage.query_engine.sage_engine import SageEngine
@@ -45,13 +44,26 @@ def choose_void_format(mimetypes):
     return "ntriples", "application/n-triples"
 
 async def execute_query(query: str, default_graph_uri: str, next_link: Optional[str], dataset: Dataset) -> Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]:
-    """
-        Execute a query using the SageEngine and returns the appropriate HTTP response.
-        Any failure will results in a rollback/abort on the current query execution.
+    """Execute a query using the SageEngine and returns the appropriate HTTP response.
+    
+    Any failure will results in a rollback/abort on the current query execution.
+
+    Args:
+      * query: SPARQL query to execute.
+      * default_graph_uri: URI of the default RDF graph to use.
+      * next_link: URI to a saved plan. Can be `None` if query execution should starts from the beginning.
+      * dataset: RDF dataset on which the query is executed.
+
+    Returns:
+      A tuple (`bindings`, `next_page`, `stats`) where:
+      * `bindings` is a list of query results.
+      * `next_page` is a link to saved query execution state. Sets to `None` if query execution completed during the time quantum.
+      * `stats` are statistics about query execution.
+    
+    Throws: Any exception that have occured during query execution.
     """
     graph = None
     try:
-        # graph_name = format_graph_uri(default_graph_uri, url)
         if not dataset.has_graph(default_graph_uri):
             raise HTTPException(status_code=404, detail=f"RDF Graph {default_graph_uri} not found on the server.")
         graph = dataset.get_graph(default_graph_uri)
@@ -106,13 +118,24 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             graph.abort()
         raise err
 
-def create_response(mimetypes, bindings, next_page, stats, url):
-    """Create an HTTP response, given a set of mimetypes"""
+def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_page: Optional[str], stats: dict, skol_url: str) -> Response:
+    """Create an HTTP response for the results of SPARQL query execution.
+
+    Args:
+      * mimetypes: mimetypes from the input HTTP request.
+      * bindings: list of query results.
+      * next_link: Link to a SaGe saved plan. Use `None` if there is no one, i.e., the query execution has completed during the quantum.
+      * stats: Statistics about query execution.
+      * skol_url: URL used for the skolemization of blank nodes.
+
+    Returns:
+      An HTTP response built from the input mimetypes and the SPARQL query results.
+    """
     if "application/json" in mimetypes:
-        iterator = responses.raw_json_streaming(bindings, next_page, stats, url)
+        iterator = responses.raw_json_streaming(bindings, next_page, stats, skol_url)
         return StreamingResponse(iterator, media_type="application/json")
     elif "application/sparql-results+json" in mimetypes:
-        iterator = responses.w3c_json_streaming(bindings, next_page, stats, url)
+        iterator = responses.w3c_json_streaming(bindings, next_page, stats, skol_url)
         return StreamingResponse(iterator, media_type="application/json")
     elif "application/xml" in mimetypes or "application/sparql-results+xml" in mimetypes:
         iterator = responses.w3c_xml(bindings, next_page, stats)
@@ -123,8 +146,13 @@ def create_response(mimetypes, bindings, next_page, stats, url):
         "stats": stats
     })
 
-def run_app(config_file: str):
-    """Create the HTTP server, compatible with uvicorn/gunicorn"""
+def run_app(config_file: str) -> FastAPI:
+    """Create the HTTP server, compatible with uvicorn/gunicorn.
+    
+    Argument: SaGe configuration file, in YAML format.
+
+    Returns: The FastAPI HTTP application.
+    """
      # set recursion depth (due to pyparsing issues)
     setrecursionlimit(3000)
 

@@ -11,7 +11,6 @@ from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
 
 from sage.database.core.dataset import Dataset
-from sage.http_server.utils import format_graph_uri
 from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator

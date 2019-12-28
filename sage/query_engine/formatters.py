@@ -37,34 +37,3 @@ def binding_to_json(binding: Dict[str, str]) -> dict:
         if extra_label is not None:
             json_binding[variable][extra_label] = extra_value
     return json_binding
-
-
-def sparql_xml(bindings_list: List[Dict[str, str]]) -> ElementTree.Element:
-    """Formats a set of bindings into SPARQL results in JSON formats."""
-    def convert_binding(b, root):
-        result_node = ElementTree.SubElement(root, "result")
-        for variable, value in b.items():
-            v_name = variable[1:]
-            b_node = ElementTree.SubElement(result_node, "binding", name=v_name)
-            value, type, extra_label, extra_value = get_binding_type(value.strip())
-            if type == "uri":
-                uri_node = ElementTree.SubElement(b_node, "uri")
-                uri_node.text = value
-            elif type == "literal":
-                literal_node = literal_node = ElementTree.SubElement(b_node, "literal")
-                literal_node.text = value
-                if extra_label is not None:
-                    literal_node.set(extra_label, extra_value)
-        return result_node
-
-    vars = list(map(lambda x: x[1:], bindings_list[0].keys()))
-    root = ElementTree.Element("sparql", xmlns="http://www.w3.org/2005/sparql-results#")
-    # build head
-    head = ElementTree.SubElement(root, "head")
-    for variable in vars:
-        ElementTree.SubElement(head, "variable", name=variable)
-    # build results
-    results = ElementTree.SubElement(root, "results")
-    for binding in bindings_list:
-        convert_binding(binding, results)
-    return root
