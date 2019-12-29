@@ -25,6 +25,15 @@ The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org
     pip install -r requirements.txt
     pip install -e .[hdt]
 
+Installing SaGe with the PostgreSQL backend
+--------------------------------------------
+
+The SaGe SPARQL query server can also be installed with a PostgreSQL backend](http://www.rdfhdt.org/).
+
+.. code:: bash
+
+    pip install -e .[postgres]
+
 Getting started
 ===============
 
@@ -40,28 +49,27 @@ syntax <http://yaml.org/>`__.
     maintainer: Chuck Norris
     quota: 75
     maxResults: 500
-    datasets:
+    graphs:
     -
       name: dbpedia-2016
+      uri: http://example.org#dbpedia-2016
       description: DBPedia v2016
       backend: hdt-file
-      file: datasets/dbpedia.2016.hdt
+      file: graphs/dbpedia.2016.hdt
     -
       name: geonames
-      description: Geonames dataset
+      uri: http://example.org#geonames
+      description: Geonames graph
       backend: hdt-file
-      file: datasets/geonames.hdt
+      file: graphs/geonames.hdt
 
 The ``quota`` and ``maxResults`` fields are used to set the maximum
 query execution time and the maximum nuber of results per request,
 respectively.
 
-Each entry in the ``datasets`` field declare a RDF dataset with a name,
+Each entry in the ``graphs`` field declare a RDF graph with a name, URI,
 description, backend and options specific to this backend. Currently,
-only the ``hdt-file`` backend is supported, which allow a Sage server to
-load RDF datasets from `HDT files <http://www.rdfhdt.org/>`__. Sage uses
-`pyHDT <https://github.com/Callidon/pyHDT>`__ to load an query HDT
-files.
+only the ``hdt-file`` and ``postgres`` backends are supported.
 
 Launch a Sage server
 --------------------
