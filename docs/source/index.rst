@@ -30,6 +30,7 @@ or `our issue tracker on github <https://github.com/sage-org/sage-engine/issues>
    :caption: Contents:
 
    installation
+   getting_started
    sage
 
 
