@@ -31,6 +31,8 @@ or `our issue tracker on github <https://github.com/sage-org/sage-engine/issues>
 
    installation
    getting_started
+   config_file
+   postgres
    sage
 
 

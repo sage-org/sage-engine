@@ -16,7 +16,7 @@ is **strongly advised!**
 Installing SaGe with the HDT backend
 ------------------------------------
 
-The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org/) as a backend can be installed as follows:
+The core engine of the SaGe SPARQL query server with `HDT <http://www.rdfhdt.org/>`_ as a backend can be installed as follows:
 
 .. code:: bash
 
@@ -28,7 +28,7 @@ The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org
 Installing SaGe with the PostgreSQL backend
 --------------------------------------------
 
-The SaGe SPARQL query server can also be installed with a PostgreSQL backend](http://www.rdfhdt.org/).
+The SaGe SPARQL query server can also be installed with `PostgreSQL <https://www.postgresql.org/>`_ as a backend.
 
 .. code:: bash
 
