@@ -10,6 +10,7 @@ data/
 .vscode/
 test.hdt.index.v*
 test.ttl.v*
+_build
 
 # frontend related
 node_modules/
