@@ -8,7 +8,6 @@ from typing import Dict, List, Optional, Tuple
 
 from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.protobuf.iterators_pb2 import RootTree
 
@@ -27,9 +26,7 @@ async def executor(plan: PreemptableIterator, queue: Queue, limit: int) -> None:
                 if queue.qsize() >= limit:
                     raise TooManyResults()
                 await loop.tick()
-    except IteratorExhausted:
-        pass
-    except StopIteration:
+    except StopAsyncIteration:
         pass
 
 
@@ -64,6 +61,8 @@ class SageEngine(object):
             await wait_for(executor(plan, queue, limit), timeout=quota)
             # loop.run_until_complete(task)
             query_done = True
+        except StopAsyncIteration:
+            pass
         except asyncTimeoutError:
             pass
         except TooManyResults:

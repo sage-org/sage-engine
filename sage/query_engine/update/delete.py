@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, Tuple
 
 from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.iterators.utils import IteratorExhausted
 from sage.query_engine.protobuf.iterators_pb2 import SavedDeleteData
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 
@@ -36,7 +35,7 @@ class DeleteOperator(PreemptableIterator):
     async def next(self) -> Optional[Dict[str, str]]:
         """Delete one RDF triple from the RDF graph"""
         if not self.has_next():
-            raise IteratorExhausted()
+            raise StopAsyncIteration()
         s, p, o, g = self._quads.pop()
         if self._dataset.has_graph(g):
             self._dataset.get_graph(g).delete(s, p, o)

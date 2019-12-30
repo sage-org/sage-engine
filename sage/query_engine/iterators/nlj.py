@@ -6,9 +6,8 @@ from typing import Dict, Optional
 from sage.database.core.graph import Graph
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.scan import ScanIterator
-from sage.query_engine.iterators.utils import (EmptyIterator,
-                                               IteratorExhausted,
-                                               apply_bindings, tuple_to_triple)
+from sage.query_engine.iterators.utils import (EmptyIterator, find_in_mappings,
+                                               tuple_to_triple)
 from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.protobuf.iterators_pb2 import (SavedIndexJoinIterator,
                                                       TriplePattern)
@@ -16,15 +15,15 @@ from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 
 
 class IndexJoinIterator(PreemptableIterator):
-    """A IndexJoinIterator implements an Index Join using the iterator paradigm.
+    """A IndexJoinIterator implements an Index Loop join in a pipeline of iterators.
 
     Args:
-        - source :class:`.PreemptableIterator` - The outer relation of the join: an iterator that yields solution mappings.
-        - innerTriple - The inner relation, i.e., a triple pattern.
-        - graph - The document scanned by inner loops.
-        - currentBinding - A set of solution mappings used to resume join processing.
-        - last_read - An offset ID used to resume processing of an inner loop.
-        - as_of - Perform all reads against a consistent snapshot represented by a timestamp.
+      * source: Previous iterator in the pipeline, i.e., the outer relation of the join
+      * innerTriple: The inner relation, i.e., a triple pattern.
+      * graph: The RDF Graph on which the join is evaluated.
+      * currentBinding: A set of solution mappings used to resume join processing.
+      * last_read: An offset ID used to resume processing of an inner loop.
+      * as_of: Perform all reads against a consistent snapshot represented by a timestamp.
     """
 
     def __init__(self, source: PreemptableIterator, innerTriple: Dict[str, str], graph: Graph, currentBinding: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, as_of: Optional[datetime] = None):
@@ -43,39 +42,54 @@ class IndexJoinIterator(PreemptableIterator):
         return f"<IndexJoinIterator ({self._source} JOIN {{ {self._innerTriple['subject']} {self._innerTriple['predicate']} {self._innerTriple['object']} }})>"
 
     def serialized_name(self) -> str:
+        """Get the name of the iterator, as used in the plan serialization protocol"""
         return "join"
 
-    @property
-    def currentBinding(self) -> Dict[str, str]:
-        return self._currentBinding
-
-    @property
-    def iterOffset(self) -> str:
-        return self._last_read
-
     def has_next(self) -> bool:
+        """Return True if the iterator has more item to yield"""
         return self._source.has_next() or (self._currentIter is not None and self._currentIter.has_next())
 
     def _initInnerLoop(self, triple: Dict[str, str], mappings: Optional[Dict[str, str]], last_read: Optional[str] = None) -> PreemptableIterator:
+        """Create an iterator to evaluates an inner loop in the Index Loop join algorithm.
+        
+        Args:
+          * triple: Triple pattern to join with.
+          * mappings: Input solution mappings for the join.
+          * last_read: An offset ID used to resume processing of an inner loop.
+        
+        Returns:
+          An iterator used to evaluate the inner loop.
+        """
         if mappings is None:
             return EmptyIterator(triple)
-        (s, p, o) = (apply_bindings(triple['subject'], mappings), apply_bindings(triple['predicate'], mappings), apply_bindings(triple['object'], mappings))
+        (s, p, o) = (find_in_mappings(triple['subject'], mappings), find_in_mappings(triple['predicate'], mappings), find_in_mappings(triple['object'], mappings))
         iterator, card = self._graph.search(s, p, o, last_read=last_read, as_of=self._start_timestamp)
         if card == 0:
             return None
         return ScanIterator(iterator, tuple_to_triple(s, p, o), card)
 
     async def _innerLoop(self) -> Optional[Dict[str, str]]:
-        """Execute one loop of the inner loop"""
+        """Execute one set of the inner loop.
+        
+        Returns: A set of solution mappings, or `None` if none was produced during this call.
+        """
         mu = await self._currentIter.next()
         if mu is None:
             return None
         return {**self._currentBinding, **mu}
 
     async def next(self) -> Optional[Dict[str, str]]:
-        """Get the next element from the join"""
+        """Get the next item from the iterator, following the iterator protocol.
+
+        This function may contains `non interruptible` clauses which must 
+        be atomically evaluated before preemption occurs.
+
+        Returns: A set of solution mappings, or `None` if none was produced during this call.
+
+        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
+        """
         if not self.has_next():
-            raise IteratorExhausted()
+            raise StopAsyncIteration()
         with PreemptiveLoop() as loop:
             while self._currentIter is None or (not self._currentIter.has_next()):
                 self._currentBinding = await self._source.next()
@@ -84,7 +98,7 @@ class IndexJoinIterator(PreemptableIterator):
         return await self._innerLoop()
 
     def save(self) -> SavedIndexJoinIterator:
-        """Save the operator using protobuf"""
+        """Save and serialize the iterator as a Protobuf message"""
         saved_join = SavedIndexJoinIterator()
         # save source operator
         source_field = self._source.serialized_name() + '_source'

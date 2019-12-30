@@ -9,15 +9,19 @@ class PreemptableIterator(ABC):
 
     @abstractmethod
     def serialized_name(self) -> str:
-        """Get the name of the operator when serialized"""
+        """Get the name of the iterator, as used in the plan serialization protocol"""
         pass
 
     @abstractmethod
     async def next(self) -> Optional[Dict[str, str]]:
-        """
-        Get the next item from the iterator, following the iterator protocol.
-        Raise `StopIteration` is the iterator cannot produce more items.
-        Warning: this function may contains `non interruptible` clauses.
+        """Get the next item from the iterator, following the iterator protocol.
+
+        This function may contains `non interruptible` clauses which must 
+        be atomically evaluated before preemption occurs.
+
+        Returns: A set of solution mappings, or `None` if none was produced during this call.
+
+        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
         """
         pass
 
@@ -28,5 +32,5 @@ class PreemptableIterator(ABC):
 
     @abstractmethod
     def save(self) -> Any:
-        """Save and serialize the iterator as a machine-readable format"""
+        """Save and serialize the iterator as a Protobuf message"""
         pass

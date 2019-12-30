@@ -4,19 +4,20 @@ from typing import Dict, Optional
 
 from sage.database.db_iterator import DBIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.iterators.utils import (IteratorExhausted, selection,
-                                               vars_positions)
+from sage.query_engine.iterators.utils import selection, vars_positions
 from sage.query_engine.protobuf.iterators_pb2 import (SavedScanIterator,
                                                       TriplePattern)
 
 
 class ScanIterator(PreemptableIterator):
-    """A ScanIterator evaluates a triple pattern over a RDF dataset. It yields solution mappings created from RDF triples matching the triple pattern.
+    """A ScanIterator evaluates a triple pattern over a RDF graph.
 
-    Constructor args:
-        - source - An HDT iterator that yields RDF triple in string format.
-        - triple - The triple pattern corresponding to the source iterator.
-        - cardinality - The cardinality of the triple pattern.
+    It can be used as the starting iterator in a pipeline of iterators.
+
+    Args:
+      * source: A DBIterator that yields RDF triple.
+      * triple: The triple pattern corresponding to the source iterator.
+      * cardinality: The cardinality of the triple pattern.
     """
 
     def __init__(self, source: DBIterator, triple: Dict[str, str], cardinality: int = 0):
@@ -33,34 +34,35 @@ class ScanIterator(PreemptableIterator):
         return f"<ScanIterator ({self._triple['subject']} {self._triple['predicate']} {self._triple['object']})>"
 
     def serialized_name(self):
+        """Get the name of the iterator, as used in the plan serialization protocol"""
         return "scan"
-
-    @property
-    def nb_reads(self) -> int:
-        return self._source.nb_reads
-
-    @property
-    def offset(self) -> int:
-        return self._source.offset
-
+    
     def last_read(self) -> str:
-        """Return the index ID of the last element read"""
         return self._source.last_read()
 
     def has_next(self) -> bool:
+        """Return True if the iterator has more item to yield"""
         return self._source.has_next()
 
     async def next(self) -> Optional[Dict[str, str]]:
-        """Scan the relation and return the next set of solution mappings"""
+        """Get the next item from the iterator, following the iterator protocol.
+
+        This function may contains `non interruptible` clauses which must 
+        be atomically evaluated before preemption occurs.
+
+        Returns: A set of solution mappings, or `None` if none was produced during this call.
+
+        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
+        """
         if not self.has_next():
-            raise IteratorExhausted()
+            raise StopAsyncIteration()
         triple = next(self._source)
         if triple is None:
             return None
         return selection(triple, self._variables)
 
     def save(self) -> SavedScanIterator:
-        """Save the operator using protocol buffers"""
+        """Save and serialize the iterator as a Protobuf message"""
         saved_scan = SavedScanIterator()
         triple = TriplePattern()
         triple.subject = self._triple['subject']
