@@ -14,12 +14,20 @@ from sage.query_engine.protobuf.iterators_pb2 import RootTree
 ExecutionResults = Tuple[List[Dict[str, str]], Optional[RootTree], bool, Optional[str]]
 
 
-async def executor(plan: PreemptableIterator, queue: Queue, limit: int) -> None:
-    """Executor used to evaluated a plan under a time quota"""
+async def executor(pipeline: PreemptableIterator, queue: Queue, limit: int) -> None:
+    """Execute a pipeline of iterator under a time quantum.
+    
+    Args:
+      * pipeline: Root of the pipeline of iterator.
+      * queue: Async queue used to store query results.
+      * limit: Maximum number of query results to fetch from the pipeline.
+    
+    Throws: Any exception raised during query execution.
+    """
     try:
         with PreemptiveLoop() as loop:
-            while plan.has_next():
-                value = await plan.next()
+            while pipeline.has_next():
+                value = await pipeline.next()
                 # discard null values
                 if value is not None:
                     await queue.put(value)
@@ -36,20 +44,20 @@ class SageEngine(object):
     def __init__(self):
         super(SageEngine, self).__init__()
 
-    async def execute(self, plan: PreemptableIterator, quota: int, limit=inf) -> ExecutionResults:
-        """
-            Execute a preemptable physical query execution plan under a time quota.
+    async def execute(self, plan: PreemptableIterator, quantum: int, limit=inf) -> ExecutionResults:
+        """Execute a preemptable physical query execution plan under a time quantum.
 
-            Args:
-                - plan :class:`.PreemptableIterator` - The root of the plan
-                - quota ``float`` - The time quota used for query execution
+        Args:
+          * plan: Root of the pipeline of iterator.
+          * quantum: Time quantum used to execute the query.
 
-            Returns:
-                A tuple (``results``, ``saved_plan``, ``is_done``, ``abort_reason``) where:
-                - ``results`` is a list of solution mappings found during query execution
-                - ``saved_plan`` is the state of the plan saved using protocol-buffers
-                - ``is_done`` is True when the plan has completed query evalution, False otherwise
-                - ``abort_reason`` is True if the query was aborted due a to concurrency control issue
+        Returns: A tuple (``results``, ``saved_plan``, ``is_done``, ``abort_reason``) where:
+          * ``results`` is a list of solution mappings found during query execution
+          * ``saved_plan`` is the state of the plan saved using protocol-buffers
+          * ``is_done`` is True when the plan has completed query evalution, False otherwise
+          * ``abort_reason`` is True if the query was aborted due a to concurrency control issue
+        
+        Throws: Any exception raised during query execution.
         """
         results: List[Dict[str, str]] = list()
         queue = Queue()
@@ -58,7 +66,7 @@ class SageEngine(object):
         root = None
         abort_reason = None
         try:
-            await wait_for(executor(plan, queue, limit), timeout=quota)
+            await wait_for(executor(plan, queue, limit), timeout=quantum)
             # loop.run_until_complete(task)
             query_done = True
         except StopAsyncIteration:

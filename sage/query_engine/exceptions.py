@@ -3,18 +3,13 @@
 
 
 class DeleteInsertConflict(Exception):
-    """
-        Exception raised when...
-    """
+    """Raised when a conflict happended during the serialization of a transaction"""
     pass
 
 class TooManyResults(Exception):
-    """
-        Exception raised when the max. number of results for a query execution
-        has been exceeded
-    """
+    """Raised when the maximum number of results for a query execution has been exceeded"""
     pass
 
 class UnsupportedSPARQL(Exception):
-    """Thrown when a SPARQL feature is not supported by the Sage query engine"""
+    """Raised when a SPARQL feature is not supported by the Sage query engine"""
     pass

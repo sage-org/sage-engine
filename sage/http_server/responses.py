@@ -4,10 +4,47 @@ from json import dumps
 from typing import Dict, Iterable, List, Optional, Tuple
 from xml.etree import ElementTree
 
-from sage.http_server.protobuf.sage_response_pb2 import (Binding, BindingBag,
-                                                         SageResponse,
-                                                         SageStatistics)
-from sage.query_engine.formatters import binding_to_json, get_binding_type
+
+def analyze_term(value: str) -> Tuple[str, str, Optional[str], Optional[str]]:
+    """Analyze a RDF term and extract various information about it.
+
+    Argument: The RDF term to analyze.
+
+    Returns: A tuple (`value`, `type`, `extra_label`, `extra_value`) where:
+      * `value` is the term value.
+      * `type` is the type of the term (literal or uri).
+      * `extra_label` is the type of an extra element for this term (datatype or xml:lang).
+      * `extra_value` is the value of an extra element for this term.
+    
+    Example:
+      >>> analyze_term("<http://example.org#Anna>")
+      ("<http://example.org#Anna>", "uri", None, None)
+      >>> analyze_term('"Anna"')
+      ('"Anna"', "literal", None, None)
+      >>> analyze_term('"Anna"@en')
+      ('"Anna"', "literal", "xml:lang", "en")
+      >>> analyze_term('"Anna"^^<http://datatype.org#string>')
+      ('"Anna"', "literal", "datatype", "<http://datatype.org#string>")
+    """
+    # literal case
+    if value.startswith("\""):
+        extra_label, extra_value = None, None
+        if "\"^^<http" in value:
+            index = value.rfind("\"^^<http")
+            extra_label, extra_value = "datatype", value[index + 4:len(value) - 1]
+            value = value[0:index + 1]
+        elif "\"^^http" in value:
+            index = value.rfind("\"^^http")
+            extra_label, extra_value = "datatype", value[index + 3:]
+            value = value[0:index + 1]
+        elif "\"@" in value:
+            index = value.rfind("\"@")
+            extra_label, extra_value = "xml:lang", value[index + 2:]
+            value = value[0:index + 1]
+        return value[1:len(value) - 1], "literal", extra_label, extra_value
+    else:
+        # as the dataset is blank-node free, all other values are uris
+        return value, "uri", None, None
 
 
 def stream_json_list(iterator: Iterable[Dict[str, str]]) -> Iterable[str]:
@@ -28,28 +65,6 @@ def stream_json_list(iterator: Iterable[Dict[str, str]]) -> Iterable[str]:
     except StopIteration:
         # StopIteration here means the length was zero, so yield a valid releases doc and stop
         pass
-
-
-def protobuf(bindings, next_page, stats):
-    sageResponse = SageResponse()
-    sageResponse.hasNext = next_page is not None
-    if next_page is not None:
-        sageResponse.next = next_page
-    # register bindings
-    for binding in bindings:
-        bag = BindingBag()
-        for k, v in binding:
-            b = Binding()
-            b.variable = v
-            b.value = v
-            bag.bindings.append(b)
-        sageResponse.bindings.append(bag)
-    # register statistics
-    stats = SageStatistics()
-    stats.importTime = stats["import"]
-    stats.exportTime = stats["export"]
-    sageResponse.stats.CopyFrom(stats)
-    return sageResponse.SerializeToString()
 
 
 def skolemize_one(bnode: str, url: str) -> str:
@@ -96,6 +111,25 @@ def ntriples_streaming(triples: Iterable[Tuple[str, str, str]]) -> Iterable[str]
         pred = f"<{p}>"
         obj = f"<{o}>" if not o.startswith("\"") else o
         yield f"{subj} {pred} {obj} .\n"
+
+
+def binding_to_json(binding: Dict[str, str]) -> dict:
+    """Format a set of solutions bindings in the W3C SPARQL JSON format.
+    
+    Argument: A set of solution bindings.
+
+    Returns: The input set of solution bindings, encoded in the W3C SPARQL JSON format.
+    """
+    json_binding = dict()
+    for variable, value in binding.items():
+        variable = variable[1:]
+        json_binding[variable] = dict()
+        value, type, extra_label, extra_value = analyze_term(value.strip())
+        json_binding[variable]["value"] = value
+        json_binding[variable]["type"] = type
+        if extra_label is not None:
+            json_binding[variable][extra_label] = extra_value
+    return json_binding
 
 
 def w3c_json_streaming(bindings: Iterable[Dict[str, str]], next_link: Optional[str], stats: dict, skol_url: str) -> Iterable[str]:
@@ -163,7 +197,7 @@ def bindings_to_w3c_xml(bindings: Iterable[Dict[str, str]], skol_url: str) -> El
         for variable, value in b.items():
             v_name = variable[1:]
             b_node = ElementTree.SubElement(result_node, "binding", name=v_name)
-            value, type, extra_label, extra_value = get_binding_type(value.strip())
+            value, type, extra_label, extra_value = analyze_term(value.strip())
             if type == "uri":
                 uri_node = ElementTree.SubElement(b_node, "uri")
                 uri_node.text = value
