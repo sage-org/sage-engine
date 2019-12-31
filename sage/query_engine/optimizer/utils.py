@@ -4,7 +4,7 @@ from typing import Dict, List, Set, Tuple
 
 
 def get_vars(triple: Dict[str, str]) -> Set[str]:
-    """Get variables in a triple pattern"""
+    """Get SPARQL variables in a triple pattern"""
     return set([v for k, v in triple.items() if v.startswith('?')])
 
 
@@ -20,8 +20,7 @@ def find_connected_pattern(variables: List[str], triples: List[Dict[str, str]]) 
 
 
 def equality_variables(subject: str, predicate: str, obj: str) -> Tuple[str, Tuple[str, str, str]]:
-    """
-        Find all variables from triple pattern with the same name, and then returns the equality expression + the triple pattern used to evaluate correctly the pattern.
+    """Find all variables from triple pattern with the same name, and then returns the equality expression + the triple pattern used to evaluate correctly the pattern.
     """
     if subject == predicate:
         return f"{subject} = {predicate + '__2'}", (subject, predicate + '__2', obj), ""

@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import pyparsing
 from pyparsing import ParseException
@@ -23,6 +23,7 @@ from sage.query_engine.update.insert import InsertOperator
 from sage.query_engine.update.serializable import SerializableUpdate
 from sage.query_engine.update.update_sequence import UpdateSequenceOperator
 
+# enable Packrat optimization for the rdflib SPARQL parser
 pyparsing.ParserElement.enablePackrat()
 
 
@@ -33,8 +34,16 @@ class ConsistencyLevel(Enum):
     ATOMIC_PER_QUANTUM = 3
 
 
-def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> List[Dict[str, str]]:
-    """Using a set of RDF graphs, performs data localization of a set of RDF triples"""
+def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> Iterable[Dict[str, str]]:
+    """Performs data localization of a set of triple patterns.
+    
+    Args:
+      * triples: Triple patterns to localize.
+      * graphs: List of RDF graphs URIs used for data localization.
+    
+    Yields:
+      The localized triple patterns.
+    """
     for t in triples:
         s, p, o = format_term(t[0]), format_term(t[1]), format_term(t[2])
         for graph in graphs:
@@ -47,7 +56,12 @@ def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> List[D
 
 
 def format_term(term: Union[BNode,Literal,URIRef,Variable]) -> str:
-    """Convert a rdflib RDF Term into the format used by SaGe"""
+    """Convert a rdflib RDF Term into the format used by SaGe.
+    
+    Argument: The rdflib RDF Term to convert.
+
+    Returns: The RDF term in Sage text format.
+    """
     if type(term) is URIRef:
         return str(term)
     elif type(term) is BNode:
@@ -57,7 +71,15 @@ def format_term(term: Union[BNode,Literal,URIRef,Variable]) -> str:
 
 
 def get_triples_from_graph(node: dict, current_graphs: List[str]) -> List[Dict[str, str]]:
-    """Fetch triples in a BGP or a BGP nested in a GRAPH clause"""
+    """Collect triples in a BGP or a BGP nested in a GRAPH clause.
+    
+    Args:
+      * node: Node of the logical query execution plan.
+      * current_graphs: List of RDF graphs URIs.
+    
+    Returns:
+      The list of localized triple patterns found in the input node.
+    """
     if node.name == 'Graph' and node.p.name == 'BGP':
         graph_uri = format_term(node.term)
         return list(localize_triples(node.p.triples, [graph_uri]))
@@ -66,21 +88,34 @@ def get_triples_from_graph(node: dict, current_graphs: List[str]) -> List[Dict[s
     else:
         raise UnsupportedSPARQL('Unsupported SPARQL Feature: a Sage engine can only perform joins between Graphs and BGPs')
 
-def get_quads_from_update(operation: dict, default_graph: str) -> List[Tuple[str, str, str, str]]:
-    """Get all quads from a SPARQL update operation (Delete or Insert)"""
+def get_quads_from_update(node: dict, default_graph: str) -> List[Tuple[str, str, str, str]]:
+    """Get all quads from a SPARQL update operation (Delete or Insert).
+    
+    Args:
+      * node: Node of the logical query execution plan.
+      * default_graph: URI of the default RDF graph.
+
+    Returns:
+      The list of all N-Quads found in the input node.
+    """
     quads = list()
     # first, gell all regular RDF triples, localized on the default RDF graph
-    if operation.triples is not None:
-        quads += [(format_term(s), format_term(p), format_term(o), default_graph) for s, p, o in operation.triples]
+    if node.triples is not None:
+        quads += [(format_term(s), format_term(p), format_term(o), default_graph) for s, p, o in node.triples]
     # then, add RDF quads from all GRAPH clauses
-    if operation.quads is not None:
-        for g, triples in operation.quads.items():
+    if node.quads is not None:
+        for g, triples in node.quads.items():
             if len(triples) > 0:
                 quads += [(format_term(s), format_term(p), format_term(o), format_term(g)) for s, p, o in triples]
     return quads
 
 def parse_filter_expr(expr: dict) -> str:
-    """Stringify a rdflib Filter expression"""
+    """Parse a rdflib SPARQL FILTER expression into a string representation.
+    
+    Argument: SPARQL FILTER expression in rdflib format.
+
+    Returns: The SPARQL FILTER expression in string format.
+    """
     if not hasattr(expr, 'name'):
         return format_term(expr)
     else:
@@ -105,7 +140,21 @@ def parse_filter_expr(expr: dict) -> str:
 
 
 def parse_query(query: str, dataset: Dataset, default_graph: str) -> Tuple[PreemptableIterator, dict]:
-    """Parse a regular SPARQL query into a query execution plan"""
+    """Parse a read-only SPARQL query into a physical query execution plan.
+
+    For parsing SPARQL UPDATE query, please refers to the `parse_update` method.
+    
+    Args:
+      * query: SPARQL query to parse.
+      * dataset: RDF dataset on which the query is executed.
+      * default_graph: URI of the default graph.
+    
+    Returns: A tuple (`iterator`, `cardinalities`) where:
+      * `iterator` is the root of a pipeline of iterators used to execute the query.
+      * `cardinalities` is the list of estimated cardinalities of all triple patterns in the query.
+
+    Throws: `UnsupportedSPARQL` is the SPARQL query contains features not supported by the SaGe query engine.
+    """
     # transaction timestamp
     start_timestamp = datetime.now()
     # rdflib has no tool for parsing both read and update query,
@@ -120,14 +169,18 @@ def parse_query(query: str, dataset: Dataset, default_graph: str) -> Tuple[Preem
 
 
 def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], cardinalities: dict, as_of: Optional[datetime] = None) -> PreemptableIterator:
-    """
-        Recursively parse node in the query logical plan to build a preemptable physical query execution plan.
+    """Recursively parse node in the query logical plan to build a preemptable physical query execution plan.
 
-        Args:
-            * node - Node of the logical plan to parse (in rdflib format)
-            * dataset - RDF dataset used to execute the query
-            * current_graphs - List of IRI of the current RDF graph queried
-            * cardinalities - Map<triple,integer> used to track triple patterns cardinalities
+    Args:
+      * node: Node of the logical plan to parse (in rdflib format).
+      * dataset: RDF dataset used to execute the query.
+      * current_graphs: List of IRI of the current RDF graphs queried.
+      * cardinalities: A dict used to track triple patterns cardinalities.
+      * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
+    
+    Returns: An iterator used to evaluate the input node.
+
+    Throws: `UnsupportedSPARQL` is the SPARQL query contains features not supported by the SaGe query engine.
     """
     if node.name == 'SelectQuery':
         # in case of a FROM clause, set the new default graphs used
@@ -166,8 +219,21 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], ca
 
 
 def parse_update(query: dict, dataset: Dataset, default_graph: str, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, dict]:
-    """
-        Parse a SPARQL INSERT DATA or DELETE DATA query, and returns a preemptable physical query execution plan to execute it.
+    """Parse a SPARQL UPDATE query into a physical query execution plan.
+
+    For parsing classic SPARQL query, please refers to the `parse_query` method.
+    
+    Args:
+      * query: SPARQL query to parse.
+      * dataset: RDF dataset on which the query is executed.
+      * default_graph: URI of the default graph.
+      * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
+    
+    Returns: A tuple (`iterator`, `cardinalities`) where:
+      * `iterator` is the root of a pipeline of iterators used to execute the query.
+      * `cardinalities` is the list of estimated cardinalities of all triple patterns in the query.
+    
+    Throws: `UnsupportedSPARQL` is the SPARQL query contains features not supported by the SaGe query engine.
     """
     # TODO change that, only used for testing
     consistency_level = "serializable"
