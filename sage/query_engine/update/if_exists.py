@@ -8,9 +8,14 @@ from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
 
 class IfExistsOperator(PreemptableIterator):
-    """
-        A IfExistsOperator checks if all N-Quads in a set exist in the database.
-        It is used to provide the "serializability per solution group" consistency level.
+    """An IfExistsOperator checks if all N-Quads in a set exist in the database.
+    
+    It is used to provide the "serializability per solution group" consistency level.
+
+    Args:
+      * quads: RDF quads to validate.
+      * dataset: RDF dataset.
+      * start_time: A timestamp used to perform all reads against a consistent version of the dataset.
     """
 
     def __init__(self, quads: List[Dict[str, str]], dataset: Dataset, start_time: datetime):
@@ -29,15 +34,26 @@ class IfExistsOperator(PreemptableIterator):
         return self._found_missing
 
     def serialized_name(self) -> str:
+        """Get the name of the iterator, as used in the plan serialization protocol"""
         return "ifexists"
 
     def has_next(self) -> bool:
+        """Return True if the iterator has more quads to validate"""
         return (not self._found_missing) and len(self._quads) > 0
 
     async def next(self) -> Optional[Dict[str, str]]:
-        """Check if the next n-quad exists in the dataset."""
+        """Validate the next quad using the RDF dataset.
+
+        This function works in an iterator fashion, so it can be used in a pipeline of iterators.
+        It may also contains `non interruptible` clauses which must 
+        be atomically evaluated before preemption occurs.
+
+        Returns: always `None` 
+
+        Throws: `StopAsyncIteration` if the iterator has no more quads to validate.
+        """
         if not self.has_next():
-            raise StopIteration()
+            raise StopAsyncIteration()
         triple = self._quads.pop()
         if self._dataset.has_graph(triple['graph']):
             try:

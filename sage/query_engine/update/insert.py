@@ -9,11 +9,11 @@ from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 
 
 class InsertOperator(PreemptableIterator):
-    """A InsertOperator inserts RDF triples into a RDF dataset.
+    """A DeleteOperator inserts RDF triples into a RDF dataset.
 
-    Constructor args:
-        - quads `list`: List of RDF quads (subject, predicate, object, graph_uri) to insert into the graph
-        - dataset :class:`sage.database.core.Dataset`: RDF dataset
+    Args:
+      * quads: List of RDF quads to insert into the RDF dataset.
+      * dataset: RDF dataset
     """
 
     def __init__(self, quads: List[Tuple[str, str, str, str]], dataset: Dataset):
@@ -27,13 +27,24 @@ class InsertOperator(PreemptableIterator):
         return f"<InsertOperator quads={self._quads}>"
 
     def serialized_name(self) -> str:
+        """Get the name of the iterator, as used in the plan serialization protocol"""
         return "insert"
 
     def has_next(self) -> bool:
+        """Return True if the iterator has more quads to insert"""
         return len(self._quads) > 0
 
     async def next(self) -> Optional[Dict[str, str]]:
-        """Insert one RDF triple into the RDF dataset"""
+        """Insert the next quad into the RDF dataset.
+
+        This function works in an iterator fashion, so it can be used in a pipeline of iterators.
+        It may also contains `non interruptible` clauses which must 
+        be atomically evaluated before preemption occurs.
+
+        Returns: The quad if it was successfully inserted, otwherise it returns `None`. 
+
+        Throws: `StopAsyncIteration` if the iterator has no more quads to insert.
+        """
         if not self.has_next():
             raise StopAsyncIteration()
         s, p, o, g = self._quads.pop()
@@ -48,7 +59,7 @@ class InsertOperator(PreemptableIterator):
         return None
 
     def save(self) -> SavedInsertData:
-        """Save the operator using protocol buffers"""
+        """Save and serialize the iterator as a Protobuf message"""
         saved = SavedInsertData()
         pyDict_to_protoDict(self._inserted, saved.nb_inserted)
         return saved

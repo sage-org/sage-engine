@@ -11,9 +11,9 @@ from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 class DeleteOperator(PreemptableIterator):
     """A DeleteOperator deletes RDF triples from a RDF dataset.
 
-    Constructor args:
-        - quads `list`: List of RDF quads (subject, predicate, object, graph_uri) to insert into the graph
-        - dataset :class:`sage.database.core.Dataset`: RDF dataset
+    Args:
+      * quads: List of RDF quads to delete from the RDF dataset.
+      * dataset: RDF dataset
     """
 
     def __init__(self, quads: List[Tuple[str, str, str, str]], dataset: Dataset):
@@ -27,13 +27,24 @@ class DeleteOperator(PreemptableIterator):
         return f"<DeleteOperator quads={self._quads}>"
 
     def serialized_name(self) -> str:
+        """Get the name of the iterator, as used in the plan serialization protocol"""
         return "delete"
 
     def has_next(self) -> bool:
+        """Return True if the iterator has more quads to delete"""
         return len(self._quads) > 0
 
     async def next(self) -> Optional[Dict[str, str]]:
-        """Delete one RDF triple from the RDF graph"""
+        """Delete the next quad from the RDF dataset.
+
+        This function works in an iterator fashion, so it can be used in a pipeline of iterators.
+        It may also contains `non interruptible` clauses which must 
+        be atomically evaluated before preemption occurs.
+
+        Returns: The quad if it was successfully deleted, otwherise it returns `None`. 
+
+        Throws: ``StopAsyncIteration` if the iterator has no more quads to delete.
+        """
         if not self.has_next():
             raise StopAsyncIteration()
         s, p, o, g = self._quads.pop()
@@ -48,7 +59,7 @@ class DeleteOperator(PreemptableIterator):
         return None
 
     def save(self) -> SavedDeleteData:
-        """Save the operator using protocol buffers"""
+        """Save and serialize the iterator as a Protobuf message"""
         saved = SavedDeleteData()
         pyDict_to_protoDict(self._inserted, saved.nb_inserted)
         return saved

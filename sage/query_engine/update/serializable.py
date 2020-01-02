@@ -34,7 +34,14 @@ def apply_templates(mappings: List[Dict[str, str]], templates: List[Quad]) -> It
 
 
 class SerializableUpdate(PreemptableIterator):
-    """A SerializableUpdate iterator evaluates a SPARQL Update query under serializability."""
+    """A SerializableUpdate iterator evaluates a SPARQL INSERT/DELETE query as a serializable transaction.
+    
+    Args:
+      * dataset: RDF dataset to update.
+      * read_input: Iterator that evaluates a WHERE clause.
+      * delete_templates: List of delete templates from the DELETE clause (nquads to delete).
+      * insert_templates: List of insert templates from the INSERT clause (nquads to insert).
+    """
 
     def __init__(self, dataset: Dataset, read_input: PreemptableIterator, delete_templates: List[Quad], insert_templates: List[Quad]):
         super(SerializableUpdate, self).__init__()
@@ -44,21 +51,35 @@ class SerializableUpdate(PreemptableIterator):
         self._insert_templates = insert_templates
 
     def serialized_name(self) -> str:
+        """Get the name of the iterator, as used in the plan serialization protocol"""
         return "serializable_update"
 
     def has_next(self) -> bool:
-        """
-            Query execution is not finished iff:
-                - the read set is not entierly built, or
-                - all deletes have not been performed, or
-                - all insert have not been performed.
+        """Return True if the iterator has more quads to process.
+        
+        This iterator has not finished to process quads iff:
+          * the read set is not entierly built, or
+          * all deletes have not been performed, or
+          * all insert have not been performed.
         """
         return self._read_input.has_next()
 
     async def next(self) -> None:
-        """Advance in the update execution"""
+        """Execute the SPARQL INSERT/DELETE query.
+
+        This function blocks until the whole query has been processed.
+        hence, it breaks the iterator model as all the work is done in a single call to next()
+        It may also contains `non interruptible` clauses which must 
+        be atomically evaluated before preemption occurs.
+
+        Returns: Always `None` 
+
+        Throws:
+          * `StopAsyncIteration` if the iterator has fnished query processing.
+          * `SerializationFailure` if the SPARQL UPDATE query cannot be serialized as a transaction.
+        """
         if not self.has_next():
-            raise StopIteration()
+            raise StopAsyncIteration()
 
         # read all mappings from the predecessor
         mappings = list()
