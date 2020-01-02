@@ -21,13 +21,20 @@ from sage.query_engine.protobuf.utils import protoTriple_to_dict
 SavedProtobufPlan = Union[RootTree,SavedBagUnionIterator,SavedFilterIterator,SavedIndexJoinIterator,SavedProjectionIterator,SavedScanIterator]
 
 
-def load(protoMsg: SavedProtobufPlan, dataset: Dataset) -> PreemptableIterator:
-    """Load a preemptable physical query execution plan from a saved state"""
-    saved_plan = protoMsg
+def load(saved_plan: SavedProtobufPlan, dataset: Dataset) -> PreemptableIterator:
+    """Load a preemptable physical query execution plan from a saved state.
+    
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+    
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
     # unpack the plan from the serialized protobuf message
-    if isinstance(protoMsg, bytes):
+    if isinstance(saved_plan, bytes):
         root = RootTree()
-        root.ParseFromString(protoMsg)
+        root.ParseFromString(saved_plan)
         sourceField = root.WhichOneof('source')
         saved_plan = getattr(root, sourceField)
     # load the plan based on the current node
@@ -46,7 +53,15 @@ def load(protoMsg: SavedProtobufPlan, dataset: Dataset) -> PreemptableIterator:
 
 
 def load_projection(saved_plan: SavedProjectionIterator, dataset: Dataset) -> PreemptableIterator:
-    """Load a ProjectionIterator from a protobuf serialization"""
+    """Load a ProjectionIterator from a protobuf serialization.
+    
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+    
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), dataset)
     values = saved_plan.values if len(saved_plan.values) > 0 else None
@@ -54,7 +69,15 @@ def load_projection(saved_plan: SavedProjectionIterator, dataset: Dataset) -> Pr
 
 
 def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset) -> PreemptableIterator:
-    """Load a FilterIterator from a protobuf serialization"""
+    """Load a FilterIterator from a protobuf serialization.
+    
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+    
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), dataset)
     mu = None
@@ -64,7 +87,15 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset) -> Preemptabl
 
 
 def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIterator:
-    """Load a ScanIterator from a protobuf serialization"""
+    """Load a ScanIterator from a protobuf serialization.
+    
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+    
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
     triple = saved_plan.triple
     s, p, o, g = (triple.subject, triple.predicate, triple.object, triple.graph)
     iterator, card = dataset.get_graph(g).search(s, p, o, last_read=saved_plan.last_read)
@@ -72,7 +103,15 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
 
 
 def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset) -> PreemptableIterator:
-    """Load a IndexJoinIterator from a protobuf serialization"""
+    """Load a IndexJoinIterator from a protobuf serialization.
+    
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+    
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
     currentBinding = None
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), dataset)
@@ -88,7 +127,15 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset) -> Preemptabl
 
 
 def load_union(saved_plan: SavedBagUnionIterator, dataset: Dataset) -> PreemptableIterator:
-    """Load a BagUnionIterator from a protobuf serialization"""
+    """Load a BagUnionIterator from a protobuf serialization.
+    
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+    
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
     leftField = saved_plan.WhichOneof('left')
     left = load(getattr(saved_plan, leftField), dataset)
     rightField = saved_plan.WhichOneof('right')

@@ -22,14 +22,6 @@ sage.query\_engine.exceptions module
    :undoc-members:
    :show-inheritance:
 
-sage.query\_engine.formatters module
-------------------------------------
-
-.. automodule:: sage.query_engine.formatters
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 sage.query\_engine.primitives module
 ------------------------------------
 

@@ -1,13 +1,6 @@
 sage.http\_server package
 =========================
 
-Subpackages
------------
-
-.. toctree::
-
-   sage.http_server.protobuf
-
 Submodules
 ----------
 

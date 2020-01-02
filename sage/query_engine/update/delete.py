@@ -13,7 +13,7 @@ class DeleteOperator(PreemptableIterator):
 
     Args:
       * quads: List of RDF quads to delete from the RDF dataset.
-      * dataset: RDF dataset
+      * dataset: RDF dataset.
     """
 
     def __init__(self, quads: List[Tuple[str, str, str, str]], dataset: Dataset):
@@ -43,7 +43,7 @@ class DeleteOperator(PreemptableIterator):
 
         Returns: The quad if it was successfully deleted, otwherise it returns `None`. 
 
-        Throws: ``StopAsyncIteration` if the iterator has no more quads to delete.
+        Throws: `StopAsyncIteration` if the iterator has no more quads to delete.
         """
         if not self.has_next():
             raise StopAsyncIteration()
