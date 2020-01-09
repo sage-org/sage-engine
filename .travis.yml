@@ -1,7 +1,7 @@
 language: python
 cache: pip
 python:
-- '3.6'
+- '3.7'
 notifications:
   email: false
 addons:
@@ -11,24 +11,40 @@ addons:
     packages:
     - g++-4.8
 before_install:
-  - pip install pytest pytest-asyncio requests
+  # Install poetry
+  - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+  - source $HOME/.poetry/env
+  # Install pybind11 (required for HDT backend)
+  - pip install pybind11
+  # Download & setup the WatDiv 10M dataset (in HDT format)
   - wget -O watdiv.10M.hdt $WATDIV_LINK
   - wget -O watdiv.10M.hdt.index.v1-1 $WATDIV_INDEX_LINK
   - cp watdiv.10M.hdt tests/data/watdiv.10M.hdt
   - cp watdiv.10M.hdt.index.v1-1 tests/data/watdiv.10M.hdt.index.v1-1
 install:
-  - pip install pybind11
-  - pip install -r requirements.txt
-  - pip install -e .[hdt]
+  - poetry install --extras "hdt"
 script:
-  - pytest
+  # Ignore PostgreSQL tests, as it snot (yet) installed on Travis CI
+  - pytest --ignore=tests/database/postgre_backend_test.py
 before_deploy:
+  # Build sphinx docs
+  - cd docs && make html
+  # Cleanup build & tests before uploading to PyPi
   - rm -rf build/
   - rm -rf tests/
 deploy:
-- provider: pypi
-  skip_cleanup: true
-  user: callidon
-  password: $PYPI_PASSWD
-  on:
-    tags: true
+  # Deploy sphinx doc on Github pages
+  - provider: pages
+    github_token: $GITHUB_TOKEN
+    local_dir: docs/build/html
+    keep_history: true
+    skip_cleanup: true
+    on:
+      branch: master
+  # Release package on PyPi
+  - provider: pypi
+    skip_cleanup: true
+    user: callidon
+    password: $PYPI_PASSWD
+    on:
+      tags: true

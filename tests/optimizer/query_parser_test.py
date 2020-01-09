@@ -54,12 +54,12 @@ queries = [
         FILTER(?price = "232" && 1 + 2 = 3)
     }
     """, 1),
-    ("""
-    SELECT * WHERE {
-        <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> ?p ?o .
-        FILTER(?p = iri("http://purl.org/goodrelations/price"))
-    }
-    """, 1),
+    # ("""
+    # SELECT * WHERE {
+    #     <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> ?p ?o .
+    #     FILTER(?p = iri("http://purl.org/goodrelations/price"))
+    # }
+    # """, 1),
     ("""
     SELECT * WHERE {
         ?s <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9> .
