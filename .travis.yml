@@ -41,10 +41,3 @@ deploy:
     skip_cleanup: true
     on:
       branch: master
-  # Release package on PyPi
-  - provider: pypi
-    skip_cleanup: true
-    user: callidon
-    password: $PYPI_PASSWD
-    on:
-      tags: true
