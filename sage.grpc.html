@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.grpc package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.http_server package" href="sage.http_server.html" />
+    <link rel="prev" title="sage.database.statefull package" href="sage.database.statefull.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.html">sage.database package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sage.grpc package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.grpc.grpc_client">sage.grpc.grpc_client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.grpc.grpc_server">sage.grpc.grpc_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.grpc.service_pb2">sage.grpc.service_pb2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.grpc.service_pb2_grpc">sage.grpc.service_pb2_grpc module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.grpc">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+      <li>sage.grpc package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.grpc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-grpc-package">
+<h1>sage.grpc package<a class="headerlink" href="#sage-grpc-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.grpc.grpc_client">
+<span id="sage-grpc-grpc-client-module"></span><h2>sage.grpc.grpc_client module<a class="headerlink" href="#module-sage.grpc.grpc_client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.grpc.grpc_client.SageClient">
+<em class="property">class </em><code class="sig-prename descclassname">sage.grpc.grpc_client.</code><code class="sig-name descname">SageClient</code><span class="sig-paren">(</span><em class="sig-param">url: str</em>, <em class="sig-param">options: Optional[Dict[str</em>, <em class="sig-param">str]] = None</em>, <em class="sig-param">credentials: Optional[grpc.ChannelCredentials] = None</em>, <em class="sig-param">compression: Optional[str] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.grpc.grpc_client.SageClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A SaGe client allows to execute SPARQL queries using a SaGe server deployed with gRPC.</p>
+<dl>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>url: URL of the SaGe gRPC server.</p></li>
+<li><p>options: An optional list of key-value pairs (channel args in gRPC Core runtime) to configure the channel.</p></li>
+<li><p>credentials: A, optional ChannelCredentials instance. If set, the client will use a secure_channel for communicating with the server. Otherwise, it will use an insecure_channel.</p></li>
+<li><p>compression: An optional value indicating the compression method to be used over the lifetime of the channel. This is an EXPERIMENTAL option.</p></li>
+</ul>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">SageClient</span><span class="p">(</span><span class="s2">&quot;localhost:8000&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="n">sparql_query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * WHERE { ?s ?p ?o }&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="k">for</span> <span class="n">bindings</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sparql_query</span><span class="p">,</span> <span class="s2">&quot;http://example.org#DBpedia&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">bindings</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.grpc.grpc_client.SageClient.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.grpc.grpc_client.SageClient.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sage.grpc.grpc_client.SageClient.query">
+<code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param">sparql_query: str</em>, <em class="sig-param">default_graph_uri: str</em><span class="sig-paren">)</span> &#x2192; Iterable[Dict[str, str]]<a class="headerlink" href="#sage.grpc.grpc_client.SageClient.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a SPARQL query using a SaGe gRPC-server.</p>
+<dl>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>sparql_query: SPARQL query to execute.</p></li>
+<li><p>default_graph_uri: URI of the default RDF Graph to query.</p></li>
+</ul>
+</dd>
+<dt>Yields:</dt><dd><p>Set of solution mappings</p>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sparql_query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * WHERE { ?s ?p ?o }&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">bindings</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sparql_query</span><span class="p">,</span> <span class="s2">&quot;http://example.org#DBpedia&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="nb">print</span><span class="p">(</span><span class="n">bindings</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.grpc.grpc_server">
+<span id="sage-grpc-grpc-server-module"></span><h2>sage.grpc.grpc_server module<a class="headerlink" href="#module-sage.grpc.grpc_server" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.grpc.grpc_server.SageQueryService">
+<em class="property">class </em><code class="sig-prename descclassname">sage.grpc.grpc_server.</code><code class="sig-name descname">SageQueryService</code><span class="sig-paren">(</span><em class="sig-param">dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.grpc.grpc_server.SageQueryService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sage.grpc.service_pb2_grpc.SageSPARQLServicer" title="sage.grpc.service_pb2_grpc.SageSPARQLServicer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.grpc.service_pb2_grpc.SageSPARQLServicer</span></code></a></p>
+<p>A SageQueryService implements a gRPC service that evaluates SPARQL queries using Web preemption</p>
+<p>Argument: RDF dataset hosted by the gRPC server.</p>
+<dl class="method">
+<dt id="sage.grpc.grpc_server.SageQueryService.Query">
+<code class="sig-name descname">Query</code><span class="sig-paren">(</span><em class="sig-param">request: service_pb2.SageQuery</em>, <em class="sig-param">context: grpc.ServicerContext</em><span class="sig-paren">)</span> &#x2192; service_pb2.SageResponse<a class="headerlink" href="#sage.grpc.grpc_server.SageQueryService.Query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a SPARQL query using the Web preemption model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.grpc.grpc_server.create_bindings">
+<code class="sig-prename descclassname">sage.grpc.grpc_server.</code><code class="sig-name descname">create_bindings</code><span class="sig-paren">(</span><em class="sig-param">bindings: List[Dict[str, str]]</em><span class="sig-paren">)</span> &#x2192; Iterable[service_pb2.BindingSet]<a class="headerlink" href="#sage.grpc.grpc_server.create_bindings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an iterator that converts a set of dict-based bindings to a set of protobuf-based bindings.</p>
+<p>Argument: List of solutions bindings, encoded as dictionaries.</p>
+<p>Yields: Set of solutions bindings, encoded in a Protobuf format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.grpc.grpc_server.get_server">
+<code class="sig-prename descclassname">sage.grpc.grpc_server.</code><code class="sig-name descname">get_server</code><span class="sig-paren">(</span><em class="sig-param">config_file: str</em>, <em class="sig-param">port=8000</em>, <em class="sig-param">workers=10</em><span class="sig-paren">)</span> &#x2192; grpc.Server<a class="headerlink" href="#sage.grpc.grpc_server.get_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a SaGe SPARQL query server powered by gRPC.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>config_file: Path to the SaGe configuration file, in YAML format.</p></li>
+<li><p>port: Host port to run the gRPC server.</p></li>
+<li><p>workers: Number of thread workers used by the gRPC server.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A SaGe gRPC server built from the input configuration file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.grpc.service_pb2">
+<span id="sage-grpc-service-pb2-module"></span><h2>sage.grpc.service_pb2 module<a class="headerlink" href="#module-sage.grpc.service_pb2" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.grpc.service_pb2_grpc">
+<span id="sage-grpc-service-pb2-grpc-module"></span><h2>sage.grpc.service_pb2_grpc module<a class="headerlink" href="#module-sage.grpc.service_pb2_grpc" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.grpc.service_pb2_grpc.SageSPARQLServicer">
+<em class="property">class </em><code class="sig-prename descclassname">sage.grpc.service_pb2_grpc.</code><code class="sig-name descname">SageSPARQLServicer</code><a class="headerlink" href="#sage.grpc.service_pb2_grpc.SageSPARQLServicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The SaGe SPARQL query server</p>
+<dl class="method">
+<dt id="sage.grpc.service_pb2_grpc.SageSPARQLServicer.Query">
+<code class="sig-name descname">Query</code><span class="sig-paren">(</span><em class="sig-param">request</em>, <em class="sig-param">context</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.grpc.service_pb2_grpc.SageSPARQLServicer.Query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a SPARQL query using the Web preemption model</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.grpc.service_pb2_grpc.SageSPARQLStub">
+<em class="property">class </em><code class="sig-prename descclassname">sage.grpc.service_pb2_grpc.</code><code class="sig-name descname">SageSPARQLStub</code><span class="sig-paren">(</span><em class="sig-param">channel</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.grpc.service_pb2_grpc.SageSPARQLStub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The SaGe SPARQL query server</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.grpc.service_pb2_grpc.add_SageSPARQLServicer_to_server">
+<code class="sig-prename descclassname">sage.grpc.service_pb2_grpc.</code><code class="sig-name descname">add_SageSPARQLServicer_to_server</code><span class="sig-paren">(</span><em class="sig-param">servicer</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.grpc.service_pb2_grpc.add_SageSPARQLServicer_to_server" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-sage.grpc">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.grpc" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.http_server.html" class="btn btn-neutral float-right" title="sage.http_server package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.database.statefull.html" class="btn btn-neutral float-left" title="sage.database.statefull package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

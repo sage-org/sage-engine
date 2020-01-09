@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuring the SaGe server &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Sage and PostgreSQL" href="postgres.html" />
+    <link rel="prev" title="Quickstart" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuring the SaGe server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-reference">Configuration reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hdt-backend-configuration">HDT backend configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#postgresql-backend-configuration">PostgreSQL backend configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sage.html">sage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuring the SaGe server</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/config_file.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuring-the-sage-server">
+<h1>Configuring the SaGe server<a class="headerlink" href="#configuring-the-sage-server" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="configuration-reference">
+<h2>Configuration reference<a class="headerlink" href="#configuration-reference" title="Permalink to this headline">¶</a></h2>
+<p>SaGe configuration files are written in YAML syntax,
+according to the following format.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># The name of the server</span>
+<span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SaGe Example Server</span>
+
+<span class="c1"># The Server maintainer</span>
+<span class="nt">maintainer</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Tim Berners-Lee</span>
+
+<span class="c1"># The public URL used to access the server</span>
+<span class="nt">public_url</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://server-url.com</span>
+
+<span class="c1"># Time quantum used by the server</span>
+<span class="c1"># Use &#39;inf&#39; to allow an infinite quantum per query (Warning: it may break SaGe properties)</span>
+<span class="nt">quota</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">75</span>
+
+<span class="c1"># (Optional) Maximum number of results fetched by HTTP request</span>
+<span class="c1"># Defaults to 2000. Use &#39;inf&#39; to disable the limitations.</span>
+<span class="nt">max_results</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2000</span>
+
+<span class="c1"># RDF Graphs hosted by the server</span>
+<span class="nt">graphs</span><span class="p">:</span>
+<span class="p p-Indicator">-</span>
+  <span class="c1"># The name of the RDF Graph</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dbpedia</span>
+  <span class="c1"># The URI of the RDF Graph in the RDF dataset</span>
+  <span class="nt">uri</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://example.org/dbpedia</span>
+  <span class="c1"># The description of the RDF Graph</span>
+  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The DBpedia dataset</span>
+  <span class="c1"># Type of backend (an example here with the HDT backend)</span>
+  <span class="nt">backend</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hdt-file</span>
+  <span class="nt">file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./dbpedia.hdt</span>
+  <span class="c1"># Example queries that can be executed using this dataset</span>
+  <span class="nt">queries</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Every</span><span class="nv"> </span><span class="s">RDF</span><span class="nv"> </span><span class="s">triples&quot;</span>
+      <span class="nt">value</span><span class="p">:</span> <span class="p p-Indicator">|</span>
+        <span class="no">SELECT * WHERE {</span>
+          <span class="no">?s ?p ?o.</span>
+        <span class="no">}</span>
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Airport</span><span class="nv"> </span><span class="s">located</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">Italy&quot;</span>
+      <span class="nt">value</span><span class="p">:</span> <span class="p p-Indicator">|</span>
+        <span class="no">prefix dbo: &lt;http://dbpedia.org/ontology/&gt;</span>
+        <span class="no">prefix dbp: &lt;http://dbpedia.org/property/&gt;</span>
+        <span class="no">prefix dbr: &lt;http://dbpedia.org/resource/&gt;</span>
+        <span class="no">SELECT DISTINCT ?entity WHERE {</span>
+          <span class="no">?entity a dbo:Airport;</span>
+            <span class="no">dbp:cityServed dbr:Italy.</span>
+        <span class="no">}</span>
+
+<span class="p p-Indicator">-</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">geonames</span>
+  <span class="nt">uri</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://example.org/geonames</span>
+  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The Geonames dataset</span>
+  <span class="nt">backend</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hdt-file</span>
+  <span class="nt">file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./geonames.hdt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="hdt-backend-configuration">
+<h2>HDT backend configuration<a class="headerlink" href="#hdt-backend-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>hdt-file</cite> backend allows to query HDT files.</p>
+<dl class="simple">
+<dt>The following option must be set with this backend</dt><dd><ul class="simple">
+<li><p><strong>file</strong> (str): Absolute path to the HDT file</p></li>
+</ul>
+</dd>
+<dt>The following options are optionals</dt><dd><ul class="simple">
+<li><p><strong>mapped</strong> (bool): True maps the HDT file on disk (faster), False loads everything in memory.</p></li>
+<li><p><strong>indexed</strong> (bool: True if the HDT must be loaded with indexes, False otherwise. The SaGe server will looks for indexes in the same directory as the original HDT files. If they are missing, they will be automatically re-built from the data (Warning: this process way be expensive for large HDT files).</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="postgresql-backend-configuration">
+<h2>PostgreSQL backend configuration<a class="headerlink" href="#postgresql-backend-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>postgres</cite> and <cite>postgres-mvcc</cite> backend allows to store
+and query RDF data using a PostgreSQL database.
+The <cite>postgres</cite> backend stores RDF triples using a simple triple-store layout,
+while the <cite>postgres-mvcc</cite> backend rely on a multi-version concurrency control
+protocol to ensure consitent reads in presence of concurrent updates.</p>
+<p>For initializing a PostgreSQL database to be used with these backend,
+please refers to the <a class="reference internal" href="postgres.html#postgres-cli"><span class="std std-ref">Sage and PostgreSQL</span></a> chapter.</p>
+<dl class="simple">
+<dt>With both backends, the following options must be set</dt><dd><ul class="simple">
+<li><p><strong>table_name</strong> (str): Name of the SQL table containing RDF data.</p></li>
+<li><p><strong>dbname</strong> (str): the database name.</p></li>
+<li><p><strong>user</strong> (str): user name used to authenticate.</p></li>
+<li><p><strong>password</strong> (str): password used to authenticate.</p></li>
+</ul>
+</dd>
+<dt>With both backends, the following options are optionals</dt><dd><ul class="simple">
+<li><p><strong>host</strong> (str): database host address (defaults to UNIX socket if not provided).</p></li>
+<li><p><strong>port</strong> (int: connection port number (defaults to 5432 if not provided).</p></li>
+<li><p><strong>fetch_size</strong> (int): The number of SQL rows/RDF triples to fetch per batch (defaults to 2000).</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="postgres.html" class="btn btn-neutral float-right" title="Sage and PostgreSQL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

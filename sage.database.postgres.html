@@ -1,0 +1,741 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.database.postgres package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.database.statefull package" href="sage.database.statefull.html" />
+    <link rel="prev" title="sage.database.hdt package" href="sage.database.hdt.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="sage.database.html">sage.database package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="sage.database.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.db_connector">sage.database.db_connector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.db_iterator">sage.database.db_iterator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.descriptors">sage.database.descriptors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.estimators">sage.database.estimators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.import_manager">sage.database.import_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.utils">sage.database.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+          <li><a href="sage.database.html">sage.database package</a> &raquo;</li>
+        
+      <li>sage.database.postgres package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.database.postgres.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-database-postgres-package">
+<h1>sage.database.postgres package<a class="headerlink" href="#sage-database-postgres-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.database.postgres.connector">
+<span id="sage-database-postgres-connector-module"></span><h2>sage.database.postgres.connector module<a class="headerlink" href="#module-sage.database.postgres.connector" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.postgres.connector.PostgresConnector">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.postgres.connector.</code><code class="sig-name descname">PostgresConnector</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em>, <em class="sig-param">dbname: str</em>, <em class="sig-param">user: str</em>, <em class="sig-param">password: str</em>, <em class="sig-param">host: str = ''</em>, <em class="sig-param">port: int = 5432</em>, <em class="sig-param">fetch_size: int = 2000</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.database.html#sage.database.db_connector.DatabaseConnector" title="sage.database.db_connector.DatabaseConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.db_connector.DatabaseConnector</span></code></a></p>
+<p>A PostgresConnector search for RDF triples in a PostgreSQL database.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>table_name: Name of the SQL table containing RDF data.</p></li>
+<li><p>dbname: the database name.</p></li>
+<li><p>user: user name used to authenticate.</p></li>
+<li><p>password: password used to authenticate.</p></li>
+<li><p>host: database host address (defaults to UNIX socket if not provided).</p></li>
+<li><p>port: connection port number (defaults to 5432 if not provided).</p></li>
+<li><p>fetch_size: The number of SQL rows/RDF triples to fetch per batch (defaults to 2000).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.abort_transaction">
+<code class="sig-name descname">abort_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.abort_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abort any ongoing transaction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the database connection</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.commit_transaction">
+<code class="sig-name descname">commit_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.commit_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit any ongoing transaction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a RDF triple from the RDF graph.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.from_config">
+<code class="sig-name descname">from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a PostgresConnector from a configuration object.</p>
+<p>The configuration object must contains the following fields: ‘dbname’, ‘name’, ‘user’ and ‘password’.
+Optional fields are: ‘host’, ‘port’ and ‘fetch_size’.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a RDF triple into the RDF graph.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.open">
+<code class="sig-name descname">open</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the connection to the PostgreSQL database and initialize histograms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.search">
+<code class="sig-name descname">search</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em>, <em class="sig-param">last_read: Optional[str] = None</em>, <em class="sig-param">as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.database.postgres.connector.PostgresIterator, int]<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over all RDF triples matching a triple pattern.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the triple pattern.</p></li>
+<li><p>predicate: Predicate of the triple pattern.</p></li>
+<li><p>object: Object of the triple pattern.</p></li>
+<li><p>last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.</p></li>
+<li><p>as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple (<cite>iterator</cite>, <cite>cardinality</cite>), where <cite>iterator</cite> is a Python iterator over RDF triples matching the given triples pattern, and <cite>cardinality</cite> is the estimated cardinality of the triple pattern.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresConnector.start_transaction">
+<code class="sig-name descname">start_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.connector.PostgresConnector.start_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a PostgreSQL transaction</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.database.postgres.connector.PostgresIterator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.postgres.connector.</code><code class="sig-name descname">PostgresIterator</code><span class="sig-paren">(</span><em class="sig-param">cursor, connection, start_query: str, start_params: List[str], pattern: Dict[str, str], fetch_size: int = 2000</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.connector.PostgresIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.database.html#sage.database.db_iterator.DBIterator" title="sage.database.db_iterator.DBIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.db_iterator.DBIterator</span></code></a></p>
+<p>A PostgresIterator fetches RDF triples from a PostgreSQL table using batch queries and lazy loading.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>cursor: A psycopg cursor. This cursor must only be used for this iterator, to avoid side-effects.</p></li>
+<li><p>connection: A psycopg connection.</p></li>
+<li><p>start_query: Prepared SQL query executed to fetch RDF triples as SQL rows.</p></li>
+<li><p>start_params: Parameters to use with the prepared SQL query.</p></li>
+<li><p>pattern: Triple pattern scanned.</p></li>
+<li><p>fetch_size: The number of SQL rows/RDF triples to fetch per batch.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresIterator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.postgres.connector.PostgresIterator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if there is still results to read, False otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresIterator.last_read">
+<code class="sig-name descname">last_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.connector.PostgresIterator.last_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index ID of the last element read</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.connector.PostgresIterator.next">
+<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.database.postgres.connector.PostgresIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next solution mapping or raise <cite>StopIteration</cite> if there are no more solutions</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.connector.fetch_histograms">
+<code class="sig-prename descclassname">sage.database.postgres.connector.</code><code class="sig-name descname">fetch_histograms</code><span class="sig-paren">(</span><em class="sig-param">cursor</em>, <em class="sig-param">table_name: str</em>, <em class="sig-param">attribute_name: str</em><span class="sig-paren">)</span> &#x2192; Tuple[int, int, Dict[str, float], int]<a class="headerlink" href="#sage.database.postgres.connector.fetch_histograms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download PostgreSQL histograms from a given table and attribute.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>cursor: A psycopg cursor.</p></li>
+<li><p>table_name: Name of the SQL table from which we should retrieve histograms.</p></li>
+<li><p>attribute_name: Table attribute from which we should retrieve histograms.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple (<cite>null_frac</cite>, <cite>n_distinct</cite>, <cite>selectivities</cite>, <cite>sum_most_common_freqs</cite>) where:
+* <cite>null_frac</cite> is the fraction of null values in the histogram.
+* <cite>n_distinct</cite> is the estimated number of distinct values for this attribute.
+* <cite>selectivities</cite> is the estimated selectivities of the attribute’s values in the table.
+* <cite>sum_most_common_freqs</cite> is the num of the frequencies of the most common values for this attribute.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.postgres.mvcc_connector">
+<span id="sage-database-postgres-mvcc-connector-module"></span><h2>sage.database.postgres.mvcc_connector module<a class="headerlink" href="#module-sage.database.postgres.mvcc_connector" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresConnector">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.postgres.mvcc_connector.</code><code class="sig-name descname">MVCCPostgresConnector</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em>, <em class="sig-param">dbname: str</em>, <em class="sig-param">user: str</em>, <em class="sig-param">password: str</em>, <em class="sig-param">host: str = ''</em>, <em class="sig-param">port: int = 5432</em>, <em class="sig-param">fetch_size: int = 2000</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sage.database.postgres.connector.PostgresConnector" title="sage.database.postgres.connector.PostgresConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.postgres.connector.PostgresConnector</span></code></a></p>
+<p>A MVCCPostgresConnector search for RDF triples in a PostgreSQL database using a timestamp-based multi-version concurrency control protocol.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>table_name: Name of the SQL table containing RDF data.</p></li>
+<li><p>dbname: the database name.</p></li>
+<li><p>user: user name used to authenticate.</p></li>
+<li><p>password: password used to authenticate.</p></li>
+<li><p>host: database host address (default to UNIX socket if not provided).</p></li>
+<li><p>port: connection port number (default to 5432 if not provided).</p></li>
+<li><p>fetch_size: The number of SQL rows/RDF triples to fetch per batch.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresConnector.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param">subject</em>, <em class="sig-param">predicate</em>, <em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a RDF triple from the RDF graph.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresConnector.from_config">
+<code class="sig-name descname">from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a MVCCPostgresConnector from a configuration object.</p>
+<p>The configuration object must contains the following fields: ‘dbname’, ‘name’, ‘user’ and ‘password’.
+Optional fields are: ‘host’, ‘port’ and ‘fetch_size’.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresConnector.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">subject</em>, <em class="sig-param">predicate</em>, <em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a RDF triple into the RDF graph.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresConnector.search">
+<code class="sig-name descname">search</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em>, <em class="sig-param">last_read: Optional[str] = None</em>, <em class="sig-param">as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.database.postgres.mvcc_connector.MVCCPostgresIterator, int]<a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over all RDF triples matching a triple pattern.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the triple pattern.</p></li>
+<li><p>predicate: Predicate of the triple pattern.</p></li>
+<li><p>object: Object of the triple pattern.</p></li>
+<li><p>last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.</p></li>
+<li><p>as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple (<cite>iterator</cite>, <cite>cardinality</cite>), where <cite>iterator</cite> is a Python iterator over RDF triples matching the given triples pattern, and <cite>cardinality</cite> is the estimated cardinality of the triple pattern.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresIterator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.postgres.mvcc_connector.</code><code class="sig-name descname">MVCCPostgresIterator</code><span class="sig-paren">(</span><em class="sig-param">cursor, start_time: datetime.datetime, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 2000</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.database.html#sage.database.db_iterator.DBIterator" title="sage.database.db_iterator.DBIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.db_iterator.DBIterator</span></code></a></p>
+<p>A MVCCPostgresIterator fetches RDF triples from a versionned PostgreSQL table using batch queries and lazy loading.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>cursor: Psycopg cursor used to query the database.</p></li>
+<li><p>start_time: Timestamp at which the iterator should read.</p></li>
+<li><p>start_query: Prepared SQL query used to start iteration.</p></li>
+<li><p>start_params: SQL params to apply to the prepared SQL query.</p></li>
+<li><p>table_name: Name of the SQL table to scan.</p></li>
+<li><p>pattern: Triple pattern scanned.</p></li>
+<li><p>fetch_size: The number of SQL rows/RDF triples to fetch per batch.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresIterator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresIterator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if there is still results to read, and False otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresIterator.last_read">
+<code class="sig-name descname">last_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresIterator.last_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index ID of the last element read</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.mvcc_connector.MVCCPostgresIterator.next">
+<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.database.postgres.mvcc_connector.MVCCPostgresIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next solution mapping or raise <cite>StopIteration</cite> if there are no more solutions</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.mvcc_connector.parse_date">
+<code class="sig-prename descclassname">sage.database.postgres.mvcc_connector.</code><code class="sig-name descname">parse_date</code><span class="sig-paren">(</span><em class="sig-param">str_date: str</em><span class="sig-paren">)</span> &#x2192; datetime.datetime<a class="headerlink" href="#sage.database.postgres.mvcc_connector.parse_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a PostgreSQL date into a Python datetime object.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.postgres.mvcc_queries">
+<span id="sage-database-postgres-mvcc-queries-module"></span><h2>sage.database.postgres.mvcc_queries module<a class="headerlink" href="#module-sage.database.postgres.mvcc_queries" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.postgres.mvcc_queries.get_delete_query">
+<code class="sig-prename descclassname">sage.database.postgres.mvcc_queries.</code><code class="sig-name descname">get_delete_query</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.mvcc_queries.get_delete_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to delete a RDF triple from a MVCC-PostgreSQL table.</p>
+<p>Argument: Name of the SQL table from which the triple will be deleted.</p>
+<p>Returns: A prepared SQL query that can be executed with a tuple (subject, predicate, object).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.mvcc_queries.get_insert_many_query">
+<code class="sig-prename descclassname">sage.database.postgres.mvcc_queries.</code><code class="sig-name descname">get_insert_many_query</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.mvcc_queries.get_insert_many_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert several RDF triples into a MVCC-PostgreSQL table.</p>
+<p>Argument: Name of the SQL table in which the triples will be inserted.</p>
+<p>Returns: A prepared SQL query that can be executed with a list of tuples (subject, predicate, object).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.mvcc_queries.get_insert_query">
+<code class="sig-prename descclassname">sage.database.postgres.mvcc_queries.</code><code class="sig-name descname">get_insert_query</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.mvcc_queries.get_insert_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF triple into a MVCC-PostgreSQL table.</p>
+<p>Argument: Name of the SQL table in which the triple will be inserted.</p>
+<p>Returns: A prepared SQL query that can be executed with a tuple (subject, predicate, object).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.mvcc_queries.get_resume_query">
+<code class="sig-prename descclassname">sage.database.postgres.mvcc_queries.</code><code class="sig-name descname">get_resume_query</code><span class="sig-paren">(</span><em class="sig-param">subj: str, pred: str, obj: str, last_read: Tuple[str, str, str, datetime.datetime, datetime.datetime], table_name: str, symbol: str = '&gt;='</em><span class="sig-paren">)</span> &#x2192; Tuple[str, List[str]]<a class="headerlink" href="#sage.database.postgres.mvcc_queries.get_resume_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which resumes scanning for a triple pattern.</p>
+<p>The SQL query rely on keyset pagination to resume query processing using an optimized Index Scan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subj: Subject of the triple pattern.</p></li>
+<li><p>pred: Predicate of the triple pattern.</p></li>
+<li><p>obj: Object of the triple pattern.</p></li>
+<li><p>last_read: The SQL row from whoch to resume scanning.</p></li>
+<li><p>table_name: Name of the SQL table to scan for RDF triples.</p></li>
+<li><p>symbol: Symbol used to perform the keyset pagination. Defaults to “&gt;=”.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple with the prepared SQL query and its parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.mvcc_queries.get_start_query">
+<code class="sig-prename descclassname">sage.database.postgres.mvcc_queries.</code><code class="sig-name descname">get_start_query</code><span class="sig-paren">(</span><em class="sig-param">subj: str</em>, <em class="sig-param">pred: str</em>, <em class="sig-param">obj: str</em>, <em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; Tuple[str, List[str]]<a class="headerlink" href="#sage.database.postgres.mvcc_queries.get_start_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which starts scanning for a triple pattern.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subj: Subject of the triple pattern.</p></li>
+<li><p>pred: Predicate of the triple pattern.</p></li>
+<li><p>obj: Object of the triple pattern.</p></li>
+<li><p>table_name: Name of the SQL table to scan for RDF triples.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple with the prepared SQL query and its parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.postgres.queries">
+<span id="sage-database-postgres-queries-module"></span><h2>sage.database.postgres.queries module<a class="headerlink" href="#module-sage.database.postgres.queries" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.postgres.queries.get_delete_query">
+<code class="sig-prename descclassname">sage.database.postgres.queries.</code><code class="sig-name descname">get_delete_query</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.queries.get_delete_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to delete a RDF triple from a PostgreSQL table.</p>
+<p>Argument: Name of the SQL table from which the triple will be deleted.</p>
+<p>Returns: A prepared SQL query that can be executed with a tuple (subject, predicate, object).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.queries.get_insert_many_query">
+<code class="sig-prename descclassname">sage.database.postgres.queries.</code><code class="sig-name descname">get_insert_many_query</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.queries.get_insert_many_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert several RDF triples into a PostgreSQL table.</p>
+<p>Argument: Name of the SQL table in which the triples will be inserted.</p>
+<p>Returns: A prepared SQL query that can be executed with a list of tuples (subject, predicate, object).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.queries.get_insert_query">
+<code class="sig-prename descclassname">sage.database.postgres.queries.</code><code class="sig-name descname">get_insert_query</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.queries.get_insert_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF triple into a PostgreSQL table.</p>
+<p>Argument: Name of the SQL table in which the triple will be inserted.</p>
+<p>Returns: A prepared SQL query that can be executed with a tuple (subject, predicate, object).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.queries.get_resume_query">
+<code class="sig-prename descclassname">sage.database.postgres.queries.</code><code class="sig-name descname">get_resume_query</code><span class="sig-paren">(</span><em class="sig-param">subj: str, pred: str, obj: str, last_read: Tuple[str, str, str], table_name: str, symbol: str = '&gt;='</em><span class="sig-paren">)</span> &#x2192; Tuple[str, str]<a class="headerlink" href="#sage.database.postgres.queries.get_resume_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which resumes scanning for a triple pattern.</p>
+<p>The SQL query rely on keyset pagination to resume query processing using an optimized Index Scan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subj: Subject of the triple pattern.</p></li>
+<li><p>pred: Predicate of the triple pattern.</p></li>
+<li><p>obj: Object of the triple pattern.</p></li>
+<li><p>last_read: The SQL row from whoch to resume scanning.</p></li>
+<li><p>table_name: Name of the SQL table to scan for RDF triples.</p></li>
+<li><p>symbol: Symbol used to perform the keyset pagination. Defaults to “&gt;=”.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple with the prepared SQL query and its parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.queries.get_start_query">
+<code class="sig-prename descclassname">sage.database.postgres.queries.</code><code class="sig-name descname">get_start_query</code><span class="sig-paren">(</span><em class="sig-param">subj: str</em>, <em class="sig-param">pred: str</em>, <em class="sig-param">obj: str</em>, <em class="sig-param">table_name: str</em><span class="sig-paren">)</span> &#x2192; Tuple[str, List[str]]<a class="headerlink" href="#sage.database.postgres.queries.get_start_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which starts scanning for a triple pattern.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subj: Subject of the triple pattern.</p></li>
+<li><p>pred: Predicate of the triple pattern.</p></li>
+<li><p>obj: Object of the triple pattern.</p></li>
+<li><p>table_name: Name of the SQL table to scan for RDF triples.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple with the prepared SQL query and its parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.postgres.transaction_manager">
+<span id="sage-database-postgres-transaction-manager-module"></span><h2>sage.database.postgres.transaction_manager module<a class="headerlink" href="#module-sage.database.postgres.transaction_manager" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.postgres.transaction_manager.</code><code class="sig-name descname">TransactionManager</code><span class="sig-paren">(</span><em class="sig-param">dbname: str</em>, <em class="sig-param">user: str</em>, <em class="sig-param">password: str</em>, <em class="sig-param">host: str = ''</em>, <em class="sig-param">port: int = 5432</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A TransactionManager handles transactions for a (MVCC-)PostgreSQL connector.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>dbname: the database name.</p></li>
+<li><p>user: user name used to authenticate.</p></li>
+<li><p>password: password used to authenticate.</p></li>
+<li><p>host: database host address (defaults to UNIX socket if not provided).</p></li>
+<li><p>port: connection port number (defaults to 5432 if not provided).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.abort">
+<code class="sig-name descname">abort</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.abort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abort an ongoing transaction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.close_all">
+<code class="sig-name descname">close_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.close_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close all connections &amp; rollback any ongoing transactions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.close_connection">
+<code class="sig-name descname">close_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.close_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the connection for a given processs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit an ongoing transaction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.get_connection">
+<code class="sig-name descname">get_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.get_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the connection of the current processs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.is_open">
+<code class="sig-name descname">is_open</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.is_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the current process has an open connection to the DB</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.open_connection">
+<code class="sig-name descname">open_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.open_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a new connection for the given process</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres.transaction_manager.TransactionManager.start_transaction">
+<code class="sig-name descname">start_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres.transaction_manager.TransactionManager.start_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a new transaction</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.postgres.utils">
+<span id="sage-database-postgres-utils-module"></span><h2>sage.database.postgres.utils module<a class="headerlink" href="#module-sage.database.postgres.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.postgres.utils.id_to_predicate">
+<code class="sig-prename descclassname">sage.database.postgres.utils.</code><code class="sig-name descname">id_to_predicate</code><span class="sig-paren">(</span><em class="sig-param">idc: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.utils.id_to_predicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to convert an unique identifier into a predicate.</p>
+<p>If it is already a decompressed predicate, do nothing.</p>
+<p>Argument: An unique ID that encode a RDF term as a predicate in a RDF triple.</p>
+<p>Returns: A RDF term that corresponds to the input ID.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres.utils.predicate_to_id">
+<code class="sig-prename descclassname">sage.database.postgres.utils.</code><code class="sig-name descname">predicate_to_id</code><span class="sig-paren">(</span><em class="sig-param">predicate: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres.utils.predicate_to_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to convert a predicate to an unique identifier.</p>
+<p>This method will only compress general predicates (rdf:type, rdfs:label, etc), as they are shared in almost every RDF dataset. Otherwise, it will simply returns the predicate value.</p>
+<p>Argument: A RDF term used as a predicate in a RDF triple.</p>
+<p>Returns: An unique ID that encode the input RDF term.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.postgres">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.database.postgres" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.database.statefull.html" class="btn btn-neutral float-right" title="sage.database.statefull package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.database.hdt.html" class="btn btn-neutral float-left" title="sage.database.hdt package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

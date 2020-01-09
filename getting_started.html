@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Quickstart &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuring the SaGe server" href="config_file.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#server-configuration">Server configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#launch-a-sage-server">Launch a Sage server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sage.html">sage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Quickstart</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="server-configuration">
+<h2>Server configuration<a class="headerlink" href="#server-configuration" title="Permalink to this headline">¶</a></h2>
+<p>A Sage server is configured using a configuration file in <a class="reference external" href="http://yaml.org/">YAML
+syntax</a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SaGe Test server</span>
+<span class="nt">maintainer</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Chuck Norris</span>
+<span class="nt">quota</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">75</span>
+<span class="nt">maxResults</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
+<span class="nt">graphs</span><span class="p">:</span>
+<span class="p p-Indicator">-</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dbpedia-2016</span>
+  <span class="nt">uri</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://example.org#dbpedia-2016</span>
+  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DBPedia v2016</span>
+  <span class="nt">backend</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hdt-file</span>
+  <span class="nt">file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">graphs/dbpedia.2016.hdt</span>
+<span class="p p-Indicator">-</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">geonames</span>
+  <span class="nt">uri</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://example.org#geonames</span>
+  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Geonames graph</span>
+  <span class="nt">backend</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hdt-file</span>
+  <span class="nt">file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">graphs/geonames.hdt</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">quota</span></code> and <code class="docutils literal notranslate"><span class="pre">maxResults</span></code> fields are used to set the maximum
+query execution time and the maximum nuber of results per request,
+respectively.</p>
+<p>Each entry in the <code class="docutils literal notranslate"><span class="pre">graphs</span></code> field declare a RDF graph with a name, URI,
+description, backend and options specific to this backend. Currently,
+only the <code class="docutils literal notranslate"><span class="pre">hdt-file</span></code> and <code class="docutils literal notranslate"><span class="pre">postgres</span></code> backends are supported.</p>
+</div>
+<div class="section" id="launch-a-sage-server">
+<h2>Launch a Sage server<a class="headerlink" href="#launch-a-sage-server" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">sage</span></code> executable , installed alongside the Sage server, allows to
+easily start a sage server from a configuration file, using
+<a class="reference external" href="http://gunicorn.org/">Gunicorn</a>, a Python WSGI HTTP Server.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># launch Sage server with 4 workers on port 8000</span>
+sage data/watdiv_config.yaml -w <span class="m">4</span> -p <span class="m">8000</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="config_file.html" class="btn btn-neutral float-right" title="Configuring the SaGe server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

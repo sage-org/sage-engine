@@ -1,0 +1,658 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.database package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.database.core package" href="sage.database.core.html" />
+    <link rel="prev" title="sage.cli package" href="sage.cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sage.database package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.database.db_connector">sage.database.db_connector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.database.db_iterator">sage.database.db_iterator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.database.descriptors">sage.database.descriptors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.database.estimators">sage.database.estimators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.database.import_manager">sage.database.import_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.database.utils">sage.database.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.database">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+      <li>sage.database package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.database.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-database-package">
+<h1>sage.database package<a class="headerlink" href="#sage-database-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sage.database.core.html">sage.database.core package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.core.html#module-sage.database.core.dataset">sage.database.core.dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.core.html#module-sage.database.core.graph">sage.database.core.graph module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.core.html#module-sage.database.core.rdf_config">sage.database.core.rdf_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.core.html#module-sage.database.core.yaml_config">sage.database.core.yaml_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.core.html#module-sage.database.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sage.database.hdt.html">sage.database.hdt package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.hdt.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.hdt.html#module-sage.database.hdt.connector">sage.database.hdt.connector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.hdt.html#module-sage.database.hdt.iterator">sage.database.hdt.iterator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.hdt.html#module-sage.database.hdt">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sage.database.postgres.html">sage.database.postgres package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.connector">sage.database.postgres.connector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.mvcc_connector">sage.database.postgres.mvcc_connector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.mvcc_queries">sage.database.postgres.mvcc_queries module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.queries">sage.database.postgres.queries module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.transaction_manager">sage.database.postgres.transaction_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.utils">sage.database.postgres.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sage.database.statefull.html">sage.database.statefull package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.statefull.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.statefull.html#module-sage.database.statefull.hashmap_manager">sage.database.statefull.hashmap_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.statefull.html#module-sage.database.statefull.statefull_manager">sage.database.statefull.statefull_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.database.statefull.html#module-sage.database.statefull">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.database.db_connector">
+<span id="sage-database-db-connector-module"></span><h2>sage.database.db_connector module<a class="headerlink" href="#module-sage.database.db_connector" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.db_connector.DatabaseConnector">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.db_connector.</code><code class="sig-name descname">DatabaseConnector</code><a class="headerlink" href="#sage.database.db_connector.DatabaseConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>A DatabaseConnector is an abstract class for creating connectors to a database</p>
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.abort_transaction">
+<code class="sig-name descname">abort_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.abort_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abort any ongoing transaction (if supported by this type of connector)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the database connection</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.commit_transaction">
+<code class="sig-name descname">commit_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.commit_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit any ongoing transaction (if supported by this type of connector)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param">ssubject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a RDF triple from the RDF graph.</p>
+<p>If not overrided, this method raises an exception as it consider the graph as read-only.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Throws: <cite>NotImplementedError</cite> if the database connection is read-only.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.from_config">
+<em class="property">abstract </em><code class="sig-name descname">from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a DatabaseConnector from a dictionnary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a RDF triple into the RDF graph.</p>
+<p>If not overrided, this method raises an exception as it consider the graph as read-only.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Throws: <cite>NotImplementedError</cite> if the database connection is read-only.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.nb_objects">
+<em class="property">property </em><code class="sig-name descname">nb_objects</code><a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.nb_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of objects in the database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.nb_predicates">
+<em class="property">property </em><code class="sig-name descname">nb_predicates</code><a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.nb_predicates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of predicates in the database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.nb_subjects">
+<em class="property">property </em><code class="sig-name descname">nb_subjects</code><a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.nb_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of subjects in the database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.nb_triples">
+<em class="property">property </em><code class="sig-name descname">nb_triples</code><a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.nb_triples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of RDF triples in the database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.open">
+<code class="sig-name descname">open</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the database connection</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.search">
+<em class="property">abstract </em><code class="sig-name descname">search</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em>, <em class="sig-param">last_read: Optional[str] = None</em>, <em class="sig-param">as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.database.db_iterator.DBIterator, int]<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over all RDF triples matching a triple pattern.</p>
+<dl>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the triple pattern.</p></li>
+<li><p>predicate: Predicate of the triple pattern.</p></li>
+<li><p>object: Object of the triple pattern.</p></li>
+<li><p>last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.</p></li>
+<li><p>as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple (<cite>iterator</cite>, <cite>cardinality</cite>), where <cite>iterator</cite> is a Python iterator over RDF triples matching the given triples pattern, and <cite>cardinality</cite> is the estimated cardinality of the triple pattern.</p>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span><span class="p">,</span> <span class="n">cardinality</span> <span class="o">=</span> <span class="n">connector</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;?s&#39;</span><span class="p">,</span> <span class="s1">&#39;http://xmlns.com/foaf/0.1/name&#39;</span><span class="p">,</span> <span class="s1">&#39;?name&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The triple pattern &#39;?s foaf:name ?o&#39; matches </span><span class="si">{cardinality}</span><span class="s2"> RDF triples&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RDF Triple </span><span class="si">{s}</span><span class="s2"> </span><span class="si">{p}</span><span class="s2"> </span><span class="si">{o}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_connector.DatabaseConnector.start_transaction">
+<code class="sig-name descname">start_transaction</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_connector.DatabaseConnector.start_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a transaction (if supported by this type of connector)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.db_iterator">
+<span id="sage-database-db-iterator-module"></span><h2>sage.database.db_iterator module<a class="headerlink" href="#module-sage.database.db_iterator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.db_iterator.DBIterator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.db_iterator.</code><code class="sig-name descname">DBIterator</code><span class="sig-paren">(</span><em class="sig-param">pattern: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.db_iterator.DBIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>A DBIterator follows the iterator protocol and evaluates a triple pattern against a RDF dataset.
+Typically, a subclass of this iterator is returned by a call to DBConnector#search_pattern.</p>
+<dl class="method">
+<dt id="sage.database.db_iterator.DBIterator.has_next">
+<em class="property">abstract </em><code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.db_iterator.DBIterator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if there is still results to read, and False otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_iterator.DBIterator.last_read">
+<em class="property">abstract </em><code class="sig-name descname">last_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.db_iterator.DBIterator.last_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index ID of the last element read</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_iterator.DBIterator.next">
+<em class="property">abstract </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Tuple[str, str, str]<a class="headerlink" href="#sage.database.db_iterator.DBIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next RDF triple or raise <cite>StopIteration</cite> if there are no more triples to scan</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_iterator.DBIterator.object">
+<em class="property">property </em><code class="sig-name descname">object</code><a class="headerlink" href="#sage.database.db_iterator.DBIterator.object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_iterator.DBIterator.predicate">
+<em class="property">property </em><code class="sig-name descname">predicate</code><a class="headerlink" href="#sage.database.db_iterator.DBIterator.predicate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_iterator.DBIterator.subject">
+<em class="property">property </em><code class="sig-name descname">subject</code><a class="headerlink" href="#sage.database.db_iterator.DBIterator.subject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.database.db_iterator.EmptyIterator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.db_iterator.</code><code class="sig-name descname">EmptyIterator</code><span class="sig-paren">(</span><em class="sig-param">pattern: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.db_iterator.EmptyIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sage.database.db_iterator.DBIterator" title="sage.database.db_iterator.DBIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.db_iterator.DBIterator</span></code></a></p>
+<p>An iterator that yields nothing and completes immediatly</p>
+<dl class="method">
+<dt id="sage.database.db_iterator.EmptyIterator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.db_iterator.EmptyIterator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if there is still results to read, and False otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_iterator.EmptyIterator.last_read">
+<code class="sig-name descname">last_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.db_iterator.EmptyIterator.last_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index ID of the last element read</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.db_iterator.EmptyIterator.next">
+<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.db_iterator.EmptyIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next solution mapping or raise <cite>StopIteration</cite> if there are no more solutions</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.descriptors">
+<span id="sage-database-descriptors-module"></span><h2>sage.database.descriptors module<a class="headerlink" href="#module-sage.database.descriptors" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.descriptors.AbstractDescriptor">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.descriptors.</code><code class="sig-name descname">AbstractDescriptor</code><a class="headerlink" href="#sage.database.descriptors.AbstractDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>A descriptor describes a RDF dataset using a given vocabulary/standard</p>
+<dl class="method">
+<dt id="sage.database.descriptors.AbstractDescriptor.describe">
+<em class="property">abstract </em><code class="sig-name descname">describe</code><span class="sig-paren">(</span><em class="sig-param">format: str</em>, <em class="sig-param">encoding='utf-8'</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.descriptors.AbstractDescriptor.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe the dataset using the given format.</p>
+<p>Supported RDF formats: ‘xml’, ‘json-ld’, ‘n3’, ‘turtle’, ‘nt’, ‘pretty-xml’, ‘trix’, ‘trig’ and ‘nquads’.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>rdf_format: RDF serialization format for the description.</p></li>
+<li><p>encoding: String encoding (Default to utf-8).</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The description of the RDF dataset, formatted in the given RDF format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.database.descriptors.VoidDescriptor">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.descriptors.</code><code class="sig-name descname">VoidDescriptor</code><span class="sig-paren">(</span><em class="sig-param">uri: str</em>, <em class="sig-param">graph: sage.database.core.graph.Graph</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.descriptors.VoidDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sage.database.descriptors.AbstractDescriptor" title="sage.database.descriptors.AbstractDescriptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.descriptors.AbstractDescriptor</span></code></a></p>
+<p>A descriptor that describes a Sage dataset using the VOID standard.</p>
+<dl>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>uri: URI of the RDF graph to describe.</p></li>
+<li><p>graph: the RDF Graph to describe.</p></li>
+</ul>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">get_some_graph</span><span class="p">()</span> <span class="c1"># get a RDF graph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uri</span> <span class="o">=</span> <span class="s2">&quot;http://example.org#my-graph&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">desc</span> <span class="o">=</span> <span class="n">VoidDescriptor</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="s2">&quot;turtle&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.database.descriptors.VoidDescriptor.describe">
+<code class="sig-name descname">describe</code><span class="sig-paren">(</span><em class="sig-param">format: str</em>, <em class="sig-param">encoding='utf-8'</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.descriptors.VoidDescriptor.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe the dataset using the given format.</p>
+<p>Supported RDF formats: ‘xml’, ‘json-ld’, ‘n3’, ‘turtle’, ‘nt’, ‘pretty-xml’, ‘trix’, ‘trig’ and ‘nquads’.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>rdf_format: RDF serialization format for the description.</p></li>
+<li><p>encoding: String encoding (Default to utf-8).</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The description of the RDF dataset, formatted in the given RDF format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.descriptors.bind_prefixes">
+<code class="sig-prename descclassname">sage.database.descriptors.</code><code class="sig-name descname">bind_prefixes</code><span class="sig-paren">(</span><em class="sig-param">graph: rdflib.graph.Graph</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.descriptors.bind_prefixes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind commons prefixes to a rdflib Graph.</p>
+<p>Generate readable prefixes when serializing the graph to turtle.</p>
+<p>Argument: The rdflib Graph to which prefixes should be added.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.descriptors.many_void">
+<code class="sig-prename descclassname">sage.database.descriptors.</code><code class="sig-name descname">many_void</code><span class="sig-paren">(</span><em class="sig-param">endpoint_uri: str</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">rdf_format: str</em>, <em class="sig-param">encoding: str = 'utf-8'</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.descriptors.many_void" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe a RDF dataset hosted by a Sage server using the VOID and SPARQL Description languages.</p>
+<p>Supported RDF formats: ‘xml’, ‘json-ld’, ‘n3’, ‘turtle’, ‘nt’, ‘pretty-xml’, ‘trix’, ‘trig’ and ‘nquads’.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>endpoint_uri: URI used to describe the endpoint.</p></li>
+<li><p>dataset: RDF dataset to describe.</p></li>
+<li><p>rdf_format: RDF serialization format for the description.</p></li>
+<li><p>encoding: String encoding (Default to utf-8).</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The description of the RDF dataset, formatted in the given RDF format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.estimators">
+<span id="sage-database-estimators-module"></span><h2>sage.database.estimators module<a class="headerlink" href="#module-sage.database.estimators" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.estimators.pattern_shape_estimate">
+<code class="sig-prename descclassname">sage.database.estimators.</code><code class="sig-name descname">pattern_shape_estimate</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sage.database.estimators.pattern_shape_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ordering number of a triple pattern, according to heurisitcs from [1].</p>
+<p>[1] Tsialiamanis et al., “Heuristics-based Query Optimisation for SPARQL”, in EDBT 2012.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the triple pattern.</p></li>
+<li><p>predicate: Predicate of the triple pattern.</p></li>
+<li><p>obj: Object of the triple pattern.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The ordering number of a triple pattern, as defined in [1].</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.import_manager">
+<span id="sage-database-import-manager-module"></span><h2>sage.database.import_manager module<a class="headerlink" href="#module-sage.database.import_manager" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.import_manager.builtin_backends">
+<code class="sig-prename descclassname">sage.database.import_manager.</code><code class="sig-name descname">builtin_backends</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict[str, Callable[[Dict[str, str]], sage.database.db_connector.DatabaseConnector]]<a class="headerlink" href="#sage.database.import_manager.builtin_backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the built-in backends: HDT, PostgreSQL and MVCC-PostgreSQL.</p>
+<p>Returns: The HDT, PostgreSQL and MVCC-PostgreSQL backends, registered in a dict.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.import_manager.import_backend">
+<code class="sig-prename descclassname">sage.database.import_manager.</code><code class="sig-name descname">import_backend</code><span class="sig-paren">(</span><em class="sig-param">name: str, module_path: str, class_name: str, required_params: List[str]</em><span class="sig-paren">)</span> &#x2192; Callable[[Dict[str, str]], sage.database.db_connector.DatabaseConnector]<a class="headerlink" href="#sage.database.import_manager.import_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new database backend, defined by the user, adn get a factory function to build it.</p>
+<dl>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>name: Name of the database backend.</p></li>
+<li><p>module_path: Path to the python module which contains the backend implementation.</p></li>
+<li><p>class_name: Name of the class that implements the backend. it must be a subclass of :class`sage.database.db_connector.DatabaseConnector`.</p></li>
+<li><p>required_params: list of required configuration parameters for the backend.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A factory function that build an instance of the new backend from a configuration object.</p>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;hdt-bis&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">module_path</span> <span class="o">=</span> <span class="s2">&quot;sage.database.hdt.connector&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">class_name</span> <span class="o">=</span> <span class="s2">&quot;HDTFileConnector&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;file&quot;</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">factory</span> <span class="o">=</span> <span class="n">import_backend</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">module_path</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hdt_backend</span> <span class="o">=</span> <span class="n">factory</span><span class="p">({</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;/opt/data/hdt/dbpedia.hdt&quot;</span> <span class="p">})</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database.utils">
+<span id="sage-database-utils-module"></span><h2>sage.database.utils module<a class="headerlink" href="#module-sage.database.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.utils.get_kind">
+<code class="sig-prename descclassname">sage.database.utils.</code><code class="sig-name descname">get_kind</code><span class="sig-paren">(</span><em class="sig-param">subj: Optional[str], pred: Optional[str], obj: Optional[str]</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.utils.get_kind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the type of a triple pattern.</p>
+<p>Possible types: ???, sp?, ?po, s?o, ?p?, s??, ??o and spo</p>
+<dl>
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the triple pattern.</p></li>
+<li><p>predicate: Predicate of the triple pattern.</p></li>
+<li><p>obj: Object of the triple pattern.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The type of the input triple pattern.</p>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">get_kind</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;http://xmlns.com/foaf/0.1/&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;Bob&quot;@en&#39;</span><span class="p">))</span>
+<span class="go">&quot;?po&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">get_kind</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;http://xmlns.com/foaf/0.1/&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="go">&quot;?p?&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.utils.is_var">
+<code class="sig-prename descclassname">sage.database.utils.</code><code class="sig-name descname">is_var</code><span class="sig-paren">(</span><em class="sig-param">term: Optional[str]</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.utils.is_var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if a RDF term is a SPARQL variable.</p>
+<p>Argument: A RDF term to test.</p>
+<p>Returns: True if the RDF term is a SPARQL variable, False otherwise.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.database">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.database" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.database.core.html" class="btn btn-neutral float-right" title="sage.database.core package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.cli.html" class="btn btn-neutral float-left" title="sage.cli package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

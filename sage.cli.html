@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.cli package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.database package" href="sage.database.html" />
+    <link rel="prev" title="sage package" href="sage.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sage.cli package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.commons">sage.cli.commons module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.grpc_server">sage.cli.grpc_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.http_server">sage.cli.http_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sage-cli-postgres-module">sage.cli.postgres module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.postgres_utils">sage.cli.postgres_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.utils">sage.cli.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.html">sage.database package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+      <li>sage.cli package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.cli.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-cli-package">
+<h1>sage.cli package<a class="headerlink" href="#sage-cli-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.cli.commons">
+<span id="sage-cli-commons-module"></span><h2>sage.cli.commons module<a class="headerlink" href="#module-sage.cli.commons" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.cli.grpc_server">
+<span id="sage-cli-grpc-server-module"></span><h2>sage.cli.grpc_server module<a class="headerlink" href="#module-sage.cli.grpc_server" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.cli.grpc_server.stop_server">
+<code class="sig-prename descclassname">sage.cli.grpc_server.</code><code class="sig-name descname">stop_server</code><span class="sig-paren">(</span><em class="sig-param">server</em>, <em class="sig-param">grace=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.grpc_server.stop_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop server on a CTRL-C event</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.cli.http_server">
+<span id="sage-cli-http-server-module"></span><h2>sage.cli.http_server module<a class="headerlink" href="#module-sage.cli.http_server" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="sage-cli-postgres-module">
+<h2>sage.cli.postgres module<a class="headerlink" href="#sage-cli-postgres-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.cli.postgres_utils">
+<span id="sage-cli-postgres-utils-module"></span><h2>sage.cli.postgres_utils module<a class="headerlink" href="#module-sage.cli.postgres_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.cli.postgres_utils.get_postgres_create_indexes">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_postgres_create_indexes</code><span class="sig-paren">(</span><em class="sig-param">table_name</em>, <em class="sig-param">enable_mvcc=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_postgres_create_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format all postgre CREATE INDEXE with the name of a SQL table</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.postgres_utils.get_postgres_create_table">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_postgres_create_table</code><span class="sig-paren">(</span><em class="sig-param">table_name</em>, <em class="sig-param">enable_mvcc=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_postgres_create_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a postgre CREATE TABLE with the name of a SQL table</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.postgres_utils.get_postgres_insert_into">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_postgres_insert_into</code><span class="sig-paren">(</span><em class="sig-param">table_name</em>, <em class="sig-param">enable_mvcc=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_postgres_insert_into" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an INSERT INTO query compatible with <cite>psycopg2.extras.execute_values</cite> (to support bulk loading).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.cli.utils">
+<span id="sage-cli-utils-module"></span><h2>sage.cli.utils module<a class="headerlink" href="#module-sage.cli.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.cli.utils.get_rdf_reader">
+<code class="sig-prename descclassname">sage.cli.utils.</code><code class="sig-name descname">get_rdf_reader</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">format='nt'</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.utils.get_rdf_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over RDF triples from a file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.utils.load_dataset">
+<code class="sig-prename descclassname">sage.cli.utils.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param">config_path</em>, <em class="sig-param">dataset_name</em>, <em class="sig-param">logger</em>, <em class="sig-param">backends=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.utils.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a dataset from a Sage config file</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.cli">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.cli" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.database.html" class="btn btn-neutral float-right" title="sage.database package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.html" class="btn btn-neutral float-left" title="sage package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

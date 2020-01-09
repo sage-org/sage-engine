@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.http_server package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.query_engine package" href="sage.query_engine.html" />
+    <link rel="prev" title="sage.grpc package" href="sage.grpc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.html">sage.database package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sage.http_server package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.http_server.responses">sage.http_server.responses module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.http_server.server">sage.http_server.server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.http_server.utils">sage.http_server.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.http_server">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+      <li>sage.http_server package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.http_server.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-http-server-package">
+<h1>sage.http_server package<a class="headerlink" href="#sage-http-server-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.http_server.responses">
+<span id="sage-http-server-responses-module"></span><h2>sage.http_server.responses module<a class="headerlink" href="#module-sage.http_server.responses" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.http_server.responses.analyze_term">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">analyze_term</code><span class="sig-paren">(</span><em class="sig-param">value: str</em><span class="sig-paren">)</span> &#x2192; Tuple[str, str, Optional[str], Optional[str]]<a class="headerlink" href="#sage.http_server.responses.analyze_term" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analyze a RDF term and extract various information about it.</p>
+<p>Argument: The RDF term to analyze.</p>
+<dl>
+<dt>Returns: A tuple (<cite>value</cite>, <cite>type</cite>, <cite>extra_label</cite>, <cite>extra_value</cite>) where:</dt><dd><ul class="simple">
+<li><p><cite>value</cite> is the term value.</p></li>
+<li><p><cite>type</cite> is the type of the term (literal or uri).</p></li>
+<li><p><cite>extra_label</cite> is the type of an extra element for this term (datatype or xml:lang).</p></li>
+<li><p><cite>extra_value</cite> is the value of an extra element for this term.</p></li>
+</ul>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">analyze_term</span><span class="p">(</span><span class="s2">&quot;&lt;http://example.org#Anna&gt;&quot;</span><span class="p">)</span>
+<span class="go">(&quot;&lt;http://example.org#Anna&gt;&quot;, &quot;uri&quot;, None, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">analyze_term</span><span class="p">(</span><span class="s1">&#39;&quot;Anna&quot;&#39;</span><span class="p">)</span>
+<span class="go">(&#39;&quot;Anna&quot;&#39;, &quot;literal&quot;, None, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">analyze_term</span><span class="p">(</span><span class="s1">&#39;&quot;Anna&quot;@en&#39;</span><span class="p">)</span>
+<span class="go">(&#39;&quot;Anna&quot;&#39;, &quot;literal&quot;, &quot;xml:lang&quot;, &quot;en&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">analyze_term</span><span class="p">(</span><span class="s1">&#39;&quot;Anna&quot;^^&lt;http://datatype.org#string&gt;&#39;</span><span class="p">)</span>
+<span class="go">(&#39;&quot;Anna&quot;&#39;, &quot;literal&quot;, &quot;datatype&quot;, &quot;&lt;http://datatype.org#string&gt;&quot;)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.binding_to_json">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">binding_to_json</code><span class="sig-paren">(</span><em class="sig-param">binding: Dict[str, str]</em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#sage.http_server.responses.binding_to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a set of solutions bindings in the W3C SPARQL JSON format.</p>
+<p>Argument: A set of solution bindings.</p>
+<p>Returns: The input set of solution bindings, encoded in the W3C SPARQL JSON format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.bindings_to_w3c_xml">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">bindings_to_w3c_xml</code><span class="sig-paren">(</span><em class="sig-param">bindings: Iterable[Dict[str, str]], skol_url: str</em><span class="sig-paren">)</span> &#x2192; xml.etree.ElementTree.Element<a class="headerlink" href="#sage.http_server.responses.bindings_to_w3c_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats a set of bindings into SPARQL results in the W3C SPARQL XML format.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>bindings: An iterable which yields set of solution bindings.</p></li>
+<li><p>skol_url: URL used for the skolemization of blank nodes.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: The input set of solution bindings, encoded in the W3C SPARQL XML format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.ntriples_streaming">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">ntriples_streaming</code><span class="sig-paren">(</span><em class="sig-param">triples: Iterable[Tuple[str, str, str]]</em><span class="sig-paren">)</span> &#x2192; Iterable[str]<a class="headerlink" href="#sage.http_server.responses.ntriples_streaming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize RDF triples in N-Triples string format in a iterable-fashion.</p>
+<p>Argument: An iterable which yields RDF triples to process.</p>
+<p>Yields: RDF triples in a string format, encoded in the N-Triples format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.raw_json_streaming">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">raw_json_streaming</code><span class="sig-paren">(</span><em class="sig-param">bindings: Iterable[Dict[str, str]], next_link: Optional[str], stats: dict, skol_url: str</em><span class="sig-paren">)</span> &#x2192; Iterable[str]<a class="headerlink" href="#sage.http_server.responses.raw_json_streaming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield a page of SaGe results in a non-standard JSON format, so it can be sent in an HTTP response.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>bindings: An iterable which yields set of solution bindings.</p></li>
+<li><p>next_link: Link to a SaGe saved plan. Use <cite>None</cite> if there is no one, i.e., the query execution has completed during the quantum.</p></li>
+<li><p>stats: Statistics about query execution.</p></li>
+<li><p>skol_url: URL used for the skolemization of blank nodes.</p></li>
+</ul>
+</dd>
+<dt>Yields:</dt><dd><p>A page of SaGe results in the W3C SPARQL JSON results format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.skolemize">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">skolemize</code><span class="sig-paren">(</span><em class="sig-param">bindings: Iterable[Dict[str, str]], url: str</em><span class="sig-paren">)</span> &#x2192; Iterable[Dict[str, str]]<a class="headerlink" href="#sage.http_server.responses.skolemize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skolemize blank nodes in a list of solution bindings.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>bindings: An iterable which yields set of solution bindings to process.</p></li>
+<li><p>url: Prefix URL used for skolemization.</p></li>
+</ul>
+</dd>
+<dt>Yields:</dt><dd><p>Solution bindings, where blank nodes have been skolemized using the input URL.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.skolemize_one">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">skolemize_one</code><span class="sig-paren">(</span><em class="sig-param">bnode: str</em>, <em class="sig-param">url: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.http_server.responses.skolemize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skolemize a blank node.</p>
+<p>If the input value is not a Blank node, then do nothing.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>value: RDF Blank node to skolemize.</p></li>
+<li><p>url: Prefix URL used for skolemization.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The skolemized blank node, or the value itself if it was not a blank node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.stream_json_list">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">stream_json_list</code><span class="sig-paren">(</span><em class="sig-param">iterator: Iterable[Dict[str, str]]</em><span class="sig-paren">)</span> &#x2192; Iterable[str]<a class="headerlink" href="#sage.http_server.responses.stream_json_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator for streaming a list of JSON results in an HTTP response.</p>
+<p>Argument: An iterator which yields solutions bindings.</p>
+<p>Yields: Solution bindings as string-encoded JSON.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.w3c_json_streaming">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">w3c_json_streaming</code><span class="sig-paren">(</span><em class="sig-param">bindings: Iterable[Dict[str, str]], next_link: Optional[str], stats: dict, skol_url: str</em><span class="sig-paren">)</span> &#x2192; Iterable[str]<a class="headerlink" href="#sage.http_server.responses.w3c_json_streaming" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield a page of SaGe results in the W3C SPARQL JSON results format, so it can be sent in an HTTP response.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>bindings: An iterable which yields set of solution bindings.</p></li>
+<li><p>next_link: Link to a SaGe saved plan. Use <cite>None</cite> if there is no one, i.e., the query execution has completed during the quantum.</p></li>
+<li><p>stats: Statistics about query execution.</p></li>
+<li><p>skol_url: URL used for the skolemization of blank nodes.</p></li>
+</ul>
+</dd>
+<dt>Yields:</dt><dd><p>A page of SaGe results in the W3C SPARQL JSON results format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.responses.w3c_xml">
+<code class="sig-prename descclassname">sage.http_server.responses.</code><code class="sig-name descname">w3c_xml</code><span class="sig-paren">(</span><em class="sig-param">bindings: Iterable[Dict[str, str]], next_link: Optional[str], stats: dict, skol_url: str</em><span class="sig-paren">)</span> &#x2192; Iterable[str]<a class="headerlink" href="#sage.http_server.responses.w3c_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield a page of SaGe results in the W3C SPARQL XML results format, so it can be sent in an HTTP response.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>bindings: An iterable which yields set of solution bindings.</p></li>
+<li><p>next_link: Link to a SaGe saved plan. Use <cite>None</cite> if there is no one, i.e., the query execution has completed during the quantum.</p></li>
+<li><p>stats: Statistics about query execution.</p></li>
+<li><p>skol_url: URL used for the skolemization of blank nodes.</p></li>
+</ul>
+</dd>
+<dt>Yields:</dt><dd><p>A page of SaGe results in the W3C SPARQL JSON results format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.http_server.server">
+<span id="sage-http-server-server-module"></span><h2>sage.http_server.server module<a class="headerlink" href="#module-sage.http_server.server" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.http_server.server.SagePostQuery">
+<em class="property">class </em><code class="sig-prename descclassname">sage.http_server.server.</code><code class="sig-name descname">SagePostQuery</code><a class="headerlink" href="#sage.http_server.server.SagePostQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pydantic.main.BaseModel</span></code></p>
+<p>Data model for the body of POST SPARQL queries</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.server.choose_void_format">
+<code class="sig-prename descclassname">sage.http_server.server.</code><code class="sig-name descname">choose_void_format</code><span class="sig-paren">(</span><em class="sig-param">mimetypes</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.http_server.server.choose_void_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.server.create_response">
+<code class="sig-prename descclassname">sage.http_server.server.</code><code class="sig-name descname">create_response</code><span class="sig-paren">(</span><em class="sig-param">mimetypes: List[str], bindings: List[Dict[str, str]], next_page: Optional[str], stats: dict, skol_url: str</em><span class="sig-paren">)</span> &#x2192; starlette.responses.Response<a class="headerlink" href="#sage.http_server.server.create_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an HTTP response for the results of SPARQL query execution.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>mimetypes: mimetypes from the input HTTP request.</p></li>
+<li><p>bindings: list of query results.</p></li>
+<li><p>next_link: Link to a SaGe saved plan. Use <cite>None</cite> if there is no one, i.e., the query execution has completed during the quantum.</p></li>
+<li><p>stats: Statistics about query execution.</p></li>
+<li><p>skol_url: URL used for the skolemization of blank nodes.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>An HTTP response built from the input mimetypes and the SPARQL query results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.server.execute_query">
+<em class="property">async </em><code class="sig-prename descclassname">sage.http_server.server.</code><code class="sig-name descname">execute_query</code><span class="sig-paren">(</span><em class="sig-param">query: str, default_graph_uri: str, next_link: Optional[str], dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span> &#x2192; Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]<a class="headerlink" href="#sage.http_server.server.execute_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a query using the SageEngine and returns the appropriate HTTP response.</p>
+<p>Any failure will results in a rollback/abort on the current query execution.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>query: SPARQL query to execute.</p></li>
+<li><p>default_graph_uri: URI of the default RDF graph to use.</p></li>
+<li><p>next_link: URI to a saved plan. Can be <cite>None</cite> if query execution should starts from the beginning.</p></li>
+<li><p>dataset: RDF dataset on which the query is executed.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple (<cite>bindings</cite>, <cite>next_page</cite>, <cite>stats</cite>) where:
+* <cite>bindings</cite> is a list of query results.
+* <cite>next_page</cite> is a link to saved query execution state. Sets to <cite>None</cite> if query execution completed during the time quantum.
+* <cite>stats</cite> are statistics about query execution.</p>
+</dd>
+</dl>
+<p>Throws: Any exception that have occured during query execution.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.server.run_app">
+<code class="sig-prename descclassname">sage.http_server.server.</code><code class="sig-name descname">run_app</code><span class="sig-paren">(</span><em class="sig-param">config_file: str</em><span class="sig-paren">)</span> &#x2192; fastapi.applications.FastAPI<a class="headerlink" href="#sage.http_server.server.run_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the HTTP server, compatible with uvicorn/gunicorn.</p>
+<p>Argument: SaGe configuration file, in YAML format.</p>
+<p>Returns: The FastAPI HTTP application.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.http_server.utils">
+<span id="sage-http-server-utils-module"></span><h2>sage.http_server.utils module<a class="headerlink" href="#module-sage.http_server.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.http_server.utils.decode_saved_plan">
+<code class="sig-prename descclassname">sage.http_server.utils.</code><code class="sig-name descname">decode_saved_plan</code><span class="sig-paren">(</span><em class="sig-param">input: str</em><span class="sig-paren">)</span> &#x2192; iterators_pb2.RootTree<a class="headerlink" href="#sage.http_server.utils.decode_saved_plan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode a Protobuf-based saved plan from a string format.</p>
+<p>Argument: A saved plan, encoded as a string of bytes.</p>
+<p>Returns: The saved plan, encoded as a Protobuf message.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.utils.encode_saved_plan">
+<code class="sig-prename descclassname">sage.http_server.utils.</code><code class="sig-name descname">encode_saved_plan</code><span class="sig-paren">(</span><em class="sig-param">savedPlan: iterators_pb2.RootTree</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.http_server.utils.encode_saved_plan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode a Protobuf-based saved plan into string format.</p>
+<p>Argument: A saved plan, encoded as a Protobuf message.</p>
+<p>Returns: The saved plan, encoded as a string of bytes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.http_server.utils.secure_url">
+<code class="sig-prename descclassname">sage.http_server.utils.</code><code class="sig-name descname">secure_url</code><span class="sig-paren">(</span><em class="sig-param">url: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.http_server.utils.secure_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Secure potentially ill formatted urls.</p>
+<p>Argument: URL to secure.</p>
+<p>Returns: Secured URL.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.http_server">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.http_server" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.query_engine.html" class="btn btn-neutral float-right" title="sage.query_engine package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.grpc.html" class="btn btn-neutral float-left" title="sage.grpc package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

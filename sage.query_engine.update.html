@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.query_engine.update package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="sage.query_engine.protobuf package" href="sage.query_engine.protobuf.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.html">sage.database package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="sage.query_engine.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.exceptions">sage.query_engine.exceptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.primitives">sage.query_engine.primitives module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.sage_engine">sage.query_engine.sage_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+          <li><a href="sage.query_engine.html">sage.query_engine package</a> &raquo;</li>
+        
+      <li>sage.query_engine.update package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.query_engine.update.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-query-engine-update-package">
+<h1>sage.query_engine.update package<a class="headerlink" href="#sage-query-engine-update-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.query_engine.update.delete">
+<span id="sage-query-engine-update-delete-module"></span><h2>sage.query_engine.update.delete module<a class="headerlink" href="#module-sage.query_engine.update.delete" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.update.delete.DeleteOperator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.update.delete.</code><code class="sig-name descname">DeleteOperator</code><span class="sig-paren">(</span><em class="sig-param">quads: List[Tuple[str, str, str, str]], dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.update.delete.DeleteOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.query_engine.iterators.html#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
+<p>A DeleteOperator deletes RDF triples from a RDF dataset.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>quads: List of RDF quads to delete from the RDF dataset.</p></li>
+<li><p>dataset: RDF dataset.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.query_engine.update.delete.DeleteOperator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.query_engine.update.delete.DeleteOperator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the iterator has more quads to delete</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.delete.DeleteOperator.next">
+<em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.update.delete.DeleteOperator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the next quad from the RDF dataset.</p>
+<p>This function works in an iterator fashion, so it can be used in a pipeline of iterators.
+It may also contains <cite>non interruptible</cite> clauses which must 
+be atomically evaluated before preemption occurs.</p>
+<p>Returns: The quad if it was successfully deleted, otwherise it returns <cite>None</cite>.</p>
+<p>Throws: <cite>StopAsyncIteration</cite> if the iterator has no more quads to delete.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.delete.DeleteOperator.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; iterators_pb2.SavedDeleteData<a class="headerlink" href="#sage.query_engine.update.delete.DeleteOperator.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save and serialize the iterator as a Protobuf message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.delete.DeleteOperator.serialized_name">
+<code class="sig-name descname">serialized_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.delete.DeleteOperator.serialized_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the iterator, as used in the plan serialization protocol</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.update.if_exists">
+<span id="sage-query-engine-update-if-exists-module"></span><h2>sage.query_engine.update.if_exists module<a class="headerlink" href="#module-sage.query_engine.update.if_exists" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.update.if_exists.IfExistsOperator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.update.if_exists.</code><code class="sig-name descname">IfExistsOperator</code><span class="sig-paren">(</span><em class="sig-param">quads: List[Dict[str, str]], dataset: sage.database.core.dataset.Dataset, start_time: datetime.datetime</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.update.if_exists.IfExistsOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.query_engine.iterators.html#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
+<p>An IfExistsOperator checks if all N-Quads in a set exist in the database.</p>
+<p>It is used to provide the “serializability per solution group” consistency level.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>quads: RDF quads to validate.</p></li>
+<li><p>dataset: RDF dataset.</p></li>
+<li><p>start_time: A timestamp used to perform all reads against a consistent version of the dataset.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.query_engine.update.if_exists.IfExistsOperator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.query_engine.update.if_exists.IfExistsOperator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the iterator has more quads to validate</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.if_exists.IfExistsOperator.missing_nquads">
+<em class="property">property </em><code class="sig-name descname">missing_nquads</code><a class="headerlink" href="#sage.query_engine.update.if_exists.IfExistsOperator.missing_nquads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if, at the time of invocation, at least one n-quad was not found in the RDF dataset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.if_exists.IfExistsOperator.next">
+<em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.update.if_exists.IfExistsOperator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate the next quad using the RDF dataset.</p>
+<p>This function works in an iterator fashion, so it can be used in a pipeline of iterators.
+It may also contains <cite>non interruptible</cite> clauses which must 
+be atomically evaluated before preemption occurs.</p>
+<p>Returns: always <cite>None</cite></p>
+<p>Throws: <cite>StopAsyncIteration</cite> if the iterator has no more quads to validate.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.if_exists.IfExistsOperator.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.if_exists.IfExistsOperator.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Useless for this operator, as it MUST run completely inside a quantum</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.if_exists.IfExistsOperator.serialized_name">
+<code class="sig-name descname">serialized_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.if_exists.IfExistsOperator.serialized_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the iterator, as used in the plan serialization protocol</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.update.insert">
+<span id="sage-query-engine-update-insert-module"></span><h2>sage.query_engine.update.insert module<a class="headerlink" href="#module-sage.query_engine.update.insert" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.update.insert.InsertOperator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.update.insert.</code><code class="sig-name descname">InsertOperator</code><span class="sig-paren">(</span><em class="sig-param">quads: List[Tuple[str, str, str, str]], dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.update.insert.InsertOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.query_engine.iterators.html#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
+<p>A DeleteOperator inserts RDF triples into a RDF dataset.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>quads: List of RDF quads to insert into the RDF dataset.</p></li>
+<li><p>dataset: RDF dataset</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.query_engine.update.insert.InsertOperator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.query_engine.update.insert.InsertOperator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the iterator has more quads to insert</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.insert.InsertOperator.next">
+<em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.update.insert.InsertOperator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert the next quad into the RDF dataset.</p>
+<p>This function works in an iterator fashion, so it can be used in a pipeline of iterators.
+It may also contains <cite>non interruptible</cite> clauses which must 
+be atomically evaluated before preemption occurs.</p>
+<p>Returns: The quad if it was successfully inserted, otwherise it returns <cite>None</cite>.</p>
+<p>Throws: <cite>StopAsyncIteration</cite> if the iterator has no more quads to insert.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.insert.InsertOperator.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; iterators_pb2.SavedInsertData<a class="headerlink" href="#sage.query_engine.update.insert.InsertOperator.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save and serialize the iterator as a Protobuf message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.insert.InsertOperator.serialized_name">
+<code class="sig-name descname">serialized_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.insert.InsertOperator.serialized_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the iterator, as used in the plan serialization protocol</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.update.serializable">
+<span id="sage-query-engine-update-serializable-module"></span><h2>sage.query_engine.update.serializable module<a class="headerlink" href="#module-sage.query_engine.update.serializable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.update.serializable.SerializableUpdate">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.update.serializable.</code><code class="sig-name descname">SerializableUpdate</code><span class="sig-paren">(</span><em class="sig-param">dataset: sage.database.core.dataset.Dataset, read_input: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator, delete_templates: List[Tuple[str, str, str, str]], insert_templates: List[Tuple[str, str, str, str]]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.update.serializable.SerializableUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.query_engine.iterators.html#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
+<p>A SerializableUpdate iterator evaluates a SPARQL INSERT/DELETE query as a serializable transaction.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>dataset: RDF dataset to update.</p></li>
+<li><p>read_input: Iterator that evaluates a WHERE clause.</p></li>
+<li><p>delete_templates: List of delete templates from the DELETE clause (nquads to delete).</p></li>
+<li><p>insert_templates: List of insert templates from the INSERT clause (nquads to insert).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.query_engine.update.serializable.SerializableUpdate.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.query_engine.update.serializable.SerializableUpdate.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the iterator has more quads to process.</p>
+<dl class="simple">
+<dt>This iterator has not finished to process quads iff:</dt><dd><ul class="simple">
+<li><p>the read set is not entierly built, or</p></li>
+<li><p>all deletes have not been performed, or</p></li>
+<li><p>all insert have not been performed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.serializable.SerializableUpdate.next">
+<em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.update.serializable.SerializableUpdate.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the SPARQL INSERT/DELETE query.</p>
+<p>This function blocks until the whole query has been processed.
+hence, it breaks the iterator model as all the work is done in a single call to next()
+It may also contains <cite>non interruptible</cite> clauses which must 
+be atomically evaluated before preemption occurs.</p>
+<p>Returns: Always <cite>None</cite></p>
+<dl class="simple">
+<dt>Throws:</dt><dd><ul class="simple">
+<li><p><cite>StopAsyncIteration</cite> if the iterator has fnished query processing.</p></li>
+<li><p><cite>SerializationFailure</cite> if the SPARQL UPDATE query cannot be serialized as a transaction.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.serializable.SerializableUpdate.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.serializable.SerializableUpdate.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Useless for this operator, as it MUST run completely inside a quantum</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.serializable.SerializableUpdate.serialized_name">
+<code class="sig-name descname">serialized_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.serializable.SerializableUpdate.serialized_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the iterator, as used in the plan serialization protocol</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.update.serializable.apply_templates">
+<code class="sig-prename descclassname">sage.query_engine.update.serializable.</code><code class="sig-name descname">apply_templates</code><span class="sig-paren">(</span><em class="sig-param">mappings: List[Dict[str, str]], templates: List[Tuple[str, str, str, str]]</em><span class="sig-paren">)</span> &#x2192; Iterable[Tuple[str, str, str, str]]<a class="headerlink" href="#sage.query_engine.update.serializable.apply_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator that applies each mapping in a set to a set of quads templates
+and returns the distinct quads produced.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.update.update_sequence">
+<span id="sage-query-engine-update-update-sequence-module"></span><h2>sage.query_engine.update.update_sequence module<a class="headerlink" href="#module-sage.query_engine.update.update_sequence" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.update.update_sequence.UpdateSequenceOperator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.update.update_sequence.</code><code class="sig-name descname">UpdateSequenceOperator</code><span class="sig-paren">(</span><em class="sig-param">if_exists_op: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">delete_op: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">insert_op: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.update.update_sequence.UpdateSequenceOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.query_engine.iterators.html#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
+<p>An UpdateSequenceOperator evaluates a “IF_EXISTS DELETE INSERT” query.</p>
+<p>It is used to provide serializability per solution group.
+To do so, it sequentually evaluates a IfExistsOperator, then a DeleteOperator and finally an InsertOperator.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>if_exists_op: Operator used to evaluated the IF_EXISTS clause.</p></li>
+<li><p>delete_op: Operator used to evaluated the DELETE clause.</p></li>
+<li><p>insert_op: Operator used to evaluated the INSERT clause.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.query_engine.update.update_sequence.UpdateSequenceOperator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.query_engine.update.update_sequence.UpdateSequenceOperator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the iterator has more quads to process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.update_sequence.UpdateSequenceOperator.next">
+<em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.update.update_sequence.UpdateSequenceOperator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Advance in the sequence of operations.</p>
+<p>This function works in an iterator fashion, so it can be used in a pipeline of iterators.
+It may also contains <cite>non interruptible</cite> clauses which must 
+be atomically evaluated before preemption occurs.</p>
+<p>Returns: Always <cite>None</cite></p>
+<dl class="simple">
+<dt>Throws:</dt><dd><ul class="simple">
+<li><p><cite>StopAsyncIteration</cite> if the iterator has fnished query processing.</p></li>
+<li><p><cite>DeleteInsertConflict</cite> if a read-write conflict is detected.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.update_sequence.UpdateSequenceOperator.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.update_sequence.UpdateSequenceOperator.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Useless for this operator, as it MUST run completely inside a quantum</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.update_sequence.UpdateSequenceOperator.serialized_name">
+<code class="sig-name descname">serialized_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.update.update_sequence.UpdateSequenceOperator.serialized_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the iterator, as used in the plan serialization protocol</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.update">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.query_engine.update" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="sage.query_engine.protobuf.html" class="btn btn-neutral float-left" title="sage.query_engine.protobuf package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

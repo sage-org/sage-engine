@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.query_engine package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.query_engine.iterators package" href="sage.query_engine.iterators.html" />
+    <link rel="prev" title="sage.http_server package" href="sage.http_server.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.html">sage.database package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sage.query_engine package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine.exceptions">sage.query_engine.exceptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine.primitives">sage.query_engine.primitives module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine.sage_engine">sage.query_engine.sage_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+      <li>sage.query_engine package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.query_engine.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-query-engine-package">
+<h1>sage.query_engine package<a class="headerlink" href="#sage-query-engine-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sage.query_engine.iterators.html">sage.query_engine.iterators package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.filter">sage.query_engine.iterators.filter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.loader">sage.query_engine.iterators.loader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.nlj">sage.query_engine.iterators.nlj module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.preemptable_iterator">sage.query_engine.iterators.preemptable_iterator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.projection">sage.query_engine.iterators.projection module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.scan">sage.query_engine.iterators.scan module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.union">sage.query_engine.iterators.union module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.utils">sage.query_engine.iterators.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.iterators.html#module-sage.query_engine.iterators">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sage.query_engine.optimizer.html">sage.query_engine.optimizer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.optimizer.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.optimizer.html#module-sage.query_engine.optimizer.join_builder">sage.query_engine.optimizer.join_builder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.optimizer.html#module-sage.query_engine.optimizer.query_parser">sage.query_engine.optimizer.query_parser module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.optimizer.html#module-sage.query_engine.optimizer.utils">sage.query_engine.optimizer.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.optimizer.html#module-sage.query_engine.optimizer">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sage.query_engine.protobuf.html">sage.query_engine.protobuf package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.protobuf.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.protobuf.html#module-sage.query_engine.protobuf.iterators_pb2">sage.query_engine.protobuf.iterators_pb2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.protobuf.html#module-sage.query_engine.protobuf.utils">sage.query_engine.protobuf.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.protobuf.html#module-sage.query_engine.protobuf">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sage.query_engine.update.html">sage.query_engine.update package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.update.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.update.html#module-sage.query_engine.update.delete">sage.query_engine.update.delete module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.update.html#module-sage.query_engine.update.if_exists">sage.query_engine.update.if_exists module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.update.html#module-sage.query_engine.update.insert">sage.query_engine.update.insert module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.update.html#module-sage.query_engine.update.serializable">sage.query_engine.update.serializable module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.update.html#module-sage.query_engine.update.update_sequence">sage.query_engine.update.update_sequence module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.update.html#module-sage.query_engine.update">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.query_engine.exceptions">
+<span id="sage-query-engine-exceptions-module"></span><h2>sage.query_engine.exceptions module<a class="headerlink" href="#module-sage.query_engine.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="sage.query_engine.exceptions.DeleteInsertConflict">
+<em class="property">exception </em><code class="sig-prename descclassname">sage.query_engine.exceptions.</code><code class="sig-name descname">DeleteInsertConflict</code><a class="headerlink" href="#sage.query_engine.exceptions.DeleteInsertConflict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when a conflict happended during the serialization of a transaction</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="sage.query_engine.exceptions.TooManyResults">
+<em class="property">exception </em><code class="sig-prename descclassname">sage.query_engine.exceptions.</code><code class="sig-name descname">TooManyResults</code><a class="headerlink" href="#sage.query_engine.exceptions.TooManyResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when the maximum number of results for a query execution has been exceeded</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="sage.query_engine.exceptions.UnsupportedSPARQL">
+<em class="property">exception </em><code class="sig-prename descclassname">sage.query_engine.exceptions.</code><code class="sig-name descname">UnsupportedSPARQL</code><a class="headerlink" href="#sage.query_engine.exceptions.UnsupportedSPARQL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when a SPARQL feature is not supported by the Sage query engine</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.primitives">
+<span id="sage-query-engine-primitives-module"></span><h2>sage.query_engine.primitives module<a class="headerlink" href="#module-sage.query_engine.primitives" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.primitives.PreemptiveLoop">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.primitives.</code><code class="sig-name descname">PreemptiveLoop</code><span class="sig-paren">(</span><em class="sig-param">threshold=50</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.primitives.PreemptiveLoop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Utility context manager to run loops in a preemptive env. with asyncio.</p>
+<p>Basically, this class allows one to trigger <cite>asyncio.sleep(0)</cite> at fixed interval,
+to yield control to the scheduler in loops that run in an event loop.
+Otherwise, such loops never yield back to the scheduler, which breaks the Round-Robin
+scheduling algorithm of the preemptive Web server.
+Yielding is performed using the <cite>tick()</cite> method.</p>
+<p>However, a call to <cite>asyncio.sleep(0)</cite> costs a lot in term of performance, so we only
+trigger every <cite>threshold</cite> calls to the tick() method. 
+<strong>This parameter defaults to 50 cycles</strong>.
+So, to optimize query execution performance, on need to minimize 
+the use of loops in the pipeline of iterators and optimize the <cite>threshold</cite> value.</p>
+<p>Argument: Number of ticks between each call to asyncio.sleep</p>
+<dl>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">PreemptiveLoop</span><span class="p">()</span> <span class="k">as</span> <span class="n">loop</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">tick</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.query_engine.primitives.PreemptiveLoop.tick">
+<em class="property">async </em><code class="sig-name descname">tick</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.primitives.PreemptiveLoop.tick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move to the next iteration and allow interruption of the current loop (if required)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.sage_engine">
+<span id="sage-query-engine-sage-engine-module"></span><h2>sage.query_engine.sage_engine module<a class="headerlink" href="#module-sage.query_engine.sage_engine" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.sage_engine.SageEngine">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.sage_engine.</code><code class="sig-name descname">SageEngine</code><a class="headerlink" href="#sage.query_engine.sage_engine.SageEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>SaGe query engine, used to evaluated a preemptable physical query execution plan</p>
+<dl class="method">
+<dt id="sage.query_engine.sage_engine.SageEngine.execute">
+<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">plan: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">quantum: int</em>, <em class="sig-param">limit=inf</em><span class="sig-paren">)</span> &#x2192; Tuple[List[Dict[str, str]], Optional[iterators_pb2.RootTree], bool, Optional[str]]<a class="headerlink" href="#sage.query_engine.sage_engine.SageEngine.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a preemptable physical query execution plan under a time quantum.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>plan: Root of the pipeline of iterator.</p></li>
+<li><p>quantum: Time quantum used to execute the query.</p></li>
+</ul>
+</dd>
+<dt>Returns: A tuple (<code class="docutils literal notranslate"><span class="pre">results</span></code>, <code class="docutils literal notranslate"><span class="pre">saved_plan</span></code>, <code class="docutils literal notranslate"><span class="pre">is_done</span></code>, <code class="docutils literal notranslate"><span class="pre">abort_reason</span></code>) where:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">results</span></code> is a list of solution mappings found during query execution</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">saved_plan</span></code> is the state of the plan saved using protocol-buffers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_done</span></code> is True when the plan has completed query evalution, False otherwise</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">abort_reason</span></code> is True if the query was aborted due a to concurrency control issue</p></li>
+</ul>
+</dd>
+</dl>
+<p>Throws: Any exception raised during query execution.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.sage_engine.executor">
+<em class="property">async </em><code class="sig-prename descclassname">sage.query_engine.sage_engine.</code><code class="sig-name descname">executor</code><span class="sig-paren">(</span><em class="sig-param">pipeline: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">queue: asyncio.queues.Queue</em>, <em class="sig-param">limit: int</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.sage_engine.executor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a pipeline of iterator under a time quantum.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>pipeline: Root of the pipeline of iterator.</p></li>
+<li><p>queue: Async queue used to store query results.</p></li>
+<li><p>limit: Maximum number of query results to fetch from the pipeline.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Throws: Any exception raised during query execution.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.query_engine" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.query_engine.iterators.html" class="btn btn-neutral float-right" title="sage.query_engine.iterators package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.http_server.html" class="btn btn-neutral float-left" title="sage.http_server package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.query_engine.optimizer package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.query_engine.protobuf package" href="sage.query_engine.protobuf.html" />
+    <link rel="prev" title="sage.query_engine.iterators package" href="sage.query_engine.iterators.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.html">sage.database package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="sage.query_engine.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.exceptions">sage.query_engine.exceptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.primitives">sage.query_engine.primitives module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.sage_engine">sage.query_engine.sage_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+          <li><a href="sage.query_engine.html">sage.query_engine package</a> &raquo;</li>
+        
+      <li>sage.query_engine.optimizer package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.query_engine.optimizer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sage-query-engine-optimizer-package">
+<h1>sage.query_engine.optimizer package<a class="headerlink" href="#sage-query-engine-optimizer-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sage.query_engine.optimizer.join_builder">
+<span id="sage-query-engine-optimizer-join-builder-module"></span><h2>sage.query_engine.optimizer.join_builder module<a class="headerlink" href="#module-sage.query_engine.optimizer.join_builder" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.query_engine.optimizer.join_builder.build_left_join_tree">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.join_builder.</code><code class="sig-name descname">build_left_join_tree</code><span class="sig-paren">(</span><em class="sig-param">bgp: List[Dict[str, str]], dataset: sage.database.core.dataset.Dataset, default_graph: str, as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.query_engine.iterators.preemptable_iterator.PreemptableIterator, List[str], Dict[str, str]]<a class="headerlink" href="#sage.query_engine.optimizer.join_builder.build_left_join_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a Left-linear join tree from a Basic Graph pattern.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>bgp: Basic Graph pattern used to build the join tree.</p></li>
+<li><p>dataset: RDF dataset on which the BGPC is evaluated.</p></li>
+<li><p>default_graph: URI of the default graph used for BGP evaluation.</p></li>
+<li><p>as_of: A timestamp used to perform all reads against a consistent version of the dataset. If <cite>None</cite>, use the latest version of the dataset, which does not guarantee snapshot isolation.</p></li>
+</ul>
+</dd>
+<dt>Returns: A tuple (<cite>iterator</cite>, <cite>query_vars</cite>, <cite>cardinalities</cite>) where:</dt><dd><ul class="simple">
+<li><p><cite>iterator</cite> is the root of the Left-linear join tree.</p></li>
+<li><p><cite>query_vars</cite> is the list of all SPARQL variables found in the BGP.</p></li>
+<li><p><cite>cardinalities</cite> is the list of estimated cardinalities of all triple patterns in the BGP.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.optimizer.query_parser">
+<span id="sage-query-engine-optimizer-query-parser-module"></span><h2>sage.query_engine.optimizer.query_parser module<a class="headerlink" href="#module-sage.query_engine.optimizer.query_parser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.query_engine.optimizer.query_parser.ConsistencyLevel">
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">ConsistencyLevel</code><a class="headerlink" href="#sage.query_engine.optimizer.query_parser.ConsistencyLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>The consistency level choosen for executing the query</p>
+<dl class="attribute">
+<dt id="sage.query_engine.optimizer.query_parser.ConsistencyLevel.ATOMIC_PER_QUANTUM">
+<code class="sig-name descname">ATOMIC_PER_QUANTUM</code><em class="property"> = 3</em><a class="headerlink" href="#sage.query_engine.optimizer.query_parser.ConsistencyLevel.ATOMIC_PER_QUANTUM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sage.query_engine.optimizer.query_parser.ConsistencyLevel.ATOMIC_PER_ROW">
+<code class="sig-name descname">ATOMIC_PER_ROW</code><em class="property"> = 1</em><a class="headerlink" href="#sage.query_engine.optimizer.query_parser.ConsistencyLevel.ATOMIC_PER_ROW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sage.query_engine.optimizer.query_parser.ConsistencyLevel.SERIALIZABLE">
+<code class="sig-name descname">SERIALIZABLE</code><em class="property"> = 2</em><a class="headerlink" href="#sage.query_engine.optimizer.query_parser.ConsistencyLevel.SERIALIZABLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.format_term">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">format_term</code><span class="sig-paren">(</span><em class="sig-param">term: Union[rdflib.term.BNode, rdflib.term.Literal, rdflib.term.URIRef, rdflib.term.Variable]</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.format_term" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a rdflib RDF Term into the format used by SaGe.</p>
+<p>Argument: The rdflib RDF Term to convert.</p>
+<p>Returns: The RDF term in Sage text format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.get_quads_from_update">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">get_quads_from_update</code><span class="sig-paren">(</span><em class="sig-param">node: dict</em>, <em class="sig-param">default_graph: str</em><span class="sig-paren">)</span> &#x2192; List[Tuple[str, str, str, str]]<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.get_quads_from_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all quads from a SPARQL update operation (Delete or Insert).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>node: Node of the logical query execution plan.</p></li>
+<li><p>default_graph: URI of the default RDF graph.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The list of all N-Quads found in the input node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.get_triples_from_graph">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">get_triples_from_graph</code><span class="sig-paren">(</span><em class="sig-param">node: dict, current_graphs: List[str]</em><span class="sig-paren">)</span> &#x2192; List[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.get_triples_from_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect triples in a BGP or a BGP nested in a GRAPH clause.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>node: Node of the logical query execution plan.</p></li>
+<li><p>current_graphs: List of RDF graphs URIs.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The list of localized triple patterns found in the input node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.localize_triples">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">localize_triples</code><span class="sig-paren">(</span><em class="sig-param">triples: List[Dict[str, str]], graphs: List[str]</em><span class="sig-paren">)</span> &#x2192; Iterable[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.localize_triples" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs data localization of a set of triple patterns.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>triples: Triple patterns to localize.</p></li>
+<li><p>graphs: List of RDF graphs URIs used for data localization.</p></li>
+</ul>
+</dd>
+<dt>Yields:</dt><dd><p>The localized triple patterns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.parse_filter_expr">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">parse_filter_expr</code><span class="sig-paren">(</span><em class="sig-param">expr: dict</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.parse_filter_expr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a rdflib SPARQL FILTER expression into a string representation.</p>
+<p>Argument: SPARQL FILTER expression in rdflib format.</p>
+<p>Returns: The SPARQL FILTER expression in string format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.parse_query">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">parse_query</code><span class="sig-paren">(</span><em class="sig-param">query: str</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">default_graph: str</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.query_engine.iterators.preemptable_iterator.PreemptableIterator, dict]<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.parse_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a read-only SPARQL query into a physical query execution plan.</p>
+<p>For parsing SPARQL UPDATE query, please refers to the <cite>parse_update</cite> method.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>query: SPARQL query to parse.</p></li>
+<li><p>dataset: RDF dataset on which the query is executed.</p></li>
+<li><p>default_graph: URI of the default graph.</p></li>
+</ul>
+</dd>
+<dt>Returns: A tuple (<cite>iterator</cite>, <cite>cardinalities</cite>) where:</dt><dd><ul class="simple">
+<li><p><cite>iterator</cite> is the root of a pipeline of iterators used to execute the query.</p></li>
+<li><p><cite>cardinalities</cite> is the list of estimated cardinalities of all triple patterns in the query.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Throws: <cite>UnsupportedSPARQL</cite> is the SPARQL query contains features not supported by the SaGe query engine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.parse_query_node">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">parse_query_node</code><span class="sig-paren">(</span><em class="sig-param">node: dict, dataset: sage.database.core.dataset.Dataset, current_graphs: List[str], cardinalities: dict, as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.parse_query_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively parse node in the query logical plan to build a preemptable physical query execution plan.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>node: Node of the logical plan to parse (in rdflib format).</p></li>
+<li><p>dataset: RDF dataset used to execute the query.</p></li>
+<li><p>current_graphs: List of IRI of the current RDF graphs queried.</p></li>
+<li><p>cardinalities: A dict used to track triple patterns cardinalities.</p></li>
+<li><p>as_of: A timestamp used to perform all reads against a consistent version of the dataset. If <cite>None</cite>, use the latest version of the dataset, which does not guarantee snapshot isolation.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: An iterator used to evaluate the input node.</p>
+<p>Throws: <cite>UnsupportedSPARQL</cite> is the SPARQL query contains features not supported by the SaGe query engine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.query_parser.parse_update">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.query_parser.</code><code class="sig-name descname">parse_update</code><span class="sig-paren">(</span><em class="sig-param">query: dict</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">default_graph: str</em>, <em class="sig-param">as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.query_engine.iterators.preemptable_iterator.PreemptableIterator, dict]<a class="headerlink" href="#sage.query_engine.optimizer.query_parser.parse_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a SPARQL UPDATE query into a physical query execution plan.</p>
+<p>For parsing classic SPARQL query, please refers to the <cite>parse_query</cite> method.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>query: SPARQL query to parse.</p></li>
+<li><p>dataset: RDF dataset on which the query is executed.</p></li>
+<li><p>default_graph: URI of the default graph.</p></li>
+<li><p>as_of: A timestamp used to perform all reads against a consistent version of the dataset. If <cite>None</cite>, use the latest version of the dataset, which does not guarantee snapshot isolation.</p></li>
+</ul>
+</dd>
+<dt>Returns: A tuple (<cite>iterator</cite>, <cite>cardinalities</cite>) where:</dt><dd><ul class="simple">
+<li><p><cite>iterator</cite> is the root of a pipeline of iterators used to execute the query.</p></li>
+<li><p><cite>cardinalities</cite> is the list of estimated cardinalities of all triple patterns in the query.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Throws: <cite>UnsupportedSPARQL</cite> is the SPARQL query contains features not supported by the SaGe query engine.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.optimizer.utils">
+<span id="sage-query-engine-optimizer-utils-module"></span><h2>sage.query_engine.optimizer.utils module<a class="headerlink" href="#module-sage.query_engine.optimizer.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.query_engine.optimizer.utils.equality_variables">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.utils.</code><code class="sig-name descname">equality_variables</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; Tuple[str, Tuple[str, str, str]]<a class="headerlink" href="#sage.query_engine.optimizer.utils.equality_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all variables from triple pattern with the same name, and then returns the equality expression + the triple pattern used to evaluate correctly the pattern.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.utils.find_connected_pattern">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.utils.</code><code class="sig-name descname">find_connected_pattern</code><span class="sig-paren">(</span><em class="sig-param">variables: List[str], triples: List[Dict[str, str]]</em><span class="sig-paren">)</span> &#x2192; Tuple[Dict[str, str], int, Set[str]]<a class="headerlink" href="#sage.query_engine.optimizer.utils.find_connected_pattern" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the first pattern in a set of triples pattern connected to a set of variables</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.query_engine.optimizer.utils.get_vars">
+<code class="sig-prename descclassname">sage.query_engine.optimizer.utils.</code><code class="sig-name descname">get_vars</code><span class="sig-paren">(</span><em class="sig-param">triple: Dict[str, str]</em><span class="sig-paren">)</span> &#x2192; Set[str]<a class="headerlink" href="#sage.query_engine.optimizer.utils.get_vars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get SPARQL variables in a triple pattern</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sage.query_engine.optimizer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.query_engine.optimizer" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.query_engine.protobuf.html" class="btn btn-neutral float-right" title="sage.query_engine.protobuf package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.query_engine.iterators.html" class="btn btn-neutral float-left" title="sage.query_engine.iterators package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
