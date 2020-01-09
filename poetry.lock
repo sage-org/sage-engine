@@ -1,5 +1,5 @@
 [[package]]
-category = "main"
+category = "dev"
 description = "A configurable sidebar-enabled Sphinx theme"
 name = "alabaster"
 optional = false
@@ -24,7 +24,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "19.3.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Internationalization utilities"
 name = "babel"
 optional = false
@@ -35,7 +35,7 @@ version = "2.8.0"
 pytz = ">=2015.7"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Python package for providing Mozilla's CA Bundle."
 name = "certifi"
 optional = false
@@ -43,7 +43,7 @@ python-versions = "*"
 version = "2019.11.28"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Universal encoding detector for Python 2 and 3"
 name = "chardet"
 optional = false
@@ -59,7 +59,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "7.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Cross-platform colored terminal text."
 marker = "sys_platform == \"win32\""
 name = "colorama"
@@ -68,7 +68,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "0.4.3"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Docutils -- Python Documentation Utilities"
 name = "docutils"
 optional = false
@@ -127,7 +127,7 @@ python-versions = "*"
 version = "0.0.13"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
 optional = false
@@ -135,7 +135,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.8"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Getting image size from png/jpeg/jpeg2000/gif file"
 name = "imagesize"
 optional = false
@@ -166,7 +166,7 @@ version = "0.6.0"
 six = "*"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "A very fast and expressive template engine."
 name = "jinja2"
 optional = false
@@ -177,7 +177,7 @@ version = "2.10.3"
 MarkupSafe = ">=0.23"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Safely add untrusted strings to HTML/XML markup."
 name = "markupsafe"
 optional = false
@@ -193,7 +193,7 @@ python-versions = ">=3.5"
 version = "8.0.2"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Core utilities for Python packages"
 name = "packaging"
 optional = false
@@ -262,7 +262,7 @@ python-versions = ">=3.6"
 version = "1.3"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Pygments is a syntax highlighting package written in Python."
 name = "pygments"
 optional = false
@@ -311,7 +311,7 @@ version = "0.10.0"
 pytest = ">=3.0.6"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "World timezone definitions, modern and historical"
 name = "pytz"
 optional = false
@@ -350,7 +350,7 @@ version = "0.4.0"
 rdflib = ">=4.2"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Python HTTP for Humans."
 name = "requests"
 optional = false
@@ -372,7 +372,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 version = "1.13.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "This package provides 26 stemmers for 25 languages generated from Snowball algorithms."
 name = "snowballstemmer"
 optional = false
@@ -380,7 +380,7 @@ python-versions = "*"
 version = "2.0.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Python documentation generator"
 name = "sphinx"
 optional = false
@@ -407,7 +407,7 @@ sphinxcontrib-qthelp = "*"
 sphinxcontrib-serializinghtml = "*"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Read the Docs theme for Sphinx"
 name = "sphinx-rtd-theme"
 optional = false
@@ -418,7 +418,7 @@ version = "0.4.3"
 sphinx = "*"
 
 [[package]]
-category = "main"
+category = "dev"
 description = ""
 name = "sphinxcontrib-applehelp"
 optional = false
@@ -426,7 +426,7 @@ python-versions = "*"
 version = "1.0.1"
 
 [[package]]
-category = "main"
+category = "dev"
 description = ""
 name = "sphinxcontrib-devhelp"
 optional = false
@@ -434,7 +434,7 @@ python-versions = "*"
 version = "1.0.1"
 
 [[package]]
-category = "main"
+category = "dev"
 description = ""
 name = "sphinxcontrib-htmlhelp"
 optional = false
@@ -442,7 +442,7 @@ python-versions = "*"
 version = "1.0.2"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "A sphinx extension which renders display math in HTML via JavaScript"
 name = "sphinxcontrib-jsmath"
 optional = false
@@ -450,7 +450,7 @@ python-versions = ">=3.5"
 version = "1.0.1"
 
 [[package]]
-category = "main"
+category = "dev"
 description = ""
 name = "sphinxcontrib-qthelp"
 optional = false
@@ -458,7 +458,7 @@ python-versions = "*"
 version = "1.0.2"
 
 [[package]]
-category = "main"
+category = "dev"
 description = ""
 name = "sphinxcontrib-serializinghtml"
 optional = false
@@ -474,7 +474,7 @@ python-versions = ">=3.6"
 version = "0.12.9"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
 optional = false
@@ -537,7 +537,7 @@ hdt = ["pybind11", "hdt"]
 postgres = ["psycopg2-binary"]
 
 [metadata]
-content-hash = "a9048d37abc0736244e7f4ba712625f7c0a4605d31acc3e154946561004ba505"
+content-hash = "22b47872d2324663e961cc72a8c064d23d3f906c53c4e0a8b5b9c20aaaa2ca87"
 python-versions = "^3.7"
 
 [metadata.hashes]

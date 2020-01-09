@@ -22,16 +22,13 @@ before_install:
   - cp watdiv.10M.hdt tests/data/watdiv.10M.hdt
   - cp watdiv.10M.hdt.index.v1-1 tests/data/watdiv.10M.hdt.index.v1-1
 install:
-  - poetry install --extras "hdt"
+  - poetry install --extras "hdt postgres"
 script:
   # Ignore PostgreSQL tests, as it snot (yet) installed on Travis CI
   - pytest --ignore=tests/database/postgre_backend_test.py
 before_deploy:
   # Build sphinx docs
   - cd docs && make html
-  # Cleanup build & tests before uploading to PyPi
-  - rm -rf build/
-  - rm -rf tests/
 deploy:
   # Deploy sphinx doc on Github pages
   - provider: pages
