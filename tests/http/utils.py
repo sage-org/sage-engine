@@ -1,17 +1,17 @@
 # utils.py
-# Author: Thomas MINIER - MIT License 2017-2018
-from json import dumps, loads
-from werkzeug.datastructures import Headers
+# Author: Thomas MINIER - MIT License 2017-2020
+from sage.http_server.server import SagePostQuery
 
 
-def jsonSparql(app, query, next_link, graph_uri):
-    headers = Headers()
-    headers.add('Accept', 'application/json')
-    data = {
-        "query": query,
-        "defaultGraph": graph_uri
+def post_sparql(client, query, next_link, graph_uri):
+    """Execute a POST SPARQL query using FastAPI TestClient"""
+    headers = {
+        "Accept": "application/json"
     }
-    if next_link is not None:
-        data["next"] = next_link
-    res = app.post('/sparql', data=dumps(data), content_type='application/json', headers=headers)
-    return loads(res.data)
+    query = SagePostQuery(
+        query = query.strip(),
+        defaultGraph = graph_uri,
+        next = next_link
+    )
+    res = client.post('/sparql', json=query.dict(), headers=headers)
+    return res

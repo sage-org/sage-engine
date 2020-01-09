@@ -2,19 +2,16 @@ name: SaGe Test server
 maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
 quota: 75
 max_results: 500
-datasets:
+graphs:
 -
   name: testdata
+  uri: http://localhost:8000/sparql/testdata
   description: Sample dataset in HDT format, used for testing
   backend: hdt-file
   file: tests/data/test.hdt
 -
-  name: foo
-  description: Sample dataset used for testing entity lookup
-  backend: hdt-file
-  file: tests/data/entity.hdt
--
   name: watdiv100
+  uri: http://testserver/sparql/watdiv100
   description: Sample dataset in HDT format, used for testing
   backend: hdt-file
   file: tests/data/watdiv.10M.hdt

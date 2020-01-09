@@ -13,9 +13,10 @@ backends:
   connector: MyCustomConnector
   # required parameters used to configure the backend
   required: [ "log_level", "path" ]
-datasets:
+graphs:
 -
   name: dbpedia
+  uri: http://example.org/dbpedia
   description: The DBpedia dataset
   backend: my-custom-backend
   log_level: info

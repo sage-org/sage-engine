@@ -10,7 +10,7 @@ class SillyConnector(DatabaseConnector):
         super(SillyConnector, self).__init__()
         self._foo = foo
 
-    def search(self, subject, predicate, obj, last_read=None):
+    def search(self, subject, predicate, obj, last_read=None, as_of=None):
         return self._foo
 
     def from_config(config):

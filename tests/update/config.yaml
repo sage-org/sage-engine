@@ -1,0 +1,19 @@
+name: SaGe update esting Server
+maintainer: Thomas Minier
+quota: 100000
+backends:
+-
+  # name of the new backend (used in the "backend" field when declaring a dataset)
+  name: memory
+  # source file containing the backend logic
+  path: tests.utils
+  # Connector class: a subclass of sage.database.db_connector.DatabaseConnector
+  connector: MemoryDatabase
+  # required parameters used to configure the backend
+  required: []
+graphs:
+-
+  name: update-test
+  uri: http://testserver/sparql/update-test
+  description: Testing dataset
+  backend: memory

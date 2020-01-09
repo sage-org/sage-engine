@@ -1,0 +1,30 @@
+name: SaGe server with PostgreSQL backend
+maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
+public_url: http://localhost:8000
+quota: 1000
+max_results: 2000
+graphs:
+-
+  name: bsbm1k
+  uri: http://example.org/bsbm1k
+  description: A dataset with serializable per row and no isolated reads
+  backend: postgres
+  # Name of the SQL database containing RDF data
+  dbname: database_name
+  # User name used to authenticate with the PostgreSQL
+  user: username
+  # Optional parameters
+  # [OPTIONAL] User password (default to an empty string)
+  password: password
+  # [OPTIONAL] Database host address (default to UNIX socket if not provided)
+  host: localhost
+  # [OPTIONAL] Connection port number (defaults to 5432 if not provided)
+  port: 5432
+-
+  name: mvcc_bsbm1k
+  uri: http://example.org/mvcc_bsbm1k
+  description: A dataset with serializable per quantum and isolated reads
+  backend: postgres
+  dbname: minier-t
+  user: minier-t
+  password: ''

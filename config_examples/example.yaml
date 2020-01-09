@@ -12,16 +12,17 @@ quota: 75
 max_results: 2000
 # (Optional) Query selected by default in the "Query" section
 default_query:
-  dataset_name: dbpedia
+  grapg_name: dbpedia
   name: Select everything
   value: |
     SELECT * WHERE {
       ?s ?p ?o.
     }
-# RDF Datasets hosted by the server
-datasets:
+# RDF Graphs hosted by the server
+graphs:
 -
   name: dbpedia
+  uri: http://example.org/dbpedia
   description: The DBpedia dataset
   # Type of backend (only hdt-file is available now)
   backend: hdt-file
@@ -46,6 +47,7 @@ datasets:
 
 -
   name: geonames
+  uri: http://example.org/geonames
   description: The Geonames dataset
   backend: hdt-file
   file: ./geonames.hdt
