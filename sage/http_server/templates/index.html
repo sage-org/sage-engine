@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>SaGe SPARQL server</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <style media="screen">
+    #sparqlQueryTextArea {
+      height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>The SaGe SPARQL query server is running!</h1>
+        <p>The SaGe server has a native support for evaluating <em>a subset of the SPARQL syntax</em>. It supports SPARQL queries with the following features:</p>
+        <ul>
+          <li><a href="https://www.w3.org/TR/sparql11-query/#WritingSimpleQueries">Triple patterns</a></li>
+          <li><a href="https://www.w3.org/TR/sparql11-query/#BasicGraphPatterns">Basic Graph patterns</a></li>
+          <li><a href="https://www.w3.org/TR/sparql11-query/#alternatives">Unions</a></li>
+          <li><a href="https://www.w3.org/TR/sparql11-query/#expressions">Filters</a>, with <em>simple expressions only</em> (=, !=, <, >=, +, -, etc)</li>
+          <li><a href="https://www.w3.org/TR/sparql11-query/#queryDataset">GRAPH clauses</a></li>
+        </ul>
+        <p>To execute <em>complete SPARQL queries</em> using a SaGe server, you need to use a <strong>SaGe Smart client</strong>. Take a look at <a href="http://sage.univ-nantes.fr/#software">existing SaGe Smart Clients</a> to evaluate SPARQL queries on your computer.</p>
+
+        <h2>SaGe SPARQL query editor</h2>
+        <form action="{{ url_for('sparql-interface.sparql_index', _external=True) }}" id="queryForm" method="GET">
+          <div class="form-group">
+            <label for="defaultGraphUri"><strong>Default Graph URI</strong></label>
+            <select class="form-control" id="defaultGraphUri" name="default-graph-uri">
+              {% for graph_uri in graph_uris %}
+              <option value="{{ graph_uri }}">{{ graph_uri }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="sparqlQueryTextArea"><strong>Type your SPARQL query</strong></label>
+            <textarea name="query" class="form-control" id="sparqlQueryTextArea">SELECT ?Concept WHERE {[] a ?Concept}</textarea>
+          </div>
+          <button type="submit" class="btn btn-success"><i class="fas fa-play"></i> Execute</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

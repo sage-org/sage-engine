@@ -10,6 +10,27 @@ from sage.database.db_iterator import DBIterator
 class DatabaseConnector(ABC):
     """A DatabaseConnector is an abstract class for creating connectors to a database"""
 
+    def open(self):
+        """Open the database connection"""
+        pass
+
+    def close(self):
+        """Close the database connection"""
+        pass
+
+    def __enter__(self):
+        """Implementation of the __enter__ method from the context manager spec"""
+        self.open()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Implementation of the __close__ method from the context manager spec"""
+        self.close()
+
+    def __del__(self):
+        """Destructor"""
+        self.close()
+
     @abstractmethod
     def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[DBIterator, int]:
         """Get an iterator over all RDF triples matching a triple pattern.

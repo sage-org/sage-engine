@@ -46,6 +46,7 @@ class FilterIterator(PreemptableIterator):
         # compile the expression using rdflib
         compiled_expr = parseQuery("SELECT * WHERE {?s ?p ?o FILTER(" + expression + ")}")
         compiled_expr = translateQuery(compiled_expr)
+        self._prologue = compiled_expr.prologue
         self._compiled_expression = compiled_expr.algebra.p.p.expr
 
     def __repr__(self) -> str:
@@ -65,6 +66,7 @@ class FilterIterator(PreemptableIterator):
         d = {Variable(key[1:]): to_rdflib_term(value) for key, value in bindings.items()}
         b = Bindings(d=d)
         context = QueryContext(bindings=b)
+        context.prologue = self._prologue
         return self._compiled_expression.eval(context)
 
     async def next(self) -> Optional[Dict[str, str]]:
