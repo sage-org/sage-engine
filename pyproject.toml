@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sage-engine"
-version = "2.1.0"
+version = "2.1.1"
 description = "Sage: a SPARQL query engine for public Linked Data providers"
 repository = "https://github.com/sage-org/sage-engine"
 authors = [ "Thomas Minier <tminier01@gmail.com>" ]
