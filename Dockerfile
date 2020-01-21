@@ -33,6 +33,4 @@ COPY . /opt/sage-engine
 # thus no need to install dev dependencies it's a production container
 RUN ~/.poetry/bin/poetry config virtualenvs.create false && ~/.poetry/bin/poetry install --no-dev --extras "hdt postgres"
 
-WORKDIR /opt/sage-engine
-
 CMD [ "sage" ]
