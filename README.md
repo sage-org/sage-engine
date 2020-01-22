@@ -115,64 +115,9 @@ docker pull callidon/sage
 docker run -v path/to/config-file:/opt/data/ -p 8000:8000 callidon/sage sage /opt/data/config.yaml -w 4 -p 8000
 ```
 
-# Command line utilities
-
-The SaGe server providers several command line utilities, alongside the `sage` command used to start the server.
-
-## `sage-postgres-init`: Initialize a PostgreSQL dataset with Sage
-```
-Usage: sage-postgres-init [OPTIONS] CONFIG DATASET_NAME
-
-  Initialize the RDF dataset DATASET_NAME with a PostgreSQL backend,
-  described in the configuration file CONFIG.
-
-Options:
-  --index / --no-index  Enable/disable indexing of SQL tables. The indexes can
-                        be created separately using the command sage-postgre-
-                        index
-  --help                Show this message and exit.
-```
-
-## `sage-postgres-put`: Efficiently insert RDF data into a Sage-PostgreSQL dataset
-```
-Usage: sage-postgres-put [OPTIONS] RDF_FILE CONFIG DATASET_NAME
-
-  Inert RDF triples from file RDF_FILE into the RDF dataset DATASET_NAME,
-  described in the configuration file CONFIG. The dataset must use the
-  PostgreSQL backend.
-
-Options:
-  -f, --format [nt|ttl|hdt]       Format of the input file. Supported: nt
-                                  (N-triples), ttl (Turtle) and hdt (HDT).
-                                  [default: nt]
-  -b, --block_size INTEGER        Block size used for the bulk loading
-                                  [default: 100]
-  -c, --commit_threshold INTEGER  Commit after sending this number of RDF
-                                  triples  [default: 500000]
-  --help                          Show this message and exit.
-```
-
-## `sage-postgres-index`: (Re)generate indexes to speed-up query processing with PostgreSQL
-```
-Usage: sage-postgres-index [OPTIONS] CONFIG DATASET_NAME
-
-  Create the additional B-tree indexes on the RDF dataset DATASET_NAME,
-  described in the configuration file CONFIG. The dataset must use the
-  PostgreSQL backend.
-
-Options:
-  --help  Show this message and exit.
-```
-
 # Documentation
 
-To generate the documentation, you must install the following dependencies
-
-```bash
-pip install sphinx sphinx_rtd_theme sphinxcontrib-httpdomain
-```
-
-Then, navigate in the `docs` directory and generate the documentation
+To generate the documentation, navigate in the `docs` directory and generate the documentation
 
 ```bash
 cd docs/
