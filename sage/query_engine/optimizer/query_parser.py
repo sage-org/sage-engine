@@ -36,11 +36,11 @@ class ConsistencyLevel(Enum):
 
 def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> Iterable[Dict[str, str]]:
     """Performs data localization of a set of triple patterns.
-    
+
     Args:
       * triples: Triple patterns to localize.
       * graphs: List of RDF graphs URIs used for data localization.
-    
+
     Yields:
       The localized triple patterns.
     """
@@ -55,9 +55,9 @@ def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> Iterab
             }
 
 
-def format_term(term: Union[BNode,Literal,URIRef,Variable]) -> str:
+def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
     """Convert a rdflib RDF Term into the format used by SaGe.
-    
+
     Argument: The rdflib RDF Term to convert.
 
     Returns: The RDF term in Sage text format.
@@ -72,11 +72,11 @@ def format_term(term: Union[BNode,Literal,URIRef,Variable]) -> str:
 
 def get_triples_from_graph(node: dict, current_graphs: List[str]) -> List[Dict[str, str]]:
     """Collect triples in a BGP or a BGP nested in a GRAPH clause.
-    
+
     Args:
       * node: Node of the logical query execution plan.
       * current_graphs: List of RDF graphs URIs.
-    
+
     Returns:
       The list of localized triple patterns found in the input node.
     """
@@ -88,9 +88,10 @@ def get_triples_from_graph(node: dict, current_graphs: List[str]) -> List[Dict[s
     else:
         raise UnsupportedSPARQL('Unsupported SPARQL Feature: a Sage engine can only perform joins between Graphs and BGPs')
 
+
 def get_quads_from_update(node: dict, default_graph: str) -> List[Tuple[str, str, str, str]]:
     """Get all quads from a SPARQL update operation (Delete or Insert).
-    
+
     Args:
       * node: Node of the logical query execution plan.
       * default_graph: URI of the default RDF graph.
@@ -109,15 +110,19 @@ def get_quads_from_update(node: dict, default_graph: str) -> List[Tuple[str, str
                 quads += [(format_term(s), format_term(p), format_term(o), format_term(g)) for s, p, o in triples]
     return quads
 
+
 def parse_filter_expr(expr: dict) -> str:
     """Parse a rdflib SPARQL FILTER expression into a string representation.
-    
+
     Argument: SPARQL FILTER expression in rdflib format.
 
     Returns: The SPARQL FILTER expression in string format.
     """
     if not hasattr(expr, 'name'):
-        return format_term(expr)
+        if type(expr) is BNode:
+            return f"?v_{expr}"
+        else:
+            return expr.n3()
     else:
         if expr.name == 'RelationalExpression':
             return f"({parse_filter_expr(expr.expr)} {expr.op} {parse_filter_expr(expr.other)})"
@@ -136,6 +141,8 @@ def parse_filter_expr(expr: dict) -> str:
             for other in expr.other:
                 expression = f"({expression} || {parse_filter_expr(other)})"
             return expression
+        elif expr.name.startswith('Builtin_'):
+            return f"{expr.name[8:]}({parse_filter_expr(expr.arg)})"
         raise UnsupportedSPARQL(f"Unsupported SPARQL FILTER expression: {expr.name}")
 
 
@@ -143,12 +150,12 @@ def parse_query(query: str, dataset: Dataset, default_graph: str) -> Tuple[Preem
     """Parse a read-only SPARQL query into a physical query execution plan.
 
     For parsing SPARQL UPDATE query, please refers to the `parse_update` method.
-    
+
     Args:
       * query: SPARQL query to parse.
       * dataset: RDF dataset on which the query is executed.
       * default_graph: URI of the default graph.
-    
+
     Returns: A tuple (`iterator`, `cardinalities`) where:
       * `iterator` is the root of a pipeline of iterators used to execute the query.
       * `cardinalities` is the list of estimated cardinalities of all triple patterns in the query.
@@ -177,7 +184,7 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], ca
       * current_graphs: List of IRI of the current RDF graphs queried.
       * cardinalities: A dict used to track triple patterns cardinalities.
       * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
-    
+
     Returns: An iterator used to evaluate the input node.
 
     Throws: `UnsupportedSPARQL` is the SPARQL query contains features not supported by the SaGe query engine.
@@ -222,17 +229,17 @@ def parse_update(query: dict, dataset: Dataset, default_graph: str, as_of: Optio
     """Parse a SPARQL UPDATE query into a physical query execution plan.
 
     For parsing classic SPARQL query, please refers to the `parse_query` method.
-    
+
     Args:
       * query: SPARQL query to parse.
       * dataset: RDF dataset on which the query is executed.
       * default_graph: URI of the default graph.
       * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
-    
+
     Returns: A tuple (`iterator`, `cardinalities`) where:
       * `iterator` is the root of a pipeline of iterators used to execute the query.
       * `cardinalities` is the list of estimated cardinalities of all triple patterns in the query.
-    
+
     Throws: `UnsupportedSPARQL` is the SPARQL query contains features not supported by the SaGe query engine.
     """
     # TODO change that, only used for testing

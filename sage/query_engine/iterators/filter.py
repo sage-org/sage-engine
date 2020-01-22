@@ -44,7 +44,7 @@ class FilterIterator(PreemptableIterator):
         self._raw_expression = expression
         self._mu = mu
         # compile the expression using rdflib
-        compiled_expr = parseQuery("SELECT * WHERE {?s ?p ?o FILTER(" + expression + ")}")
+        compiled_expr = parseQuery(f"SELECT * WHERE {{?s ?p ?o . FILTER({expression})}}")
         compiled_expr = translateQuery(compiled_expr)
         self._prologue = compiled_expr.prologue
         self._compiled_expression = compiled_expr.algebra.p.p.expr

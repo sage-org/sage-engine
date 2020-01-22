@@ -18,6 +18,12 @@ filter_queries = [
             <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> <http://schema.org/eligibleQuantity> ?quantity .
             FILTER(?price = "232" && ?quantity = "4")
         }
+    """, 1),
+    ("""
+        SELECT * WHERE {
+            <http://db.uwaterloo.ca/~galuc/wsdbm/Offer1000> <http://purl.org/goodrelations/price> ?price .
+            FILTER(isLiteral(?price))
+        }
     """, 1)
 ]
 

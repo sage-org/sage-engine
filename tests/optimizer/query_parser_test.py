@@ -68,7 +68,14 @@ queries = [
             ?s <http://purl.org/goodrelations/validThrough> ?validity .
         }
     }
-    """, 2180)]
+    """, 2180),
+    ("""
+    SELECT * WHERE {
+        ?s ?filter_0 ?state_1_1 .
+        FILTER((<http://www.ppbenchmark.com/e7> != ?filter_0) && (<http://www.ppbenchmark.com/e2> != ?filter_0))
+    }
+    """, 0)
+]
 
 
 class TestQueryParser(object):
