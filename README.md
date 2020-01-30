@@ -70,6 +70,7 @@ max_results: 2000
 graphs:
 -
   name: dbpedia
+  uri: http://example.org/dbpedia
   description: DBPedia
   backend: hdt-file
   file: datasets/dbpedia.2016.hdt
