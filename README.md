@@ -67,7 +67,7 @@ name: SaGe Test server
 maintainer: Chuck Norris
 quota: 75
 max_results: 2000
-datasets:
+graphs:
 -
   name: dbpedia
   description: DBPedia
