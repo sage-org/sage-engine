@@ -2,30 +2,30 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 from sys import exit
 from os.path import isfile
-from yaml import load
+from yaml import load, FullLoader
 from rdflib import Graph
 from hdt import HDTDocument
 
 
-def load_dataset(config_path, dataset_name, logger, backends=[]):
-    """Load a dataset from a Sage config file"""
+def load_graph(config_path, graph_name, logger, backends=[]):
+    """Load a RDF graph from a Sage config file"""
     if isfile(config_path):
-        config = load(open(config_path))
-        if 'datasets' not in config:
-            logger.error("No RDF datasets declared in the configuration provided")
+        config = load(open(config_path), Loader=FullLoader)
+        if 'graphs' not in config:
+            logger.error("No RDF graphs declared in the configuration provided")
             exit(1)
-        datasets = config['datasets']
-        dataset = None
+        graphs = config['graphs']
+        graph = None
         kind = None
-        for d in datasets:
-            if d['name'] == dataset_name and d['backend'] in backends:
-                dataset = d
-                kind = d['backend']
+        for g in graphs:
+            if g['name'] == graph_name and g['backend'] in backends:
+                graph = g
+                kind = g['backend']
                 break
-        if dataset is None:
-            logger.error("No compatible RDF dataset named '{}' declared in the configuration provided".format(dataset_name))
+        if graph is None:
+            logger.error("No compatible RDF graph named '{}' declared in the configuration provided".format(graph_name))
             exit(1)
-        return dataset, kind
+        return graph, kind
     else:
         logger.error("Invalid configuration file supplied '{}'".format(config_path))
         exit(1)

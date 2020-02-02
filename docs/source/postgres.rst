@@ -13,7 +13,7 @@ Initializing a PostgreSQL graph
 
     Usage: sage-postgres-init [OPTIONS] CONFIG GRAPH_NAME
 
-      Initialize the RDF dataset GRAPH_NAME with the postgres or postgres-mvcc
+      Initialize the RDF graph GRAPH_NAME with the postgres or postgres-mvcc
       backends, as described in the configuration file CONFIG.
 
     Options:
@@ -56,4 +56,3 @@ Insert RDF triples into PostgreSQL
 
   Options:
     --help  Show this message and exit.
-

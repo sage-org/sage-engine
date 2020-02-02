@@ -1,20 +1,21 @@
 [tool.poetry]
 name = "sage-engine"
-version = "2.1.2"
+version = "2.1.3"
 description = "Sage: a SPARQL query engine for public Linked Data providers"
 repository = "https://github.com/sage-org/sage-engine"
 authors = [ "Thomas Minier <tminier01@gmail.com>" ]
 keywords = [ "rdf", "sparql", "query engine" ]
+classifiers = [
+  "Topic :: Database :: Database Engines/Servers",
+  "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+  "Topic :: Scientific/Engineering"
+]
 readme = "README.md"
 license = "MIT"
 packages = [
   { include = "sage" }
 ]
-include = [
-  "requirements.txt",
-  "README.md",
-  "README.rst"
-]
+include = [ "README.md" ]
 exclude = [ "tests" ]
 
 [tool.poetry.scripts]
