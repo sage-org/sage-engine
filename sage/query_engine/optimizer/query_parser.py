@@ -196,7 +196,7 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], ca
             graphs = [format_term(graph_iri.default) for graph_iri in node.datasetClause]
         return parse_query_node(node.p, dataset, graphs, cardinalities, as_of=as_of)
     elif node.name == 'Project':
-        query_vars = list(map(lambda t: '?' + str(t), node._vars))
+        query_vars = list(map(lambda t: '?' + str(t), node.PV))
         child = parse_query_node(node.p, dataset, current_graphs, cardinalities, as_of=as_of)
         return ProjectionIterator(child, query_vars)
     elif node.name == 'BGP':
