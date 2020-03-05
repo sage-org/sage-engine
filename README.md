@@ -50,7 +50,7 @@ The SaGe SPARQL query server can also be manually installed using the [poetry](h
 ```bash
 git clone https://github.com/sage-org/sage-engine
 cd sage-engine
-poetry install --extras "hdt postgre"
+poetry install --extras "hdt postgres"
 ```
 As with pip, the various SaGe backends are installed as extras dependencies, using the  `--extras` flag.
 
