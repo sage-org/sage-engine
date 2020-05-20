@@ -1,12 +1,15 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2020
 import logging
+from asyncio import set_event_loop_policy
+from os import environ
 from sys import setrecursionlimit
 from time import time
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlunparse
 from uuid import uuid4
 
+import uvloop
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
@@ -30,6 +33,7 @@ class SagePostQuery(BaseModel):
     defaultGraph: str = Field(..., description="The URI of the default RDF graph queried.")
     next: str = Field(None, description="(Optional) A next link used to resume query execution from a saved state.")
 
+
 def choose_void_format(mimetypes):
     if "text/turtle" in mimetypes:
         return "turtle", "text/turtle"
@@ -43,9 +47,10 @@ def choose_void_format(mimetypes):
         return "json-ld", "application/json"
     return "ntriples", "application/n-triples"
 
+
 async def execute_query(query: str, default_graph_uri: str, next_link: Optional[str], dataset: Dataset) -> Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]:
     """Execute a query using the SageEngine and returns the appropriate HTTP response.
-    
+
     Any failure will results in a rollback/abort on the current query execution.
 
     Args:
@@ -59,7 +64,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
       * `bindings` is a list of query results.
       * `next_page` is a link to saved query execution state. Sets to `None` if query execution completed during the time quantum.
       * `stats` are statistics about query execution.
-    
+
     Throws: Any exception that have occured during query execution.
     """
     graph = None
@@ -118,6 +123,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             graph.abort()
         raise err
 
+
 def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_page: Optional[str], stats: dict, skol_url: str) -> Response:
     """Create an HTTP response for the results of SPARQL query execution.
 
@@ -146,14 +152,15 @@ def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_p
         "stats": stats
     })
 
+
 def run_app(config_file: str) -> FastAPI:
     """Create the HTTP server, compatible with uvicorn/gunicorn.
-    
+
     Argument: SaGe configuration file, in YAML format.
 
     Returns: The FastAPI HTTP application.
     """
-     # set recursion depth (due to pyparsing issues)
+    # set recursion depth (due to pyparsing issues)
     setrecursionlimit(3000)
 
     # create the HTTP server & activate CORS
@@ -169,11 +176,9 @@ def run_app(config_file: str) -> FastAPI:
     # Build the RDF dataset from the configuration file
     dataset = load_config(config_file)
 
-
     @app.get("/")
     async def root():
         return "The SaGe SPARQL query server is running!"
-
 
     @app.get("/sparql")
     async def sparql_get(
@@ -194,7 +199,6 @@ def run_app(config_file: str) -> FastAPI:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))
 
-
     @app.post("/sparql")
     async def sparql_post(request: Request, item: SagePostQuery):
         """Execute a SPARQL query using the Web Preemption model"""
@@ -208,7 +212,7 @@ def run_app(config_file: str) -> FastAPI:
         except Exception as err:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))
-    
+
     @app.get("/void/", description="Get the VoID description of the SaGe server")
     async def server_void(request: Request):
         """Describe all RDF datasets hosted by the Sage endpoint"""
@@ -223,12 +227,12 @@ def run_app(config_file: str) -> FastAPI:
         except Exception as err:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))
-    
+
     @app.get("/.well-known/void/")
     async def well_known():
         """Alias for /void/"""
         return RedirectResponse(url="/void/")
-    
+
     @app.get("/void/{graph_name}", description="Get the VoID description of a RDF Graph hosted by the SaGe server")
     async def graph_void(request: Request, graph_name: str = Field(..., description="Name of the RDF Graph")):
         """Get the VoID description of a RDF Graph hosted by the SaGe server"""
@@ -246,5 +250,13 @@ def run_app(config_file: str) -> FastAPI:
         except Exception as err:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))
-    
+
     return app
+
+
+if __name__ == "sage.http_server.server":
+    set_event_loop_policy(uvloop.EventLoopPolicy())
+    config_file = environ['SAGE_CONFIG_FILE']
+    app = run_app(config_file)
+elif __name__ == "__main__":
+    raise RuntimeError("You cannot run the script server.py as a amin script. Please the use the SaGe CLI to start you own server.")

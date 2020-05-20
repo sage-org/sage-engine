@@ -1,13 +1,14 @@
 # http_server.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from asyncio import set_event_loop_policy
+from os import environ
+
 import click
 import uvicorn
 import uvloop
-from asyncio import set_event_loop_policy
-from os.path import isfile
-from sage.http_server.server import run_app
 
 set_event_loop_policy(uvloop.EventLoopPolicy())
+
 
 @click.command()
 @click.argument("config")
@@ -17,5 +18,5 @@ set_event_loop_policy(uvloop.EventLoopPolicy())
 @click.option("--log-level", type=click.Choice(["debug", "info", "warning", "error"]), default="info", show_default=True, help="The granularity of log outputs")
 def start_sage_server(config, port, workers, host, log_level):
   """Launch the Sage server using the CONFIG configuration file"""
-  app = run_app(config)
-  uvicorn.run(app, port=port, host=host, log_level=log_level)
+  environ['SAGE_CONFIG_FILE'] = config
+  uvicorn.run("sage.http_server.server:app", port=port, host=host, workers=workers, log_level=log_level)
