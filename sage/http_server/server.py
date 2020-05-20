@@ -160,6 +160,8 @@ def run_app(config_file: str) -> FastAPI:
 
     Returns: The FastAPI HTTP application.
     """
+    # enable uvloop for SPARQL query processing
+    set_event_loop_policy(uvloop.EventLoopPolicy())
     # set recursion depth (due to pyparsing issues)
     setrecursionlimit(3000)
 
@@ -254,9 +256,8 @@ def run_app(config_file: str) -> FastAPI:
     return app
 
 
-if __name__ == "sage.http_server.server":
-    set_event_loop_policy(uvloop.EventLoopPolicy())
+if 'SAGE_CONFIG_FILE' in environ:
     config_file = environ['SAGE_CONFIG_FILE']
     app = run_app(config_file)
 elif __name__ == "__main__":
-    raise RuntimeError("You cannot run the script server.py as a amin script. Please the use the SaGe CLI to start you own server.")
+    raise RuntimeError("You cannot run the script server.py as a plain script. Please the use the SaGe CLI to start you own server.")
