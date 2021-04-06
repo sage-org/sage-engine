@@ -27,28 +27,29 @@ sage-postgres-put = "sage.cli.postgres:put_postgres"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-uvloop = "0.14.0"
-PyYAML = "5.1.2"
-rdflib = "4.2.2"
+uvloop = "0.15.2"
+PyYAML = "5.4.1"
+rdflib = "5.0.0"
 rdflib-jsonld = "0.4.0"
-protobuf = "3.11.0"
-click = "7.0"
-fastapi = "0.44.1"
-uvicorn = "0.10.8"
-grpcio = "^1.26"
+protobuf = "3.15.7"
+click = "7.1.2"
+fastapi = "0.63.0"
+uvicorn = "0.13.4"
+grpcio = "^1.36"
+coloredlogs="15.0"
 # optional dependencies
 pybind11 = { version = "2.2.4", optional = true }
 hdt = { version = "2.3", optional = true }
-psycopg2-binary = { version = "2.7.7", optional = true }
+psycopg2-binary = { version = "2.8.6", optional = true }
 
 [tool.poetry.extras]
 hdt = ["pybind11", "hdt"]
 postgres = ["psycopg2-binary"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.3"
-pytest-asyncio = "^0.10.0"
-requests = "^2.22"
+pytest = "^6.2"
+pytest-asyncio = "^O.14"
+requests = "^2.25"
 sphinx = "^2.3"
 sphinx_rtd_theme = "^0.4.3"
 
