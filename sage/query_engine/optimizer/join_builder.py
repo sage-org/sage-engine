@@ -16,13 +16,13 @@ from sage.query_engine.optimizer.utils import (equality_variables,
 
 def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, List[str], Dict[str, str]]:
     """Build a Left-linear join tree from a Basic Graph pattern.
-    
+
     Args:
       * bgp: Basic Graph pattern used to build the join tree.
       * dataset: RDF dataset on which the BGPC is evaluated.
       * default_graph: URI of the default graph used for BGP evaluation.
       * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
-    
+
     Returns: A tuple (`iterator`, `query_vars`, `cardinalities`) where:
       * `iterator` is the root of the Left-linear join tree.
       * `query_vars` is the list of all SPARQL variables found in the BGP.

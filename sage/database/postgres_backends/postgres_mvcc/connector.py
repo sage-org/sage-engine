@@ -1,16 +1,18 @@
-# mvcc_connector.py
-# Author: Thomas MINIER - MIT License 2017-2020
 import json
+import logging
+import coloredlogs
+
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Optional, List, Dict, Tuple
 from uuid import uuid4
 
 from sage.database.db_iterator import DBIterator, EmptyIterator
-from sage.database.postgres.connector import PostgresConnector
-from sage.database.postgres.mvcc_queries import (get_delete_query,
-                                                 get_insert_query,
-                                                 get_resume_query,
-                                                 get_start_query)
+from sage.database.postgres_backends.connector import PostgresConnector
+from sage.database.postgres_backends.postgres_mvcc.queries import get_delete_query, get_insert_query
+from sage.database.postgres_backends.postgres_mvcc.queries import get_resume_query, get_start_query
+
+coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def parse_date(str_date: str) -> datetime:
@@ -65,6 +67,7 @@ class MVCCPostgresIterator(DBIterator):
 
     def next(self) -> Optional[Dict[str, str]]:
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
+        start = time()
         if not self.has_next():
             return None
         triple = self._last_reads.pop(0)
@@ -72,6 +75,9 @@ class MVCCPostgresIterator(DBIterator):
         # extract timestamps from the RDF triple
         insert_t = triple[3]
         delete_t = triple[4]
+
+        triple = self._last_reads.pop(0)
+        logger.debug(f'database access time: {(time() - start) * 1000}ms')
 
         # case 1: the current triple is in the valid version, so it is a match
         if insert_t <= self._start_time and self._start_time < delete_t:
@@ -112,7 +118,7 @@ class MVCCPostgresConnector(PostgresConnector):
           * object: Object of the triple pattern.
           * last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.
           * as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.
-          
+
         Returns:
           A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern.
         """
@@ -163,7 +169,7 @@ class MVCCPostgresConnector(PostgresConnector):
 
     def from_config(config: dict):
         """Build a MVCCPostgresConnector from a configuration object.
-        
+
         The configuration object must contains the following fields: 'dbname', 'name', 'user' and 'password'.
         Optional fields are: 'host', 'port' and 'fetch_size'.
         """
@@ -178,7 +184,7 @@ class MVCCPostgresConnector(PostgresConnector):
 
     def insert(self, subject, predicate, obj):
         """Insert a RDF triple into the RDF graph.
-        
+
         Args:
           * subject: Subject of the RDF triple.
           * predicate: Predicate of the RDF triple.
@@ -194,7 +200,7 @@ class MVCCPostgresConnector(PostgresConnector):
 
     def delete(self, subject, predicate, obj):
         """Delete a RDF triple from the RDF graph.
-        
+
         Args:
           * subject: Subject of the RDF triple.
           * predicate: Predicate of the RDF triple.

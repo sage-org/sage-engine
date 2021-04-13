@@ -4,9 +4,11 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
+import re
 import pyparsing
 from pyparsing import ParseException
-from rdflib import BNode, Literal, URIRef, Variable
+from rdflib.term import BNode, Literal, URIRef, Variable
+from rdflib.namespace import XSD
 from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
 
@@ -26,6 +28,12 @@ from sage.query_engine.update.update_sequence import UpdateSequenceOperator
 # enable Packrat optimization for the rdflib SPARQL parser
 pyparsing.ParserElement.enablePackrat()
 
+exponent = r'[eE][+-]?[0-9]+'
+
+r_integer = re.compile(r'[0-9]+')
+r_decimal = re.compile(r'([0-9]+\.[0-9]*|\.[0-9]+)')
+r_double = re.compile(rf'([0-9]+\.[0-9]*{exponent}|\.[0-9]+{exponent}|[0-9]+{exponent})')
+r_boolean = re.compile(r'(true|false)')
 
 class ConsistencyLevel(Enum):
     """The consistency level choosen for executing the query"""
@@ -44,15 +52,37 @@ def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> Iterab
     Yields:
       The localized triple patterns.
     """
-    for t in triples:
-        s, p, o = format_term(t[0]), format_term(t[1]), format_term(t[2])
+    for (s, p, o) in triples:
         for graph in graphs:
             yield {
-                'subject': s,
-                'predicate': p,
-                'object': o,
+                'subject': format_term(s),
+                'predicate': format_term(p),
+                'object': format_term(o),
                 'graph': graph
             }
+
+
+def format_literal(term: Literal) -> str:
+    """Convert a rdflib Literal into the format used by SaGe.
+
+    Argument: The rdflib Literal to convert.
+
+    Returns: The RDF Literal in Sage text format.
+    """
+    lang = term.language
+    dtype = term.datatype
+    lit = str(term)
+    if lang is not None or dtype is not None:
+        return term.n3()
+    if re.fullmatch(r_integer, lit):
+        dtype = XSD.integer
+    elif re.fullmatch(r_decimal, lit):
+        dtype = XSD.decimal
+    elif re.fullmatch(r_double, lit):
+        dtype = XSD.double
+    elif re.fullmatch(r_boolean, lit):
+        dtype = XSD.boolean
+    return Literal(lit, lang, dtype).n3()
 
 
 def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
@@ -62,10 +92,12 @@ def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
 
     Returns: The RDF term in Sage text format.
     """
-    if type(term) is URIRef:
+    if isinstance(term, URIRef):
         return str(term)
-    elif type(term) is BNode:
+    elif isinstance(term, BNode):
         return '?v_' + str(term)
+    elif isinstance(term, Literal):
+        return format_literal(term)
     else:
         return term.n3()
 

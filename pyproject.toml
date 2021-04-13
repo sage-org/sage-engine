@@ -24,6 +24,9 @@ sage-grpc = "sage.cli.grpc_server:start_grpc_server"
 sage-postgres-init = "sage.cli.postgres:init_postgres"
 sage-postgres-index = "sage.cli.postgres:index_postgres"
 sage-postgres-put = "sage.cli.postgres:put_postgres"
+sage-sqlite-init = "sage.cli.sqlite:init_sqlite"
+sage-sqlite-index = "sage.cli.sqlite:index_sqlite"
+sage-sqlite-put = "sage.cli.sqlite:put_sqlite"
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -37,6 +40,7 @@ fastapi = "0.63.0"
 uvicorn = "0.13.4"
 grpcio = "^1.36"
 coloredlogs="15.0"
+pylru="^1.0"
 # optional dependencies
 pybind11 = { version = "2.2.4", optional = true }
 hdt = { version = "2.3", optional = true }

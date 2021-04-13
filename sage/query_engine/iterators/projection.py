@@ -1,5 +1,6 @@
 # projection.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from time import time
 from typing import Dict, List, Optional
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -8,7 +9,7 @@ from sage.query_engine.protobuf.iterators_pb2 import SavedProjectionIterator
 
 class ProjectionIterator(PreemptableIterator):
     """A ProjectionIterator evaluates a SPARQL projection (SELECT) in a pipeline of iterators.
-    
+
     Args:
       * source: Previous iterator in the pipeline.
       * projection: Projection variables
@@ -33,7 +34,7 @@ class ProjectionIterator(PreemptableIterator):
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
-        This function may contains `non interruptible` clauses which must 
+        This function may contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.

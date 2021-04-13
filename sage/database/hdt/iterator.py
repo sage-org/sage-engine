@@ -1,7 +1,6 @@
 # hdt_file_connector.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from typing import Dict, Tuple
-
 from hdt import TripleIterator
 
 from sage.database.db_iterator import DBIterator
@@ -9,7 +8,7 @@ from sage.database.db_iterator import DBIterator
 
 class HDTIterator(DBIterator):
     """An HDTIterator implements a DBIterator for scanning RDF triples in a HDT file.
-    
+
     Args:
       * source: HDT iterator which scans for RDF triples from a HDT file.
       * pattern: Triple pattern scanned.

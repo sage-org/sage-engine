@@ -1,5 +1,7 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2019
+import subprocess
+
 from sys import exit
 from os.path import isfile
 from yaml import load, FullLoader
@@ -31,34 +33,18 @@ def load_graph(config_path, graph_name, logger, backends=[]):
         exit(1)
 
 
-def __n3_to_str(triple):
-    """Convert a rdflib RDF triple into a tuple of strings (in N3 format)"""
-    s, p, o = triple
-    s = s.n3()
-    p = p.n3()
-    o = o.n3()
-    if s.startswith('<') and s.endswith('>'):
-        s = s[1:len(s) - 1]
-    if p.startswith('<') and p.endswith('>'):
-        p = p[1:len(p) - 1]
-    if o.startswith('<') and o.endswith('>'):
-        o = o[1:len(o) - 1]
-    return (s, p, o)
+def wccount(filename):
+    command = f"wc -l {filename} | awk '{{print $1}}'"
+    total = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE).stdout
+    return int(total)
 
 
-def get_rdf_reader(file_path, format='nt'):
-    """Get an iterator over RDF triples from a file"""
-    iterator = None
-    nb_triples = 0
-    # load standard RDF formats using rdflib
-    if format == 'nt' or format == 'ttl':
-        g = Graph()
-        g.parse(file_path, format=format)
-        nb_triples = len(g)
-        iterator = map(__n3_to_str, g.triples((None, None, None)))
+def get_nb_triples(file_path: str, format: str) -> int:
+    if format == 'nt':
+        return wccount(file_path)
     elif format == 'hdt':
-        # load HDTDocument without additional indexes
-        # they are not needed since we only search by "?s ?p ?o"
         doc = HDTDocument(file_path, indexed=False)
-        iterator, nb_triples = doc.search_triples("", "", "")
-    return iterator, nb_triples
+        _, nb_triples = doc.search_triples("", "", "")
+        return nb_triples
+    else:
+        raise Exception(f'Unsupported RDF format: "{format}"')

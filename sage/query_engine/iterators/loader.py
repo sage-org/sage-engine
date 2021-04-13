@@ -23,11 +23,11 @@ SavedProtobufPlan = Union[RootTree,SavedBagUnionIterator,SavedFilterIterator,Sav
 
 def load(saved_plan: SavedProtobufPlan, dataset: Dataset) -> PreemptableIterator:
     """Load a preemptable physical query execution plan from a saved state.
-    
+
     Args:
       * saved_plan: Saved query execution plan.
       * dataset: RDF dataset used to execute the plan.
-    
+
     Returns:
       The pipeline of iterator used to continue query execution.
     """
@@ -54,11 +54,11 @@ def load(saved_plan: SavedProtobufPlan, dataset: Dataset) -> PreemptableIterator
 
 def load_projection(saved_plan: SavedProjectionIterator, dataset: Dataset) -> PreemptableIterator:
     """Load a ProjectionIterator from a protobuf serialization.
-    
+
     Args:
       * saved_plan: Saved query execution plan.
       * dataset: RDF dataset used to execute the plan.
-    
+
     Returns:
       The pipeline of iterator used to continue query execution.
     """
@@ -70,11 +70,11 @@ def load_projection(saved_plan: SavedProjectionIterator, dataset: Dataset) -> Pr
 
 def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset) -> PreemptableIterator:
     """Load a FilterIterator from a protobuf serialization.
-    
+
     Args:
       * saved_plan: Saved query execution plan.
       * dataset: RDF dataset used to execute the plan.
-    
+
     Returns:
       The pipeline of iterator used to continue query execution.
     """
@@ -88,11 +88,11 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset) -> Preemptabl
 
 def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIterator:
     """Load a ScanIterator from a protobuf serialization.
-    
+
     Args:
       * saved_plan: Saved query execution plan.
       * dataset: RDF dataset used to execute the plan.
-    
+
     Returns:
       The pipeline of iterator used to continue query execution.
     """
@@ -104,11 +104,11 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
 
 def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset) -> PreemptableIterator:
     """Load a IndexJoinIterator from a protobuf serialization.
-    
+
     Args:
       * saved_plan: Saved query execution plan.
       * dataset: RDF dataset used to execute the plan.
-    
+
     Returns:
       The pipeline of iterator used to continue query execution.
     """
@@ -128,11 +128,11 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset) -> Preemptabl
 
 def load_union(saved_plan: SavedBagUnionIterator, dataset: Dataset) -> PreemptableIterator:
     """Load a BagUnionIterator from a protobuf serialization.
-    
+
     Args:
       * saved_plan: Saved query execution plan.
       * dataset: RDF dataset used to execute the plan.
-    
+
     Returns:
       The pipeline of iterator used to continue query execution.
     """

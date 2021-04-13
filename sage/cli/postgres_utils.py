@@ -1,76 +1,82 @@
 # postgres_utils.py
 # Author: Thomas MINIER - MIT License 2017-2019
 
-POSTGRES_CREATE_TABLE = """
-    CREATE TABLE {} (
-        subject text,
-        predicate text,
-        object text
-    );
-    """
-
-POSTGRES_CREATE_MVCC_TABLE = """
-    CREATE TABLE {} (
-        subject text,
-        predicate text,
-        object text,
-        insert_t timestamp DEFAULT transaction_timestamp(),
-        delete_t timestamp DEFAULT 'infinity'
-    );
-    """
-
-POSTGRES_CREATE_INDEXES = [
-    # Create index of SPO
-    """
-    CREATE INDEX {}_spo_index ON {}(subject text_ops,predicate text_ops, object text_ops);
-    """,
-    # Create index of OSP
-    """
-    CREATE INDEX {}_osp_index ON {}(object text_ops,subject text_ops,predicate text_ops);
-    """,
-    # Create index on POS
-    """
-    CREATE INDEX {}_pos_index ON {}(predicate text_ops,object text_ops,subject text_ops);
-    """
-]
-
-POSTGRES_CREATE_MVCC_INDEXES = [
-    # Create index of SPO
-    """
-    CREATE INDEX {}_spo_index ON {}(subject text_ops,predicate text_ops, object text_ops, insert_t timestamp_ops,delete_t timestamp_ops);
-    """,
-    # Create index of OSP
-    """
-    CREATE INDEX {}_osp_index ON {}(object text_ops,subject text_ops,predicate text_ops, insert_t timestamp_ops,delete_t timestamp_ops);
-    """,
-    # Create index on POS
-    """
-    CREATE INDEX {}_pos_index ON {}(predicate text_ops,object text_ops,subject text_ops, insert_t timestamp_ops,delete_t timestamp_ops);
-    """
-]
+def get_create_tables_queries(graph_name, backend):
+    """Format a PostgreSQL CREATE TABLE query with the name of the RDF graph to insert."""
+    if backend == "postgres":
+        return [(
+            f"CREATE TABLE {graph_name} ("
+            f"subject TEXT, "
+            f"predicate TEXT, "
+            f"object TEXT);"
+        )]
+    elif backend == "postgres-mvcc":
+        return [(
+            f"CREATE TABLE {graph_name} ("
+            f"subject TEXT, "
+            f"predicate TEXT, "
+            f"object TEXT, "
+            f"insert_t abstime DEFAULT transaction_timestamp(), "
+            f"delete_t abstime DEFAULT \"infinity\");"
+        )]
+    elif backend == "postgres-catalog":
+        return [
+            (
+                f"CREATE TABLE IF NOT EXISTS catalog ("
+                f"id BIGSERIAL, "
+                f"value TEXT);"
+            ),
+            (
+                f"CREATE UNIQUE INDEX IF NOT EXISTS catalog_locate_index ON catalog (md5(value));"
+            ),
+            (
+                f"CREATE INDEX IF NOT EXISTS catalog_extract_index ON catalog using HASH (id);"
+            ),
+            (
+                f"CREATE TABLE {graph_name} ("
+                f"subject BIGINT, "
+                f"predicate BIGINT, "
+                f"object BIGINT);"
+            )
+        ]
+    else:
+        raise Exception(f"Unknown backend for PostgreSQL: {backend}")
 
 
-def get_postgres_create_table(table_name, enable_mvcc=False):
-    """Format a postgre CREATE TABLE with the name of a SQL table"""
-    if enable_mvcc:
-        return POSTGRES_CREATE_MVCC_TABLE.format(table_name)
-    return POSTGRES_CREATE_TABLE.format(table_name)
+def get_create_indexes_queries(graph_name, backend):
+    """Format all PostgreSQL CREATE INDEX queries with the name of the RDF graph to insert."""
+    if backend == "postgres":
+        return [
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_spo_index ON {graph_name} (subject,predicate,md5(object));",
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_osp_index ON {graph_name} (md5(object),subject,predicate);",
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_pos_index ON {graph_name} (predicate,md5(object),subject);"
+        ]
+    elif backend == "postgres-mvcc":
+        return [
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_spo_index ON {graph_name} (subject,predicate,md5(object),insert_t abstime_ops,delete_t abstime_ops);",
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_osp_index ON {graph_name} (md5(object),subject,predicate,insert_t abstime_ops,delete_t abstime_ops);",
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_pos_index ON {graph_name} (predicate,md5(object),subject,insert_t abstime_ops,delete_t abstime_ops);"
+        ]
+    elif backend == "postgres-catalog":
+        return [
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_spo_index ON {graph_name} (subject,predicate,md5(object));",
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_osp_index ON {graph_name} (md5(object),subject,predicate);",
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_pos_index ON {graph_name} (predicate,md5(object),subject);"
+        ]
+    else:
+        raise Exception(f"Unknown backend for PostgreSQL: {backend}")
 
 
-def get_postgres_create_indexes(table_name, enable_mvcc=False):
-    """Format all postgre CREATE INDEXE with the name of a SQL table"""
-    def __mapper(query):
-        return query.format(table_name, table_name)
-
-    if enable_mvcc:
-        return map(__mapper, POSTGRES_CREATE_MVCC_INDEXES)
-    return map(__mapper, POSTGRES_CREATE_INDEXES)
+def get_insert_into_query(graph_name):
+    """Get an INSERT INTO query compatible with "psycopg2.extras.execute_values" to support the bulk loading."""
+    return f"INSERT INTO {graph_name} (subject,predicate,object) VALUES %s ON CONFLICT DO NOTHING"
 
 
-def get_postgres_insert_into(table_name, enable_mvcc=False):
-    """
-        Get an INSERT INTO query compatible with `psycopg2.extras.execute_values` (to support bulk loading).
-    """
-    if enable_mvcc:
-        return "INSERT INTO {} (subject,predicate,object) VALUES %s".format(table_name)
-    return "INSERT INTO {} (subject,predicate,object) VALUES %s".format(table_name)
+def get_insert_into_catalog_query():
+    """Get an INSERT INTO query compatible with "psycopg2.extras.execute_values" to support the bulk loading."""
+    return f"INSERT INTO catalog (value) VALUES %s ON CONFLICT (md5(value)) DO UPDATE SET value=EXCLUDED.value RETURNING ID"
+
+
+def get_analyze_query(graph_name):
+    """Format an ANALYZE query with the name of the inserted RDF graph."""
+    return f"ANALYZE {graph_name}"

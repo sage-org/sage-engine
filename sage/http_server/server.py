@@ -1,6 +1,8 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2020
 import logging
+import traceback
+import uvloop
 from asyncio import set_event_loop_policy
 from os import environ
 from sys import setrecursionlimit
@@ -9,13 +11,11 @@ from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlunparse
 from uuid import uuid4
 
-import uvloop
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import (JSONResponse, RedirectResponse, Response,
-                                 StreamingResponse)
+from starlette.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
 
 import sage.http_server.responses as responses
 from sage.database.core.dataset import Dataset
@@ -84,6 +84,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             plan = load(decode_saved_plan(saved_plan), dataset)
         else:
             plan, cardinalities = parse_query(query, dataset, default_graph_uri)
+        logging.debug(f'loading time: {(time() - start) * 1000}ms')
         loading_time = (time() - start) * 1000
 
         # execute query
@@ -113,12 +114,14 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             # delete the saved plan, as it will not be reloaded anymore
             dataset.statefull_manager.delete_plan(next_link)
 
+        logging.debug(f'export time: {(time() - start) * 1000}ms')
         exportTime = (time() - start) * 1000
         stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
         return (bindings, next_page, stats)
     except Exception as err:
         # abort all ongoing transactions, then forward the exception to the main loop
+        logger.error(traceback.format_exc())
         if graph is not None:
             graph.abort()
         raise err
@@ -137,10 +140,10 @@ def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_p
     Returns:
       An HTTP response built from the input mimetypes and the SPARQL query results.
     """
-    if "application/json" in mimetypes:
-        iterator = responses.raw_json_streaming(bindings, next_page, stats, skol_url)
-        return StreamingResponse(iterator, media_type="application/json")
-    elif "application/sparql-results+json" in mimetypes:
+    # if "application/json" in mimetypes:
+    #     iterator = responses.raw_json_streaming(bindings, next_page, stats, skol_url)
+    #     return StreamingResponse(iterator, media_type="application/json")
+    if "application/sparql-results+json" in mimetypes:
         iterator = responses.w3c_json_streaming(bindings, next_page, stats, skol_url)
         return StreamingResponse(iterator, media_type="application/json")
     elif "application/xml" in mimetypes or "application/sparql-results+xml" in mimetypes:
@@ -205,10 +208,17 @@ def run_app(config_file: str) -> FastAPI:
     async def sparql_post(request: Request, item: SagePostQuery):
         """Execute a SPARQL query using the Web Preemption model"""
         try:
+            start = time()
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
+            exec_start = time()
             bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset)
-            return create_response(mimetypes, bindings, next_page, stats, server_url)
+            logging.debug(f'query execution time: {(time() - exec_start) * 1000}ms')
+            serialization_start = time()
+            response = create_response(mimetypes, bindings, next_page, stats, server_url)
+            logging.debug(f'serialization execution time: {(time() - serialization_start) * 1000}ms')
+            logging.debug(f'execution time: {(time() - start) * 1000}ms')
+            return response
         except HTTPException as err:
             raise err
         except Exception as err:

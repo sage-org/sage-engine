@@ -41,7 +41,7 @@ class DatabaseConnector(ABC):
           * object: Object of the triple pattern.
           * last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.
           * as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.
-          
+
         Returns:
           A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern.
 
@@ -75,7 +75,7 @@ class DatabaseConnector(ABC):
           * subject: Subject of the RDF triple.
           * predicate: Predicate of the RDF triple.
           * obj: Object of the RDF triple.
-        
+
         Throws: `NotImplementedError` if the database connection is read-only.
         """
         raise NotImplementedError("The RDF graph is read-only: INSERT DATA queries are not allowed")
@@ -84,12 +84,12 @@ class DatabaseConnector(ABC):
         """Delete a RDF triple from the RDF graph.
 
         If not overrided, this method raises an exception as it consider the graph as read-only.
-        
+
         Args:
           * subject: Subject of the RDF triple.
           * predicate: Predicate of the RDF triple.
           * obj: Object of the RDF triple.
-        
+
         Throws: `NotImplementedError` if the database connection is read-only.
         """
         raise NotImplementedError("The RDF graph is read-only: DELETE DATA queries are not allowed")
@@ -118,7 +118,7 @@ class DatabaseConnector(ABC):
     def __del__(self):
         """Destructor"""
         self.close()
-    
+
     @property
     def nb_triples(self) -> int:
         """Get the number of RDF triples in the database"""
