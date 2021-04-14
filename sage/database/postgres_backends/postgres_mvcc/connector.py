@@ -45,7 +45,7 @@ class MVCCPostgresIterator(DBIterator):
         # execute the starting SQL query to pre-fetch results
         self._cursor.execute(self._current_query, start_params)
         # always keep the current set of rows buffered inside the iterator
-        self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
+        self._last_reads = self._cursor.fetchmany(size=1)
 
     def __del__(self):
         """Destructor"""
@@ -67,7 +67,6 @@ class MVCCPostgresIterator(DBIterator):
 
     def next(self) -> Optional[Dict[str, str]]:
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        start = time()
         if not self.has_next():
             return None
         triple = self._last_reads.pop(0)
@@ -77,7 +76,6 @@ class MVCCPostgresIterator(DBIterator):
         delete_t = triple[4]
 
         triple = self._last_reads.pop(0)
-        logger.debug(f'database access time: {(time() - start) * 1000}ms')
 
         # case 1: the current triple is in the valid version, so it is a match
         if insert_t <= self._start_time and self._start_time < delete_t:

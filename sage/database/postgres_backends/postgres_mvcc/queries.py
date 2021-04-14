@@ -74,25 +74,25 @@ def get_resume_query(subj: str, pred: str, obj: str, last_read: Tuple[str, str, 
         query += f"""WHERE (subject, predicate, md5(object), insert_t, delete_t) {symbol} (%s, %s, md5(%s), %s, %s)"""
         return query, (last_s, last_p, last_o, last_insert_t, last_delete_t)
     elif kind == 's??':
-        query += f"""WHERE subject = md5(%s)
+        query += f"""WHERE subject = %s
                      AND (predicate, md5(object), insert_t, delete_t) {symbol} (%s, md5(%s), %s, %s)"""
         return query, (last_s, last_p, last_o, last_insert_t, last_delete_t)
     elif kind == 'sp?':
-        query += f"""WHERE subject = md5(%s)
-                     AND predicate = md5(%s)
+        query += f"""WHERE subject = %s
+                     AND predicate = %s
                      AND (md5(object), insert_t, delete_t) {symbol} (md5(%s), %s, %s)"""
         return query, (last_s, last_p, last_o, last_insert_t, last_delete_t)
     elif kind == '?p?':
-        query += f"""WHERE predicate = md5(%s)
+        query += f"""WHERE predicate = %s
                      AND (md5(object), subject, insert_t, delete_t) {symbol} (md5(%s), %s, %s, %s)"""
         return query, (last_p, last_o, last_s, last_insert_t, last_delete_t)
     elif kind == '?po':
-        query += f"""WHERE predicate = md5(%s)
+        query += f"""WHERE predicate = %s
                      AND md5(object) = md5(%s)
                      AND (subject, insert_t, delete_t) {symbol} (%s, %s, %s)"""
         return query, (last_p, last_o, last_s, last_insert_t, last_delete_t)
     elif kind == 's?o':
-        query += f"""WHERE subject = md5(%s)
+        query += f"""WHERE subject = %s
                      AND md5(object) = md5(%s)
                      AND (predicate, insert_t, delete_t) {symbol} (%s, %s, %s)"""
         return query, (last_s, last_o, last_p, last_insert_t, last_delete_t)

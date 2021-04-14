@@ -1,7 +1,7 @@
 from sage.database.utils import get_kind
 
 
-def get_start_query(subj, pred, obj, table_name, fetch_size=500):
+def get_start_query(subj, pred, obj, table_name):
     """
         Get a prepared SQL query which starts scanning for a triple pattern
         and the parameters used to execute it.
@@ -44,7 +44,7 @@ def get_start_query(subj, pred, obj, table_name, fetch_size=500):
         raise Exception(f"Unkown pattern type: {kind}")
 
 
-def get_resume_query(subj, pred, obj, last_read, table_name, fetch_size=500, symbol=">="):
+def get_resume_query(subj, pred, obj, last_read, table_name, symbol=">="):
     """
         Get a prepared SQL query which resumes scanning for a triple pattern
         and the parameters used to execute it.
@@ -122,4 +122,7 @@ def get_catalog_insert_many_query():
 
 def get_delete_query(table_name):
     """Build a SQL query to delete a RDF triple form a PostgreSQL dataset"""
-    return f"DELETE FROM {table_name} WHERE subject = %s AND predicate = %s AND object = %s"
+    return f"""DELETE FROM {table_name}
+               WHERE subject = ({get_locate_query()})
+               AND predicate = ({get_locate_query()})
+               AND object = ({get_locate_query()})"""

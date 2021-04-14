@@ -38,7 +38,7 @@ class DefaultPostgresIterator(DBIterator):
         # resume query execution with a SQL query
         self._cursor.execute(self._current_query, start_params)
         # always keep the current set of rows buffered inside the iterator
-        self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
+        self._last_reads = self._cursor.fetchmany(size=1)
 
     def __del__(self) -> None:
         """Destructor (close the database cursor)"""
@@ -57,12 +57,9 @@ class DefaultPostgresIterator(DBIterator):
 
     def next(self) -> Optional[Dict[str, str]]:
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        start = time()
         if not self.has_next():
             return None
-        triple = self._last_reads.pop(0)
-        logger.debug(f'database access time: {(time() - start) * 1000}ms')
-        return triple
+        return self._last_reads.pop(0)
 
     def has_next(self) -> bool:
         """Return True if there is still results to read, False otherwise"""

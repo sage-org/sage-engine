@@ -73,6 +73,10 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             raise HTTPException(status_code=404, detail=f"RDF Graph {default_graph_uri} not found on the server.")
         graph = dataset.get_graph(default_graph_uri)
 
+        context = dict()
+        context['quantum'] = graph.quota
+        context['max_results'] = graph.max_results
+
         # decode next_link or build query execution plan
         cardinalities = dict()
         start = time()
@@ -81,17 +85,16 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
                 saved_plan = next_link
             else:
                 saved_plan = dataset.statefull_manager.get_plan(next_link)
-            plan = load(decode_saved_plan(saved_plan), dataset)
+            plan = load(decode_saved_plan(saved_plan), dataset, context)
         else:
-            plan, cardinalities = parse_query(query, dataset, default_graph_uri)
-        logging.debug(f'loading time: {(time() - start) * 1000}ms')
+            plan, cardinalities = parse_query(query, dataset, default_graph_uri, context)
+        logging.info(f'loading time: {(time() - start) * 1000}ms')
         loading_time = (time() - start) * 1000
 
         # execute query
         engine = SageEngine()
-        quota = graph.quota / 1000
-        max_results = graph.max_results
-        bindings, saved_plan, is_done, abort_reason = await engine.execute(plan, quota, max_results)
+        context['start_timestamp'] = time()
+        bindings, saved_plan, is_done, abort_reason = await engine.execute(plan, context)
 
         # commit or abort (if necessary)
         if abort_reason is not None:
@@ -114,14 +117,14 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             # delete the saved plan, as it will not be reloaded anymore
             dataset.statefull_manager.delete_plan(next_link)
 
-        logging.debug(f'export time: {(time() - start) * 1000}ms')
+        logging.info(f'export time: {(time() - start) * 1000}ms')
         exportTime = (time() - start) * 1000
         stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
 
         return (bindings, next_page, stats)
     except Exception as err:
         # abort all ongoing transactions, then forward the exception to the main loop
-        logger.error(traceback.format_exc())
+        logging.error(traceback.format_exc())
         if graph is not None:
             graph.abort()
         raise err
@@ -213,11 +216,11 @@ def run_app(config_file: str) -> FastAPI:
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
             exec_start = time()
             bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset)
-            logging.debug(f'query execution time: {(time() - exec_start) * 1000}ms')
+            logging.info(f'query execution time: {(time() - exec_start) * 1000}ms')
             serialization_start = time()
             response = create_response(mimetypes, bindings, next_page, stats, server_url)
-            logging.debug(f'serialization execution time: {(time() - serialization_start) * 1000}ms')
-            logging.debug(f'execution time: {(time() - start) * 1000}ms')
+            logging.info(f'serialization execution time: {(time() - serialization_start) * 1000}ms')
+            logging.info(f'execution time: {(time() - start) * 1000}ms')
             return response
         except HTTPException as err:
             raise err

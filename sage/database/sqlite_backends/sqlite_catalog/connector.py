@@ -30,7 +30,7 @@ class CatalogSQliteIterator(DBIterator):
         self._fetch_size = fetch_size
         self._cursor.execute(self._current_query, start_params)
         # always keep the current set of rows buffered inside the iterator
-        self._last_reads = self._cursor.fetchmany(size=100)
+        self._last_reads = self._cursor.fetchmany(size=1)
 
     def __del__(self):
         """Destructor (close the database cursor)"""
@@ -49,12 +49,9 @@ class CatalogSQliteIterator(DBIterator):
 
     def next(self):
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        start = time()
         if not self.has_next():
             return None
-        triple = self._last_reads.pop(0)
-        logger.debug(f'database access time: {(time() - start) * 1000}ms')
-        return triple
+        return self._last_reads.pop(0)
 
     def has_next(self):
         """Return True if there is still results to read, and False otherwise"""

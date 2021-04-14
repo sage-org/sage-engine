@@ -12,10 +12,11 @@ class ProjectionIterator(PreemptableIterator):
 
     Args:
       * source: Previous iterator in the pipeline.
-      * projection: Projection variables
+      * projection: Projection variables.
+      * context: Information about the query execution.
     """
 
-    def __init__(self, source: PreemptableIterator, projection: List[str] = None):
+    def __init__(self, source: PreemptableIterator, context: dict, projection: List[str] = None):
         super(ProjectionIterator, self).__init__()
         self._source = source
         self._projection = projection
@@ -31,6 +32,10 @@ class ProjectionIterator(PreemptableIterator):
         """Return True if the iterator has more item to yield"""
         return self._source.has_next()
 
+    def next_stage(self, mappings: Dict[str, str]):
+        """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
+        self._source.next_stage(mappings)
+
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
@@ -38,11 +43,9 @@ class ProjectionIterator(PreemptableIterator):
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
-
-        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
         """
         if not self.has_next():
-            raise StopAsyncIteration()
+            return None
         mappings = await self._source.next()
         if mappings is None:
             return None
