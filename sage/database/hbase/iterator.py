@@ -24,12 +24,12 @@ class HBaseIterator(DBIterator):
         pass
 
     def __fetch_one(self) -> None:
-        # try:
-        self._last_read_key, self._last_read_triple = next(self._scanner)
-        # except Exception:
-            # self._last_read_key, self._last_read_triple = '', None
-        # finally:
-        self._warmup = False
+        try:
+            self._last_read_key, self._last_read_triple = next(self._scanner)
+        except StopIteration:
+            self._last_read_key, self._last_read_triple = '', None
+        finally:
+            self._warmup = False
 
     def __is_relevant_triple(self, triple: Dict[bytes, str]) -> bool:
         """Return True if the RDF triple matches the triple pattern scanned"""
