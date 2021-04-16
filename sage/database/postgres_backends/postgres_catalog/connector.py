@@ -8,56 +8,15 @@ from uuid import uuid4
 from typing import Optional, Dict, Tuple
 from psycopg2.extras import execute_values
 
-from sage.database.db_iterator import DBIterator, EmptyIterator
+from sage.database.db_iterator import EmptyIterator
 from sage.database.postgres_backends.connector import PostgresConnector
+from sage.database.postgres_backends.postgres_catalog.iterator import PostgresIterator
 from sage.database.postgres_backends.postgres_catalog.queries import get_delete_query, get_insert_query, get_catalog_insert_many_query
 from sage.database.postgres_backends.postgres_catalog.queries import get_start_query, get_resume_query
 from sage.database.postgres_backends.postgres_catalog.queries import get_extract_query, get_locate_query
 
 coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
-
-
-class CatalogPostgresIterator(DBIterator):
-    """A CatalogPostgresIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file"""
-
-    def __init__(self, cursor, connection, start_query, start_params, pattern, fetch_size=2000):
-        super(CatalogPostgresIterator, self).__init__(pattern)
-        self._cursor = cursor
-        self._connection = connection
-        self._current_query = start_query
-        self._fetch_size = fetch_size
-        # resume query execution with a SQL query
-        self._cursor.execute(self._current_query, start_params)
-        # always keep the current set of rows buffered inside the iterator
-        self._last_reads = self._cursor.fetchmany(size=1)
-
-    def __del__(self):
-        """Destructor (close the database cursor)"""
-        self._cursor.close()
-
-    def last_read(self):
-        """Return the index ID of the last element read"""
-        if not self.has_next():
-            return ''
-        triple = self._last_reads[0]
-        return json.dumps({
-            's': triple[0],
-            'p': triple[1],
-            'o': triple[2]
-        }, separators=(',', ':'))
-
-    def next(self):
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        if not self.has_next():
-            return None
-        return self._last_reads.pop(0)
-
-    def has_next(self):
-        """Return True if there is still results to read, and False otherwise"""
-        if len(self._last_reads) == 0:
-            self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
-        return len(self._last_reads) > 0
 
 
 class CatalogPostgresConnector(PostgresConnector):
@@ -107,7 +66,7 @@ class CatalogPostgresConnector(PostgresConnector):
             cpt += 1
         return (null_frac, n_distinct, selectivities, sum(most_common_freqs))
 
-    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[CatalogPostgresIterator, int]:
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[PostgresIterator, int]:
         """Get an iterator over all RDF triples matching a triple pattern.
 
         Args:
@@ -147,11 +106,11 @@ class CatalogPostgresConnector(PostgresConnector):
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name)
 
         # create the iterator to yield the matching RDF triples
-        iterator = CatalogPostgresIterator(cursor, self._manager.get_connection(), start_query, start_params, pattern, fetch_size=self._fetch_size)
+        iterator = PostgresIterator(cursor, self._manager.get_connection(), start_query, start_params, pattern, fetch_size=self._fetch_size)
         card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
-    def from_config(config: dict):
+    def from_config(config: dict) -> PostgresConnector:
         """Build a CatalogPostgresConnector from a configuration object.
 
         The configuration object must contains the following fields: 'dbname', 'name', 'user' and 'password'.

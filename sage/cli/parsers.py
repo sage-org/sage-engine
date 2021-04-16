@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from hdt import HDTDocument
 from rdflib.namespace import XSD
 from rdflib.term import Literal, BNode, URIRef
-from rdflib.plugins.parsers.ntriples import NTriplesParser, ParseError, unquote, uriquote
+from rdflib.plugins.parsers.ntriples import NTriplesParser, unquote, uriquote
 
 uriref = r'<([^:]+:[^\s"<>]*)>'
 literal = r'"([^"\\]*(?:\\.[^"\\]*)*)"'
@@ -21,6 +21,10 @@ r_decimal = re.compile(r'([0-9]+\.[0-9]*|\.[0-9]+)')
 r_double = re.compile(rf'([0-9]+\.[0-9]*{exponent}|\.[0-9]+{exponent}|[0-9]+{exponent})')
 r_boolean = re.compile(r'(true|false)')
 
+
+class ParseError(Exception):
+    """Raised Raised when an error occurs while parsing an RDF file."""
+    pass
 
 class Parser(ABC):
 
@@ -60,39 +64,43 @@ class CustomNTriplesParser(Parser, NTriplesParser):
                     self.on_bucket(self.bucket)
                 self.on_complete()
                 break
-            try:
-                self.parseline()
-            except:
-                self.on_error(f"Invalid triple: {line}")
+            self.parseline()
 
     def parseline(self):
-        self.eat(r_wspace)
-        if (not self.line) or self.line.startswith('#'):
-            return  # The line is empty or a comment
+        line = self.line
+        try:
+            self.eat(r_wspace)
+            if (not self.line) or self.line.startswith('#'):
+                return  # The line is empty or a comment
 
-        subject = self.subject()
-        subject.n3()
-        self.eat(r_wspaces)
+            subject = self.subject()
+            subject.n3()
+            self.eat(r_wspaces)
 
-        predicate = self.predicate()
-        predicate.n3()
-        self.eat(r_wspaces)
+            predicate = self.predicate()
+            predicate.n3()
+            self.eat(r_wspaces)
 
-        object = self.object()
-        object.n3()
-        self.eat(r_tail)
+            object = self.object()
+            object.n3()
+            self.eat(r_tail)
 
-        subject = str(subject)
-        predicate = str(predicate)
-        if isinstance(object, Literal) or isinstance(object, BNode):
-            object = object.n3()
-        else:
-            object = str(object)
+            subject = str(subject)
+            predicate = str(predicate)
+            if isinstance(object, Literal) or isinstance(object, BNode):
+                object = object.n3()
+            else:
+                object = str(object)
 
-        self.bucket.append((subject, predicate, object))
-        if len(self.bucket) >= self.bucket_size:
-            self.on_bucket(self.bucket)
-            self.bucket = list()
+            self.bucket.append((subject, predicate, object))
+        except ParseError as error:
+            self.on_error(error)
+        except:
+            self.on_error(ParseError(f"Invalid triple: {line}"))
+        finally:
+            if len(self.bucket) >= self.bucket_size:
+                self.on_bucket(self.bucket)
+                self.bucket = list()
 
     def literal(self):
         if self.peek('"'):
@@ -168,13 +176,3 @@ class ParserFactory():
             return NTParser(bucket_size)
         else:
             raise Exception(f'Unsupported RDF format: "{format}"')
-
-
-# def on_bucket(bucket):
-#     print(bucket)
-#     print(f'new bucket of {len(bucket)} triples')
-#
-#
-# parser = ParserFactory.create_parser('hdt', 5)
-# parser.on_bucket = on_bucket
-# parser.parsefile(sys.argv[1])

@@ -6,8 +6,9 @@ from datetime import datetime
 from typing import Optional, List, Dict, Tuple
 from uuid import uuid4
 
-from sage.database.db_iterator import DBIterator, EmptyIterator
+from sage.database.db_iterator import EmptyIterator
 from sage.database.postgres_backends.connector import PostgresConnector
+from sage.database.postgres_backends.postgres_mvcc.iterator import PostgresIterator
 from sage.database.postgres_backends.postgres_mvcc.queries import get_delete_query, get_insert_query
 from sage.database.postgres_backends.postgres_mvcc.queries import get_resume_query, get_start_query
 
@@ -20,75 +21,6 @@ def parse_date(str_date: str) -> datetime:
     if str_date == 'infinity':
         return datetime.max
     return datetime.strptime(str_date, '%Y-%m-%d %H:%M:%S+%f')
-
-
-class MVCCPostgresIterator(DBIterator):
-    """A MVCCPostgresIterator fetches RDF triples from a versionned PostgreSQL table using batch queries and lazy loading.
-
-    Args:
-      * cursor: Psycopg cursor used to query the database.
-      * start_time: Timestamp at which the iterator should read.
-      * start_query: Prepared SQL query used to start iteration.
-      * start_params: SQL params to apply to the prepared SQL query.
-      * table_name: Name of the SQL table to scan.
-      * pattern: Triple pattern scanned.
-      * fetch_size: The number of SQL rows/RDF triples to fetch per batch.
-    """
-
-    def __init__(self, cursor, start_time: datetime, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 2000):
-        super(MVCCPostgresIterator, self).__init__(pattern)
-        self._cursor = cursor
-        self._start_time = start_time
-        self._current_query = start_query
-        self._table_name = table_name
-        self._fetch_size = fetch_size
-        # execute the starting SQL query to pre-fetch results
-        self._cursor.execute(self._current_query, start_params)
-        # always keep the current set of rows buffered inside the iterator
-        self._last_reads = self._cursor.fetchmany(size=1)
-
-    def __del__(self):
-        """Destructor"""
-        self._cursor.close()
-
-    def last_read(self) -> str:
-        """Return the index ID of the last element read"""
-        if not self.has_next():
-            return ''
-        triple = self._last_reads[0]
-        return json.dumps({
-            's': triple[0],
-            'p': triple[1],
-            'o': triple[2],
-            'ins': triple[3].isoformat(),
-            'del': triple[4].isoformat(),
-            'ts': self._start_time.isoformat()
-        }, separators=(',', ':'))
-
-    def next(self) -> Optional[Dict[str, str]]:
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        if not self.has_next():
-            return None
-        triple = self._last_reads.pop(0)
-
-        # extract timestamps from the RDF triple
-        insert_t = triple[3]
-        delete_t = triple[4]
-
-        triple = self._last_reads.pop(0)
-
-        # case 1: the current triple is in the valid version, so it is a match
-        if insert_t <= self._start_time and self._start_time < delete_t:
-            return (triple[0], triple[1], triple[2])
-        # case 2: do a NONE forward to trigger another iteration loop
-        # to find a matching RDF triple
-        return None
-
-    def has_next(self) -> bool:
-        """Return True if there is still results to read, and False otherwise"""
-        if len(self._last_reads) == 0:
-            self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
-        return len(self._last_reads) > 0
 
 
 class MVCCPostgresConnector(PostgresConnector):
@@ -107,7 +39,7 @@ class MVCCPostgresConnector(PostgresConnector):
     def __init__(self, table_name: str, dbname: str, user: str, password: str, host: str = '', port: int = 5432, fetch_size: int = 2000):
         super(MVCCPostgresConnector, self).__init__(table_name, dbname, user, password, host, port, fetch_size)
 
-    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[MVCCPostgresIterator, int]:
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[PostgresIterator, int]:
         """Get an iterator over all RDF triples matching a triple pattern.
 
         Args:
@@ -161,11 +93,11 @@ class MVCCPostgresConnector(PostgresConnector):
             start_query, start_params = get_resume_query(subject, predicate, obj, last_triple, self._table_name)
 
         # create the iterator to yield the matching RDF triples
-        iterator = MVCCPostgresIterator(cursor, timestamp, start_query, start_params, self._table_name, pattern, fetch_size=self._fetch_size)
+        iterator = PostgresIterator(cursor, timestamp, start_query, start_params, self._table_name, pattern, fetch_size=self._fetch_size)
         card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
-    def from_config(config: dict):
+    def from_config(config: dict) -> PostgresConnector:
         """Build a MVCCPostgresConnector from a configuration object.
 
         The configuration object must contains the following fields: 'dbname', 'name', 'user' and 'password'.
@@ -180,7 +112,7 @@ class MVCCPostgresConnector(PostgresConnector):
 
         return MVCCPostgresConnector(config['name'], config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
 
-    def insert(self, subject, predicate, obj):
+    def insert(self, subject: str, predicate: str, obj: str) -> None:
         """Insert a RDF triple into the RDF graph.
 
         Args:
@@ -196,7 +128,7 @@ class MVCCPostgresConnector(PostgresConnector):
             insert_query = get_insert_query(self._table_name)
             self._update_cursor.execute(insert_query, (subject, predicate, obj))
 
-    def delete(self, subject, predicate, obj):
+    def delete(self, subject: str, predicate: str, obj: str) -> None:
         """Delete a RDF triple from the RDF graph.
 
         Args:

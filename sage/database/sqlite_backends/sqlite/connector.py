@@ -4,12 +4,15 @@ import coloredlogs
 
 from math import ceil
 from time import time
+from datetime import datetime
 from functools import reduce
+from typing import Optional, List, Dict, Tuple
 
 from sage.database.utils import get_kind
 from sage.database.db_connector import DatabaseConnector
-from sage.database.db_iterator import DBIterator, EmptyIterator
+from sage.database.db_iterator import EmptyIterator
 from sage.database.sqlite_backends.connector import SQliteConnector
+from sage.database.sqlite_backends.sqlite.iterator import SQliteIterator
 from sage.database.sqlite_backends.sqlite.queries import get_start_query, get_resume_query
 from sage.database.sqlite_backends.sqlite.queries import get_insert_query, get_delete_query
 
@@ -17,61 +20,19 @@ coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
 
-class DefaultSQliteIterator(DBIterator):
-    """A DefaultSQliteIterator implements a DBIterator for a triple pattern evaluated using a SQlite database file"""
-
-    def __init__(self, cursor, connection, start_query, start_params, table_name, pattern, fetch_size=2000):
-        super(DefaultSQliteIterator, self).__init__(pattern)
-        self._cursor = cursor
-        self._connection = connection
-        self._current_query = start_query
-        self._table_name = table_name
-        self._fetch_size = fetch_size
-        self._cursor.execute(self._current_query, start_params)
-        # always keep the current set of rows buffered inside the iterator
-        self._last_reads = self._cursor.fetchmany(size=1)
-
-    def __del__(self):
-        """Destructor (close the database cursor)"""
-        self._cursor.close()
-
-    def last_read(self):
-        """Return the index ID of the last element read"""
-        if not self.has_next():
-            return ''
-        triple = self._last_reads[0]
-        return json.dumps({
-            's': triple[0],
-            'p': triple[1],
-            'o': triple[2]
-        }, separators=(',', ':'))
-
-    def next(self):
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        if not self.has_next():
-            return None
-        return self._last_reads.pop(0)
-
-    def has_next(self):
-        """Return True if there is still results to read, and False otherwise"""
-        if len(self._last_reads) == 0:
-            self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
-        return len(self._last_reads) > 0
-
-
 class DefaultSQliteConnector(SQliteConnector):
     """
-        A DefaultSQliteConnector search for RDF triples in a SQlite database.
+        A DefaultSQliteConnector search for RDF triples in a SQlite database where triples are stored in one SQL table.
         Constructor arguments:
             - table_name `str`: Name of the SQL table containing RDF data.
             - database `str`: the name of the sqlite database file.
             - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 2000)
     """
 
-    def __init__(self, table_name, database, fetch_size=2000):
+    def __init__(self, table_name: str, database: str, fetch_size: int = 2000):
         super(DefaultSQliteConnector, self).__init__(table_name, database, fetch_size)
 
-    def search(self, subject, predicate, obj, last_read=None, as_of=None):
+    def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[SQliteIterator, int]:
         """
             Get an iterator over all RDF triples matching a triple pattern.
             Args:
@@ -110,7 +71,7 @@ class DefaultSQliteConnector(SQliteConnector):
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name)
 
         # create the iterator to yield the matching RDF triples
-        iterator = DefaultSQliteIterator(
+        iterator = SQliteIterator(
             cursor, self._manager.get_connection(),
             start_query, start_params,
             self._table_name,
@@ -119,7 +80,7 @@ class DefaultSQliteConnector(SQliteConnector):
         card = self._estimate_cardinality(subject, predicate, obj) if iterator.has_next() else 0
         return iterator, card
 
-    def from_config(config):
+    def from_config(config: dict) -> SQliteConnector:
         """Build a SQliteConnector from a configuration object"""
         if 'database' not in config:
             raise SyntaxError(
@@ -131,7 +92,7 @@ class DefaultSQliteConnector(SQliteConnector):
 
         return DefaultSQliteConnector(table_name, database, fetch_size=fetch_size)
 
-    def insert(self, subject, predicate, obj):
+    def insert(self, subject: str, predicate: str, obj: str) -> None:
         """
             Insert a RDF triple into the RDF Graph.
         """
@@ -143,7 +104,7 @@ class DefaultSQliteConnector(SQliteConnector):
             transaction.execute(insert_query, (subject, predicate, obj))
             self._manager.commit()
 
-    def delete(self, subject, predicate, obj):
+    def delete(self, subject: str, predicate: str, obj: str) -> None:
         """
             Delete a RDF triple from the RDF Graph.
         """

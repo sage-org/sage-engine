@@ -73,6 +73,15 @@ def builtin_backends() -> Dict[str, BackendFactory]:
             'required': [
                 'database'
             ]
+        },
+        # HBase backend
+        {
+            'name': 'hbase',
+            'path': 'sage.database.hbase.connector',
+            'connector': 'HBaseConnector',
+            'required': [
+                'thrift_host'
+            ]
         }
     ]
     return {item['name']: import_backend(item['name'], item['path'], item['connector'], item['required']) for item in data}

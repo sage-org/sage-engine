@@ -35,13 +35,13 @@ def init_sqlite(config, graph_name, index):
     graph, backend = load_graph(config, graph_name, logger, backends=['sqlite', 'sqlite-catalog'])
 
     # init SQlite connection
-    logger.info("Connecting to SQlite server...")
+    logger.info("Connecting to the SQlite server...")
     connection = connect_sqlite(graph)
     connection.isolation_level = None
     if connection is None:
         logger.error('Failed to establish a connection with SQlite')
         exit(1)
-    logger.info("Connected to SQlite server")
+    logger.info("Connected to the SQlite server")
 
     # create a cursor to interact with the database
     cursor = connection.cursor()
@@ -83,13 +83,13 @@ def index_sqlite(config, graph_name):
     graph, backend = load_graph(config, graph_name, logger, backends=['sqlite', 'sqlite-catalog'])
 
     # init SQlite connection
-    logger.info("Connecting to SQlite server...")
+    logger.info("Connecting to the SQlite server...")
     connection = connect_sqlite(graph)
     connection.isolation_level = None
     if connection is None:
         logger.error('Failed to establish a connection with SQlite')
         exit(1)
-    logger.info("Connected to SQlite server")
+    logger.info("Connected to the SQlite server")
 
     # create a cursor to interact with the database
     cursor = connection.cursor()
@@ -176,7 +176,7 @@ def insert_bucket(cursor, bucket, graph_name, backend, block_size, cache):
 @click.argument("graph_name")
 @click.option("-f", "--format", type=click.Choice(["nt", "hdt"]),
     default="nt", show_default=True,
-    help="Format of the input file. Supported: nt (N-triples), ttl (Turtle) and hdt (HDT).")
+    help="Format of the input file. Supported: nt (N-triples) and hdt (HDT).")
 @click.option("--block-size", type=int,
     default=100, show_default=True,
     help="Block size used for the bulk loading")
@@ -186,20 +186,19 @@ def insert_bucket(cursor, bucket, graph_name, backend, block_size, cache):
 @click.option("--cache-size", type=int,
     default=300, show_default=True,
     help="Store terms identifier when using the catalog schema to improve loading performance")
-@click.option("--ignore-errors/--throw-errors", default=True,
-    help="When enabled malformed triples are ignored and will not be load into the database.")
 def put_sqlite(config, graph_name, rdf_file, format, block_size, commit_threshold, cache_size, ignore_errors):
     """Insert RDF triples from file RDF_FILE into the RDF graph GRAPH_NAME, described in the configuration file CONFIG."""
     # load graph from config file
     graph, backend = load_graph(config, graph_name, logger, backends=['sqlite', 'sqlite-catalog'])
 
     # init SQlite connection
-    logger.info("Connecting to SQlite server...")
+    logger.info("Connecting to the SQlite server...")
     connection = connect_sqlite(graph)
+    connection.isolation_level = None
     if connection is None:
-        logger.error('Failed to establish a connection with Sqlite')
+        logger.error('Failed to establish a connection with SQlite')
         exit(1)
-    logger.info("Connected to SQlite server")
+    logger.info("Connected to the SQlite server")
 
     # create a cursor to interact with the database
     cursor = connection.cursor()
@@ -232,14 +231,10 @@ def put_sqlite(config, graph_name, rdf_file, format, block_size, commit_threshol
             bar.update(len(bucket))
 
         def on_error(error):
-            if ignore_errors:
-                nonlocal dropped
-                dropped = dropped + 1
-            else:
-                logger.error(error)
-                cursor.close()
-                connection.close()
-                exit(1)
+            nonlocal dropped, inserted
+            dropped = dropped + 1
+            bar.label = f"Inserting RDF triples {inserted}/{nb_triples} - {dropped} triples dropped."
+            bar.update(0)
 
         def on_complete():
             nonlocal start

@@ -10,7 +10,7 @@ def is_var(term) -> bool:
 
     Returns: True if the RDF term is a SPARQL variable, False otherwise.
     """
-    return term is None # or term.startswith("?")
+    return term is None or term.startswith("?")
 
 
 def get_kind(subj, pred, obj):
