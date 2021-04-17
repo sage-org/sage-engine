@@ -8,28 +8,17 @@ from sage.database.db_iterator import DBIterator
 class HBaseIterator(DBIterator):
     """A HBaseIterator scan for results"""
 
-    def __init__(self, connection, scanner, pattern):
+    def __init__(self, connection, table, row_key, pattern):
         super(HBaseIterator, self).__init__(pattern)
+        self._table = table
         self._connection = connection
-        self._scanner = scanner
-        self._last_read_key, self._last_read_triple = '', None
         self._subject = pattern['subject'].encode('utf-8') if pattern['subject'] is not None else None
         self._predicate = pattern['predicate'].encode('utf-8') if pattern['predicate'] is not None else None
         self._object = pattern['object'].encode('utf-8') if pattern['object'] is not None else None
-        self._warmup = True
-
-    def __del__(self) -> None:
-        """Destructor (close the database connection)"""
-        # self._connection.close()
-        pass
-
-    def __fetch_one(self) -> None:
-        try:
-            self._last_read_key, self._last_read_triple = next(self._scanner)
-        except StopIteration:
-            self._last_read_key, self._last_read_triple = '', None
-        finally:
-            self._warmup = False
+        self._current_page = list()
+        self._has_next_page = False
+        self._last_read_key = row_key
+        self.__fetch_many(limit=1, skip_first=False)
 
     def __is_relevant_triple(self, triple: Dict[bytes, str]) -> bool:
         """Return True if the RDF triple matches the triple pattern scanned"""
@@ -41,25 +30,42 @@ class HBaseIterator(DBIterator):
             return False
         return True
 
+    def __decode_triple(self, triple):
+        """Return a RDF triple where terms are string to be conformed with SaGe"""
+        return (
+            triple[b'rdf:subject'].decode('utf-8'),
+            triple[b'rdf:predicate'].decode('utf-8'),
+            triple[b'rdf:object'].decode('utf-8')
+        )
+
+    def __fetch_many(self, limit=500, skip_first=True):
+        scanner = self._table.scan(row_start=self._last_read_key, limit=limit + 1)
+        self._has_next_page = False
+        for key, triple in scanner:
+            if not self.__is_relevant_triple(triple):
+                break
+            self._current_page.append((key, self.__decode_triple(triple)))
+        if len(self._current_page) == (limit + 1):
+            self._has_next_page = True
+        if skip_first:
+            self._current_page.pop(0)
+
     def last_read(self) -> str:
         """Return the index ID of the last element read"""
-        return self._last_read_key
+        if not self.has_next():
+            return 'None_None_None' # whatever as long as the key is not in the HBase database...
+        (key, triple) = self._current_page[0]
+        return key
 
     def next(self) -> Optional[Dict[str, str]]:
-        """Return the next solution mapping"""
-        if self._warmup:
-            # self._connection.open()
-            self.__fetch_one()
-        triple = self._last_read_triple
-        if triple is None or not self.__is_relevant_triple(triple):
+        """Return the next solution mapping or None if there are no more solutions"""
+        if not self.has_next():
             return None
-        self.__fetch_one()
-        triple = (triple[b'rdf:subject'].decode('utf-8'), triple[b'rdf:predicate'].decode('utf-8'), triple[b'rdf:object'].decode('utf-8'))
+        self._last_read_key, triple = self._current_page.pop(0)
         return triple
 
     def has_next(self) -> bool:
-        """Return True if there are still results to read, and False otherwise"""
-        if self._warmup:
-            # self._connection.open()
-            self.__fetch_one()
-        return self._last_read_triple is not None and self.__is_relevant_triple(self._last_read_triple)
+        """Return True if there is still results to read, False otherwise"""
+        if len(self._current_page) == 0 and self._has_next_page:
+            self.__fetch_many()
+        return len(self._current_page) > 0

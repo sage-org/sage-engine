@@ -25,8 +25,11 @@ class HDTIterator(DBIterator):
         return str(self._source.nb_reads + self._start_offset)
 
     def next(self) -> Tuple[str, str, str]:
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        return next(self._source)
+        """Return the next solution mapping or None if there are no more solutions"""
+        try:
+            return next(self._source)
+        except StopIteration:
+            return None
 
     def has_next(self) -> bool:
         """Return True if there is still results to read, and False otherwise"""

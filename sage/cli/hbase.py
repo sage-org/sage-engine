@@ -31,8 +31,8 @@ def init_hbase(config, graph_name):
     thrift_port = graph['thrift_port'] if 'thrift_port' in graph else 9090
 
     logger.info("Connexion to the HBase server...")
-    connection = happybase.Connection(graph['thrift_host'], port=thrift_port, table_prefix=graph_name)
-    logger.info("Connected!")
+    connection = happybase.Connection(graph['thrift_host'], protocol="compact", transport="framed", port=thrift_port, table_prefix=graph_name)
+    logger.info("Connected to the HBase server !")
 
     # create HBase tables
     families = {'rdf': dict()}
@@ -63,8 +63,8 @@ def put_hbase(rdf_file, config, graph_name, format, batch_size):
     thrift_port = graph['thrift_port'] if 'thrift_port' in graph else 9090
 
     logger.info("Connexion to the HBase server...")
-    connection = happybase.Connection(graph['thrift_host'], port=thrift_port, table_prefix=graph_name)
-    logger.info("Connected!")
+    connection = happybase.Connection(graph['thrift_host'], protocol="compact", transport="framed", port=thrift_port, table_prefix=graph_name)
+    logger.info("Connected to the HBase server !")
 
     spo_batch = connection.table('spo').batch(batch_size=batch_size)
     pos_batch = connection.table('pos').batch(batch_size=batch_size)

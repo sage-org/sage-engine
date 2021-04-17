@@ -29,7 +29,7 @@ def find_triples(connection, s, p, o):
         start_key = build_row_key(o, s, p)
     else:
         raise Exception(f"Unkown pattern type: {kind}")
-    return table.scan(row_start=start_key, batch_size=10)
+    return table, start_key
 
 
 def resume_triples(connection, last_read, s, p, o):
@@ -44,7 +44,7 @@ def resume_triples(connection, last_read, s, p, o):
         table = connection.table('osp')
     else:
         raise Exception(f"Unkown pattern type: {kind}")
-    return table.scan(row_start=last_read, batch_size=10)
+    return table, last_read
 
 
 class HBaseConnector(DatabaseConnector):
@@ -55,7 +55,7 @@ class HBaseConnector(DatabaseConnector):
         self._graph_name = graph_name
         self._thrift_host = thrift_host
         self._thrift_port = thrift_port
-        self._connection = happybase.Connection(self._thrift_host, port=self._thrift_port, table_prefix=self._graph_name)
+        self._connection = happybase.Connection(self._thrift_host, protocol="compact", transport="framed", port=self._thrift_port, table_prefix=self._graph_name)
         # batches used to perform updates
         self._spo_batch = None
         self._pos_batch = None
@@ -91,6 +91,12 @@ class HBaseConnector(DatabaseConnector):
         if self._osp_batch is None:
             self._osp_batch = self._connection.table('osp').batch()
 
+    def __refresh_connection(self):
+        try:
+            list(self._connection.table('spo').scan(limit=1))
+        except:
+            self._connection = happybase.Connection(self._thrift_host, protocol="compact", transport="framed", port=self._thrift_port, table_prefix=self._graph_name)
+
     def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[HBaseIterator, int]:
         """Get an iterator over all RDF triples matching a triple pattern.
 
@@ -109,18 +115,14 @@ class HBaseConnector(DatabaseConnector):
         obj = obj if (obj is not None) and (not obj.startswith('?')) else None
         pattern = {'subject': subject, 'predicate': predicate, 'object': obj}
 
-        # dedicated connection used to scan this triple pattern
-        # WARNING: we need to use a dedicated connection per triple pattern iterator.
-        # Otherwise, we might close a connection whose results were not fully consumed.
-        # connection = happybase.Connection(self._thrift_host, port=self._thrift_port, table_prefix=self._graph_name, autoconnect=False)
+        self.__refresh_connection()
 
         if last_read is None:
-            scanner = find_triples(self._connection, subject, predicate, obj)
-            # scanner = find_triples(connection, subject, predicate, obj)
+            (table, row_key) = find_triples(self._connection, subject, predicate, obj)
         else:
-            scanner = resume_triples(self._connection, last_read, subject, predicate, obj)
-            # scanner = resume_triples(connection, last_read, subject, predicate, obj)
-        iterator = HBaseIterator(self._connection, scanner, pattern)
+            (table, row_key) = resume_triples(self._connection, last_read, subject, predicate, obj)
+
+        iterator = HBaseIterator(self._connection, table, row_key, pattern)
         return iterator, pattern_shape_estimate(subject, predicate, obj)
 
     def insert(self, s: str, p: str, o: str) -> None:

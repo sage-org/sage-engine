@@ -186,7 +186,7 @@ def insert_bucket(cursor, bucket, graph_name, backend, block_size, cache):
 @click.option("--cache-size", type=int,
     default=300, show_default=True,
     help="Store terms identifier when using the catalog schema to improve loading performance")
-def put_sqlite(config, graph_name, rdf_file, format, block_size, commit_threshold, cache_size, ignore_errors):
+def put_sqlite(config, graph_name, rdf_file, format, block_size, commit_threshold, cache_size):
     """Insert RDF triples from file RDF_FILE into the RDF graph GRAPH_NAME, described in the configuration file CONFIG."""
     # load graph from config file
     graph, backend = load_graph(config, graph_name, logger, backends=['sqlite', 'sqlite-catalog'])
@@ -223,7 +223,7 @@ def put_sqlite(config, graph_name, rdf_file, format, block_size, commit_threshol
             nonlocal to_commit, inserted, dropped
             insert_bucket(cursor, bucket, graph_name, backend, block_size, cache)
             to_commit = to_commit + len(bucket)
-            if to_commit >= commit_threshold and ignore_errors:
+            if to_commit >= commit_threshold:
                 connection.commit()
                 to_commit = 0
             inserted = inserted + len(bucket)

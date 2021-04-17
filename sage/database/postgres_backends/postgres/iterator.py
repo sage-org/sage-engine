@@ -41,7 +41,7 @@ class PostgresIterator(DBIterator):
         }, separators=(',', ':'))
 
     def next(self) -> Optional[Dict[str, str]]:
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
+        """Return the next solution mapping or None if there are no more solutions"""
         if not self.has_next():
             return None
         return self._last_reads.pop(0)

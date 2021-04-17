@@ -219,7 +219,7 @@ def run_app(config_file: str) -> FastAPI:
             logging.info(f'query execution time: {(time() - exec_start) * 1000}ms')
             serialization_start = time()
             response = create_response(mimetypes, bindings, next_page, stats, server_url)
-            logging.info(f'serialization execution time: {(time() - serialization_start) * 1000}ms')
+            logging.info(f'serialization time: {(time() - serialization_start) * 1000}ms')
             logging.info(f'execution time: {(time() - start) * 1000}ms')
             return response
         except HTTPException as err:
