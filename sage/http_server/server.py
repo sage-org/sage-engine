@@ -143,10 +143,10 @@ def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_p
     Returns:
       An HTTP response built from the input mimetypes and the SPARQL query results.
     """
-    # if "application/json" in mimetypes:
-    #     iterator = responses.raw_json_streaming(bindings, next_page, stats, skol_url)
-    #     return StreamingResponse(iterator, media_type="application/json")
-    if "application/sparql-results+json" in mimetypes:
+    if "application/json" in mimetypes:
+        iterator = responses.raw_json_streaming(bindings, next_page, stats, skol_url)
+        return StreamingResponse(iterator, media_type="application/json")
+    elif "application/sparql-results+json" in mimetypes:
         iterator = responses.w3c_json_streaming(bindings, next_page, stats, skol_url)
         return StreamingResponse(iterator, media_type="application/json")
     elif "application/xml" in mimetypes or "application/sparql-results+xml" in mimetypes:

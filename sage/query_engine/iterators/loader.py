@@ -85,7 +85,7 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset, context: dict
     source = load(getattr(saved_plan, sourceField), dataset, context)
     mu = None
     if len(saved_plan.mu) > 0:
-        mu = saved_plan.mu
+        mu = dict(saved_plan.mu)
     return FilterIterator(source, saved_plan.expression, context, mu=mu)
 
 
@@ -107,10 +107,10 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
         as_of = None
     current_mappings = None
     if len(saved_plan.muc) > 0:
-        current_mappings = saved_plan.muc
+        current_mappings = dict(saved_plan.muc)
     mu = None
     if len(saved_plan.mu) > 0:
-        mu = saved_plan.mu
+        mu = dict(saved_plan.mu)
     return ScanIterator(pattern, dataset, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, as_of=as_of)
 
 
@@ -131,7 +131,7 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict
     right = load(getattr(saved_plan, rightField), dataset, context)
     current_mappings = None
     if len(saved_plan.muc) > 0:
-        current_mappings = saved_plan.muc
+        current_mappings = dict(saved_plan.muc)
     return IndexJoinIterator(left, right, context, current_mappings=current_mappings)
 
 
