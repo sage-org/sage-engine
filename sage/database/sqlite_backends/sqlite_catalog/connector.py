@@ -32,6 +32,13 @@ class CatalogSQliteConnector(SQliteConnector):
     def __init__(self, table_name, database, fetch_size=500):
         super(CatalogSQliteConnector, self).__init__(table_name, database, fetch_size)
 
+    def __get_identifiers(self, cursor, terms):
+        identified_terms = list()
+        for term in terms:
+            result = cursor.execute(get_locate_query(), [term]).fetchone()
+            identified_terms.append(-1 if result is None else result[0])
+        return identified_terms
+
     def search(self, subject, predicate, obj, last_read=None, as_of=None):
         """
             Get an iterator over all RDF triples matching a triple pattern.
@@ -68,6 +75,8 @@ class CatalogSQliteConnector(SQliteConnector):
             last_read = json.loads(last_read)
             t = (last_read["s"], last_read["p"], last_read["o"])
             start_query, start_params = get_resume_query(subject, predicate, obj, t, self._table_name)
+
+        start_params = self.__get_identifiers(cursor, start_params)
 
         # create the iterator to yield the matching RDF triples
         iterator = SQliteIterator(
