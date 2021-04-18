@@ -26,10 +26,10 @@ class CatalogSQliteConnector(SQliteConnector):
         Constructor arguments:
             - table_name `str`: Name of the SQL table containing RDF data.
             - database `str`: the name of the sqlite database file.
-            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 2000)
+            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 500)
     """
 
-    def __init__(self, table_name, database, fetch_size=2000):
+    def __init__(self, table_name, database, fetch_size=500):
         super(CatalogSQliteConnector, self).__init__(table_name, database, fetch_size)
 
     def search(self, subject, predicate, obj, last_read=None, as_of=None):
@@ -87,7 +87,7 @@ class CatalogSQliteConnector(SQliteConnector):
 
         table_name = config['name']
         database = config['database']
-        fetch_size = config['fetch_size'] if 'fetch_size' in config else 5000
+        fetch_size = config['fetch_size'] if 'fetch_size' in config else 500
 
         return CatalogSQliteConnector(table_name, database, fetch_size=fetch_size)
 

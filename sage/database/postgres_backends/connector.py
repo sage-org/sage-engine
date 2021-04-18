@@ -17,10 +17,10 @@ class PostgresConnector(DatabaseConnector):
       * password: password used to authenticate.
       * host: database host address (defaults to UNIX socket if not provided).
       * port: connection port number (defaults to 5432 if not provided).
-      * fetch_size: The number of SQL rows/RDF triples to fetch per batch (defaults to 2000).
+      * fetch_size: The number of SQL rows/RDF triples to fetch per batch (defaults to 500).
     """
 
-    def __init__(self, table_name: str, dbname: str, user: str, password: str, host: str = '', port: int = 5432, fetch_size: int = 2000):
+    def __init__(self, table_name: str, dbname: str, user: str, password: str, host: str = '', port: int = 5432, fetch_size: int = 500):
         super(PostgresConnector, self).__init__()
         self._table_name = table_name
         self._manager = TransactionManager(dbname, user, password, host=host, port=port)

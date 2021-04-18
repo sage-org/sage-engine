@@ -38,7 +38,7 @@ class HBaseIterator(DBIterator):
             triple[b'rdf:object'].decode('utf-8')
         )
 
-    def __fetch_many(self, limit=200, skip_first=True):
+    def __fetch_many(self, limit=500, skip_first=True):
         scanner = self._table.scan(row_start=self._last_read_key, limit=limit + 1, batch_size=limit + 1)
         self._has_next_page = False
         for key, triple in scanner:

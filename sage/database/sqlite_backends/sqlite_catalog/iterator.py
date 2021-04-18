@@ -7,7 +7,7 @@ from sage.database.db_iterator import DBIterator
 class SQliteIterator(DBIterator):
     """A SQliteIterator implements a DBIterator for a triple pattern evaluated using a SQlite database file"""
 
-    def __init__(self, cursor, connection, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 2000):
+    def __init__(self, cursor, connection, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 500):
         super(SQliteIterator, self).__init__(pattern)
         self._cursor = cursor
         self._connection = connection

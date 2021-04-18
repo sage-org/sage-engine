@@ -17,7 +17,7 @@ class PostgresIterator(DBIterator):
       * fetch_size: The number of SQL rows/RDF triples to fetch per batch.
     """
 
-    def __init__(self, cursor, start_time: datetime, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 2000):
+    def __init__(self, cursor, start_time: datetime, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 500):
         super(PostgresIterator, self).__init__(pattern)
         self._cursor = cursor
         self._start_time = start_time

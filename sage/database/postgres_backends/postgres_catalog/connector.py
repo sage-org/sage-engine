@@ -29,10 +29,10 @@ class CatalogPostgresConnector(PostgresConnector):
       * password: password used to authenticate.
       * host: database host address (defaults to UNIX socket if not provided).
       * port: connection port number (defaults to 5432 if not provided).
-      * fetch_size: The number of SQL rows/RDF triples to fetch per batch (defaults to 2000).
+      * fetch_size: The number of SQL rows/RDF triples to fetch per batch (defaults to 500).
     """
 
-    def __init__(self, table_name: str, dbname: str, user: str, password: str, host: str = '', port: int = 5432, fetch_size: int = 2000):
+    def __init__(self, table_name: str, dbname: str, user: str, password: str, host: str = '', port: int = 5432, fetch_size: int = 500):
         super(CatalogPostgresConnector, self).__init__(table_name, dbname, user, password, host, port, fetch_size)
 
     def _fetch_histograms(self, cursor, table_name: str, attribute_name: str) -> Tuple[int, int, Dict[str, float], int]:
@@ -121,7 +121,7 @@ class CatalogPostgresConnector(PostgresConnector):
 
         host = config['host'] if 'host' in config else ''
         port = config['port'] if 'port' in config else 5432
-        fetch_size = config['fetch_size'] if 'fetch_size' in config else 2000
+        fetch_size = config['fetch_size'] if 'fetch_size' in config else 500
 
         return CatalogPostgresConnector(config['name'], config['dbname'], config['user'], config['password'], host=host, port=port, fetch_size=fetch_size)
 

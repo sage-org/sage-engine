@@ -2,7 +2,6 @@ import sys
 import re
 
 from abc import ABC, abstractmethod
-from hdt import HDTDocument
 from rdflib.namespace import XSD
 from rdflib.term import Literal, BNode, URIRef
 from rdflib.plugins.parsers.ntriples import NTriplesParser, unquote, uriquote
@@ -140,6 +139,8 @@ class NTParser(CustomNTriplesParser):
 
 
 class HDTParser(CustomNTriplesParser):
+
+    from hdt import HDTDocument
 
     def __init__(self, bucket_size):
         super(HDTParser, self).__init__(bucket_size)

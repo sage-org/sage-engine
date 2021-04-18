@@ -21,6 +21,8 @@ def find_triples(connection, s, p, o):
         start_key = build_row_key(s, p, o)
     elif kind == '???':
         table = connection.table('spo')
+        # table = connection.table('pos')
+        # table = connection.table('osp')
     elif kind == '?p?' or kind == '?po':
         table = connection.table('pos')
         start_key = build_row_key(p, o, s)
@@ -36,7 +38,11 @@ def resume_triples(connection, last_read, s, p, o):
     """Resume the evaluation of a triple pattern from a RDF triple"""
     table = None
     kind = get_kind(s, p, o)
-    if kind == '???' or kind == 'spo' or kind == 's??' or kind == 'sp?':
+    if kind == '???':
+        table = connection.table('spo')
+        # table = connection.table('pos')
+        # table = connection.table('osp')
+    elif kind == 'spo' or kind == 's??' or kind == 'sp?':
         table = connection.table('spo')
     elif kind == '?p?' or kind == '?po':
         table = connection.table('pos')

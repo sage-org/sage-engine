@@ -15,30 +15,40 @@ def get_start_query(subj, pred, obj, table_name):
     if kind == 'spo':
         query += f"""WHERE subject = ({get_locate_query()})
                      AND predicate = ({get_locate_query()})
-                     AND object = ({get_locate_query()})"""
+                     AND object = ({get_locate_query()})
+                     ORDER BY subject, predicate, object"""
         return query, (subj, pred, obj)
     elif kind == '???':
+        query += "ORDER BY subject, predicate, object"
+        # query += "ORDER BY predicate, object, subject"
+        # query += "ORDER BY object, subject, predicate"
         return query, None
     elif kind == 's??':
-        query += f"""WHERE subject = ({get_locate_query()})"""
+        query += f"""WHERE subject = ({get_locate_query()})
+                     ORDER BY subject, predicate, object"""
         return query, [subj]
     elif kind == 'sp?':
         query += f"""WHERE subject = ({get_locate_query()})
-                     AND predicate = ({get_locate_query()})"""
+                     AND predicate = ({get_locate_query()})
+                     ORDER BY subject, predicate, object"""
         return query, (subj, pred)
     elif kind == '?p?':
-        query += f"""WHERE predicate = ({get_locate_query()})"""
+        query += f"""WHERE predicate = ({get_locate_query()})
+                     ORDER BY predicate, object, subject"""
         return query, [pred]
     elif kind == '?po':
         query += f"""WHERE predicate = ({get_locate_query()})
-                     AND object = ({get_locate_query()})"""
+                     AND object = ({get_locate_query()})
+                     ORDER BY predicate, object, subject"""
         return query, (pred, obj)
     elif kind == 's?o':
-        query += f"""WHERE subject = ({get_locate_query()})
-                     AND object = ({get_locate_query()})"""
-        return query, (subj, obj)
+        query += f"""WHERE object = ({get_locate_query()})
+                     AND subject = ({get_locate_query()})
+                     ORDER BY object, subject, predicate"""
+        return query, (obj, subj)
     elif kind == '??o':
-        query += f"""WHERE object = ({get_locate_query()})"""
+        query += f"""WHERE object = ({get_locate_query()})
+                     ORDER BY object, subject, predicate"""
         return query, [obj]
     else:
         raise Exception(f"Unkown pattern type: {kind}")
@@ -59,34 +69,47 @@ def get_resume_query(subj, pred, obj, last_read, table_name, symbol=">="):
     if kind == 'spo':
         return None, None
     elif kind == '???':
-        query += f"""WHERE (subject, predicate, object) {symbol} (({get_locate_query()}), ({get_locate_query()}), ({get_locate_query()}))"""
+        query += f"""WHERE (subject, predicate, object) {symbol} (({get_locate_query()}), ({get_locate_query()}), ({get_locate_query()}))
+                     ORDER BY subject, predicate, object"""
+        # query += f"""WHERE (predicate, object, subject) {symbol} (({get_locate_query()}), ({get_locate_query()}), ({get_locate_query()}))
+        #              ORDER BY predicate, object, subject"""
+        # query += f"""WHERE (object, subject, predicate) {symbol} (({get_locate_query()}), ({get_locate_query()}), ({get_locate_query()}))
+        #              ORDER BY object, subject, predicate"""
         return query, (last_s, last_p, last_o)
+        # return query, (last_p, last_o, last_s)
+        # return query, (last_o, last_s, last_p)
     elif kind == 's??':
         query += f"""WHERE subject = ({get_locate_query()})
-                     AND (predicate, object) {symbol} (({get_locate_query()}), ({get_locate_query()}))"""
+                     AND (predicate, object) {symbol} (({get_locate_query()}), ({get_locate_query()}))
+                     ORDER BY subject, predicate, object"""
         return query, (last_s, last_p, last_o)
     elif kind == 'sp?':
         query += f"""WHERE subject = ({get_locate_query()})
                      AND predicate = ({get_locate_query()})
-                     AND (object) {symbol} ({get_locate_query()})"""
+                     AND (object) {symbol} ({get_locate_query()})
+                     ORDER BY subject, predicate, object"""
         return query, (last_s, last_p, last_o)
     elif kind == '?p?':
         query += f"""WHERE predicate = ({get_locate_query()})
-                     AND (object, subject) {symbol} (({get_locate_query()}), ({get_locate_query()}))"""
+                     AND (object, subject) {symbol} (({get_locate_query()}), ({get_locate_query()}))
+                     ORDER BY predicate, object, subject"""
         return query, (last_p, last_o, last_s)
     elif kind == '?po':
         query += f"""WHERE predicate = ({get_locate_query()})
                      AND object = ({get_locate_query()})
-                     AND (subject) {symbol} ({get_locate_query()})"""
+                     AND (subject) {symbol} ({get_locate_query()})
+                     ORDER BY predicate, object, subject"""
         return query, (last_p, last_o, last_s)
     elif kind == 's?o':
-        query += f"""WHERE subject = ({get_locate_query()})
-                     AND object = ({get_locate_query()})
-                     AND (predicate) {symbol} ({get_locate_query()})"""
-        return query, (last_s, last_o, last_p)
+        query += f"""WHERE object = ({get_locate_query()})
+                     AND subject = ({get_locate_query()})
+                     AND (predicate) {symbol} ({get_locate_query()})
+                     ORDER BY object, subject, predicate"""
+        return query, (last_o, last_s, last_p)
     elif kind == '??o':
         query += f"""WHERE object = ({get_locate_query()})
-                     AND (subject, predicate) {symbol} (({get_locate_query()}), ({get_locate_query()}))"""
+                     AND (subject, predicate) {symbol} (({get_locate_query()}), ({get_locate_query()}))
+                     ORDER BY object, subject, predicate"""
         return query, (last_o, last_s, last_p)
     else:
         raise Exception(f"Unkown pattern type: {kind}")

@@ -26,10 +26,10 @@ class DefaultSQliteConnector(SQliteConnector):
         Constructor arguments:
             - table_name `str`: Name of the SQL table containing RDF data.
             - database `str`: the name of the sqlite database file.
-            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 2000)
+            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 500)
     """
 
-    def __init__(self, table_name: str, database: str, fetch_size: int = 2000):
+    def __init__(self, table_name: str, database: str, fetch_size: int = 500):
         super(DefaultSQliteConnector, self).__init__(table_name, database, fetch_size)
 
     def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[SQliteIterator, int]:
@@ -88,7 +88,7 @@ class DefaultSQliteConnector(SQliteConnector):
 
         table_name = config['name']
         database = config['database']
-        fetch_size = config['fetch_size'] if 'fetch_size' in config else 5000
+        fetch_size = config['fetch_size'] if 'fetch_size' in config else 500
 
         return DefaultSQliteConnector(table_name, database, fetch_size=fetch_size)
 

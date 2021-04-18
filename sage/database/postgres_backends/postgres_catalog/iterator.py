@@ -7,7 +7,7 @@ from sage.database.db_iterator import DBIterator
 class PostgresIterator(DBIterator):
     """A PostgresIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file"""
 
-    def __init__(self, cursor, connection, start_query: str, start_params: List[str], pattern: Dict[str, str], fetch_size: int = 2000):
+    def __init__(self, cursor, connection, start_query: str, start_params: List[str], pattern: Dict[str, str], fetch_size: int = 500):
         super(PostgresIterator, self).__init__(pattern)
         self._cursor = cursor
         self._connection = connection

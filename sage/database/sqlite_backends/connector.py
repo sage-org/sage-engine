@@ -21,10 +21,10 @@ class SQliteConnector(DatabaseConnector):
         Constructor arguments:
             - table_name `str`: Name of the SQL table containing RDF data.
             - database `str`: the name of the sqlite database file.
-            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 2000)
+            - fetch_size `int`: how many RDF triples are fetched per SQL query (default to 500)
     """
 
-    def __init__(self, table_name: str, database: str, fetch_size: int = 2000):
+    def __init__(self, table_name: str, database: str, fetch_size: int = 500):
         super(SQliteConnector, self).__init__()
         self._table_name = table_name
         self._manager = TransactionManager(database)
