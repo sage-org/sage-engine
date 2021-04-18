@@ -2,6 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 import json
 import uuid
+import logging
 
 from math import ceil
 from time import time
@@ -59,6 +60,9 @@ class SQliteConnector(DatabaseConnector):
         # Do warmup phase if required, i.e., fetch stats for query execution
         if self._warmup:
             cursor = self._manager.start_transaction()
+            # improve SQlite performance using PRAGMA
+            # cursor.execute("PRAGMA mmap_size=10485760")
+            # cursor.execute("PRAGMA cache_size=-10000")
             # fetch SPO index statistics
             cursor.execute(f'SELECT stat FROM sqlite_stat1 WHERE idx = \'{self._table_name}_spo_index\'')
             (row_count, same_s_row_count, same_sp_row_count, same_spo_row_count) = cursor.fetchone()[0].split(' ')

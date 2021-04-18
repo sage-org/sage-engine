@@ -82,6 +82,7 @@ class TestQueryParser(object):
     @pytest.mark.asyncio
     @pytest.mark.parametrize("query,cardinality", queries)
     async def test_query_parser(self, query, cardinality):
-        iterator, cards = parse_query(query, dataset, 'watdiv100')
+        context= { 'quantum': 10e7, 'max_results': 10e7, 'start_timestamp': 0 }
+        iterator, cards = parse_query(query, dataset, 'watdiv100', context)
         assert len(cards) > 0
         assert iterator is not None

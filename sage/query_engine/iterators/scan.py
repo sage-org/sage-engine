@@ -4,8 +4,7 @@ from datetime import datetime
 from time import time
 from typing import Dict, Optional
 
-from sage.database.db_iterator import DBIterator
-from sage.database.core.dataset import Dataset
+from sage.database.db_connector import DatabaseConnector
 from sage.query_engine.exceptions import QuantumExhausted
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.utils import selection, vars_positions
@@ -20,8 +19,8 @@ class ScanIterator(PreemptableIterator):
     It can be used as the starting iterator in a pipeline of iterators.
 
     Args:
+      * connector: The database connector that will be used to evaluate a triple pattern.
       * pattern: The evaluated triple pattern.
-      * dataset: The dataset on which the scan is evaluated.
       * context: Information about the query execution.
       * current_mappings: The current mappings when the scan is performed.
       * mu: The last triple read when the preemption occured. This triple must be the next returned triple when the query is resumed.
@@ -29,10 +28,10 @@ class ScanIterator(PreemptableIterator):
       * as_of: Perform all reads against a consistent snapshot represented by a timestamp.
     """
 
-    def __init__(self, pattern: Dict[str, str], dataset: Dataset, context: dict, current_mappings: Optional[Dict[str, str]] = None, mu: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, as_of: Optional[datetime] = None):
+    def __init__(self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict, current_mappings: Optional[Dict[str, str]] = None, mu: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, as_of: Optional[datetime] = None):
         super(ScanIterator, self).__init__()
+        self._connector = connector
         self._pattern = pattern
-        self._dataset = dataset
         self._context = context
         self._variables = vars_positions(pattern['subject'], pattern['predicate'], pattern['object'])
         self._current_mappings = current_mappings
@@ -41,12 +40,12 @@ class ScanIterator(PreemptableIterator):
         self._start_timestamp = as_of
         # Create an iterator on the database
         if current_mappings is None:
-            it, card = dataset.get_graph(pattern['graph']).search(pattern['subject'], pattern['predicate'], pattern['object'], last_read=last_read, as_of=as_of)
+            it, card = self._connector.search(pattern['subject'], pattern['predicate'], pattern['object'], last_read=last_read, as_of=as_of)
             self._source = it
             self._cardinality = card
         else:
             (s, p, o) = (find_in_mappings(pattern['subject'], current_mappings), find_in_mappings(pattern['predicate'], current_mappings), find_in_mappings(pattern['object'], current_mappings))
-            it, card = dataset.get_graph(pattern['graph']).search(s, p, o, last_read=last_read, as_of=as_of)
+            it, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
             self._source = it
             self._cardinality = card
 
@@ -70,7 +69,7 @@ class ScanIterator(PreemptableIterator):
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         (s, p, o) = (find_in_mappings(self._pattern['subject'], mappings), find_in_mappings(self._pattern['predicate'], mappings), find_in_mappings(self._pattern['object'], mappings))
-        it, card = self._dataset.get_graph(self._pattern['graph']).search(s, p, o, as_of=self._start_timestamp)
+        it, card = self._connector.search(s, p, o, as_of=self._start_timestamp)
         self._current_mappings = mappings
         self._source = it
         self._cardinality = card

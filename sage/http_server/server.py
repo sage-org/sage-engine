@@ -93,7 +93,6 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
 
         # execute query
         engine = SageEngine()
-        context['start_timestamp'] = time()
         bindings, saved_plan, is_done, abort_reason = await engine.execute(plan, context)
 
         # commit or abort (if necessary)

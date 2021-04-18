@@ -31,7 +31,7 @@ bgp_queries = [
         SELECT * WHERE {
             ?s <http://xmlns.com/foaf/age> ?s .
         }
-    """, 0)
+    """, 50095)
 ]
 
 

@@ -123,7 +123,8 @@ class HBaseConnector(DatabaseConnector):
             (table, row_key) = resume_triples(self._connection, last_read, subject, predicate, obj)
 
         iterator = HBaseIterator(self._connection, table, row_key, pattern)
-        return iterator, pattern_shape_estimate(subject, predicate, obj)
+        card = pattern_shape_estimate(subject, predicate, obj) if iterator.has_next() else 0
+        return iterator, card
 
     def insert(self, s: str, p: str, o: str) -> None:
         """Insert a RDF triple into the database"""

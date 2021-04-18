@@ -17,23 +17,23 @@ triple = {
 
 @pytest.mark.asyncio
 async def test_scan_read():
-    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
-    scan = ScanIterator(iterator, triple, card)
-    (results, saved, done, _) = await engine.execute(scan, 10e7)
-    assert len(results) == card
+    context = { 'quantum': 10e7, 'max_results': 10e7 }
+    scan = ScanIterator(hdtDoc, triple, context)
+    (results, saved, done, _) = await engine.execute(scan, context)
+    assert len(results) == scan.__len__()
     assert done
 
 
 @pytest.mark.asyncio
 async def test_scan_save_nointerrupt():
-    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
-    scan = ScanIterator(iterator, triple, card)
-    (results, saved, done, _) = await engine.execute(scan, 10e7)
+    context = { 'quantum': 10e7, 'max_results': 10e7 }
+    scan = ScanIterator(hdtDoc, triple, context)
+    (results, saved, done, _) = await engine.execute(scan, context)
 
 
 @pytest.mark.asyncio
 async def test_scan_save_interrupt():
-    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
-    scan = ScanIterator(iterator, triple, card)
-    (results, saved, done, _) = await engine.execute(scan, 1e-3)
-    assert len(results) <= card
+    context = { 'quantum': 10e7, 'max_results': 1e-3 }
+    scan = ScanIterator(hdtDoc, triple, context)
+    (results, saved, done, _) = await engine.execute(scan, context)
+    assert len(results) <= scan.__len__()

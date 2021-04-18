@@ -40,7 +40,7 @@ def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_gr
         triple['graph'] = graph_uri
         # get iterator and statistics about the pattern
         if dataset.has_graph(graph_uri):
-            it = ScanIterator(triple, dataset, context, as_of=as_of)
+            it = ScanIterator(dataset.get_graph(graph_uri), triple, context, as_of=as_of)
             c = it.__len__()
         else:
             it, c = EmptyIterator(), 0

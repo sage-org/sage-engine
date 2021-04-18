@@ -83,10 +83,7 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset, context: dict
     """
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), dataset, context)
-    mu = None
-    if len(saved_plan.mu) > 0:
-        mu = dict(saved_plan.mu)
-    return FilterIterator(source, saved_plan.expression, context, mu=mu)
+    return FilterIterator(source, saved_plan.expression, context)
 
 
 def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -101,7 +98,8 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
       The pipeline of iterator used to continue query execution.
     """
     pattern = protoTriple_to_dict(saved_plan.pattern)
-    if saved_plan.timestamp is not None:
+    connector = dataset.get_graph(pattern['graph'])
+    if saved_plan.timestamp is not None and saved_plan.timestamp != '':
         as_of = datetime.fromisoformat(saved_plan.timestamp)
     else:
         as_of = None
@@ -111,7 +109,7 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
     mu = None
     if len(saved_plan.mu) > 0:
         mu = dict(saved_plan.mu)
-    return ScanIterator(pattern, dataset, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, as_of=as_of)
+    return ScanIterator(connector, pattern, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, as_of=as_of)
 
 
 def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict) -> PreemptableIterator:

@@ -34,19 +34,21 @@ class DeleteOperator(PreemptableIterator):
         """Return True if the iterator has more quads to delete"""
         return len(self._quads) > 0
 
+    def next_stage(self, mappings: Dict[str, str]) -> None:
+        """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
+        pass
+
     async def next(self) -> Optional[Dict[str, str]]:
         """Delete the next quad from the RDF dataset.
 
         This function works in an iterator fashion, so it can be used in a pipeline of iterators.
-        It may also contains `non interruptible` clauses which must 
+        It may also contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
-        Returns: The quad if it was successfully deleted, otwherise it returns `None`. 
-
-        Throws: `StopAsyncIteration` if the iterator has no more quads to delete.
+        Returns: The quad if it was successfully deleted, otwherise it returns `None`.
         """
         if not self.has_next():
-            raise StopAsyncIteration()
+            return None
         s, p, o, g = self._quads.pop()
         if self._dataset.has_graph(g):
             self._dataset.get_graph(g).delete(s, p, o)

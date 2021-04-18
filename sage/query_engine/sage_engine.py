@@ -1,5 +1,6 @@
 # sage_engine.py
 # Author: Thomas MINIER - MIT License 2017-2020
+from time import time
 from typing import Dict, List, Optional, Tuple
 
 from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults, QuantumExhausted
@@ -53,6 +54,7 @@ class SageEngine(object):
         root = None
         abort_reason = None
         try:
+            context['start_timestamp'] = time()
             await executor(plan, results, context)
             query_done = True
         except QuantumExhausted:
