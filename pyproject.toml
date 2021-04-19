@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "sage-engine"
-version = "2.2.0"
-description = "Sage: a SPARQL query engine for public Linked Data providers"
+version = "2.3.0"
+description = "Sage: a preemptive SPARQL query engine for online Knowledge Graphs"
 repository = "https://github.com/sage-org/sage-engine"
-authors = [ "Thomas Minier <tminier01@gmail.com>" ]
+authors = [ "Thomas Minier <tminier01@gmail.com>",
+	"Julien Aimonier-Davat <julien.aimonier-davat@univ-nantes.fr>",
+	"Pascal Molli <pascal.molli@univ-nantes.fr>",
+	"Hala Skaf <hala.skaf@univ-nantes.fr>" ]
 keywords = [ "rdf", "sparql", "query engine" ]
 classifiers = [
   "Topic :: Database :: Database Engines/Servers",
@@ -33,7 +36,7 @@ sage-hbase-init = "sage.cli.hbase:init_hbase"
 sage-hbase-put = "sage.cli.hbase:put_hbase"
 
 [tool.poetry.dependencies]
-python = "3.7.10"
+python = "^3.7"
 uvloop = "0.15.2"
 PyYAML = "5.4.1"
 rdflib = "5.0.0"
