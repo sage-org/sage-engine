@@ -1,0 +1,39 @@
+sage.database.postgres\_backends package
+========================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   sage.database.postgres_backends.postgres
+   sage.database.postgres_backends.postgres_catalog
+   sage.database.postgres_backends.postgres_mvcc
+
+Submodules
+----------
+
+sage.database.postgres\_backends.connector module
+-------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.postgres\_backends.transaction\_manager module
+------------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.transaction_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: sage.database.postgres_backends
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>sage.query_engine package &mdash; sage-engine 2.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -84,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -100,7 +101,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine.exceptions">sage.query_engine.exceptions module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine.primitives">sage.query_engine.primitives module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine.sage_engine">sage.query_engine.sage_engine module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.query_engine">Module contents</a></li>
 </ul>
@@ -176,9 +176,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sage-query-engine-package">
+  <section id="sage-query-engine-package">
 <h1>sage.query_engine package<a class="headerlink" href="#sage-query-engine-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -222,17 +222,24 @@
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
+</section>
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-sage.query_engine.exceptions">
+</section>
+<section id="module-sage.query_engine.exceptions">
 <span id="sage-query-engine-exceptions-module"></span><h2>sage.query_engine.exceptions module<a class="headerlink" href="#module-sage.query_engine.exceptions" title="Permalink to this headline">¶</a></h2>
 <dl class="exception">
 <dt id="sage.query_engine.exceptions.DeleteInsertConflict">
 <em class="property">exception </em><code class="sig-prename descclassname">sage.query_engine.exceptions.</code><code class="sig-name descname">DeleteInsertConflict</code><a class="headerlink" href="#sage.query_engine.exceptions.DeleteInsertConflict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Raised when a conflict happended during the serialization of a transaction</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="sage.query_engine.exceptions.QuantumExhausted">
+<em class="property">exception </em><code class="sig-prename descclassname">sage.query_engine.exceptions.</code><code class="sig-name descname">QuantumExhausted</code><a class="headerlink" href="#sage.query_engine.exceptions.QuantumExhausted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when the time quantum for a query execution has been exceeded</p>
 </dd></dl>
 
 <dl class="exception">
@@ -249,44 +256,8 @@
 <p>Raised when a SPARQL feature is not supported by the Sage query engine</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.primitives">
-<span id="sage-query-engine-primitives-module"></span><h2>sage.query_engine.primitives module<a class="headerlink" href="#module-sage.query_engine.primitives" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="sage.query_engine.primitives.PreemptiveLoop">
-<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.primitives.</code><code class="sig-name descname">PreemptiveLoop</code><span class="sig-paren">(</span><em class="sig-param">threshold=50</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.primitives.PreemptiveLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Utility context manager to run loops in a preemptive env. with asyncio.</p>
-<p>Basically, this class allows one to trigger <cite>asyncio.sleep(0)</cite> at fixed interval,
-to yield control to the scheduler in loops that run in an event loop.
-Otherwise, such loops never yield back to the scheduler, which breaks the Round-Robin
-scheduling algorithm of the preemptive Web server.
-Yielding is performed using the <cite>tick()</cite> method.</p>
-<p>However, a call to <cite>asyncio.sleep(0)</cite> costs a lot in term of performance, so we only
-trigger every <cite>threshold</cite> calls to the tick() method. 
-<strong>This parameter defaults to 50 cycles</strong>.
-So, to optimize query execution performance, on need to minimize 
-the use of loops in the pipeline of iterators and optimize the <cite>threshold</cite> value.</p>
-<p>Argument: Number of ticks between each call to asyncio.sleep</p>
-<dl>
-<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">PreemptiveLoop</span><span class="p">()</span> <span class="k">as</span> <span class="n">loop</span><span class="p">:</span>
-<span class="gp">&gt;&gt;&gt; </span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">tick</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<dl class="method">
-<dt id="sage.query_engine.primitives.PreemptiveLoop.tick">
-<em class="property">async </em><code class="sig-name descname">tick</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.primitives.PreemptiveLoop.tick" title="Permalink to this definition">¶</a></dt>
-<dd><p>Move to the next iteration and allow interruption of the current loop (if required)</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-sage.query_engine.sage_engine">
+</section>
+<section id="module-sage.query_engine.sage_engine">
 <span id="sage-query-engine-sage-engine-module"></span><h2>sage.query_engine.sage_engine module<a class="headerlink" href="#module-sage.query_engine.sage_engine" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.sage_engine.SageEngine">
@@ -295,12 +266,12 @@ the use of loops in the pipeline of iterators and optimize the <cite>threshold</
 <p>SaGe query engine, used to evaluated a preemptable physical query execution plan</p>
 <dl class="method">
 <dt id="sage.query_engine.sage_engine.SageEngine.execute">
-<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">plan: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">quantum: int</em>, <em class="sig-param">limit=inf</em><span class="sig-paren">)</span> &#x2192; Tuple[List[Dict[str, str]], Optional[iterators_pb2.RootTree], bool, Optional[str]]<a class="headerlink" href="#sage.query_engine.sage_engine.SageEngine.execute" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">plan: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span> &#x2192; Tuple[List[Dict[str, str]], Optional[iterators_pb2.RootTree], bool, Optional[str]]<a class="headerlink" href="#sage.query_engine.sage_engine.SageEngine.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a preemptable physical query execution plan under a time quantum.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>plan: Root of the pipeline of iterator.</p></li>
-<li><p>quantum: Time quantum used to execute the query.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 <dt>Returns: A tuple (<code class="docutils literal notranslate"><span class="pre">results</span></code>, <code class="docutils literal notranslate"><span class="pre">saved_plan</span></code>, <code class="docutils literal notranslate"><span class="pre">is_done</span></code>, <code class="docutils literal notranslate"><span class="pre">abort_reason</span></code>) where:</dt><dd><ul class="simple">
@@ -318,24 +289,24 @@ the use of loops in the pipeline of iterators and optimize the <cite>threshold</
 
 <dl class="function">
 <dt id="sage.query_engine.sage_engine.executor">
-<em class="property">async </em><code class="sig-prename descclassname">sage.query_engine.sage_engine.</code><code class="sig-name descname">executor</code><span class="sig-paren">(</span><em class="sig-param">pipeline: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">queue: asyncio.queues.Queue</em>, <em class="sig-param">limit: int</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.sage_engine.executor" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-prename descclassname">sage.query_engine.sage_engine.</code><code class="sig-name descname">executor</code><span class="sig-paren">(</span><em class="sig-param">pipeline: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">results: list</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.sage_engine.executor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute a pipeline of iterator under a time quantum.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>pipeline: Root of the pipeline of iterator.</p></li>
-<li><p>queue: Async queue used to store query results.</p></li>
-<li><p>limit: Maximum number of query results to fetch from the pipeline.</p></li>
+<li><p>results: List used to store query results.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 </dl>
 <p>Throws: Any exception raised during query execution.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine">
+</section>
+<section id="module-sage.query_engine">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.query_engine" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

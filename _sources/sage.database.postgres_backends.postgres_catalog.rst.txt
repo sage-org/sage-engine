@@ -1,0 +1,38 @@
+sage.database.postgres\_backends.postgres\_catalog package
+==========================================================
+
+Submodules
+----------
+
+sage.database.postgres\_backends.postgres\_catalog.connector module
+-------------------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres_catalog.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.postgres\_backends.postgres\_catalog.iterator module
+------------------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres_catalog.iterator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.postgres\_backends.postgres\_catalog.queries module
+-----------------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres_catalog.queries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: sage.database.postgres_backends.postgres_catalog
+   :members:
+   :undoc-members:
+   :show-inheritance:

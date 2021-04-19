@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>sage.database.hdt package &mdash; sage-engine 2.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -35,8 +36,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="sage.database.postgres package" href="sage.database.postgres.html" />
-    <link rel="prev" title="sage.database.core package" href="sage.database.core.html" /> 
+    <link rel="next" title="sage.database.postgres_backends package" href="sage.database.postgres_backends.html" />
+    <link rel="prev" title="sage.database.hbase package" href="sage.database.hbase.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -181,12 +182,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sage-database-hdt-package">
+  <section id="sage-database-hdt-package">
 <h1>sage.database.hdt package<a class="headerlink" href="#sage-database-hdt-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-sage.database.hdt.connector">
+</section>
+<section id="module-sage.database.hdt.connector">
 <span id="sage-database-hdt-connector-module"></span><h2>sage.database.hdt.connector module<a class="headerlink" href="#module-sage.database.hdt.connector" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.database.hdt.connector.HDTFileConnector">
@@ -212,7 +213,7 @@
 </dd>
 <dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;./dbpedia.hdt&quot;</span> <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">connector</span> <span class="o">=</span> <span class="n">HDTFileConnector</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The HDT file contains </span><span class="si">{connector.nb_triples}</span><span class="s2"> RDF triples&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The HDT file contains </span><span class="si">{</span><span class="n">connector</span><span class="o">.</span><span class="n">nb_triples</span><span class="si">}</span><span class="s2"> RDF triples&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>
@@ -263,8 +264,8 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.database.hdt.iterator">
+</section>
+<section id="module-sage.database.hdt.iterator">
 <span id="sage-database-hdt-iterator-module"></span><h2>sage.database.hdt.iterator module<a class="headerlink" href="#module-sage.database.hdt.iterator" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.database.hdt.iterator.HDTIterator">
@@ -294,16 +295,16 @@
 <dl class="method">
 <dt id="sage.database.hdt.iterator.HDTIterator.next">
 <code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Tuple[str, str, str]<a class="headerlink" href="#sage.database.hdt.iterator.HDTIterator.next" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the next solution mapping or raise <cite>StopIteration</cite> if there are no more solutions</p>
+<dd><p>Return the next solution mapping or None if there are no more solutions</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.database.hdt">
+</section>
+<section id="module-sage.database.hdt">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.database.hdt" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -313,10 +314,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sage.database.postgres.html" class="btn btn-neutral float-right" title="sage.database.postgres package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sage.database.postgres_backends.html" class="btn btn-neutral float-right" title="sage.database.postgres_backends package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sage.database.core.html" class="btn btn-neutral float-left" title="sage.database.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sage.database.hbase.html" class="btn btn-neutral float-left" title="sage.database.hbase package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

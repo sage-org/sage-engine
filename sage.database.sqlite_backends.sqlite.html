@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.database.sqlite_backends.sqlite package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.database.sqlite_backends.sqlite_catalog package" href="sage.database.sqlite_backends.sqlite_catalog.html" />
+    <link rel="prev" title="sage.database.sqlite_backends package" href="sage.database.sqlite_backends.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="sage.database.html">sage.database package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="sage.database.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.db_connector">sage.database.db_connector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.db_iterator">sage.database.db_iterator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.descriptors">sage.database.descriptors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.estimators">sage.database.estimators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.import_manager">sage.database.import_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.utils">sage.database.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+          <li><a href="sage.database.html">sage.database package</a> &raquo;</li>
+        
+          <li><a href="sage.database.sqlite_backends.html">sage.database.sqlite_backends package</a> &raquo;</li>
+        
+      <li>sage.database.sqlite_backends.sqlite package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.database.sqlite_backends.sqlite.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="sage-database-sqlite-backends-sqlite-package">
+<h1>sage.database.sqlite_backends.sqlite package<a class="headerlink" href="#sage-database-sqlite-backends-sqlite-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-sage.database.sqlite_backends.sqlite.connector">
+<span id="sage-database-sqlite-backends-sqlite-connector-module"></span><h2>sage.database.sqlite_backends.sqlite.connector module<a class="headerlink" href="#module-sage.database.sqlite_backends.sqlite.connector" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.sqlite_backends.sqlite.connector.</code><code class="sig-name descname">DefaultSQliteConnector</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em>, <em class="sig-param">database: str</em>, <em class="sig-param">fetch_size: int = 500</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.connector.SQliteConnector" title="sage.database.sqlite_backends.connector.SQliteConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.sqlite_backends.connector.SQliteConnector</span></code></a></p>
+<p>A DefaultSQliteConnector search for RDF triples in a SQlite database where triples are stored in one SQL table.
+Constructor arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>table_name <cite>str</cite>: Name of the SQL table containing RDF data.</p></li>
+<li><p>database <cite>str</cite>: the name of the sqlite database file.</p></li>
+<li><p>fetch_size <cite>int</cite>: how many RDF triples are fetched per SQL query (default to 500)</p></li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a RDF triple from the RDF Graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.from_config">
+<code class="sig-name descname">from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; sage.database.sqlite_backends.connector.SQliteConnector<a class="headerlink" href="#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQliteConnector from a configuration object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a RDF triple into the RDF Graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.search">
+<code class="sig-name descname">search</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em>, <em class="sig-param">last_read: Optional[str] = None</em>, <em class="sig-param">as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.database.sqlite_backends.sqlite.iterator.SQliteIterator, int]<a class="headerlink" href="#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over all RDF triples matching a triple pattern.
+Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>subject <code class="docutils literal notranslate"><span class="pre">string</span></code> - Subject of the triple pattern</p></li>
+<li><p>predicate <code class="docutils literal notranslate"><span class="pre">string</span></code> - Predicate of the triple pattern</p></li>
+<li><p>obj <code class="docutils literal notranslate"><span class="pre">string</span></code> - Object of the triple pattern</p></li>
+<li><p>last_read <code class="docutils literal notranslate"><span class="pre">string=None</span></code> <code class="docutils literal notranslate"><span class="pre">optional</span></code> -  OFFSET ID used to resume scan</p></li>
+<li><p>as_of <code class="docutils literal notranslate"><span class="pre">datetime=None</span></code> <code class="docutils literal notranslate"><span class="pre">optional</span></code> - Perform all reads against a consistent snapshot represented by a timestamp.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>A tuple (<cite>iterator</cite>, <cite>cardinality</cite>), where <cite>iterator</cite> is a Python iterator over RDF triples matching the given triples pattern, and <cite>cardinality</cite> is the estimated cardinality of the triple pattern</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sage.database.sqlite_backends.sqlite.iterator">
+<span id="sage-database-sqlite-backends-sqlite-iterator-module"></span><h2>sage.database.sqlite_backends.sqlite.iterator module<a class="headerlink" href="#module-sage.database.sqlite_backends.sqlite.iterator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.sqlite_backends.sqlite.iterator.SQliteIterator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.sqlite_backends.sqlite.iterator.</code><code class="sig-name descname">SQliteIterator</code><span class="sig-paren">(</span><em class="sig-param">cursor, connection, start_query: str, start_params: List[str], table_name: str, pattern: Dict[str, str], fetch_size: int = 500</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.database.html#sage.database.db_iterator.DBIterator" title="sage.database.db_iterator.DBIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.db_iterator.DBIterator</span></code></a></p>
+<p>A SQliteIterator implements a DBIterator for a triple pattern evaluated using a SQlite database file</p>
+<dl class="method">
+<dt id="sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if there is still results to read, and False otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.last_read">
+<code class="sig-name descname">last_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.last_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index ID of the last element read</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.next">
+<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next solution mapping or None if there are no more solutions</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sage.database.sqlite_backends.sqlite.queries">
+<span id="sage-database-sqlite-backends-sqlite-queries-module"></span><h2>sage.database.sqlite_backends.sqlite.queries module<a class="headerlink" href="#module-sage.database.sqlite_backends.sqlite.queries" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.sqlite_backends.sqlite.queries.get_delete_query">
+<code class="sig-prename descclassname">sage.database.sqlite_backends.sqlite.queries.</code><code class="sig-name descname">get_delete_query</code><span class="sig-paren">(</span><em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.sqlite_backends.sqlite.queries.get_delete_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to delete a RDF triple form a SQlite dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.sqlite_backends.sqlite.queries.get_insert_many_query">
+<code class="sig-prename descclassname">sage.database.sqlite_backends.sqlite.queries.</code><code class="sig-name descname">get_insert_many_query</code><span class="sig-paren">(</span><em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.sqlite_backends.sqlite.queries.get_insert_many_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF triple into a SQlite dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.sqlite_backends.sqlite.queries.get_insert_query">
+<code class="sig-prename descclassname">sage.database.sqlite_backends.sqlite.queries.</code><code class="sig-name descname">get_insert_query</code><span class="sig-paren">(</span><em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.sqlite_backends.sqlite.queries.get_insert_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF triple into a SQlite dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.sqlite_backends.sqlite.queries.get_resume_query">
+<code class="sig-prename descclassname">sage.database.sqlite_backends.sqlite.queries.</code><code class="sig-name descname">get_resume_query</code><span class="sig-paren">(</span><em class="sig-param">subj</em>, <em class="sig-param">pred</em>, <em class="sig-param">obj</em>, <em class="sig-param">last_read</em>, <em class="sig-param">table_name</em>, <em class="sig-param">symbol='&gt;='</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.sqlite_backends.sqlite.queries.get_resume_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which resumes scanning for a triple pattern
+and the parameters used to execute it.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.sqlite_backends.sqlite.queries.get_start_query">
+<code class="sig-prename descclassname">sage.database.sqlite_backends.sqlite.queries.</code><code class="sig-name descname">get_start_query</code><span class="sig-paren">(</span><em class="sig-param">subj</em>, <em class="sig-param">pred</em>, <em class="sig-param">obj</em>, <em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.sqlite_backends.sqlite.queries.get_start_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which starts scanning for a triple pattern
+and the parameters used to execute it.</p>
+</dd></dl>
+
+</section>
+<section id="module-sage.database.sqlite_backends.sqlite">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.database.sqlite_backends.sqlite" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.database.sqlite_backends.sqlite_catalog.html" class="btn btn-neutral float-right" title="sage.database.sqlite_backends.sqlite_catalog package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.database.sqlite_backends.html" class="btn btn-neutral float-left" title="sage.database.sqlite_backends package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

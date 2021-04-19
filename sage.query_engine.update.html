@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>sage.query_engine.update package &mdash; sage-engine 2.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -83,7 +84,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -99,7 +100,6 @@
 <li class="toctree-l4 current"><a class="reference internal" href="sage.query_engine.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.exceptions">sage.query_engine.exceptions module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.primitives">sage.query_engine.primitives module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.sage_engine">sage.query_engine.sage_engine module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine">Module contents</a></li>
 </ul>
@@ -177,12 +177,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sage-query-engine-update-package">
+  <section id="sage-query-engine-update-package">
 <h1>sage.query_engine.update package<a class="headerlink" href="#sage-query-engine-update-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-sage.query_engine.update.delete">
+</section>
+<section id="module-sage.query_engine.update.delete">
 <span id="sage-query-engine-update-delete-module"></span><h2>sage.query_engine.update.delete module<a class="headerlink" href="#module-sage.query_engine.update.delete" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.update.delete.DeleteOperator">
@@ -207,10 +207,15 @@
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.update.delete.DeleteOperator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete the next quad from the RDF dataset.</p>
 <p>This function works in an iterator fashion, so it can be used in a pipeline of iterators.
-It may also contains <cite>non interruptible</cite> clauses which must 
+It may also contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: The quad if it was successfully deleted, otwherise it returns <cite>None</cite>.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator has no more quads to delete.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.delete.DeleteOperator.next_stage">
+<code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.update.delete.DeleteOperator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -227,8 +232,8 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.update.if_exists">
+</section>
+<section id="module-sage.query_engine.update.if_exists">
 <span id="sage-query-engine-update-if-exists-module"></span><h2>sage.query_engine.update.if_exists module<a class="headerlink" href="#module-sage.query_engine.update.if_exists" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.update.if_exists.IfExistsOperator">
@@ -281,8 +286,8 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.update.insert">
+</section>
+<section id="module-sage.query_engine.update.insert">
 <span id="sage-query-engine-update-insert-module"></span><h2>sage.query_engine.update.insert module<a class="headerlink" href="#module-sage.query_engine.update.insert" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.update.insert.InsertOperator">
@@ -307,10 +312,15 @@ be atomically evaluated before preemption occurs.</p>
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.update.insert.InsertOperator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert the next quad into the RDF dataset.</p>
 <p>This function works in an iterator fashion, so it can be used in a pipeline of iterators.
-It may also contains <cite>non interruptible</cite> clauses which must 
+It may also contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: The quad if it was successfully inserted, otwherise it returns <cite>None</cite>.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator has no more quads to insert.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.update.insert.InsertOperator.next_stage">
+<code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.update.insert.InsertOperator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -327,8 +337,8 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.update.serializable">
+</section>
+<section id="module-sage.query_engine.update.serializable">
 <span id="sage-query-engine-update-serializable-module"></span><h2>sage.query_engine.update.serializable module<a class="headerlink" href="#module-sage.query_engine.update.serializable" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.update.serializable.SerializableUpdate">
@@ -397,8 +407,8 @@ be atomically evaluated before preemption occurs.</p>
 and returns the distinct quads produced.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.update.update_sequence">
+</section>
+<section id="module-sage.query_engine.update.update_sequence">
 <span id="sage-query-engine-update-update-sequence-module"></span><h2>sage.query_engine.update.update_sequence module<a class="headerlink" href="#module-sage.query_engine.update.update_sequence" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.update.update_sequence.UpdateSequenceOperator">
@@ -452,11 +462,11 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.update">
+</section>
+<section id="module-sage.query_engine.update">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.query_engine.update" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

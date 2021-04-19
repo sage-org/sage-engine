@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Sage and PostgreSQL &mdash; sage-engine 2.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -84,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -160,16 +161,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sage-and-postgresql">
+  <section id="sage-and-postgresql">
 <span id="postgres-cli"></span><h1>Sage and PostgreSQL<a class="headerlink" href="#sage-and-postgresql" title="Permalink to this headline">¶</a></h1>
 <p>The SaGe server providers several command line utilities
 for initializing and manipulating RDF graphs hosted by the PostgreSQL backends.</p>
-<div class="section" id="initializing-a-postgresql-graph">
+<section id="initializing-a-postgresql-graph">
 <h2>Initializing a PostgreSQL graph<a class="headerlink" href="#initializing-a-postgresql-graph" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Usage: sage-postgres-init <span class="o">[</span>OPTIONS<span class="o">]</span> CONFIG GRAPH_NAME
 
   Initialize the RDF graph GRAPH_NAME with the postgres or postgres-mvcc
-  backends, as described in the configuration file CONFIG.
+  backends, as described <span class="k">in</span> the configuration file CONFIG.
 
 Options:
   --index / --no-index  Enable/disable indexing of SQL tables. The indexes can
@@ -177,13 +178,13 @@ Options:
   --help                Show this message and exit.
 </pre></div>
 </div>
-</div>
-<div class="section" id="insert-rdf-triples-into-postgresql">
+</section>
+<section id="insert-rdf-triples-into-postgresql">
 <h2>Insert RDF triples into PostgreSQL<a class="headerlink" href="#insert-rdf-triples-into-postgresql" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Usage: sage-postgres-put <span class="o">[</span>OPTIONS<span class="o">]</span> RDF_FILE CONFIG GRAPH_NAME
 
   Insert RDF triples from file RDF_FILE into the RDF graph GRAPH_NAME,
-  described in the configuration file CONFIG. The graph must use the
+  described <span class="k">in</span> the configuration file CONFIG. The graph must use the
   postgres or postgres-mvcc backends.
 
 Options:
@@ -197,21 +198,21 @@ Options:
   --help                          Show this message and exit.
 </pre></div>
 </div>
-</div>
-<div class="section" id="re-generate-indexes-to-speed-up-query-processing">
+</section>
+<section id="re-generate-indexes-to-speed-up-query-processing">
 <h2>(Re)generate indexes to speed-up query processing<a class="headerlink" href="#re-generate-indexes-to-speed-up-query-processing" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Usage: sage-postgres-index <span class="o">[</span>OPTIONS<span class="o">]</span> CONFIG GRAPh_NAME
 
   Create the additional B-tree indexes on the RDF graph GRAPH_NAME,
-  described in the configuration file CONFIG. The graph must use the
+  described <span class="k">in</span> the configuration file CONFIG. The graph must use the
   postgres or postgres-mvcc backends.
 
 Options:
   --help  Show this message and exit.
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

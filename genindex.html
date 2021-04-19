@@ -22,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -83,7 +83,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -185,21 +185,25 @@
       <li><a href="sage.database.core.html#sage.database.core.graph.Graph.abort">abort() (sage.database.core.graph.Graph method)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.abort">(sage.database.postgres.transaction_manager.TransactionManager method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.abort">(sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.abort">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
 </li>
       </ul></li>
       <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.abort_transaction">abort_transaction() (sage.database.db_connector.DatabaseConnector method)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.abort_transaction">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.connector.PostgresConnector.abort_transaction">(sage.database.postgres_backends.connector.PostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.connector.SQliteConnector.abort_transaction">(sage.database.sqlite_backends.connector.SQliteConnector method)</a>
 </li>
       </ul></li>
       <li><a href="sage.database.html#sage.database.descriptors.AbstractDescriptor">AbstractDescriptor (class in sage.database.descriptors)</a>
 </li>
-      <li><a href="sage.grpc.html#sage.grpc.service_pb2_grpc.add_SageSPARQLServicer_to_server">add_SageSPARQLServicer_to_server() (in module sage.grpc.service_pb2_grpc)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.grpc.html#sage.grpc.service_pb2_grpc.add_SageSPARQLServicer_to_server">add_SageSPARQLServicer_to_server() (in module sage.grpc.service_pb2_grpc)</a>
+</li>
       <li><a href="sage.database.core.html#sage.database.core.dataset.Dataset.analytics">analytics() (sage.database.core.dataset.Dataset property)</a>
 </li>
       <li><a href="sage.http_server.html#sage.http_server.responses.analyze_term">analyze_term() (in module sage.http_server.responses)</a>
@@ -230,6 +234,8 @@
 </li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.join_builder.build_left_join_tree">build_left_join_tree() (in module sage.query_engine.optimizer.join_builder)</a>
 </li>
+      <li><a href="sage.database.hbase.html#sage.database.hbase.utils.build_row_key">build_row_key() (in module sage.database.hbase.utils)</a>
+</li>
       <li><a href="sage.database.html#sage.database.import_manager.builtin_backends">builtin_backends() (in module sage.database.import_manager)</a>
 </li>
   </ul></td>
@@ -238,43 +244,69 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector">CatalogPostgresConnector (class in sage.database.postgres_backends.postgres_catalog.connector)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector">CatalogSQliteConnector (class in sage.database.sqlite_backends.sqlite_catalog.connector)</a>
+</li>
       <li><a href="sage.http_server.html#sage.http_server.server.choose_void_format">choose_void_format() (in module sage.http_server.server)</a>
 </li>
       <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.close">close() (sage.database.db_connector.DatabaseConnector method)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.close">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.connector.PostgresConnector.close">(sage.database.postgres_backends.connector.PostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.connector.SQliteConnector.close">(sage.database.sqlite_backends.connector.SQliteConnector method)</a>
 </li>
         <li><a href="sage.database.statefull.html#sage.database.statefull.statefull_manager.StatefullManager.close">(sage.database.statefull.statefull_manager.StatefullManager method)</a>
 </li>
         <li><a href="sage.grpc.html#sage.grpc.grpc_client.SageClient.close">(sage.grpc.grpc_client.SageClient method)</a>
 </li>
       </ul></li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.close_all">close_all() (sage.database.postgres.transaction_manager.TransactionManager method)</a>
+      <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.close_all">close_all() (sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.close_all">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.close_connection">close_connection() (sage.database.postgres.transaction_manager.TransactionManager method)</a>
+      </ul></li>
+      <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.close_connection">close_connection() (sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.close_connection">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      </ul></li>
       <li><a href="sage.database.core.html#sage.database.core.graph.Graph.commit">commit() (sage.database.core.graph.Graph method)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.commit">(sage.database.postgres.transaction_manager.TransactionManager method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.commit">(sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.commit">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.commit_transaction">commit_transaction() (sage.database.db_connector.DatabaseConnector method)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.commit_transaction">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.connector.PostgresConnector.commit_transaction">(sage.database.postgres_backends.connector.PostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.connector.SQliteConnector.commit_transaction">(sage.database.sqlite_backends.connector.SQliteConnector method)</a>
 </li>
       </ul></li>
+      <li><a href="sage.cli.html#sage.cli.postgres.connect_postgres">connect_postgres() (in module sage.cli.postgres)</a>
+</li>
+      <li><a href="sage.cli.html#sage.cli.sqlite.connect_sqlite">connect_sqlite() (in module sage.cli.sqlite)</a>
+</li>
       <li><a href="sage.database.core.html#sage.database.core.graph.Graph.connector">connector() (sage.database.core.graph.Graph method)</a>
 </li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.query_parser.ConsistencyLevel">ConsistencyLevel (class in sage.query_engine.optimizer.query_parser)</a>
 </li>
       <li><a href="sage.grpc.html#sage.grpc.grpc_server.create_bindings">create_bindings() (in module sage.grpc.grpc_server)</a>
 </li>
+      <li><a href="sage.cli.html#sage.cli.parsers.ParserFactory.create_parser">create_parser() (sage.cli.parsers.ParserFactory method)</a>
+</li>
       <li><a href="sage.http_server.html#sage.http_server.server.create_response">create_response() (in module sage.http_server.server)</a>
+</li>
+      <li><a href="sage.cli.html#sage.cli.parsers.CustomNTriplesParser">CustomNTriplesParser (class in sage.cli.parsers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -292,14 +324,24 @@
 </li>
       <li><a href="sage.database.core.html#sage.database.core.dataset.Dataset.default_query">default_query() (sage.database.core.dataset.Dataset property)</a>
 </li>
+      <li><a href="sage.http_server.html#sage.http_server.server.SagePostQuery.defaultGraph">defaultGraph (sage.http_server.server.SagePostQuery attribute)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector">DefaultPostgresConnector (class in sage.database.postgres_backends.postgres.connector)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector">DefaultSQliteConnector (class in sage.database.sqlite_backends.sqlite.connector)</a>
+</li>
       <li><a href="sage.database.core.html#sage.database.core.graph.Graph.delete">delete() (sage.database.core.graph.Graph method)</a>
 
       <ul>
         <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.delete">(sage.database.db_connector.DatabaseConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.delete">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector.delete">(sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.delete">(sage.database.postgres.mvcc_connector.MVCCPostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.delete">(sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.delete">(sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector.delete">(sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -346,8 +388,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.database.core.html#sage.database.core.graph.Graph.example_queries">example_queries() (sage.database.core.graph.Graph property)</a>
 </li>
-      <li><a href="sage.query_engine.html#sage.query_engine.sage_engine.SageEngine.execute">execute() (sage.query_engine.sage_engine.SageEngine method)</a>
+      <li><a href="sage.cli.html#sage.cli.debug.execute">execute() (in module sage.cli.debug)</a>
+
+      <ul>
+        <li><a href="sage.query_engine.html#sage.query_engine.sage_engine.SageEngine.execute">(sage.query_engine.sage_engine.SageEngine method)</a>
 </li>
+      </ul></li>
       <li><a href="sage.http_server.html#sage.http_server.server.execute_query">execute_query() (in module sage.http_server.server)</a>
 </li>
       <li><a href="sage.query_engine.html#sage.query_engine.sage_engine.executor">executor() (in module sage.query_engine.sage_engine)</a>
@@ -358,26 +404,28 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.connector.fetch_histograms">fetch_histograms() (in module sage.database.postgres.connector)</a>
-</li>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.filter.FilterIterator">FilterIterator (class in sage.query_engine.iterators.filter)</a>
 </li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.utils.find_connected_pattern">find_connected_pattern() (in module sage.query_engine.optimizer.utils)</a>
 </li>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.utils.find_in_mappings">find_in_mappings() (in module sage.query_engine.iterators.utils)</a>
 </li>
+      <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.query_parser.format_literal">format_literal() (in module sage.query_engine.optimizer.query_parser)</a>
+</li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.query_parser.format_term">format_term() (in module sage.query_engine.optimizer.query_parser)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.from_config">from_config() (sage.database.db_connector.DatabaseConnector method)</a>
 
       <ul>
         <li><a href="sage.database.hdt.html#sage.database.hdt.connector.HDTFileConnector.from_config">(sage.database.hdt.connector.HDTFileConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.from_config">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector.from_config">(sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.from_config">(sage.database.postgres.mvcc_connector.MVCCPostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.from_config">(sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.from_config">(sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector.from_config">(sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector method)</a>
 </li>
         <li><a href="sage.database.statefull.html#sage.database.statefull.hashmap_manager.HashMapManager.from_config">(sage.database.statefull.hashmap_manager.HashMapManager method)</a>
 </li>
@@ -390,29 +438,101 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.get_connection">get_connection() (sage.database.postgres.transaction_manager.TransactionManager method)</a>
-</li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_queries.get_delete_query">get_delete_query() (in module sage.database.postgres.mvcc_queries)</a>
+      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_analyze_query">get_analyze_query() (in module sage.cli.postgres_utils)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.queries.get_delete_query">(in module sage.database.postgres.queries)</a>
+        <li><a href="sage.cli.html#sage.cli.sqlite_utils.get_analyze_query">(in module sage.cli.sqlite_utils)</a>
 </li>
       </ul></li>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_catalog_insert_many_query">get_catalog_insert_many_query() (in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_catalog_insert_query">get_catalog_insert_query() (in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.queries.get_catalog_insert_query">(in module sage.database.sqlite_backends.sqlite_catalog.queries)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.get_connection">get_connection() (sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.get_connection">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_create_indexes_queries">get_create_indexes_queries() (in module sage.cli.postgres_utils)</a>
+
+      <ul>
+        <li><a href="sage.cli.html#sage.cli.sqlite_utils.get_create_indexes_queries">(in module sage.cli.sqlite_utils)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_create_tables_queries">get_create_tables_queries() (in module sage.cli.postgres_utils)</a>
+
+      <ul>
+        <li><a href="sage.cli.html#sage.cli.sqlite_utils.get_create_tables_queries">(in module sage.cli.sqlite_utils)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.queries.get_delete_query">get_delete_query() (in module sage.database.postgres_backends.postgres.queries)</a>
+
+      <ul>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_delete_query">(in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+</li>
+        <li><a href="sage.database.postgres_backends.postgres_mvcc.html#sage.database.postgres_backends.postgres_mvcc.queries.get_delete_query">(in module sage.database.postgres_backends.postgres_mvcc.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.queries.get_delete_query">(in module sage.database.sqlite_backends.sqlite.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.queries.get_delete_query">(in module sage.database.sqlite_backends.sqlite_catalog.queries)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_extract_query">get_extract_query() (in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+</li>
       <li><a href="sage.database.core.html#sage.database.core.dataset.Dataset.get_graph">get_graph() (sage.database.core.dataset.Dataset method)</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_queries.get_insert_many_query">get_insert_many_query() (in module sage.database.postgres.mvcc_queries)</a>
+      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_insert_into_catalog_query">get_insert_into_catalog_query() (in module sage.cli.postgres_utils)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.queries.get_insert_many_query">(in module sage.database.postgres.queries)</a>
+        <li><a href="sage.cli.html#sage.cli.sqlite_utils.get_insert_into_catalog_query">(in module sage.cli.sqlite_utils)</a>
 </li>
       </ul></li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_queries.get_insert_query">get_insert_query() (in module sage.database.postgres.mvcc_queries)</a>
+      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_insert_into_query">get_insert_into_query() (in module sage.cli.postgres_utils)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.queries.get_insert_query">(in module sage.database.postgres.queries)</a>
+        <li><a href="sage.cli.html#sage.cli.sqlite_utils.get_insert_into_query">(in module sage.cli.sqlite_utils)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.queries.get_insert_many_query">get_insert_many_query() (in module sage.database.postgres_backends.postgres.queries)</a>
+
+      <ul>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_insert_many_query">(in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+</li>
+        <li><a href="sage.database.postgres_backends.postgres_mvcc.html#sage.database.postgres_backends.postgres_mvcc.queries.get_insert_many_query">(in module sage.database.postgres_backends.postgres_mvcc.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.queries.get_insert_many_query">(in module sage.database.sqlite_backends.sqlite.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.queries.get_insert_many_query">(in module sage.database.sqlite_backends.sqlite_catalog.queries)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.queries.get_insert_query">get_insert_query() (in module sage.database.postgres_backends.postgres.queries)</a>
+
+      <ul>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_insert_query">(in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+</li>
+        <li><a href="sage.database.postgres_backends.postgres_mvcc.html#sage.database.postgres_backends.postgres_mvcc.queries.get_insert_query">(in module sage.database.postgres_backends.postgres_mvcc.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.queries.get_insert_query">(in module sage.database.sqlite_backends.sqlite.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.queries.get_insert_query">(in module sage.database.sqlite_backends.sqlite_catalog.queries)</a>
 </li>
       </ul></li>
       <li><a href="sage.database.html#sage.database.utils.get_kind">get_kind() (in module sage.database.utils)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_locate_query">get_locate_query() (in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.queries.get_locate_query">(in module sage.database.sqlite_backends.sqlite_catalog.queries)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.cli.html#sage.cli.utils.get_nb_triples">get_nb_triples() (in module sage.cli.utils)</a>
 </li>
       <li><a href="sage.database.statefull.html#sage.database.statefull.hashmap_manager.HashMapManager.get_plan">get_plan() (sage.database.statefull.hashmap_manager.HashMapManager method)</a>
 
@@ -420,32 +540,36 @@
         <li><a href="sage.database.statefull.html#sage.database.statefull.statefull_manager.StatefullManager.get_plan">(sage.database.statefull.statefull_manager.StatefullManager method)</a>
 </li>
       </ul></li>
-      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_postgres_create_indexes">get_postgres_create_indexes() (in module sage.cli.postgres_utils)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_postgres_create_table">get_postgres_create_table() (in module sage.cli.postgres_utils)</a>
-</li>
-      <li><a href="sage.cli.html#sage.cli.postgres_utils.get_postgres_insert_into">get_postgres_insert_into() (in module sage.cli.postgres_utils)</a>
-</li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.query_parser.get_quads_from_update">get_quads_from_update() (in module sage.query_engine.optimizer.query_parser)</a>
 </li>
       <li><a href="sage.database.core.html#sage.database.core.graph.Graph.get_query">get_query() (sage.database.core.graph.Graph method)</a>
 </li>
-      <li><a href="sage.cli.html#sage.cli.utils.get_rdf_reader">get_rdf_reader() (in module sage.cli.utils)</a>
-</li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_queries.get_resume_query">get_resume_query() (in module sage.database.postgres.mvcc_queries)</a>
+      <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.queries.get_resume_query">get_resume_query() (in module sage.database.postgres_backends.postgres.queries)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.queries.get_resume_query">(in module sage.database.postgres.queries)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_resume_query">(in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+</li>
+        <li><a href="sage.database.postgres_backends.postgres_mvcc.html#sage.database.postgres_backends.postgres_mvcc.queries.get_resume_query">(in module sage.database.postgres_backends.postgres_mvcc.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.queries.get_resume_query">(in module sage.database.sqlite_backends.sqlite.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.queries.get_resume_query">(in module sage.database.sqlite_backends.sqlite_catalog.queries)</a>
 </li>
       </ul></li>
+      <li><a href="sage.cli.html#sage.cli.sqlite_utils.get_select_identifier_query">get_select_identifier_query() (in module sage.cli.sqlite_utils)</a>
+</li>
       <li><a href="sage.grpc.html#sage.grpc.grpc_server.get_server">get_server() (in module sage.grpc.grpc_server)</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_queries.get_start_query">get_start_query() (in module sage.database.postgres.mvcc_queries)</a>
+      <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.queries.get_start_query">get_start_query() (in module sage.database.postgres_backends.postgres.queries)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.queries.get_start_query">(in module sage.database.postgres.queries)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.queries.get_start_query">(in module sage.database.postgres_backends.postgres_catalog.queries)</a>
+</li>
+        <li><a href="sage.database.postgres_backends.postgres_mvcc.html#sage.database.postgres_backends.postgres_mvcc.queries.get_start_query">(in module sage.database.postgres_backends.postgres_mvcc.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.queries.get_start_query">(in module sage.database.sqlite_backends.sqlite.queries)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.queries.get_start_query">(in module sage.database.sqlite_backends.sqlite_catalog.queries)</a>
 </li>
       </ul></li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.query_parser.get_triples_from_graph">get_triples_from_graph() (in module sage.query_engine.optimizer.query_parser)</a>
@@ -467,11 +591,17 @@
       <ul>
         <li><a href="sage.database.html#sage.database.db_iterator.EmptyIterator.has_next">(sage.database.db_iterator.EmptyIterator method)</a>
 </li>
+        <li><a href="sage.database.hbase.html#sage.database.hbase.iterator.HBaseIterator.has_next">(sage.database.hbase.iterator.HBaseIterator method)</a>
+</li>
         <li><a href="sage.database.hdt.html#sage.database.hdt.iterator.HDTIterator.has_next">(sage.database.hdt.iterator.HDTIterator method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresIterator.has_next">(sage.database.postgres.connector.PostgresIterator method)</a>
+        <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.iterator.PostgresIterator.has_next">(sage.database.postgres_backends.postgres.iterator.PostgresIterator method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresIterator.has_next">(sage.database.postgres.mvcc_connector.MVCCPostgresIterator method)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.has_next">(sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.has_next">(sage.database.sqlite_backends.sqlite.iterator.SQliteIterator method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.iterator.SQliteIterator.has_next">(sage.database.sqlite_backends.sqlite_catalog.iterator.SQliteIterator method)</a>
 </li>
         <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.filter.FilterIterator.has_next">(sage.query_engine.iterators.filter.FilterIterator method)</a>
 </li>
@@ -484,6 +614,8 @@
         <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.scan.ScanIterator.has_next">(sage.query_engine.iterators.scan.ScanIterator method)</a>
 </li>
         <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.union.BagUnionIterator.has_next">(sage.query_engine.iterators.union.BagUnionIterator method)</a>
+</li>
+        <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.union.RandomBagUnionIterator.has_next">(sage.query_engine.iterators.union.RandomBagUnionIterator method)</a>
 </li>
         <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.utils.ArrayIterator.has_next">(sage.query_engine.iterators.utils.ArrayIterator method)</a>
 </li>
@@ -502,11 +634,17 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.database.hbase.html#sage.database.hbase.utils.hash_term">hash_term() (in module sage.database.hbase.utils)</a>
+</li>
       <li><a href="sage.database.statefull.html#sage.database.statefull.hashmap_manager.HashMapManager">HashMapManager (class in sage.database.statefull.hashmap_manager)</a>
+</li>
+      <li><a href="sage.database.hbase.html#sage.database.hbase.iterator.HBaseIterator">HBaseIterator (class in sage.database.hbase.iterator)</a>
 </li>
       <li><a href="sage.database.hdt.html#sage.database.hdt.connector.HDTFileConnector">HDTFileConnector (class in sage.database.hdt.connector)</a>
 </li>
       <li><a href="sage.database.hdt.html#sage.database.hdt.iterator.HDTIterator">HDTIterator (class in sage.database.hdt.iterator)</a>
+</li>
+      <li><a href="sage.cli.html#sage.cli.parsers.HDTParser">HDTParser (class in sage.cli.parsers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -514,8 +652,6 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.utils.id_to_predicate">id_to_predicate() (in module sage.database.postgres.utils)</a>
-</li>
       <li><a href="sage.query_engine.update.html#sage.query_engine.update.if_exists.IfExistsOperator">IfExistsOperator (class in sage.query_engine.update.if_exists)</a>
 </li>
       <li><a href="sage.database.html#sage.database.import_manager.import_backend">import_backend() (in module sage.database.import_manager)</a>
@@ -527,17 +663,31 @@
       <ul>
         <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.insert">(sage.database.db_connector.DatabaseConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.insert">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector.insert">(sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.insert">(sage.database.postgres.mvcc_connector.MVCCPostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.insert">(sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.insert">(sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector.insert">(sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.cli.html#sage.cli.postgres.insert_bucket">insert_bucket() (in module sage.cli.postgres)</a>
+
+      <ul>
+        <li><a href="sage.cli.html#sage.cli.sqlite.insert_bucket">(in module sage.cli.sqlite)</a>
+</li>
+      </ul></li>
       <li><a href="sage.query_engine.update.html#sage.query_engine.update.insert.InsertOperator">InsertOperator (class in sage.query_engine.update.insert)</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.is_open">is_open() (sage.database.postgres.transaction_manager.TransactionManager method)</a>
+      <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.is_open">is_open() (sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.is_open">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
 </li>
+      </ul></li>
       <li><a href="sage.database.core.html#sage.database.core.dataset.Dataset.is_stateless">is_stateless() (sage.database.core.dataset.Dataset property)</a>
 </li>
       <li><a href="sage.database.html#sage.database.utils.is_var">is_var() (in module sage.database.utils)</a>
@@ -553,15 +703,25 @@
       <ul>
         <li><a href="sage.database.html#sage.database.db_iterator.EmptyIterator.last_read">(sage.database.db_iterator.EmptyIterator method)</a>
 </li>
+        <li><a href="sage.database.hbase.html#sage.database.hbase.iterator.HBaseIterator.last_read">(sage.database.hbase.iterator.HBaseIterator method)</a>
+</li>
         <li><a href="sage.database.hdt.html#sage.database.hdt.iterator.HDTIterator.last_read">(sage.database.hdt.iterator.HDTIterator method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresIterator.last_read">(sage.database.postgres.connector.PostgresIterator method)</a>
+        <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.iterator.PostgresIterator.last_read">(sage.database.postgres_backends.postgres.iterator.PostgresIterator method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresIterator.last_read">(sage.database.postgres.mvcc_connector.MVCCPostgresIterator method)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.last_read">(sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.last_read">(sage.database.sqlite_backends.sqlite.iterator.SQliteIterator method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.iterator.SQliteIterator.last_read">(sage.database.sqlite_backends.sqlite_catalog.iterator.SQliteIterator method)</a>
 </li>
         <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.scan.ScanIterator.last_read">(sage.query_engine.iterators.scan.ScanIterator method)</a>
 </li>
       </ul></li>
+      <li><a href="sage.cli.html#sage.cli.parsers.CustomNTriplesParser.literal">literal() (sage.cli.parsers.CustomNTriplesParser method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.loader.load">load() (in module sage.query_engine.iterators.loader)</a>
 </li>
       <li><a href="sage.database.core.html#sage.database.core.rdf_config.load_config">load_config() (in module sage.database.core.rdf_config)</a>
@@ -570,8 +730,6 @@
         <li><a href="sage.database.core.html#sage.database.core.yaml_config.load_config">(in module sage.database.core.yaml_config)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.loader.load_filter">load_filter() (in module sage.query_engine.iterators.loader)</a>
 </li>
       <li><a href="sage.cli.html#sage.cli.utils.load_graph">load_graph() (in module sage.cli.utils)</a>
@@ -598,15 +756,11 @@
 </li>
       <li><a href="sage.database.html#sage.database.descriptors.many_void">many_void() (in module sage.database.descriptors)</a>
 </li>
-      <li><a href="sage.database.core.html#sage.database.core.graph.Graph.max_results">max_results() (sage.database.core.graph.Graph property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.database.core.html#sage.database.core.graph.Graph.max_results">max_results() (sage.database.core.graph.Graph property)</a>
+</li>
       <li><a href="sage.query_engine.update.html#sage.query_engine.update.if_exists.IfExistsOperator.missing_nquads">missing_nquads() (sage.query_engine.update.if_exists.IfExistsOperator property)</a>
-</li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresConnector">MVCCPostgresConnector (class in sage.database.postgres.mvcc_connector)</a>
-</li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresIterator">MVCCPostgresIterator (class in sage.database.postgres.mvcc_connector)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -646,16 +800,24 @@
         <li><a href="sage.database.hdt.html#sage.database.hdt.connector.HDTFileConnector.nb_triples">(sage.database.hdt.connector.HDTFileConnector property)</a>
 </li>
       </ul></li>
+      <li><a href="sage.http_server.html#sage.http_server.server.SagePostQuery.next">next (sage.http_server.server.SagePostQuery attribute)</a>
+</li>
       <li><a href="sage.database.html#sage.database.db_iterator.DBIterator.next">next() (sage.database.db_iterator.DBIterator method)</a>
 
       <ul>
         <li><a href="sage.database.html#sage.database.db_iterator.EmptyIterator.next">(sage.database.db_iterator.EmptyIterator method)</a>
 </li>
+        <li><a href="sage.database.hbase.html#sage.database.hbase.iterator.HBaseIterator.next">(sage.database.hbase.iterator.HBaseIterator method)</a>
+</li>
         <li><a href="sage.database.hdt.html#sage.database.hdt.iterator.HDTIterator.next">(sage.database.hdt.iterator.HDTIterator method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresIterator.next">(sage.database.postgres.connector.PostgresIterator method)</a>
+        <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.iterator.PostgresIterator.next">(sage.database.postgres_backends.postgres.iterator.PostgresIterator method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresIterator.next">(sage.database.postgres.mvcc_connector.MVCCPostgresIterator method)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.next">(sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator.next">(sage.database.sqlite_backends.sqlite.iterator.SQliteIterator method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.iterator.SQliteIterator.next">(sage.database.sqlite_backends.sqlite_catalog.iterator.SQliteIterator method)</a>
 </li>
         <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.filter.FilterIterator.next">(sage.query_engine.iterators.filter.FilterIterator method)</a>
 </li>
@@ -688,6 +850,26 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.filter.FilterIterator.next_stage">next_stage() (sage.query_engine.iterators.filter.FilterIterator method)</a>
+
+      <ul>
+        <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.nlj.IndexJoinIterator.next_stage">(sage.query_engine.iterators.nlj.IndexJoinIterator method)</a>
+</li>
+        <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator.next_stage">(sage.query_engine.iterators.preemptable_iterator.PreemptableIterator method)</a>
+</li>
+        <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.projection.ProjectionIterator.next_stage">(sage.query_engine.iterators.projection.ProjectionIterator method)</a>
+</li>
+        <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.scan.ScanIterator.next_stage">(sage.query_engine.iterators.scan.ScanIterator method)</a>
+</li>
+        <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.union.BagUnionIterator.next_stage">(sage.query_engine.iterators.union.BagUnionIterator method)</a>
+</li>
+        <li><a href="sage.query_engine.update.html#sage.query_engine.update.delete.DeleteOperator.next_stage">(sage.query_engine.update.delete.DeleteOperator method)</a>
+</li>
+        <li><a href="sage.query_engine.update.html#sage.query_engine.update.insert.InsertOperator.next_stage">(sage.query_engine.update.insert.InsertOperator method)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.cli.html#sage.cli.parsers.NTParser">NTParser (class in sage.cli.parsers)</a>
+</li>
       <li><a href="sage.http_server.html#sage.http_server.responses.ntriples_streaming">ntriples_streaming() (in module sage.http_server.responses)</a>
 </li>
   </ul></td>
@@ -698,25 +880,37 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.database.html#sage.database.db_iterator.DBIterator.object">object() (sage.database.db_iterator.DBIterator property)</a>
 </li>
+      <li><a href="sage.cli.html#sage.cli.parsers.Parser.on_bucket">on_bucket() (sage.cli.parsers.Parser method)</a>
+</li>
+      <li><a href="sage.cli.html#sage.cli.parsers.Parser.on_complete">on_complete() (sage.cli.parsers.Parser method)</a>
+</li>
+      <li><a href="sage.cli.html#sage.cli.parsers.Parser.on_error">on_error() (sage.cli.parsers.Parser method)</a>
+</li>
       <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.open">open() (sage.database.db_connector.DatabaseConnector method)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.open">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.connector.PostgresConnector.open">(sage.database.postgres_backends.connector.PostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.connector.SQliteConnector.open">(sage.database.sqlite_backends.connector.SQliteConnector method)</a>
 </li>
         <li><a href="sage.database.statefull.html#sage.database.statefull.statefull_manager.StatefullManager.open">(sage.database.statefull.statefull_manager.StatefullManager method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.open_connection">open_connection() (sage.database.postgres.transaction_manager.TransactionManager method)</a>
+      <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.open_connection">open_connection() (sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.open_connection">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.parse_date">parse_date() (in module sage.database.postgres.mvcc_connector)</a>
+      <li><a href="sage.cli.html#sage.cli.parsers.CustomNTriplesParser.parse">parse() (sage.cli.parsers.CustomNTriplesParser method)</a>
 </li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.query_parser.parse_filter_expr">parse_filter_expr() (in module sage.query_engine.optimizer.query_parser)</a>
 </li>
@@ -726,21 +920,37 @@
 </li>
       <li><a href="sage.query_engine.optimizer.html#sage.query_engine.optimizer.query_parser.parse_update">parse_update() (in module sage.query_engine.optimizer.query_parser)</a>
 </li>
-      <li><a href="sage.database.html#sage.database.estimators.pattern_shape_estimate">pattern_shape_estimate() (in module sage.database.estimators)</a>
+      <li><a href="sage.cli.html#sage.cli.parsers.ParseError">ParseError</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector">PostgresConnector (class in sage.database.postgres.connector)</a>
+      <li><a href="sage.cli.html#sage.cli.parsers.HDTParser.parsefile">parsefile() (sage.cli.parsers.HDTParser method)</a>
+
+      <ul>
+        <li><a href="sage.cli.html#sage.cli.parsers.NTParser.parsefile">(sage.cli.parsers.NTParser method)</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresIterator">PostgresIterator (class in sage.database.postgres.connector)</a>
+        <li><a href="sage.cli.html#sage.cli.parsers.Parser.parsefile">(sage.cli.parsers.Parser method)</a>
+</li>
+      </ul></li>
+      <li><a href="sage.cli.html#sage.cli.parsers.CustomNTriplesParser.parseline">parseline() (sage.cli.parsers.CustomNTriplesParser method)</a>
+</li>
+      <li><a href="sage.cli.html#sage.cli.parsers.Parser">Parser (class in sage.cli.parsers)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.cli.html#sage.cli.parsers.ParserFactory">ParserFactory (class in sage.cli.parsers)</a>
+</li>
+      <li><a href="sage.database.html#sage.database.estimators.pattern_shape_estimate">pattern_shape_estimate() (in module sage.database.estimators)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.connector.PostgresConnector">PostgresConnector (class in sage.database.postgres_backends.connector)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.iterator.PostgresIterator">PostgresIterator (class in sage.database.postgres_backends.postgres.iterator)</a>
+
+      <ul>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator">(class in sage.database.postgres_backends.postgres_catalog.iterator)</a>
+</li>
+      </ul></li>
       <li><a href="sage.database.html#sage.database.db_iterator.DBIterator.predicate">predicate() (sage.database.db_iterator.DBIterator property)</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.utils.predicate_to_id">predicate_to_id() (in module sage.database.postgres.utils)</a>
-</li>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator">PreemptableIterator (class in sage.query_engine.iterators.preemptable_iterator)</a>
-</li>
-      <li><a href="sage.query_engine.html#sage.query_engine.primitives.PreemptiveLoop">PreemptiveLoop (class in sage.query_engine.primitives)</a>
 </li>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.projection.ProjectionIterator">ProjectionIterator (class in sage.query_engine.iterators.projection)</a>
 </li>
@@ -756,16 +966,20 @@
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sage.query_engine.html#sage.query_engine.exceptions.QuantumExhausted">QuantumExhausted</a>
+</li>
+      <li><a href="sage.http_server.html#sage.http_server.server.SagePostQuery.query">query (sage.http_server.server.SagePostQuery attribute)</a>
+</li>
       <li><a href="sage.grpc.html#sage.grpc.grpc_client.SageClient.query">query() (sage.grpc.grpc_client.SageClient method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.grpc.html#sage.grpc.grpc_server.SageQueryService.Query">Query() (sage.grpc.grpc_server.SageQueryService method)</a>
 
       <ul>
         <li><a href="sage.grpc.html#sage.grpc.service_pb2_grpc.SageSPARQLServicer.Query">(sage.grpc.service_pb2_grpc.SageSPARQLServicer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.database.core.html#sage.database.core.graph.Graph.quota">quota() (sage.database.core.graph.Graph property)</a>
 </li>
   </ul></td>
@@ -782,6 +996,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.http_server.html#sage.http_server.responses.raw_json_streaming">raw_json_streaming() (in module sage.http_server.responses)</a>
 </li>
+      <li><a href="sage.cli.html#sage.cli.parsers.HDTParser.readline">readline() (sage.cli.parsers.HDTParser method)</a>
+</li>
       <li><a href="sage.http_server.html#sage.http_server.server.run_app">run_app() (in module sage.http_server.server)</a>
 </li>
   </ul></td>
@@ -796,11 +1012,21 @@
 </li>
       <li><a href="sage.cli.html#module-sage.cli.commons">sage.cli.commons (module)</a>
 </li>
+      <li><a href="sage.cli.html#module-sage.cli.debug">sage.cli.debug (module)</a>
+</li>
       <li><a href="sage.cli.html#module-sage.cli.grpc_server">sage.cli.grpc_server (module)</a>
 </li>
       <li><a href="sage.cli.html#module-sage.cli.http_server">sage.cli.http_server (module)</a>
 </li>
+      <li><a href="sage.cli.html#module-sage.cli.parsers">sage.cli.parsers (module)</a>
+</li>
+      <li><a href="sage.cli.html#module-sage.cli.postgres">sage.cli.postgres (module)</a>
+</li>
       <li><a href="sage.cli.html#module-sage.cli.postgres_utils">sage.cli.postgres_utils (module)</a>
+</li>
+      <li><a href="sage.cli.html#module-sage.cli.sqlite">sage.cli.sqlite (module)</a>
+</li>
+      <li><a href="sage.cli.html#module-sage.cli.sqlite_utils">sage.cli.sqlite_utils (module)</a>
 </li>
       <li><a href="sage.cli.html#module-sage.cli.utils">sage.cli.utils (module)</a>
 </li>
@@ -824,6 +1050,12 @@
 </li>
       <li><a href="sage.database.html#module-sage.database.estimators">sage.database.estimators (module)</a>
 </li>
+      <li><a href="sage.database.hbase.html#module-sage.database.hbase">sage.database.hbase (module)</a>
+</li>
+      <li><a href="sage.database.hbase.html#module-sage.database.hbase.iterator">sage.database.hbase.iterator (module)</a>
+</li>
+      <li><a href="sage.database.hbase.html#module-sage.database.hbase.utils">sage.database.hbase.utils (module)</a>
+</li>
       <li><a href="sage.database.hdt.html#module-sage.database.hdt">sage.database.hdt (module)</a>
 </li>
       <li><a href="sage.database.hdt.html#module-sage.database.hdt.connector">sage.database.hdt.connector (module)</a>
@@ -832,19 +1064,53 @@
 </li>
       <li><a href="sage.database.html#module-sage.database.import_manager">sage.database.import_manager (module)</a>
 </li>
-      <li><a href="sage.database.postgres.html#module-sage.database.postgres">sage.database.postgres (module)</a>
+      <li><a href="sage.database.postgres_backends.html#module-sage.database.postgres_backends">sage.database.postgres_backends (module)</a>
 </li>
-      <li><a href="sage.database.postgres.html#module-sage.database.postgres.connector">sage.database.postgres.connector (module)</a>
+      <li><a href="sage.database.postgres_backends.html#module-sage.database.postgres_backends.connector">sage.database.postgres_backends.connector (module)</a>
 </li>
-      <li><a href="sage.database.postgres.html#module-sage.database.postgres.mvcc_connector">sage.database.postgres.mvcc_connector (module)</a>
+      <li><a href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres">sage.database.postgres_backends.postgres (module)</a>
 </li>
-      <li><a href="sage.database.postgres.html#module-sage.database.postgres.mvcc_queries">sage.database.postgres.mvcc_queries (module)</a>
+      <li><a href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres.connector">sage.database.postgres_backends.postgres.connector (module)</a>
 </li>
-      <li><a href="sage.database.postgres.html#module-sage.database.postgres.queries">sage.database.postgres.queries (module)</a>
+      <li><a href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres.iterator">sage.database.postgres_backends.postgres.iterator (module)</a>
 </li>
-      <li><a href="sage.database.postgres.html#module-sage.database.postgres.transaction_manager">sage.database.postgres.transaction_manager (module)</a>
+      <li><a href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres.queries">sage.database.postgres_backends.postgres.queries (module)</a>
 </li>
-      <li><a href="sage.database.postgres.html#module-sage.database.postgres.utils">sage.database.postgres.utils (module)</a>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog">sage.database.postgres_backends.postgres_catalog (module)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog.connector">sage.database.postgres_backends.postgres_catalog.connector (module)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog.iterator">sage.database.postgres_backends.postgres_catalog.iterator (module)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog.queries">sage.database.postgres_backends.postgres_catalog.queries (module)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres_mvcc.html#module-sage.database.postgres_backends.postgres_mvcc">sage.database.postgres_backends.postgres_mvcc (module)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.postgres_mvcc.html#module-sage.database.postgres_backends.postgres_mvcc.queries">sage.database.postgres_backends.postgres_mvcc.queries (module)</a>
+</li>
+      <li><a href="sage.database.postgres_backends.html#module-sage.database.postgres_backends.transaction_manager">sage.database.postgres_backends.transaction_manager (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.html#module-sage.database.sqlite_backends">sage.database.sqlite_backends (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.html#module-sage.database.sqlite_backends.connector">sage.database.sqlite_backends.connector (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite">sage.database.sqlite_backends.sqlite (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite.connector">sage.database.sqlite_backends.sqlite.connector (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite.iterator">sage.database.sqlite_backends.sqlite.iterator (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite.queries">sage.database.sqlite_backends.sqlite.queries (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog">sage.database.sqlite_backends.sqlite_catalog (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog.connector">sage.database.sqlite_backends.sqlite_catalog.connector (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog.iterator">sage.database.sqlite_backends.sqlite_catalog.iterator (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog.queries">sage.database.sqlite_backends.sqlite_catalog.queries (module)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.html#module-sage.database.sqlite_backends.transaction_manager">sage.database.sqlite_backends.transaction_manager (module)</a>
 </li>
       <li><a href="sage.database.statefull.html#module-sage.database.statefull">sage.database.statefull (module)</a>
 </li>
@@ -888,6 +1154,8 @@
 </li>
       <li><a href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.projection">sage.query_engine.iterators.projection (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.scan">sage.query_engine.iterators.scan (module)</a>
 </li>
       <li><a href="sage.query_engine.iterators.html#module-sage.query_engine.iterators.union">sage.query_engine.iterators.union (module)</a>
@@ -902,12 +1170,8 @@
 </li>
       <li><a href="sage.query_engine.optimizer.html#module-sage.query_engine.optimizer.utils">sage.query_engine.optimizer.utils (module)</a>
 </li>
-      <li><a href="sage.query_engine.html#module-sage.query_engine.primitives">sage.query_engine.primitives (module)</a>
-</li>
       <li><a href="sage.query_engine.protobuf.html#module-sage.query_engine.protobuf">sage.query_engine.protobuf (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.query_engine.protobuf.html#module-sage.query_engine.protobuf.iterators_pb2">sage.query_engine.protobuf.iterators_pb2 (module)</a>
 </li>
       <li><a href="sage.query_engine.protobuf.html#module-sage.query_engine.protobuf.utils">sage.query_engine.protobuf.utils (module)</a>
@@ -977,9 +1241,13 @@
 </li>
         <li><a href="sage.database.hdt.html#sage.database.hdt.connector.HDTFileConnector.search">(sage.database.hdt.connector.HDTFileConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.search">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres.html#sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector.search">(sage.database.postgres_backends.postgres.connector.DefaultPostgresConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.mvcc_connector.MVCCPostgresConnector.search">(sage.database.postgres.mvcc_connector.MVCCPostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.postgres_catalog.html#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.search">(sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector.search">(sage.database.sqlite_backends.sqlite.connector.DefaultSQliteConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector.search">(sage.database.sqlite_backends.sqlite_catalog.connector.CatalogSQliteConnector method)</a>
 </li>
       </ul></li>
       <li><a href="sage.http_server.html#sage.http_server.utils.secure_url">secure_url() (in module sage.http_server.utils)</a>
@@ -1018,12 +1286,24 @@
 </li>
       <li><a href="sage.http_server.html#sage.http_server.responses.skolemize_one">skolemize_one() (in module sage.http_server.responses)</a>
 </li>
+      <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.connector.SQliteConnector">SQliteConnector (class in sage.database.sqlite_backends.connector)</a>
+</li>
+      <li><a href="sage.database.sqlite_backends.sqlite.html#sage.database.sqlite_backends.sqlite.iterator.SQliteIterator">SQliteIterator (class in sage.database.sqlite_backends.sqlite.iterator)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.sqlite_catalog.html#sage.database.sqlite_backends.sqlite_catalog.iterator.SQliteIterator">(class in sage.database.sqlite_backends.sqlite_catalog.iterator)</a>
+</li>
+      </ul></li>
       <li><a href="sage.database.html#sage.database.db_connector.DatabaseConnector.start_transaction">start_transaction() (sage.database.db_connector.DatabaseConnector method)</a>
 
       <ul>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.connector.PostgresConnector.start_transaction">(sage.database.postgres.connector.PostgresConnector method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.connector.PostgresConnector.start_transaction">(sage.database.postgres_backends.connector.PostgresConnector method)</a>
 </li>
-        <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager.start_transaction">(sage.database.postgres.transaction_manager.TransactionManager method)</a>
+        <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager.start_transaction">(sage.database.postgres_backends.transaction_manager.TransactionManager method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.connector.SQliteConnector.start_transaction">(sage.database.sqlite_backends.connector.SQliteConnector method)</a>
+</li>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager.start_transaction">(sage.database.sqlite_backends.transaction_manager.TransactionManager method)</a>
 </li>
       </ul></li>
       <li><a href="sage.database.core.html#sage.database.core.dataset.Dataset.statefull_manager">statefull_manager() (sage.database.core.dataset.Dataset property)</a>
@@ -1042,16 +1322,18 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.query_engine.html#sage.query_engine.primitives.PreemptiveLoop.tick">tick() (sage.query_engine.primitives.PreemptiveLoop method)</a>
-</li>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.filter.to_rdflib_term">to_rdflib_term() (in module sage.query_engine.iterators.filter)</a>
+</li>
+      <li><a href="sage.query_engine.html#sage.query_engine.exceptions.TooManyResults">TooManyResults</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sage.query_engine.html#sage.query_engine.exceptions.TooManyResults">TooManyResults</a>
+      <li><a href="sage.database.postgres_backends.html#sage.database.postgres_backends.transaction_manager.TransactionManager">TransactionManager (class in sage.database.postgres_backends.transaction_manager)</a>
+
+      <ul>
+        <li><a href="sage.database.sqlite_backends.html#sage.database.sqlite_backends.transaction_manager.TransactionManager">(class in sage.database.sqlite_backends.transaction_manager)</a>
 </li>
-      <li><a href="sage.database.postgres.html#sage.database.postgres.transaction_manager.TransactionManager">TransactionManager (class in sage.database.postgres.transaction_manager)</a>
-</li>
+      </ul></li>
       <li><a href="sage.query_engine.iterators.html#sage.query_engine.iterators.utils.tuple_to_triple">tuple_to_triple() (in module sage.query_engine.iterators.utils)</a>
 </li>
   </ul></td>
@@ -1091,6 +1373,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sage.http_server.html#sage.http_server.responses.w3c_xml">w3c_xml() (in module sage.http_server.responses)</a>
+</li>
+      <li><a href="sage.cli.html#sage.cli.utils.wccount">wccount() (in module sage.cli.utils)</a>
 </li>
   </ul></td>
 </tr></table>

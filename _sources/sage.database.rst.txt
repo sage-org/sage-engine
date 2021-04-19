@@ -7,8 +7,10 @@ Subpackages
 .. toctree::
 
    sage.database.core
+   sage.database.hbase
    sage.database.hdt
-   sage.database.postgres
+   sage.database.postgres_backends
+   sage.database.sqlite_backends
    sage.database.statefull
 
 Submodules

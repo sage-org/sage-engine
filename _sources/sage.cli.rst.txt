@@ -12,6 +12,14 @@ sage.cli.commons module
    :undoc-members:
    :show-inheritance:
 
+sage.cli.debug module
+---------------------
+
+.. automodule:: sage.cli.debug
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 sage.cli.grpc\_server module
 ----------------------------
 
@@ -20,10 +28,26 @@ sage.cli.grpc\_server module
    :undoc-members:
    :show-inheritance:
 
+sage.cli.hbase module
+---------------------
+
+.. automodule:: sage.cli.hbase
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 sage.cli.http\_server module
 ----------------------------
 
 .. automodule:: sage.cli.http_server
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.cli.parsers module
+-----------------------
+
+.. automodule:: sage.cli.parsers
    :members:
    :undoc-members:
    :show-inheritance:
@@ -40,6 +64,22 @@ sage.cli.postgres\_utils module
 -------------------------------
 
 .. automodule:: sage.cli.postgres_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.cli.sqlite module
+----------------------
+
+.. automodule:: sage.cli.sqlite
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.cli.sqlite\_utils module
+-----------------------------
+
+.. automodule:: sage.cli.sqlite_utils
    :members:
    :undoc-members:
    :show-inheritance:

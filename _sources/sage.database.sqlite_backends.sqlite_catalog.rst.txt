@@ -1,0 +1,38 @@
+sage.database.sqlite\_backends.sqlite\_catalog package
+======================================================
+
+Submodules
+----------
+
+sage.database.sqlite\_backends.sqlite\_catalog.connector module
+---------------------------------------------------------------
+
+.. automodule:: sage.database.sqlite_backends.sqlite_catalog.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.sqlite\_backends.sqlite\_catalog.iterator module
+--------------------------------------------------------------
+
+.. automodule:: sage.database.sqlite_backends.sqlite_catalog.iterator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.sqlite\_backends.sqlite\_catalog.queries module
+-------------------------------------------------------------
+
+.. automodule:: sage.database.sqlite_backends.sqlite_catalog.queries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: sage.database.sqlite_backends.sqlite_catalog
+   :members:
+   :undoc-members:
+   :show-inheritance:

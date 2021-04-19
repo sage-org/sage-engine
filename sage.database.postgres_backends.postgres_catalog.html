@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sage.database.postgres_backends.postgres_catalog package &mdash; sage-engine 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sage.database.postgres_backends.postgres_mvcc package" href="sage.database.postgres_backends.postgres_mvcc.html" />
+    <link rel="prev" title="sage.database.postgres_backends.postgres package" href="sage.database.postgres_backends.postgres.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sage-engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_file.html">Configuring the SaGe server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgres.html">Sage and PostgreSQL</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="sage.html">sage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sage.cli.html">sage.cli package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="sage.database.html">sage.database package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="sage.database.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.db_connector">sage.database.db_connector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.db_iterator">sage.database.db_iterator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.descriptors">sage.database.descriptors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.estimators">sage.database.estimators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.import_manager">sage.database.import_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database.utils">sage.database.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.html#module-sage.database">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.grpc.html">sage.grpc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.http_server.html">sage.http_server package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.query_engine.html">sage.query_engine package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sage.html#module-sage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sage-engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sage.html">sage package</a> &raquo;</li>
+        
+          <li><a href="sage.database.html">sage.database package</a> &raquo;</li>
+        
+          <li><a href="sage.database.postgres_backends.html">sage.database.postgres_backends package</a> &raquo;</li>
+        
+      <li>sage.database.postgres_backends.postgres_catalog package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sage.database.postgres_backends.postgres_catalog.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="sage-database-postgres-backends-postgres-catalog-package">
+<h1>sage.database.postgres_backends.postgres_catalog package<a class="headerlink" href="#sage-database-postgres-backends-postgres-catalog-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-sage.database.postgres_backends.postgres_catalog.connector">
+<span id="sage-database-postgres-backends-postgres-catalog-connector-module"></span><h2>sage.database.postgres_backends.postgres_catalog.connector module<a class="headerlink" href="#module-sage.database.postgres_backends.postgres_catalog.connector" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.connector.</code><code class="sig-name descname">CatalogPostgresConnector</code><span class="sig-paren">(</span><em class="sig-param">table_name: str</em>, <em class="sig-param">dbname: str</em>, <em class="sig-param">user: str</em>, <em class="sig-param">password: str</em>, <em class="sig-param">host: str = ''</em>, <em class="sig-param">port: int = 5432</em>, <em class="sig-param">fetch_size: int = 500</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.database.postgres_backends.html#sage.database.postgres_backends.connector.PostgresConnector" title="sage.database.postgres_backends.connector.PostgresConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.postgres_backends.connector.PostgresConnector</span></code></a></p>
+<p>A CatalogPostgresConnector search for RDF triples in a PostgreSQL database.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>table_name: Name of the SQL table containing RDF data.</p></li>
+<li><p>dbname: the database name.</p></li>
+<li><p>user: user name used to authenticate.</p></li>
+<li><p>password: password used to authenticate.</p></li>
+<li><p>host: database host address (defaults to UNIX socket if not provided).</p></li>
+<li><p>port: connection port number (defaults to 5432 if not provided).</p></li>
+<li><p>fetch_size: The number of SQL rows/RDF triples to fetch per batch (defaults to 500).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.delete">
+<code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a RDF triple from the RDF graph.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.from_config">
+<code class="sig-name descname">from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; sage.database.postgres_backends.connector.PostgresConnector<a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a CatalogPostgresConnector from a configuration object.</p>
+<p>The configuration object must contains the following fields: ‘dbname’, ‘name’, ‘user’ and ‘password’.
+Optional fields are: ‘host’, ‘port’ and ‘fetch_size’.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.insert">
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a RDF triple into the RDF graph.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the RDF triple.</p></li>
+<li><p>predicate: Predicate of the RDF triple.</p></li>
+<li><p>obj: Object of the RDF triple.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.search">
+<code class="sig-name descname">search</code><span class="sig-paren">(</span><em class="sig-param">subject: str</em>, <em class="sig-param">predicate: str</em>, <em class="sig-param">obj: str</em>, <em class="sig-param">last_read: Optional[str] = None</em>, <em class="sig-param">as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator, int]<a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.connector.CatalogPostgresConnector.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an iterator over all RDF triples matching a triple pattern.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><ul class="simple">
+<li><p>subject: Subject of the triple pattern.</p></li>
+<li><p>predicate: Predicate of the triple pattern.</p></li>
+<li><p>object: Object of the triple pattern.</p></li>
+<li><p>last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.</p></li>
+<li><p>as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple (<cite>iterator</cite>, <cite>cardinality</cite>), where <cite>iterator</cite> is a Python iterator over RDF triples matching the given triples pattern, and <cite>cardinality</cite> is the estimated cardinality of the triple pattern.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sage.database.postgres_backends.postgres_catalog.iterator">
+<span id="sage-database-postgres-backends-postgres-catalog-iterator-module"></span><h2>sage.database.postgres_backends.postgres_catalog.iterator module<a class="headerlink" href="#module-sage.database.postgres_backends.postgres_catalog.iterator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator">
+<em class="property">class </em><code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.iterator.</code><code class="sig-name descname">PostgresIterator</code><span class="sig-paren">(</span><em class="sig-param">cursor, connection, start_query: str, start_params: List[str], pattern: Dict[str, str], fetch_size: int = 500</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sage.database.html#sage.database.db_iterator.DBIterator" title="sage.database.db_iterator.DBIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.database.db_iterator.DBIterator</span></code></a></p>
+<p>A PostgresIterator implements a DBIterator for a triple pattern evaluated using a Postgre database file</p>
+<dl class="method">
+<dt id="sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if there is still results to read, and False otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.last_read">
+<code class="sig-name descname">last_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.last_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index ID of the last element read</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.next">
+<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.iterator.PostgresIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the next solution mapping or None if there are no more solutions</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sage.database.postgres_backends.postgres_catalog.queries">
+<span id="sage-database-postgres-backends-postgres-catalog-queries-module"></span><h2>sage.database.postgres_backends.postgres_catalog.queries module<a class="headerlink" href="#module-sage.database.postgres_backends.postgres_catalog.queries" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_catalog_insert_many_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_catalog_insert_many_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_catalog_insert_many_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF term into a PostgreSQL dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_catalog_insert_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_catalog_insert_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_catalog_insert_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF term into a PostgreSQL dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_delete_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_delete_query</code><span class="sig-paren">(</span><em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_delete_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to delete a RDF triple form a PostgreSQL dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_extract_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_extract_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_extract_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_insert_many_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_insert_many_query</code><span class="sig-paren">(</span><em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_insert_many_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF triple into a PostgreSQL dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_insert_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_insert_query</code><span class="sig-paren">(</span><em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_insert_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a SQL query to insert a RDF triple into a PostgreSQL dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_locate_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_locate_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_locate_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_resume_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_resume_query</code><span class="sig-paren">(</span><em class="sig-param">subj</em>, <em class="sig-param">pred</em>, <em class="sig-param">obj</em>, <em class="sig-param">last_read</em>, <em class="sig-param">table_name</em>, <em class="sig-param">symbol='&gt;='</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_resume_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which resumes scanning for a triple pattern
+and the parameters used to execute it.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.database.postgres_backends.postgres_catalog.queries.get_start_query">
+<code class="sig-prename descclassname">sage.database.postgres_backends.postgres_catalog.queries.</code><code class="sig-name descname">get_start_query</code><span class="sig-paren">(</span><em class="sig-param">subj</em>, <em class="sig-param">pred</em>, <em class="sig-param">obj</em>, <em class="sig-param">table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.database.postgres_backends.postgres_catalog.queries.get_start_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a prepared SQL query which starts scanning for a triple pattern
+and the parameters used to execute it.</p>
+</dd></dl>
+
+</section>
+<section id="module-sage.database.postgres_backends.postgres_catalog">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.database.postgres_backends.postgres_catalog" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sage.database.postgres_backends.postgres_mvcc.html" class="btn btn-neutral float-right" title="sage.database.postgres_backends.postgres_mvcc package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sage.database.postgres_backends.postgres.html" class="btn btn-neutral float-left" title="sage.database.postgres_backends.postgres package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, GDD Team - Laboratoire des Sciences du Numérique de Nante
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>sage.cli package &mdash; sage-engine 2.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -84,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -95,10 +96,15 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">sage.cli package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.commons">sage.cli.commons module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.debug">sage.cli.debug module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.grpc_server">sage.cli.grpc_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sage-cli-hbase-module">sage.cli.hbase module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.http_server">sage.cli.http_server module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#sage-cli-postgres-module">sage.cli.postgres module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.parsers">sage.cli.parsers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.postgres">sage.cli.postgres module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.postgres_utils">sage.cli.postgres_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.sqlite">sage.cli.sqlite module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.sqlite_utils">sage.cli.sqlite_utils module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.cli.utils">sage.cli.utils module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-sage.cli">Module contents</a></li>
 </ul>
@@ -178,15 +184,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sage-cli-package">
+  <section id="sage-cli-package">
 <h1>sage.cli package<a class="headerlink" href="#sage-cli-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-sage.cli.commons">
+</section>
+<section id="module-sage.cli.commons">
 <span id="sage-cli-commons-module"></span><h2>sage.cli.commons module<a class="headerlink" href="#module-sage.cli.commons" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-sage.cli.grpc_server">
+</section>
+<section id="module-sage.cli.debug">
+<span id="sage-cli-debug-module"></span><h2>sage.cli.debug module<a class="headerlink" href="#module-sage.cli.debug" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.cli.debug.execute">
+<em class="property">async </em><code class="sig-prename descclassname">sage.cli.debug.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">engine</em>, <em class="sig-param">iterator</em>, <em class="sig-param">limit</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.debug.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-sage.cli.grpc_server">
 <span id="sage-cli-grpc-server-module"></span><h2>sage.cli.grpc_server module<a class="headerlink" href="#module-sage.cli.grpc_server" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="sage.cli.grpc_server.stop_server">
@@ -194,41 +208,221 @@
 <dd><p>Stop server on a CTRL-C event</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.cli.http_server">
+</section>
+<section id="sage-cli-hbase-module">
+<h2>sage.cli.hbase module<a class="headerlink" href="#sage-cli-hbase-module" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-sage.cli.http_server">
 <span id="sage-cli-http-server-module"></span><h2>sage.cli.http_server module<a class="headerlink" href="#module-sage.cli.http_server" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="sage-cli-postgres-module">
-<h2>sage.cli.postgres module<a class="headerlink" href="#sage-cli-postgres-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-sage.cli.postgres_utils">
+</section>
+<section id="module-sage.cli.parsers">
+<span id="sage-cli-parsers-module"></span><h2>sage.cli.parsers module<a class="headerlink" href="#module-sage.cli.parsers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sage.cli.parsers.CustomNTriplesParser">
+<em class="property">class </em><code class="sig-prename descclassname">sage.cli.parsers.</code><code class="sig-name descname">CustomNTriplesParser</code><span class="sig-paren">(</span><em class="sig-param">bucket_size=100</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.CustomNTriplesParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sage.cli.parsers.Parser" title="sage.cli.parsers.Parser"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.cli.parsers.Parser</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rdflib.plugins.parsers.ntriples.NTriplesParser</span></code></p>
+<dl class="method">
+<dt id="sage.cli.parsers.CustomNTriplesParser.literal">
+<code class="sig-name descname">literal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.CustomNTriplesParser.literal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sage.cli.parsers.CustomNTriplesParser.parse">
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.CustomNTriplesParser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse f as an N-Triples file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.cli.parsers.CustomNTriplesParser.parseline">
+<code class="sig-name descname">parseline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.CustomNTriplesParser.parseline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.cli.parsers.HDTParser">
+<em class="property">class </em><code class="sig-prename descclassname">sage.cli.parsers.</code><code class="sig-name descname">HDTParser</code><span class="sig-paren">(</span><em class="sig-param">bucket_size</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.HDTParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sage.cli.parsers.CustomNTriplesParser" title="sage.cli.parsers.CustomNTriplesParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.cli.parsers.CustomNTriplesParser</span></code></a></p>
+<dl class="method">
+<dt id="sage.cli.parsers.HDTParser.parsefile">
+<code class="sig-name descname">parsefile</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.HDTParser.parsefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an HDT file as an N-Triples file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.cli.parsers.HDTParser.readline">
+<code class="sig-name descname">readline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.HDTParser.readline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert triples read from an HDT file into N-Triples.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.cli.parsers.NTParser">
+<em class="property">class </em><code class="sig-prename descclassname">sage.cli.parsers.</code><code class="sig-name descname">NTParser</code><span class="sig-paren">(</span><em class="sig-param">bucket_size=100</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.NTParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sage.cli.parsers.CustomNTriplesParser" title="sage.cli.parsers.CustomNTriplesParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.cli.parsers.CustomNTriplesParser</span></code></a></p>
+<dl class="method">
+<dt id="sage.cli.parsers.NTParser.parsefile">
+<code class="sig-name descname">parsefile</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.NTParser.parsefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an N-Triples file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="sage.cli.parsers.ParseError">
+<em class="property">exception </em><code class="sig-prename descclassname">sage.cli.parsers.</code><code class="sig-name descname">ParseError</code><a class="headerlink" href="#sage.cli.parsers.ParseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised Raised when an error occurs while parsing an RDF file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.cli.parsers.Parser">
+<em class="property">class </em><code class="sig-prename descclassname">sage.cli.parsers.</code><code class="sig-name descname">Parser</code><span class="sig-paren">(</span><em class="sig-param">bucket_size=100</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.Parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="sage.cli.parsers.Parser.on_bucket">
+<code class="sig-name descname">on_bucket</code><span class="sig-paren">(</span><em class="sig-param">bucket</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.Parser.on_bucket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a new bucket of triples is ready to be inserted into the database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.cli.parsers.Parser.on_complete">
+<code class="sig-name descname">on_complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.Parser.on_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the file has been fully parsed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.cli.parsers.Parser.on_error">
+<code class="sig-name descname">on_error</code><span class="sig-paren">(</span><em class="sig-param">error</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.Parser.on_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when an error is raised by the parser.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.cli.parsers.Parser.parsefile">
+<em class="property">abstract </em><code class="sig-name descname">parsefile</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.parsers.Parser.parsefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a RDF file into bucket of triples.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sage.cli.parsers.ParserFactory">
+<em class="property">class </em><code class="sig-prename descclassname">sage.cli.parsers.</code><code class="sig-name descname">ParserFactory</code><a class="headerlink" href="#sage.cli.parsers.ParserFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="sage.cli.parsers.ParserFactory.create_parser">
+<code class="sig-name descname">create_parser</code><span class="sig-paren">(</span><em class="sig-param">bucket_size: int = 100</em><span class="sig-paren">)</span> &#x2192; sage.cli.parsers.Parser<a class="headerlink" href="#sage.cli.parsers.ParserFactory.create_parser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sage.cli.postgres">
+<span id="sage-cli-postgres-module"></span><h2>sage.cli.postgres module<a class="headerlink" href="#module-sage.cli.postgres" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.cli.postgres.connect_postgres">
+<code class="sig-prename descclassname">sage.cli.postgres.</code><code class="sig-name descname">connect_postgres</code><span class="sig-paren">(</span><em class="sig-param">graph</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres.connect_postgres" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to connect to a PostgreSQL server</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.postgres.insert_bucket">
+<code class="sig-prename descclassname">sage.cli.postgres.</code><code class="sig-name descname">insert_bucket</code><span class="sig-paren">(</span><em class="sig-param">cursor</em>, <em class="sig-param">bucket</em>, <em class="sig-param">graph_name</em>, <em class="sig-param">backend</em>, <em class="sig-param">block_size</em>, <em class="sig-param">cache</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres.insert_bucket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-sage.cli.postgres_utils">
 <span id="sage-cli-postgres-utils-module"></span><h2>sage.cli.postgres_utils module<a class="headerlink" href="#module-sage.cli.postgres_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="sage.cli.postgres_utils.get_postgres_create_indexes">
-<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_postgres_create_indexes</code><span class="sig-paren">(</span><em class="sig-param">table_name</em>, <em class="sig-param">enable_mvcc=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_postgres_create_indexes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Format all postgre CREATE INDEXE with the name of a SQL table</p>
+<dt id="sage.cli.postgres_utils.get_analyze_query">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_analyze_query</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_analyze_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format an ANALYZE query with the name of the inserted RDF graph.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="sage.cli.postgres_utils.get_postgres_create_table">
-<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_postgres_create_table</code><span class="sig-paren">(</span><em class="sig-param">table_name</em>, <em class="sig-param">enable_mvcc=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_postgres_create_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Format a postgre CREATE TABLE with the name of a SQL table</p>
+<dt id="sage.cli.postgres_utils.get_create_indexes_queries">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_create_indexes_queries</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em>, <em class="sig-param">backend</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_create_indexes_queries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format all PostgreSQL CREATE INDEX queries with the name of the RDF graph to insert.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="sage.cli.postgres_utils.get_postgres_insert_into">
-<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_postgres_insert_into</code><span class="sig-paren">(</span><em class="sig-param">table_name</em>, <em class="sig-param">enable_mvcc=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_postgres_insert_into" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get an INSERT INTO query compatible with <cite>psycopg2.extras.execute_values</cite> (to support bulk loading).</p>
+<dt id="sage.cli.postgres_utils.get_create_tables_queries">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_create_tables_queries</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em>, <em class="sig-param">backend</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_create_tables_queries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a PostgreSQL CREATE TABLE query with the name of the RDF graph to insert.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.cli.utils">
+<dl class="function">
+<dt id="sage.cli.postgres_utils.get_insert_into_catalog_query">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_insert_into_catalog_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_insert_into_catalog_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an INSERT INTO query compatible with “psycopg2.extras.execute_values” to support the bulk loading.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.postgres_utils.get_insert_into_query">
+<code class="sig-prename descclassname">sage.cli.postgres_utils.</code><code class="sig-name descname">get_insert_into_query</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.postgres_utils.get_insert_into_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an INSERT INTO query compatible with “psycopg2.extras.execute_values” to support the bulk loading.</p>
+</dd></dl>
+
+</section>
+<section id="module-sage.cli.sqlite">
+<span id="sage-cli-sqlite-module"></span><h2>sage.cli.sqlite module<a class="headerlink" href="#module-sage.cli.sqlite" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.cli.sqlite.connect_sqlite">
+<code class="sig-prename descclassname">sage.cli.sqlite.</code><code class="sig-name descname">connect_sqlite</code><span class="sig-paren">(</span><em class="sig-param">graph</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite.connect_sqlite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.sqlite.insert_bucket">
+<code class="sig-prename descclassname">sage.cli.sqlite.</code><code class="sig-name descname">insert_bucket</code><span class="sig-paren">(</span><em class="sig-param">cursor</em>, <em class="sig-param">bucket</em>, <em class="sig-param">graph_name</em>, <em class="sig-param">backend</em>, <em class="sig-param">block_size</em>, <em class="sig-param">cache</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite.insert_bucket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-sage.cli.sqlite_utils">
+<span id="sage-cli-sqlite-utils-module"></span><h2>sage.cli.sqlite_utils module<a class="headerlink" href="#module-sage.cli.sqlite_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sage.cli.sqlite_utils.get_analyze_query">
+<code class="sig-prename descclassname">sage.cli.sqlite_utils.</code><code class="sig-name descname">get_analyze_query</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite_utils.get_analyze_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format an ANALYZE query with the name of the inserted RDF graph.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.sqlite_utils.get_create_indexes_queries">
+<code class="sig-prename descclassname">sage.cli.sqlite_utils.</code><code class="sig-name descname">get_create_indexes_queries</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em>, <em class="sig-param">backend</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite_utils.get_create_indexes_queries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format all SQlite CREATE INDEXES statements with the name of the RDF graph to insert.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.sqlite_utils.get_create_tables_queries">
+<code class="sig-prename descclassname">sage.cli.sqlite_utils.</code><code class="sig-name descname">get_create_tables_queries</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em>, <em class="sig-param">backend</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite_utils.get_create_tables_queries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a SQlite CREATE TABLE statement with the name of the RDF graph to insert.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.sqlite_utils.get_insert_into_catalog_query">
+<code class="sig-prename descclassname">sage.cli.sqlite_utils.</code><code class="sig-name descname">get_insert_into_catalog_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite_utils.get_insert_into_catalog_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an INSERT INTO statement compatible with the “executemany” function of SQlite to support the bulk loading.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.sqlite_utils.get_insert_into_query">
+<code class="sig-prename descclassname">sage.cli.sqlite_utils.</code><code class="sig-name descname">get_insert_into_query</code><span class="sig-paren">(</span><em class="sig-param">graph_name</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite_utils.get_insert_into_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an INSERT INTO statement compatible with the “executemany” function of SQlite to support the bulk loading.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sage.cli.sqlite_utils.get_select_identifier_query">
+<code class="sig-prename descclassname">sage.cli.sqlite_utils.</code><code class="sig-name descname">get_select_identifier_query</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.sqlite_utils.get_select_identifier_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a SELECT statement to retrieve the identifier of a RDF term.</p>
+</dd></dl>
+
+</section>
+<section id="module-sage.cli.utils">
 <span id="sage-cli-utils-module"></span><h2>sage.cli.utils module<a class="headerlink" href="#module-sage.cli.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="sage.cli.utils.get_rdf_reader">
-<code class="sig-prename descclassname">sage.cli.utils.</code><code class="sig-name descname">get_rdf_reader</code><span class="sig-paren">(</span><em class="sig-param">file_path</em>, <em class="sig-param">format='nt'</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.utils.get_rdf_reader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get an iterator over RDF triples from a file</p>
-</dd></dl>
+<dt id="sage.cli.utils.get_nb_triples">
+<code class="sig-prename descclassname">sage.cli.utils.</code><code class="sig-name descname">get_nb_triples</code><span class="sig-paren">(</span><em class="sig-param">file_path: str</em>, <em class="sig-param">format: str</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sage.cli.utils.get_nb_triples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="sage.cli.utils.load_graph">
@@ -236,11 +430,16 @@
 <dd><p>Load a RDF graph from a Sage config file</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.cli">
+<dl class="function">
+<dt id="sage.cli.utils.wccount">
+<code class="sig-prename descclassname">sage.cli.utils.</code><code class="sig-name descname">wccount</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.cli.utils.wccount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-sage.cli">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.cli" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

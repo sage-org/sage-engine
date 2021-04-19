@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>sage.query_engine.iterators package &mdash; sage-engine 2.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -84,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -100,7 +101,6 @@
 <li class="toctree-l4 current"><a class="reference internal" href="sage.query_engine.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.exceptions">sage.query_engine.exceptions module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.primitives">sage.query_engine.primitives module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.sage_engine">sage.query_engine.sage_engine module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine">Module contents</a></li>
 </ul>
@@ -178,23 +178,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sage-query-engine-iterators-package">
+  <section id="sage-query-engine-iterators-package">
 <h1>sage.query_engine.iterators package<a class="headerlink" href="#sage-query-engine-iterators-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-sage.query_engine.iterators.filter">
+</section>
+<section id="module-sage.query_engine.iterators.filter">
 <span id="sage-query-engine-iterators-filter-module"></span><h2>sage.query_engine.iterators.filter module<a class="headerlink" href="#module-sage.query_engine.iterators.filter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.iterators.filter.FilterIterator">
-<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.filter.</code><code class="sig-name descname">FilterIterator</code><span class="sig-paren">(</span><em class="sig-param">source: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">expression: str</em>, <em class="sig-param">mu: Optional[Dict[str</em>, <em class="sig-param">str]] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.filter.FilterIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.filter.</code><code class="sig-name descname">FilterIterator</code><span class="sig-paren">(</span><em class="sig-param">source: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">expression: str</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.filter.FilterIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
 <p>A FilterIterator evaluates a FILTER clause in a pipeline of iterators.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>source: Previous iterator in the pipeline.</p></li>
 <li><p>expression: A SPARQL FILTER expression.</p></li>
-<li><p>mu: Last set of mappings read by the iterator.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 </dl>
@@ -208,10 +208,15 @@
 <dt id="sage.query_engine.iterators.filter.FilterIterator.next">
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.filter.FilterIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.iterators.filter.FilterIterator.next_stage">
+<code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.filter.FilterIterator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -236,17 +241,18 @@ be atomically evaluated before preemption occurs.</p>
 <p>Returns: The RDF Term in rdflib format.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators.loader">
+</section>
+<section id="module-sage.query_engine.iterators.loader">
 <span id="sage-query-engine-iterators-loader-module"></span><h2>sage.query_engine.iterators.loader module<a class="headerlink" href="#module-sage.query_engine.iterators.loader" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="sage.query_engine.iterators.loader.load">
-<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: Union[iterators_pb2.RootTree, iterators_pb2.SavedBagUnionIterator, iterators_pb2.SavedFilterIterator, iterators_pb2.SavedIndexJoinIterator, iterators_pb2.SavedProjectionIterator, iterators_pb2.SavedScanIterator], dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: Union[iterators_pb2.RootTree, iterators_pb2.SavedBagUnionIterator, iterators_pb2.SavedFilterIterator, iterators_pb2.SavedIndexJoinIterator, iterators_pb2.SavedProjectionIterator, iterators_pb2.SavedScanIterator], dataset: sage.database.core.dataset.Dataset, context: dict</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a preemptable physical query execution plan from a saved state.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>saved_plan: Saved query execution plan.</p></li>
 <li><p>dataset: RDF dataset used to execute the plan.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><p>The pipeline of iterator used to continue query execution.</p>
@@ -256,12 +262,13 @@ be atomically evaluated before preemption occurs.</p>
 
 <dl class="function">
 <dt id="sage.query_engine.iterators.loader.load_filter">
-<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_filter</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedFilterIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_filter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_filter</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedFilterIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a FilterIterator from a protobuf serialization.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>saved_plan: Saved query execution plan.</p></li>
 <li><p>dataset: RDF dataset used to execute the plan.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><p>The pipeline of iterator used to continue query execution.</p>
@@ -271,12 +278,13 @@ be atomically evaluated before preemption occurs.</p>
 
 <dl class="function">
 <dt id="sage.query_engine.iterators.loader.load_nlj">
-<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_nlj</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedIndexJoinIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_nlj" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_nlj</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedIndexJoinIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_nlj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a IndexJoinIterator from a protobuf serialization.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>saved_plan: Saved query execution plan.</p></li>
 <li><p>dataset: RDF dataset used to execute the plan.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><p>The pipeline of iterator used to continue query execution.</p>
@@ -286,12 +294,13 @@ be atomically evaluated before preemption occurs.</p>
 
 <dl class="function">
 <dt id="sage.query_engine.iterators.loader.load_projection">
-<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_projection</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedProjectionIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_projection" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_projection</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedProjectionIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_projection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a ProjectionIterator from a protobuf serialization.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>saved_plan: Saved query execution plan.</p></li>
 <li><p>dataset: RDF dataset used to execute the plan.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><p>The pipeline of iterator used to continue query execution.</p>
@@ -301,12 +310,13 @@ be atomically evaluated before preemption occurs.</p>
 
 <dl class="function">
 <dt id="sage.query_engine.iterators.loader.load_scan">
-<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_scan</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedScanIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_scan" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_scan</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedScanIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a ScanIterator from a protobuf serialization.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>saved_plan: Saved query execution plan.</p></li>
 <li><p>dataset: RDF dataset used to execute the plan.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><p>The pipeline of iterator used to continue query execution.</p>
@@ -316,12 +326,13 @@ be atomically evaluated before preemption occurs.</p>
 
 <dl class="function">
 <dt id="sage.query_engine.iterators.loader.load_union">
-<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_union</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedBagUnionIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_union" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sage.query_engine.iterators.loader.</code><code class="sig-name descname">load_union</code><span class="sig-paren">(</span><em class="sig-param">saved_plan: iterators_pb2.SavedBagUnionIterator</em>, <em class="sig-param">dataset: sage.database.core.dataset.Dataset</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span> &#x2192; sage.query_engine.iterators.preemptable_iterator.PreemptableIterator<a class="headerlink" href="#sage.query_engine.iterators.loader.load_union" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a BagUnionIterator from a protobuf serialization.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>saved_plan: Saved query execution plan.</p></li>
 <li><p>dataset: RDF dataset used to execute the plan.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 <dt>Returns:</dt><dd><p>The pipeline of iterator used to continue query execution.</p>
@@ -329,22 +340,20 @@ be atomically evaluated before preemption occurs.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators.nlj">
+</section>
+<section id="module-sage.query_engine.iterators.nlj">
 <span id="sage-query-engine-iterators-nlj-module"></span><h2>sage.query_engine.iterators.nlj module<a class="headerlink" href="#module-sage.query_engine.iterators.nlj" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.iterators.nlj.IndexJoinIterator">
-<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.nlj.</code><code class="sig-name descname">IndexJoinIterator</code><span class="sig-paren">(</span><em class="sig-param">source: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator, innerTriple: Dict[str, str], graph: sage.database.core.graph.Graph, currentBinding: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.nlj.IndexJoinIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.nlj.</code><code class="sig-name descname">IndexJoinIterator</code><span class="sig-paren">(</span><em class="sig-param">left: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">right: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">context: dict</em>, <em class="sig-param">current_mappings: Optional[Dict[str</em>, <em class="sig-param">str]] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.nlj.IndexJoinIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
 <p>A IndexJoinIterator implements an Index Loop join in a pipeline of iterators.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
-<li><p>source: Previous iterator in the pipeline, i.e., the outer relation of the join</p></li>
-<li><p>innerTriple: The inner relation, i.e., a triple pattern.</p></li>
-<li><p>graph: The RDF Graph on which the join is evaluated.</p></li>
-<li><p>currentBinding: A set of solution mappings used to resume join processing.</p></li>
-<li><p>last_read: An offset ID used to resume processing of an inner loop.</p></li>
-<li><p>as_of: Perform all reads against a consistent snapshot represented by a timestamp.</p></li>
+<li><p>left: Previous iterator in the pipeline, i.e., the outer relation of the join.</p></li>
+<li><p>right: Next iterator in the pipeline, i.e., the inner relation of the join.</p></li>
+<li><p>context: Information about the query execution.</p></li>
+<li><p>current_mappings: The current mappings when the join is performed.</p></li>
 </ul>
 </dd>
 </dl>
@@ -358,10 +367,15 @@ be atomically evaluated before preemption occurs.</p>
 <dt id="sage.query_engine.iterators.nlj.IndexJoinIterator.next">
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.nlj.IndexJoinIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.iterators.nlj.IndexJoinIterator.next_stage">
+<code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.nlj.IndexJoinIterator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -378,8 +392,8 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators.preemptable_iterator">
+</section>
+<section id="module-sage.query_engine.iterators.preemptable_iterator">
 <span id="sage-query-engine-iterators-preemptable-iterator-module"></span><h2>sage.query_engine.iterators.preemptable_iterator module<a class="headerlink" href="#module-sage.query_engine.iterators.preemptable_iterator" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator">
@@ -396,10 +410,15 @@ be atomically evaluated before preemption occurs.</p>
 <dt id="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator.next">
 <em class="property">abstract async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator.next_stage">
+<em class="property">abstract </em><code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -416,18 +435,19 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators.projection">
+</section>
+<section id="module-sage.query_engine.iterators.projection">
 <span id="sage-query-engine-iterators-projection-module"></span><h2>sage.query_engine.iterators.projection module<a class="headerlink" href="#module-sage.query_engine.iterators.projection" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.iterators.projection.ProjectionIterator">
-<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.projection.</code><code class="sig-name descname">ProjectionIterator</code><span class="sig-paren">(</span><em class="sig-param">source: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">projection: List[str] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.projection.ProjectionIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.projection.</code><code class="sig-name descname">ProjectionIterator</code><span class="sig-paren">(</span><em class="sig-param">source: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">context: dict</em>, <em class="sig-param">projection: List[str] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.projection.ProjectionIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
 <p>A ProjectionIterator evaluates a SPARQL projection (SELECT) in a pipeline of iterators.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>source: Previous iterator in the pipeline.</p></li>
-<li><p>projection: Projection variables</p></li>
+<li><p>projection: Projection variables.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 </dl>
@@ -441,10 +461,15 @@ be atomically evaluated before preemption occurs.</p>
 <dt id="sage.query_engine.iterators.projection.ProjectionIterator.next">
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.projection.ProjectionIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.iterators.projection.ProjectionIterator.next_stage">
+<code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.projection.ProjectionIterator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -461,20 +486,24 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators.scan">
+</section>
+<section id="module-sage.query_engine.iterators.scan">
 <span id="sage-query-engine-iterators-scan-module"></span><h2>sage.query_engine.iterators.scan module<a class="headerlink" href="#module-sage.query_engine.iterators.scan" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.iterators.scan.ScanIterator">
-<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.scan.</code><code class="sig-name descname">ScanIterator</code><span class="sig-paren">(</span><em class="sig-param">source: sage.database.db_iterator.DBIterator, triple: Dict[str, str], cardinality: int = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.scan.ScanIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.scan.</code><code class="sig-name descname">ScanIterator</code><span class="sig-paren">(</span><em class="sig-param">connector: sage.database.db_connector.DatabaseConnector, pattern: Dict[str, str], context: dict, current_mappings: Optional[Dict[str, str]] = None, mu: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, as_of: Optional[datetime.datetime] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.scan.ScanIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
 <p>A ScanIterator evaluates a triple pattern over a RDF graph.</p>
 <p>It can be used as the starting iterator in a pipeline of iterators.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
-<li><p>source: A DBIterator that yields RDF triple.</p></li>
-<li><p>triple: The triple pattern corresponding to the source iterator.</p></li>
-<li><p>cardinality: The cardinality of the triple pattern.</p></li>
+<li><p>connector: The database connector that will be used to evaluate a triple pattern.</p></li>
+<li><p>pattern: The evaluated triple pattern.</p></li>
+<li><p>context: Information about the query execution.</p></li>
+<li><p>current_mappings: The current mappings when the scan is performed.</p></li>
+<li><p>mu: The last triple read when the preemption occured. This triple must be the next returned triple when the query is resumed.</p></li>
+<li><p>last_read: An offset ID used to resume the ScanIterator.</p></li>
+<li><p>as_of: Perform all reads against a consistent snapshot represented by a timestamp.</p></li>
 </ul>
 </dd>
 </dl>
@@ -493,10 +522,15 @@ be atomically evaluated before preemption occurs.</p>
 <dt id="sage.query_engine.iterators.scan.ScanIterator.next">
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.scan.ScanIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.iterators.scan.ScanIterator.next_stage">
+<code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.scan.ScanIterator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -513,20 +547,21 @@ be atomically evaluated before preemption occurs.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators.union">
+</section>
+<section id="module-sage.query_engine.iterators.union">
 <span id="sage-query-engine-iterators-union-module"></span><h2>sage.query_engine.iterators.union module<a class="headerlink" href="#module-sage.query_engine.iterators.union" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.iterators.union.BagUnionIterator">
-<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.union.</code><code class="sig-name descname">BagUnionIterator</code><span class="sig-paren">(</span><em class="sig-param">left: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">right: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.union.BagUnionIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.union.</code><code class="sig-name descname">BagUnionIterator</code><span class="sig-paren">(</span><em class="sig-param">left: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">right: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.union.BagUnionIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sage.query_engine.iterators.preemptable_iterator.PreemptableIterator" title="sage.query_engine.iterators.preemptable_iterator.PreemptableIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</span></code></a></p>
 <p>A BagUnionIterator performs a SPARQL UNION with bag semantics in a pipeline of iterators.</p>
-<p>This operator sequentially produces all solutions from the left operand, 
+<p>This operator sequentially produces all solutions from the left operand,
 and then do the same for the right operand.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>left: left operand of the union.</p></li>
 <li><p>right: right operand of the union.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 </dl>
@@ -540,10 +575,15 @@ and then do the same for the right operand.</p>
 <dt id="sage.query_engine.iterators.union.BagUnionIterator.next">
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.union.BagUnionIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sage.query_engine.iterators.union.BagUnionIterator.next_stage">
+<code class="sig-name descname">next_stage</code><span class="sig-paren">(</span><em class="sig-param">mappings: Dict[str, str]</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.union.BagUnionIterator.next_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate mappings to the bottom of the pipeline in order to compute nested loop joins</p>
 </dd></dl>
 
 <dl class="method">
@@ -562,7 +602,7 @@ be atomically evaluated before preemption occurs.</p>
 
 <dl class="class">
 <dt id="sage.query_engine.iterators.union.RandomBagUnionIterator">
-<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.union.</code><code class="sig-name descname">RandomBagUnionIterator</code><span class="sig-paren">(</span><em class="sig-param">left: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">right: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.union.RandomBagUnionIterator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sage.query_engine.iterators.union.</code><code class="sig-name descname">RandomBagUnionIterator</code><span class="sig-paren">(</span><em class="sig-param">left: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">right: sage.query_engine.iterators.preemptable_iterator.PreemptableIterator</em>, <em class="sig-param">context: dict</em><span class="sig-paren">)</span><a class="headerlink" href="#sage.query_engine.iterators.union.RandomBagUnionIterator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#sage.query_engine.iterators.union.BagUnionIterator" title="sage.query_engine.iterators.union.BagUnionIterator"><code class="xref py py-class docutils literal notranslate"><span class="pre">sage.query_engine.iterators.union.BagUnionIterator</span></code></a></p>
 <p>A RandomBagUnionIterator performs a SPARQL UNION with bag semantics in a pipeline of iterators.</p>
 <p>This operator randomly reads from the left and right operands to produce solution mappings.</p>
@@ -570,17 +610,23 @@ be atomically evaluated before preemption occurs.</p>
 <dt>Args:</dt><dd><ul class="simple">
 <li><p>left: left operand of the union.</p></li>
 <li><p>right: right operand of the union.</p></li>
+<li><p>context: Information about the query execution.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="method">
+<dt id="sage.query_engine.iterators.union.RandomBagUnionIterator.has_next">
+<code class="sig-name descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#sage.query_engine.iterators.union.RandomBagUnionIterator.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if the iterator has more item to yield</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="sage.query_engine.iterators.union.RandomBagUnionIterator.next">
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.union.RandomBagUnionIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
 </dd></dl>
 
 </dd></dl>
@@ -590,8 +636,8 @@ be atomically evaluated before preemption occurs.</p>
 <code class="sig-prename descclassname">sage.query_engine.iterators.union.</code><code class="sig-name descname">random</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; x in the interval [0, 1).<a class="headerlink" href="#sage.query_engine.iterators.union.random" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators.utils">
+</section>
+<section id="module-sage.query_engine.iterators.utils">
 <span id="sage-query-engine-iterators-utils-module"></span><h2>sage.query_engine.iterators.utils module<a class="headerlink" href="#module-sage.query_engine.iterators.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="sage.query_engine.iterators.utils.ArrayIterator">
@@ -607,12 +653,11 @@ be atomically evaluated before preemption occurs.</p>
 
 <dl class="method">
 <dt id="sage.query_engine.iterators.utils.ArrayIterator.next">
-<code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.utils.ArrayIterator.next" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[Dict[str, str]]<a class="headerlink" href="#sage.query_engine.iterators.utils.ArrayIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
 </dd></dl>
 
 </dd></dl>
@@ -632,10 +677,9 @@ be atomically evaluated before preemption occurs.</p>
 <dt id="sage.query_engine.iterators.utils.EmptyIterator.next">
 <em class="property">async </em><code class="sig-name descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sage.query_engine.iterators.utils.EmptyIterator.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the next item from the iterator, following the iterator protocol.</p>
-<p>This function may contains <cite>non interruptible</cite> clauses which must 
+<p>This function may contains <cite>non interruptible</cite> clauses which must
 be atomically evaluated before preemption occurs.</p>
 <p>Returns: A set of solution mappings, or <cite>None</cite> if none was produced during this call.</p>
-<p>Throws: <cite>StopAsyncIteration</cite> if the iterator cannot produce more items.</p>
 </dd></dl>
 
 </dd></dl>
@@ -729,11 +773,11 @@ be atomically evaluated before preemption occurs.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-sage.query_engine.iterators">
+</section>
+<section id="module-sage.query_engine.iterators">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage.query_engine.iterators" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

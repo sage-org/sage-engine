@@ -1,0 +1,38 @@
+sage.database.postgres\_backends.postgres package
+=================================================
+
+Submodules
+----------
+
+sage.database.postgres\_backends.postgres.connector module
+----------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.postgres\_backends.postgres.iterator module
+---------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres.iterator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.postgres\_backends.postgres.queries module
+--------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres.queries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: sage.database.postgres_backends.postgres
+   :members:
+   :undoc-members:
+   :show-inheritance:

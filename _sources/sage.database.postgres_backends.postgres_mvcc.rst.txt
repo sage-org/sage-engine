@@ -1,0 +1,38 @@
+sage.database.postgres\_backends.postgres\_mvcc package
+=======================================================
+
+Submodules
+----------
+
+sage.database.postgres\_backends.postgres\_mvcc.connector module
+----------------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres_mvcc.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.postgres\_backends.postgres\_mvcc.iterator module
+---------------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres_mvcc.iterator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.postgres\_backends.postgres\_mvcc.queries module
+--------------------------------------------------------------
+
+.. automodule:: sage.database.postgres_backends.postgres_mvcc.queries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: sage.database.postgres_backends.postgres_mvcc
+   :members:
+   :undoc-members:
+   :show-inheritance:

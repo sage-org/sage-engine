@@ -1,0 +1,38 @@
+sage.database.sqlite\_backends package
+======================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   sage.database.sqlite_backends.sqlite
+   sage.database.sqlite_backends.sqlite_catalog
+
+Submodules
+----------
+
+sage.database.sqlite\_backends.connector module
+-----------------------------------------------
+
+.. automodule:: sage.database.sqlite_backends.connector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+sage.database.sqlite\_backends.transaction\_manager module
+----------------------------------------------------------
+
+.. automodule:: sage.database.sqlite_backends.transaction_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: sage.database.sqlite_backends
+   :members:
+   :undoc-members:
+   :show-inheritance:

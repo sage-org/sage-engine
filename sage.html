@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>sage package &mdash; sage-engine 2.0 documentation</title>
@@ -21,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -84,7 +85,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Quickstart</a></li>
@@ -166,19 +167,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sage-package">
+  <section id="sage-package">
 <h1>sage package<a class="headerlink" href="#sage-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="sage.cli.html">sage.cli package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sage.cli.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.commons">sage.cli.commons module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.debug">sage.cli.debug module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.grpc_server">sage.cli.grpc_server module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.cli.html#sage-cli-hbase-module">sage.cli.hbase module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.http_server">sage.cli.http_server module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sage.cli.html#sage-cli-postgres-module">sage.cli.postgres module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.parsers">sage.cli.parsers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.postgres">sage.cli.postgres module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.postgres_utils">sage.cli.postgres_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.sqlite">sage.cli.sqlite module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.sqlite_utils">sage.cli.sqlite_utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli.utils">sage.cli.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.cli.html#module-sage.cli">Module contents</a></li>
 </ul>
@@ -194,6 +200,14 @@
 <li class="toctree-l4"><a class="reference internal" href="sage.database.core.html#module-sage.database.core">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.hbase.html">sage.database.hbase package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.hbase.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.hbase.html#sage-database-hbase-connector-module">sage.database.hbase.connector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.hbase.html#module-sage.database.hbase.iterator">sage.database.hbase.iterator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.hbase.html#module-sage.database.hbase.utils">sage.database.hbase.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.hbase.html#module-sage.database.hbase">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="sage.database.hdt.html">sage.database.hdt package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="sage.database.hdt.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="sage.database.hdt.html#module-sage.database.hdt.connector">sage.database.hdt.connector module</a></li>
@@ -201,15 +215,64 @@
 <li class="toctree-l4"><a class="reference internal" href="sage.database.hdt.html#module-sage.database.hdt">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="sage.database.postgres.html">sage.database.postgres package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.connector">sage.database.postgres.connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.mvcc_connector">sage.database.postgres.mvcc_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.mvcc_queries">sage.database.postgres.mvcc_queries module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.queries">sage.database.postgres.queries module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.transaction_manager">sage.database.postgres.transaction_manager module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres.utils">sage.database.postgres.utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres.html#module-sage.database.postgres">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.postgres_backends.html">sage.database.postgres_backends package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres_backends.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="sage.database.postgres_backends.postgres.html">sage.database.postgres_backends.postgres package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres.connector">sage.database.postgres_backends.postgres.connector module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres.iterator">sage.database.postgres_backends.postgres.iterator module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres.queries">sage.database.postgres_backends.postgres.queries module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres.html#module-sage.database.postgres_backends.postgres">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="sage.database.postgres_backends.postgres_catalog.html">sage.database.postgres_backends.postgres_catalog package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_catalog.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog.connector">sage.database.postgres_backends.postgres_catalog.connector module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog.iterator">sage.database.postgres_backends.postgres_catalog.iterator module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog.queries">sage.database.postgres_backends.postgres_catalog.queries module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_catalog.html#module-sage.database.postgres_backends.postgres_catalog">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="sage.database.postgres_backends.postgres_mvcc.html">sage.database.postgres_backends.postgres_mvcc package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_mvcc.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_mvcc.html#sage-database-postgres-backends-postgres-mvcc-connector-module">sage.database.postgres_backends.postgres_mvcc.connector module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_mvcc.html#sage-database-postgres-backends-postgres-mvcc-iterator-module">sage.database.postgres_backends.postgres_mvcc.iterator module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_mvcc.html#module-sage.database.postgres_backends.postgres_mvcc.queries">sage.database.postgres_backends.postgres_mvcc.queries module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.postgres_backends.postgres_mvcc.html#module-sage.database.postgres_backends.postgres_mvcc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres_backends.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres_backends.html#module-sage.database.postgres_backends.connector">sage.database.postgres_backends.connector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres_backends.html#module-sage.database.postgres_backends.transaction_manager">sage.database.postgres_backends.transaction_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.postgres_backends.html#module-sage.database.postgres_backends">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sage.database.sqlite_backends.html">sage.database.sqlite_backends package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.sqlite_backends.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="sage.database.sqlite_backends.sqlite.html">sage.database.sqlite_backends.sqlite package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite.connector">sage.database.sqlite_backends.sqlite.connector module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite.iterator">sage.database.sqlite_backends.sqlite.iterator module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite.queries">sage.database.sqlite_backends.sqlite.queries module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite.html#module-sage.database.sqlite_backends.sqlite">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="sage.database.sqlite_backends.sqlite_catalog.html">sage.database.sqlite_backends.sqlite_catalog package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite_catalog.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog.connector">sage.database.sqlite_backends.sqlite_catalog.connector module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog.iterator">sage.database.sqlite_backends.sqlite_catalog.iterator module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog.queries">sage.database.sqlite_backends.sqlite_catalog.queries module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="sage.database.sqlite_backends.sqlite_catalog.html#module-sage.database.sqlite_backends.sqlite_catalog">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.sqlite_backends.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.sqlite_backends.html#module-sage.database.sqlite_backends.connector">sage.database.sqlite_backends.connector module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.sqlite_backends.html#module-sage.database.sqlite_backends.transaction_manager">sage.database.sqlite_backends.transaction_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sage.database.sqlite_backends.html#module-sage.database.sqlite_backends">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="sage.database.statefull.html">sage.database.statefull package</a><ul>
@@ -292,18 +355,17 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="sage.query_engine.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.exceptions">sage.query_engine.exceptions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.primitives">sage.query_engine.primitives module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine.sage_engine">sage.query_engine.sage_engine module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sage.query_engine.html#module-sage.query_engine">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="module-sage">
+</section>
+<section id="module-sage">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sage" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
