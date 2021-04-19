@@ -54,7 +54,7 @@ class HBaseIterator(DBIterator):
     def last_read(self) -> str:
         """Return the index ID of the last element read"""
         if not self.has_next():
-            return 'None_None_None' # whatever as long as the key is not in the HBase database...
+            return self._last_read_key # whatever as long as the key is not in the HBase database...
         (key, triple) = self._current_page[0]
         return key
 

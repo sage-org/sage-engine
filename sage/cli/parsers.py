@@ -140,14 +140,15 @@ class NTParser(CustomNTriplesParser):
 
 class HDTParser(CustomNTriplesParser):
 
-    from hdt import HDTDocument
-
     def __init__(self, bucket_size):
         super(HDTParser, self).__init__(bucket_size)
         self.iterator = None
 
     def parsefile(self, file_path):
         """Parse an HDT file as an N-Triples file."""
+
+        from hdt import HDTDocument
+
         doc = HDTDocument(file_path, indexed=False)
         iterator, _ = doc.search_triples("", "", "")
         self.iterator = iterator
