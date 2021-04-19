@@ -41,6 +41,5 @@ def test_hdt_resume_scan(subj, pred, obj, expected):
 
 def test_hdt_scan_unknown_pattern():
     with HDTFileConnector('tests/data/watdiv.10M.hdt') as backend:
-        with pytest.raises(StopIteration):
-            iterator, c = backend.search('http://example.org#toto', None, None)
-            next(iterator)
+        iterator, c = backend.search('http://example.org#toto', None, None)
+        assert next(iterator) is None

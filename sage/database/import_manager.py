@@ -10,7 +10,7 @@ BackendFactory = Callable[[Dict[str, str]], DatabaseConnector]
 
 def builtin_backends() -> Dict[str, BackendFactory]:
     """Load the built-in backends: HDT, PostgreSQL and MVCC-PostgreSQL.
-    
+
     Returns: The HDT, PostgreSQL and MVCC-PostgreSQL backends, registered in a dict.
     """
     data = [
@@ -26,8 +26,19 @@ def builtin_backends() -> Dict[str, BackendFactory]:
         # PostgreSQL backend (optimised for read-only)
         {
             'name': 'postgres',
-            'path': 'sage.database.postgres.connector',
-            'connector': 'PostgresConnector',
+            'path': 'sage.database.postgres_backends.postgres.connector',
+            'connector': 'DefaultPostgresConnector',
+            'required': [
+                'dbname',
+                'user',
+                'password'
+            ]
+        },
+        # PostgreSQL backend with a catalog-based schema (optimised for read-only)
+        {
+            'name': 'postgres-catalog',
+            'path': 'sage.database.postgres_backends.postgres_catalog.connector',
+            'connector': 'CatalogPostgresConnector',
             'required': [
                 'dbname',
                 'user',
@@ -37,12 +48,39 @@ def builtin_backends() -> Dict[str, BackendFactory]:
         # MVCC-PostgreSQL (read-write)
         {
             'name': 'postgres-mvcc',
-            'path': 'sage.database.postgres.mvcc_connector',
+            'path': 'sage.database.postgres_backends.postgres_mvcc.connector',
             'connector': 'MVCCPostgresConnector',
             'required': [
                 'dbname',
                 'user',
                 'password'
+            ]
+        },
+        # SQlite backend (optimised for read-only)
+        {
+            'name': 'sqlite',
+            'path': 'sage.database.sqlite_backends.sqlite.connector',
+            'connector': 'DefaultSQliteConnector',
+            'required': [
+                'database'
+            ]
+        },
+        # SQlite backend (optimised for read-only)
+        {
+            'name': 'sqlite-catalog',
+            'path': 'sage.database.sqlite_backends.sqlite_catalog.connector',
+            'connector': 'CatalogSQliteConnector',
+            'required': [
+                'database'
+            ]
+        },
+        # HBase backend
+        {
+            'name': 'hbase',
+            'path': 'sage.database.hbase.connector',
+            'connector': 'HBaseConnector',
+            'required': [
+                'thrift_host'
             ]
         }
     ]
@@ -51,7 +89,7 @@ def builtin_backends() -> Dict[str, BackendFactory]:
 
 def import_backend(name: str, module_path: str, class_name: str, required_params: List[str]) -> BackendFactory:
     """Load a new database backend, defined by the user, adn get a factory function to build it.
-    
+
     Args:
       * name: Name of the database backend.
       * module_path: Path to the python module which contains the backend implementation.

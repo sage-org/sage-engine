@@ -10,15 +10,16 @@ from sage.query_engine.protobuf.iterators_pb2 import SavedBagUnionIterator
 class BagUnionIterator(PreemptableIterator):
     """A BagUnionIterator performs a SPARQL UNION with bag semantics in a pipeline of iterators.
 
-    This operator sequentially produces all solutions from the left operand, 
+    This operator sequentially produces all solutions from the left operand,
     and then do the same for the right operand.
-    
+
     Args:
       * left: left operand of the union.
       * right: right operand of the union.
+      * context: Information about the query execution.
     """
 
-    def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
+    def __init__(self, left: PreemptableIterator, right: PreemptableIterator, context: dict):
         super(BagUnionIterator, self).__init__()
         self._left = left
         self._right = right
@@ -34,18 +35,21 @@ class BagUnionIterator(PreemptableIterator):
         """Return True if the iterator has more item to yield"""
         return self._left.has_next() or self._right.has_next()
 
+    def next_stage(self, mappings: Dict[str, str]):
+        """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
+        self._left.next_stage(mappings)
+        self._right.next_stage(mappings)
+
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
-        This function may contains `non interruptible` clauses which must 
+        This function may contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
-
-        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
         """
         if not self.has_next():
-            raise StopAsyncIteration()
+            return None
         elif self._left.has_next():
             return await self._left.next()
         else:
@@ -67,29 +71,32 @@ class RandomBagUnionIterator(BagUnionIterator):
     """A RandomBagUnionIterator performs a SPARQL UNION with bag semantics in a pipeline of iterators.
 
     This operator randomly reads from the left and right operands to produce solution mappings.
-    
+
     Args:
       * left: left operand of the union.
       * right: right operand of the union.
+      * context: Information about the query execution.
     """
 
-    def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
+    def __init__(self, left: PreemptableIterator, right: PreemptableIterator, context: dict):
         super(BagUnionIterator, self).__init__()
         self._left = left
         self._right = right
 
+    def has_next(self) -> bool:
+        """Return True if the iterator has more item to yield"""
+        return self._left.has_next() or self._right.has_next()
+
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
-        This function may contains `non interruptible` clauses which must 
+        This function may contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
-
-        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
         """
         if not self.has_next():
-            raise StopAsyncIteration()
+            return None
         elif random() < 0.5:
             if self._left.has_next():
                 return await self._left.next()

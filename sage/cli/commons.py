@@ -35,7 +35,7 @@ def sage_query(entrypoint, default_graph_uri, query, file, format, limit):
 
     # prepare query headers
     headers = {
-        "accept": "application/sparql-results+json",
+        "accept": "text/html",
         "content-type": "application/json",
         "next": None
     }
@@ -52,10 +52,10 @@ def sage_query(entrypoint, default_graph_uri, query, file, format, limit):
     while has_next and count < limit:
         response = requests.post(entrypoint, headers=headers, data=dumps(payload))
         json_response = response.json()
-        has_next = json_response["head"]['hasNext']
-        payload["next"] = json_response["head"]["next"]
-        for bindings in json_response["results"]['bindings']:
-            print(bindings)
+        has_next = json_response['next']
+        payload['next'] = json_response['next']
+        for bindings in json_response['bindings']:
+            print(str(bindings))
             count += 1
             if count >= limit:
                 break

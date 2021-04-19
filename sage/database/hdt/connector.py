@@ -12,7 +12,7 @@ from datetime import datetime
 
 class HDTFileConnector(DatabaseConnector):
     """A HDTFileConnector search for RDF triples in a HDT file.
-    
+
     Args:
       * file: Path to the HDT file.
       * mapped: True maps the HDT file on disk (faster), False loads everything in memory.
@@ -32,7 +32,7 @@ class HDTFileConnector(DatabaseConnector):
           * object: Object of the triple pattern.
           * last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.
           * as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.
-          
+
         Returns:
           A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern.
         """
@@ -66,10 +66,10 @@ class HDTFileConnector(DatabaseConnector):
 
     def from_config(config: dict):
         """Build a HDTFileFactory from a configuration object.
-        
+
         Args:
           * config: configuration object. Must contains the 'file' field.
-        
+
         Example:
           >>> config = { "file": "./dbpedia.hdt" }
           >>> connector = HDTFileConnector.from_config(config)

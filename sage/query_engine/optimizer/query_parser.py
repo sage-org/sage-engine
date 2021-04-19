@@ -4,9 +4,11 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
+import re
 import pyparsing
 from pyparsing import ParseException
-from rdflib import BNode, Literal, URIRef, Variable
+from rdflib.term import BNode, Literal, URIRef, Variable
+from rdflib.namespace import XSD
 from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
 
@@ -26,6 +28,12 @@ from sage.query_engine.update.update_sequence import UpdateSequenceOperator
 # enable Packrat optimization for the rdflib SPARQL parser
 pyparsing.ParserElement.enablePackrat()
 
+exponent = r'[eE][+-]?[0-9]+'
+
+r_integer = re.compile(r'[0-9]+')
+r_decimal = re.compile(r'([0-9]+\.[0-9]*|\.[0-9]+)')
+r_double = re.compile(rf'([0-9]+\.[0-9]*{exponent}|\.[0-9]+{exponent}|[0-9]+{exponent})')
+r_boolean = re.compile(r'(true|false)')
 
 class ConsistencyLevel(Enum):
     """The consistency level choosen for executing the query"""
@@ -44,15 +52,37 @@ def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> Iterab
     Yields:
       The localized triple patterns.
     """
-    for t in triples:
-        s, p, o = format_term(t[0]), format_term(t[1]), format_term(t[2])
+    for (s, p, o) in triples:
         for graph in graphs:
             yield {
-                'subject': s,
-                'predicate': p,
-                'object': o,
+                'subject': format_term(s),
+                'predicate': format_term(p),
+                'object': format_term(o),
                 'graph': graph
             }
+
+
+def format_literal(term: Literal) -> str:
+    """Convert a rdflib Literal into the format used by SaGe.
+
+    Argument: The rdflib Literal to convert.
+
+    Returns: The RDF Literal in Sage text format.
+    """
+    lang = term.language
+    dtype = term.datatype
+    lit = str(term)
+    if lang is not None or dtype is not None:
+        return term.n3()
+    if re.fullmatch(r_integer, lit):
+        dtype = XSD.integer
+    elif re.fullmatch(r_decimal, lit):
+        dtype = XSD.decimal
+    elif re.fullmatch(r_double, lit):
+        dtype = XSD.double
+    elif re.fullmatch(r_boolean, lit):
+        dtype = XSD.boolean
+    return Literal(lit, lang, dtype).n3()
 
 
 def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
@@ -62,10 +92,12 @@ def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
 
     Returns: The RDF term in Sage text format.
     """
-    if type(term) is URIRef:
+    if isinstance(term, URIRef):
         return str(term)
-    elif type(term) is BNode:
+    elif isinstance(term, BNode):
         return '?v_' + str(term)
+    elif isinstance(term, Literal):
+        return format_literal(term)
     else:
         return term.n3()
 
@@ -146,7 +178,7 @@ def parse_filter_expr(expr: dict) -> str:
         raise UnsupportedSPARQL(f"Unsupported SPARQL FILTER expression: {expr.name}")
 
 
-def parse_query(query: str, dataset: Dataset, default_graph: str) -> Tuple[PreemptableIterator, dict]:
+def parse_query(query: str, dataset: Dataset, default_graph: str, context: dict) -> Tuple[PreemptableIterator, dict]:
     """Parse a read-only SPARQL query into a physical query execution plan.
 
     For parsing SPARQL UPDATE query, please refers to the `parse_update` method.
@@ -155,6 +187,7 @@ def parse_query(query: str, dataset: Dataset, default_graph: str) -> Tuple[Preem
       * query: SPARQL query to parse.
       * dataset: RDF dataset on which the query is executed.
       * default_graph: URI of the default graph.
+      * context: Information about the query execution.
 
     Returns: A tuple (`iterator`, `cardinalities`) where:
       * `iterator` is the root of a pipeline of iterators used to execute the query.
@@ -169,19 +202,20 @@ def parse_query(query: str, dataset: Dataset, default_graph: str) -> Tuple[Preem
     try:
         logical_plan = translateQuery(parseQuery(query)).algebra
         cardinalities = list()
-        iterator = parse_query_node(logical_plan, dataset, [default_graph], cardinalities, as_of=start_timestamp)
+        iterator = parse_query_node(logical_plan, dataset, [default_graph], context, cardinalities, as_of=start_timestamp)
         return iterator, cardinalities
     except ParseException:
-        return parse_update(query, dataset, default_graph, as_of=start_timestamp)
+        return parse_update(query, dataset, default_graph, context, as_of=start_timestamp)
 
 
-def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], cardinalities: dict, as_of: Optional[datetime] = None) -> PreemptableIterator:
+def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], context: dict, cardinalities: dict, as_of: Optional[datetime] = None) -> PreemptableIterator:
     """Recursively parse node in the query logical plan to build a preemptable physical query execution plan.
 
     Args:
       * node: Node of the logical plan to parse (in rdflib format).
       * dataset: RDF dataset used to execute the query.
       * current_graphs: List of IRI of the current RDF graphs queried.
+      * context: Information about the query execution.
       * cardinalities: A dict used to track triple patterns cardinalities.
       * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
 
@@ -194,30 +228,30 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], ca
         graphs = current_graphs
         if node.datasetClause is not None:
             graphs = [format_term(graph_iri.default) for graph_iri in node.datasetClause]
-        return parse_query_node(node.p, dataset, graphs, cardinalities, as_of=as_of)
+        return parse_query_node(node.p, dataset, graphs, context, cardinalities, as_of=as_of)
     elif node.name == 'Project':
         query_vars = list(map(lambda t: '?' + str(t), node.PV))
-        child = parse_query_node(node.p, dataset, current_graphs, cardinalities, as_of=as_of)
+        child = parse_query_node(node.p, dataset, current_graphs, context, cardinalities, as_of=as_of)
         return ProjectionIterator(child, query_vars)
     elif node.name == 'BGP':
         # bgp_vars = node._vars
         triples = list(localize_triples(node.triples, current_graphs))
-        iterator, query_vars, c = build_left_join_tree(triples, dataset, current_graphs, as_of=as_of)
+        iterator, query_vars, c = build_left_join_tree(triples, dataset, current_graphs, context, as_of=as_of)
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator
     elif node.name == 'Union':
-        left = parse_query_node(node.p1, dataset, current_graphs, cardinalities, as_of=as_of)
-        right = parse_query_node(node.p2, dataset, current_graphs, cardinalities, as_of=as_of)
-        return BagUnionIterator(left, right)
+        left = parse_query_node(node.p1, dataset, current_graphs, context, cardinalities, as_of=as_of)
+        right = parse_query_node(node.p2, dataset, current_graphs, context, cardinalities, as_of=as_of)
+        return BagUnionIterator(left, right, context)
     elif node.name == 'Filter':
         expression = parse_filter_expr(node.expr)
-        iterator = parse_query_node(node.p, dataset, current_graphs, cardinalities, as_of=as_of)
-        return FilterIterator(iterator, expression)
+        iterator = parse_query_node(node.p, dataset, current_graphs, context, cardinalities, as_of=as_of)
+        return FilterIterator(iterator, expression, context)
     elif node.name == 'Join':
         # only allow for joining BGPs from different GRAPH clauses
         triples = get_triples_from_graph(node.p1, current_graphs) + get_triples_from_graph(node.p2, current_graphs)
-        iterator, query_vars, c = build_left_join_tree(triples, dataset, current_graphs)
+        iterator, query_vars, c = build_left_join_tree(triples, dataset, current_graphs, context)
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator
@@ -225,7 +259,7 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], ca
         raise UnsupportedSPARQL(f"Unsupported SPARQL feature: {node.name}")
 
 
-def parse_update(query: dict, dataset: Dataset, default_graph: str, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, dict]:
+def parse_update(query: dict, dataset: Dataset, default_graph: str, context: dict, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, dict]:
     """Parse a SPARQL UPDATE query into a physical query execution plan.
 
     For parsing classic SPARQL query, please refers to the `parse_query` method.
@@ -234,6 +268,7 @@ def parse_update(query: dict, dataset: Dataset, default_graph: str, as_of: Optio
       * query: SPARQL query to parse.
       * dataset: RDF dataset on which the query is executed.
       * default_graph: URI of the default graph.
+      * context: Information about the query execution.
       * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
 
     Returns: A tuple (`iterator`, `cardinalities`) where:
@@ -270,7 +305,7 @@ def parse_update(query: dict, dataset: Dataset, default_graph: str, as_of: Optio
         if consistency_level == "serializable":
             # build the read iterator
             cardinalities = list()
-            read_iterator = parse_query_node(where_root, dataset, [default_graph], cardinalities, as_of=as_of)
+            read_iterator = parse_query_node(where_root, dataset, [default_graph], context, cardinalities, as_of=as_of)
             # get the delete and/or insert templates
             delete_templates = list()
             insert_templates = list()

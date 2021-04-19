@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "sage-engine"
-version = "2.2.0"
-description = "Sage: a SPARQL query engine for public Linked Data providers"
+version = "2.3.0"
+description = "Sage: a preemptive SPARQL query engine for online Knowledge Graphs"
 repository = "https://github.com/sage-org/sage-engine"
-authors = [ "Thomas Minier <tminier01@gmail.com>" ]
+authors = [ "Thomas Minier <tminier01@gmail.com>",
+	"Julien Aimonier-Davat <julien.aimonier-davat@univ-nantes.fr>",
+	"Pascal Molli <pascal.molli@univ-nantes.fr>",
+	"Hala Skaf <hala.skaf@univ-nantes.fr>" ]
 keywords = [ "rdf", "sparql", "query engine" ]
 classifiers = [
   "Topic :: Database :: Database Engines/Servers",
@@ -20,35 +23,46 @@ exclude = [ "tests" ]
 
 [tool.poetry.scripts]
 sage = "sage.cli.http_server:start_sage_server"
+sage-query = "sage.cli.commons:sage_query"
+sage-debug= "sage.cli.debug:sage_query_debug"
 sage-grpc = "sage.cli.grpc_server:start_grpc_server"
 sage-postgres-init = "sage.cli.postgres:init_postgres"
 sage-postgres-index = "sage.cli.postgres:index_postgres"
 sage-postgres-put = "sage.cli.postgres:put_postgres"
+sage-sqlite-init = "sage.cli.sqlite:init_sqlite"
+sage-sqlite-index = "sage.cli.sqlite:index_sqlite"
+sage-sqlite-put = "sage.cli.sqlite:put_sqlite"
+sage-hbase-init = "sage.cli.hbase:init_hbase"
+sage-hbase-put = "sage.cli.hbase:put_hbase"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-uvloop = "0.14.0"
-PyYAML = "5.1.2"
-rdflib = "4.2.2"
-rdflib-jsonld = "0.4.0"
-protobuf = "3.11.0"
-click = "7.0"
-fastapi = "0.44.1"
-uvicorn = "0.10.8"
-grpcio = "^1.26"
+uvloop = "0.15.2"
+PyYAML = "5.4.1"
+rdflib = "5.0.0"
+rdflib-jsonld = "0.5.0"
+protobuf = "3.15.7"
+click = "7.1.2"
+fastapi = "0.63.0"
+uvicorn = "0.13.4"
+grpcio = "^1.36"
+coloredlogs="15.0"
+pylru="^1.0"
 # optional dependencies
 pybind11 = { version = "2.2.4", optional = true }
 hdt = { version = "2.3", optional = true }
-psycopg2-binary = { version = "2.7.7", optional = true }
+psycopg2-binary = { version = "2.8.6", optional = true }
+happybase = { version = "1.2.0", optional = true }
 
 [tool.poetry.extras]
 hdt = ["pybind11", "hdt"]
 postgres = ["psycopg2-binary"]
+hbase = ["happybase"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.3"
-pytest-asyncio = "^0.10.0"
-requests = "^2.22"
+pytest = "^6.2"
+pytest-asyncio = "^O.14"
+requests = "^2.25"
 sphinx = "^2.3"
 sphinx_rtd_theme = "^0.4.3"
 

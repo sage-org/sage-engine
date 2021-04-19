@@ -10,7 +10,7 @@ from sage.database.db_iterator import DBIterator
 
 class Graph(object):
     """A RDF Graph with a dedicated backend used to search/store RDF triples.
-    
+
     Args:
       * uri: URI of the RDF Graph.
       * name: Name of the RDF Graph.
@@ -30,7 +30,7 @@ class Graph(object):
         self._quantum = quantum
         self._max_results = max_results
         self._example_queries = default_queries
-    
+
     @property
     def uri(self) -> str:
         return self._uri
@@ -72,7 +72,7 @@ class Graph(object):
           * object: Object of the triple pattern.
           * last_read: A RDF triple ID. When set, the search is resumed for this RDF triple.
           * as_of: A version timestamp. When set, perform all reads against a consistent snapshot represented by this timestamp.
-          
+
         Returns:
           A tuple (`iterator`, `cardinality`), where `iterator` is a Python iterator over RDF triples matching the given triples pattern, and `cardinality` is the estimated cardinality of the triple pattern.
 
@@ -86,7 +86,7 @@ class Graph(object):
 
     def insert(self, subject: str, predicate: str, obj: str):
         """Insert a RDF triple into the RDF graph.
-        
+
         Args:
           * subject: Subject of the RDF triple.
           * predicate: Predicate of the RDF triple.
@@ -96,7 +96,7 @@ class Graph(object):
 
     def delete(self, subject: str, predicate: str, obj: str):
         """Delete a RDF triple from the RDF graph.
-        
+
         Args:
           * subject: Subject of the RDF triple.
           * predicate: Predicate of the RDF triple.
