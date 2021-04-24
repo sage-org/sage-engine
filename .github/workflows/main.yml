@@ -1,4 +1,4 @@
-name: Python packaging 🐍
+name: 🚀 Publish on PyPi
 on:
   push:
     tags:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Build and Publish 📦 to PyPI
+    - name: Build and Publish to PyPI
       uses: JRubics/poetry-publish@v1
       with:
         pypi_token: ${{ secrets.PYPI_API_TOKEN }}
