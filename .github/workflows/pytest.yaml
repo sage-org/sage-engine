@@ -28,7 +28,7 @@ jobs:
         path: |
           tests/data/watdiv.10M.hdt
           tests/data/watdiv.10M.hdt.index.v1-1
-        key: ${{ runner.os }}-${{ hashFiles('tests/data/watdiv.10M.hdt') }}${{ hashFiles('tests/data/watdiv.10M.hdt.index.v1-1')
+        key: ${{ runner.os }}-${{ hashFiles('tests/data/watdiv.10M.hdt') }}-${{ hashFiles('tests/data/watdiv.10M.hdt.index.v1-1')}}
     - name: Install WatDiv dataset for tests
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
