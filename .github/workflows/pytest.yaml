@@ -5,12 +5,13 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  doc:
+  pytest:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.7]
         poetry-version: [1.1.6]
+        pytest-version: [6.2.3]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }} 🐍
@@ -41,5 +42,7 @@ jobs:
       run: pip install pybind11
     - name: Install project
       run: poetry install --extras "hdt postgres"
+    - name: Install pytest ${{ matrix.pytest-version }}
+      run: peotry add pytest@${{ matrix.pytest-version }}
     - name: Run tests
       run: pytest --ignore=tests/database/postgre_backend_test.py
