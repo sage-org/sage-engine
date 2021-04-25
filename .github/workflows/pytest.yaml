@@ -43,6 +43,6 @@ jobs:
     - name: Install project
       run: poetry install --extras "hdt postgres"
     - name: Install pytest ${{ matrix.pytest-version }}
-      run: peotry add pytest@${{ matrix.pytest-version }}
+      run: poetry add pytest@${{ matrix.pytest-version }}
     - name: Run tests
       run: pytest --ignore=tests/database/postgre_backend_test.py
