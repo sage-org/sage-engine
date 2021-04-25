@@ -1,0 +1,45 @@
+name: 🔎 Tests
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+        poetry-version: [1.1.6]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} 🐍
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup poetry
+      uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: ${{ matrix.poetry-version }}
+    - name: Cache WatDiv dataset
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: |
+          tests/data/watdiv.10M.hdt
+          tests/data/watdiv.10M.hdt.index.v1-1
+        key: ${{ runner.os }}-${{ hashFiles('tests/data/watdiv.10M.hdt') }}${{ hashFiles('tests/data/watdiv.10M.hdt.index.v1-1')
+    - name: Install WatDiv dataset for tests
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        wget -O watdiv.10M.hdt ${{ secrets.WATDIV_LINK }}
+        wget -O watdiv.10M.hdt.index.v1-1 ${{ secrets.WATDIV_INDEX_LINK }}
+        cp watdiv.10M.hdt tests/data/watdiv.10M.hdt
+        cp watdiv.10M.hdt.index.v1-1 tests/data/watdiv.10M.hdt.index.v1-1
+    # pybind11 is required for the hdt backend
+    - name: Install pybind11
+      run: pip install pybind11
+    - name: Install project
+      run: poetry install --extras "hdt postgres"
+    - name: Run tests
+      run: pytest --ignore=tests/database/postgre_backend_test.py
