@@ -22,16 +22,16 @@ jobs:
       uses: abatilo/actions-poetry@v2.0.0
       with:
         poetry-version: ${{ matrix.poetry-version }}
-    - name: Cache WatDiv dataset
-      uses: actions/cache@v2
-      id: cache
-      with:
-        path: |
-          tests/data/watdiv.10M.hdt
-          tests/data/watdiv.10M.hdt.index.v1-1
-        key: ${{ runner.os }}-${{ hashFiles('tests/data/watdiv.10M.hdt') }}-${{ hashFiles('tests/data/watdiv.10M.hdt.index.v1-1')}}
+    # - name: Cache WatDiv dataset
+    #   uses: actions/cache@v2
+    #   id: cache
+    #   with:
+    #     path: |
+    #       tests/data/watdiv.10M.hdt
+    #       tests/data/watdiv.10M.hdt.index.v1-1
+    #     key: ${{ runner.os }}-${{ hashFiles('tests/data/watdiv.10M.hdt') }}-${{ hashFiles('tests/data/watdiv.10M.hdt.index.v1-1')}}
     - name: Install WatDiv dataset for tests
-      if: steps.cache.outputs.cache-hit != 'true'
+      # if: steps.cache.outputs.cache-hit != 'true'
       run: |
         wget -O watdiv.10M.hdt ${{ secrets.WATDIV_LINK }}
         wget -O watdiv.10M.hdt.index.v1-1 ${{ secrets.WATDIV_INDEX_LINK }}
