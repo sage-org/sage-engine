@@ -1,7 +1,6 @@
 # hdt_file_connector.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from typing import Dict, Tuple
-
 from hdt import TripleIterator
 
 from sage.database.db_iterator import DBIterator
@@ -9,7 +8,7 @@ from sage.database.db_iterator import DBIterator
 
 class HDTIterator(DBIterator):
     """An HDTIterator implements a DBIterator for scanning RDF triples in a HDT file.
-    
+
     Args:
       * source: HDT iterator which scans for RDF triples from a HDT file.
       * pattern: Triple pattern scanned.
@@ -26,8 +25,11 @@ class HDTIterator(DBIterator):
         return str(self._source.nb_reads + self._start_offset)
 
     def next(self) -> Tuple[str, str, str]:
-        """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
-        return next(self._source)
+        """Return the next solution mapping or None if there are no more solutions"""
+        try:
+            return next(self._source)
+        except StopIteration:
+            return None
 
     def has_next(self) -> bool:
         """Return True if there is still results to read, and False otherwise"""

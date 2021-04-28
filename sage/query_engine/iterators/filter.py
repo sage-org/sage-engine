@@ -9,14 +9,13 @@ from rdflib.plugins.sparql.sparql import Bindings, QueryContext
 from rdflib.util import from_n3
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.primitives import PreemptiveLoop
 from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 
 
 def to_rdflib_term(value: str) -> Union[Literal, URIRef, Variable]:
     """Convert a N3 term to a RDFLib Term.
-    
+
     Argument: A RDF Term in N3 format.
 
     Returns: The RDF Term in rdflib format.
@@ -31,18 +30,17 @@ def to_rdflib_term(value: str) -> Union[Literal, URIRef, Variable]:
 
 class FilterIterator(PreemptableIterator):
     """A FilterIterator evaluates a FILTER clause in a pipeline of iterators.
-    
+
     Args:
       * source: Previous iterator in the pipeline.
       * expression: A SPARQL FILTER expression.
-      * mu: Last set of mappings read by the iterator.
+      * context: Information about the query execution.
     """
 
-    def __init__(self, source: PreemptableIterator, expression: str, mu: Optional[Dict[str, str]] = None):
+    def __init__(self, source: PreemptableIterator, expression: str, context: dict):
         super(FilterIterator, self).__init__()
         self._source = source
         self._raw_expression = expression
-        self._mu = mu
         # compile the expression using rdflib
         compiled_expr = parseQuery(f"SELECT * WHERE {{?s ?p ?o . FILTER({expression})}}")
         compiled_expr = translateQuery(compiled_expr)
@@ -58,7 +56,7 @@ class FilterIterator(PreemptableIterator):
 
     def _evaluate(self, bindings: Dict[str, str]) -> bool:
         """Evaluate the FILTER expression with a set mappings.
-        
+
         Argument: A set of solution mappings.
 
         Returns: The outcome of evaluating the SPARQL FILTER on the input set of solution mappings.
@@ -69,33 +67,28 @@ class FilterIterator(PreemptableIterator):
         context.prologue = self._prologue
         return self._compiled_expression.eval(context)
 
+    def next_stage(self, mappings: Dict[str, str]):
+        """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
+        self._source.next_stage(mappings)
+
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
-        This function may contains `non interruptible` clauses which must 
+        This function may contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
-
-        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
         """
         if not self.has_next():
-            raise StopAsyncIteration()
-        if self._mu is None:
-            self._mu = await self._source.next()
-        with PreemptiveLoop() as loop:
-            while not self._evaluate(self._mu):
-                self._mu = await self._source.next()
-                await loop.tick()
-        if not self.has_next():
-            raise StopAsyncIteration()
-        mu = self._mu
-        self._mu = None
+            return None
+        mu = await self._source.next()
+        while mu is None or not self._evaluate(mu):
+            mu = await self._source.next()
         return mu
 
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
-        return self._mu is not None or self._source.has_next()
+        return self._source.has_next()
 
     def save(self) -> SavedFilterIterator:
         """Save and serialize the iterator as a Protobuf message"""
@@ -103,6 +96,4 @@ class FilterIterator(PreemptableIterator):
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_filter, source_field).CopyFrom(self._source.save())
         saved_filter.expression = self._raw_expression
-        if self._mu is not None:
-            pyDict_to_protoDict(self._mu, saved_filter.mu)
         return saved_filter

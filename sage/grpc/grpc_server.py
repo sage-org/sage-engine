@@ -22,7 +22,7 @@ from sage.query_engine.sage_engine import SageEngine
 
 def create_bindings(bindings: List[Dict[str, str]]) -> Iterable[BindingSet]:
   """Create an iterator that converts a set of dict-based bindings to a set of protobuf-based bindings.
-  
+
   Argument: List of solutions bindings, encoded as dictionaries.
 
   Yields: Set of solutions bindings, encoded in a Protobuf format.
@@ -36,7 +36,7 @@ def create_bindings(bindings: List[Dict[str, str]]) -> Iterable[BindingSet]:
 
 class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
   """A SageQueryService implements a gRPC service that evaluates SPARQL queries using Web preemption
-  
+
   Argument: RDF dataset hosted by the gRPC server.
   """
 
@@ -44,7 +44,7 @@ class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
     super(SageQueryService).__init__()
     self._dataset = dataset
     self._engine = SageEngine()
-  
+
   def Query(self, request: SageQuery, context: grpc.ServicerContext) -> SageResponse:
     graph: Graph = None
     try:
@@ -55,6 +55,11 @@ class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
         context.abort(code=404, details=f"RDF Graph {graph_name} not found on the server.")
       graph = self._dataset.get_graph(graph_name)
 
+      # query execution context
+      query_exec_context = dict()
+      query_exec_context['quantum'] = graph.quota
+      query_exec_context['max_results'] = graph.max_results
+
       # decode next_link or build query execution plan
       cardinalities = dict()
       start = time()
@@ -63,16 +68,14 @@ class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
             saved_plan = next_link
         else:
             saved_plan = self._dataset.statefull_manager.get_plan(next_link)
-        plan = load(decode_saved_plan(saved_plan), self._dataset)
+        plan = load(decode_saved_plan(saved_plan), self._dataset, query_exec_context)
       else:
-        plan, cardinalities = parse_query(query, self._dataset, graph_name)
+        plan, cardinalities = parse_query(query, self._dataset, graph_name, query_exec_context)
       loading_time = (time() - start) * 1000
 
       # execute query
       engine = SageEngine()
-      quota = graph.quota / 1000
-      max_results = graph.max_results
-      bindings, saved_plan, is_done, abort_reason = run(engine.execute(plan, quota, max_results))
+      bindings, saved_plan, is_done, abort_reason = run(engine.execute(plan, query_exec_context))
 
       # commit or abort (if necessary)
       if abort_reason is not None:
@@ -109,12 +112,12 @@ class SageQueryService(service_pb2_grpc.SageSPARQLServicer):
 
 def get_server(config_file: str, port=8000, workers=10) -> grpc.Server:
   """Create a SaGe SPARQL query server powered by gRPC.
-  
+
   Args:
     * config_file: Path to the SaGe configuration file, in YAML format.
     * port: Host port to run the gRPC server.
     * workers: Number of thread workers used by the gRPC server.
-  
+
   Returns:
     A SaGe gRPC server built from the input configuration file.
   """
@@ -125,6 +128,6 @@ def get_server(config_file: str, port=8000, workers=10) -> grpc.Server:
 
   server = grpc.server(ThreadPoolExecutor(max_workers=10))
   service_pb2_grpc.add_SageSPARQLServicer_to_server(service, server)
-  
+
   server.add_insecure_port(f'[::]:{port}')
   return server

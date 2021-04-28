@@ -3,9 +3,9 @@
 from typing import Optional
 
 
-def is_var(term: Optional[str]) -> bool:
+def is_var(term) -> bool:
     """Test if a RDF term is a SPARQL variable.
-    
+
     Argument: A RDF term to test.
 
     Returns: True if the RDF term is a SPARQL variable, False otherwise.
@@ -13,19 +13,19 @@ def is_var(term: Optional[str]) -> bool:
     return term is None or term.startswith("?")
 
 
-def get_kind(subj: Optional[str], pred: Optional[str], obj: Optional[str]) -> str:
+def get_kind(subj, pred, obj):
     """Get the type of a triple pattern.
-    
+
     Possible types: ???, sp?, ?po, s?o, ?p?, s??, ??o and spo
 
     Args:
       * subject: Subject of the triple pattern.
       * predicate: Predicate of the triple pattern.
       * obj: Object of the triple pattern.
-    
+
     Returns:
         The type of the input triple pattern.
-    
+
     Example:
       >>> print(get_kind(None, 'http://xmlns.com/foaf/0.1/', '"Bob"@en'))
       "?po"

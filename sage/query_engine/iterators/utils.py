@@ -11,7 +11,7 @@ class EmptyIterator(object):
 
     def __len__(self) -> int:
         return 0
-    
+
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
         return False
@@ -19,15 +19,13 @@ class EmptyIterator(object):
     async def next(self) -> None:
         """Get the next item from the iterator, following the iterator protocol.
 
-        This function may contains `non interruptible` clauses which must 
+        This function may contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
-
-        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
         """
-        raise StopAsyncIteration()
-    
+        return  None
+
 
 
 class ArrayIterator(object):
@@ -44,32 +42,30 @@ class ArrayIterator(object):
         """Return True if the iterator has more item to yield"""
         return len(self._array) > 0
 
-    def next(self) -> Optional[Dict[str, str]]:
+    async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
-        This function may contains `non interruptible` clauses which must 
+        This function may contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
-
-        Throws: `StopAsyncIteration` if the iterator cannot produce more items.
         """
         if not self.has_next():
-            raise StopAsyncIteration()
+            return None
         mu = self._array.pop(0)
         return mu
 
 
 def selection(triple: Tuple[str, str, str], variables: List[str]) -> Dict[str, str]:
     """Apply a selection on a RDF triple, producing a set of solution mappings.
-    
+
     Args:
       * triple: RDF triple on which the selection is applied.
       * variables: Input variables of the selection.
-    
+
     Returns:
       A set of solution mappings built from the selection results.
-    
+
     Example:
       >>> triple = (":Ann", "foaf:knows", ":Bob")
       >>> variables = ["?s", None, "?knows"]
@@ -88,14 +84,14 @@ def selection(triple: Tuple[str, str, str], variables: List[str]) -> Dict[str, s
 
 def find_in_mappings(variable: str, mappings: Dict[str, str] = dict()) -> str:
     """Find a substitution for a SPARQL variable in a set of solution mappings.
-    
+
     Args:
       * variable: SPARQL variable to look for.
       * bindings: Set of solution mappings to search in.
 
     Returns:
       The value that can be substituted for this variable.
-    
+
     Example:
       >>> mappings = { "?s": ":Ann", "?knows": ":Bob" }
       >>> find_in_mappings("?s", mappings)
@@ -110,7 +106,7 @@ def find_in_mappings(variable: str, mappings: Dict[str, str] = dict()) -> str:
 
 def vars_positions(subject: str, predicate: str, obj: str) -> List[str]:
     """Find the positions of SPARQL variables in a triple pattern.
-    
+
     Args:
       * subject: Subject of the triple pattern.
       * predicate: Predicate of the triple pattern.
@@ -130,7 +126,7 @@ def vars_positions(subject: str, predicate: str, obj: str) -> List[str]:
 
 def tuple_to_triple(s: str, p: str, o: str) -> Dict[str, str]:
     """Convert a tuple-based triple pattern into a dict-based triple pattern.
-    
+
     Args:
       * s: Subject of the triple pattern.
       * p: Predicate of the triple pattern.
@@ -138,7 +134,7 @@ def tuple_to_triple(s: str, p: str, o: str) -> Dict[str, str]:
 
     Returns:
       The triple pattern as a dictionnary.
-    
+
     Example:
       >>> tuple_to_triple("?s", "foaf:knows", ":Bob")
       { "subject": "?s", "predicate": "foaf:knows", "object": "Bob" }

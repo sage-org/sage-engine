@@ -24,10 +24,11 @@ innerTriple = {
 
 @pytest.mark.asyncio
 async def test_nlj_read():
-    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
-    scan = ScanIterator(iterator, triple, card)
-    join = IndexJoinIterator(scan, innerTriple, hdtDoc)
-    (results, saved, done, _) = await engine.execute(join, 10e7)
+    context = { 'quantum': 10e7, 'max_results': 10e7 }
+    left_scan = ScanIterator(hdtDoc, triple, context)
+    right_scan = ScanIterator(hdtDoc, innerTriple, context)
+    join = IndexJoinIterator(left_scan, right_scan, context)
+    (results, saved, done, _) = await engine.execute(join, context)
     assert len(results) == 20
     for res in results:
         assert '?s1' in res and '?s2' in res and '?common' in res
@@ -36,8 +37,9 @@ async def test_nlj_read():
 
 @pytest.mark.asyncio
 async def test_nlj_interrupt():
-    iterator, card = hdtDoc.search(triple['subject'], triple['predicate'], triple['object'])
-    scan = ScanIterator(iterator, triple, card)
-    join = IndexJoinIterator(scan, innerTriple, hdtDoc)
-    (results, saved, done, _) = await engine.execute(join, 10e-5)
+    context = { 'quantum': 10e7, 'max_results': 10e-5 }
+    left_scan = ScanIterator(hdtDoc, triple, context)
+    right_scan = ScanIterator(hdtDoc, innerTriple, context)
+    join = IndexJoinIterator(left_scan, right_scan, context)
+    (results, saved, done, _) = await engine.execute(join, context)
     assert len(results) <= 20

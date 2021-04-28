@@ -85,7 +85,7 @@ class Dataset(object):
 
     def get_graph(self, graph_uri: str) -> Optional[Graph]:
         """Get a RDF graph given its URI, otherwise returns None.
-          
+
         Args:
           * graph_uri: URI of the RDF graph to access.
 
@@ -96,7 +96,7 @@ class Dataset(object):
 
     def has_graph(self, graph_uri: str) -> bool:
         """Test if a RDF graph exists in the RDF dataset.
-        
+
         Args:
           * graph_uri: URI of the RDF graph to access.
 

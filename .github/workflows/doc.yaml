@@ -1,0 +1,34 @@
+name: 🚀 Deploy documentation
+on:
+  release:
+    types: [created]
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+        poetry-version: [1.1.6]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} 🐍
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup poetry
+      uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: ${{ matrix.poetry-version }}
+    # pybind11 is required for the hdt backend
+    - name: Install pybind11
+      run: pip install pybind11
+    - name: Install project
+      run: poetry install --extras "hdt postgres"
+    - name: Build documentation
+      run: |
+        cd docs && make html
+    - name: Deploy documentation to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/build/html
