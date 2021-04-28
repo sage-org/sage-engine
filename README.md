@@ -81,10 +81,10 @@ graphs:
 The `quota` and `max_results` fields are used to set the maximum time quantum and the maximum number of results
 allowed per request, respectively.
 
-Each entry in the `datasets` field declare a RDF dataset with a name, description, backend and options specific to this backend.
+Each entry in the `graphs` field declare a RDF dataset with a name, description, backend and options specific to this backend.
 Different backends are available:
 - the `hdt-file` backend allows a SaGe server to load RDF datasets from [HDT files](http://www.rdfhdt.org/). SaGe uses [pyHDT](https://github.com/Callidon/pyHDT) to load and query HDT files.
-- the `postgres` backend allows a SaGe server to create, query and update RDF datasets stored in [PostgreSQL](https://www.postgresql.org/). Each dataset is stored in a table composed of 3 columns; S (subject), P (predicate) and O (object). Tables are created with B-Tree indexes on SPO, POS and OSP. SaGe uses [psycopg2](https://pypi.org/project/psycopg2/) to interact with PostgreSQL.
+- the `postgres` backend allows a SaGe server to create, query and update RDF datasets stored in [PostgreSQL](https://www.postgresql.org/). Each dataset is stored in a single table composed of 3 columns; S (subject), P (predicate) and O (object). Tables are created with B-Tree indexes on SPO, POS and OSP. SaGe uses [psycopg2](https://pypi.org/project/psycopg2/) to interact with PostgreSQL.
 - the `postgres-catalog` backend uses a different schema than `postgres` to store datasets. Triples terms are mapped to unique identifiers and a dictionary table that is common to all datasets is used to map RDF terms with their identifiers. This schema allows to reduce the space required to store datasets.
 - the `sqlite` backend allows a SaGe server to create, query and update RDF datasets stored in [SQLite](https://docs.python.org/3/library/sqlite3.html). Datasets are stored using the same schema as the `postgres` backend.
 - the `sqlite-catalog` is another backend for SQLite that uses a dictionary based schema as the `postgres-catalog` backend.
@@ -99,7 +99,7 @@ To ensure stable performance when using PostgreSQL with SaGe, PostgreSQL needs t
 - Set *enable_indexscan*, *enable_indexonlyscan* and *enable_nestloop* to **on**
 - Set all the other enable_XYZ options to **off**
 
-These changes force the PostgreSQL query optimizer to generate the desired query plan for SaGe resume queries.
+These changes force the PostgreSQL query optimizer to generate the desired query plan for the SaGe resume queries.
 
 ## Data ingestion
 
@@ -112,7 +112,7 @@ To load a N-Triples file using one of the `postgres`, `postgres-catalog`, `hbase
 ```yaml
 quota: 75
 max_results: 10000
-datasets:
+graphs:
 -
   name: my_dataset
   uri: http://example.org/my_dataset
