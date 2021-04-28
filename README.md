@@ -18,6 +18,8 @@ We appreciate your feedback/comments/questions to be sent to our [mailing list](
 * [Installation](#installation)
 * [Getting started](#getting-started)
   * [Server configuration](#server-configuration)
+  * [PostgreSQL configuration](#postgresql-configuration)
+  * [Data ingestion](#data-ingestion)
   * [Starting the server](#starting-the-server)
 * [Sage Docker image](#sage-docker-image)
 * [Command line utilities](#command-line-utilities)
@@ -39,10 +41,10 @@ Requirements:
 
 The core engine of the SaGe SPARQL query server with [HDT](http://www.rdfhdt.org/) as a backend can be installed as follows:
 ```bash
-pip install sage-engine[hdt,postgres]
+pip install sage-engine[hdt,postgres,hbase]
 ```
 The SaGe query engine uses various **backends** to load RDF datasets.
-The various backends available are installed as extras dependencies. The above command install both the HDT and PostgreSQL backends.
+The various backends available are installed as extras dependencies. The above command install both the HDT, the PostgreSQL and the HBase backends.
 
 ## Manual Installation using poetry
 
@@ -50,7 +52,7 @@ The SaGe SPARQL query server can also be manually installed using the [poetry](h
 ```bash
 git clone https://github.com/sage-org/sage-engine
 cd sage-engine
-poetry install --extras "hdt postgres"
+poetry install --extras "hdt postgres hbase"
 ```
 As with pip, the various SaGe backends are installed as extras dependencies, using the  `--extras` flag.
 
@@ -58,9 +60,9 @@ As with pip, the various SaGe backends are installed as extras dependencies, usi
 
 ## Server configuration
 
-A Sage server is configured using a configuration file in [YAML syntax](http://yaml.org/).
-You will find below a minimal working example of such configuration file.
-A full example is available [in the `config_examples/` directory](https://github.com/sage-org/sage-engine/blob/master/config_examples/example.yaml)
+A SaGe server is configured using a configuration file in [YAML syntax](http://yaml.org/).
+You will find below a minimal working example of such a configuration file.
+Full examples are available [in the `config_examples/` directory](https://github.com/sage-org/sage-engine/blob/master/config_examples/example.yaml)
 
 ```yaml
 name: SaGe Test server
@@ -80,11 +82,80 @@ The `quota` and `max_results` fields are used to set the maximum time quantum an
 allowed per request, respectively.
 
 Each entry in the `datasets` field declare a RDF dataset with a name, description, backend and options specific to this backend.
-Currently, **only** the `hdt-file` backend is supported, which allow a Sage server to load RDF datasets from [HDT files](http://www.rdfhdt.org/). Sage uses [pyHDT](https://github.com/Callidon/pyHDT) to load and query HDT files.
+Different backends are available:
+- the `hdt-file` backend allows a SaGe server to load RDF datasets from [HDT files](http://www.rdfhdt.org/). SaGe uses [pyHDT](https://github.com/Callidon/pyHDT) to load and query HDT files.
+- the `postgres` backend allows a SaGe server to create, query and update RDF datasets stored in [PostgreSQL](https://www.postgresql.org/). Each dataset is stored in a table composed of 3 columns; S (subject), P (predicate) and O (object). Tables are created with B-Tree indexes on SPO, POS and OSP. SaGe uses [psycopg2](https://pypi.org/project/psycopg2/) to interact with PostgreSQL.
+- the `postgres-catalog` backend uses a different schema than `postgres` to store datasets. Triples terms are mapped to unique identifiers and a dictionary table that is common to all datasets is used to map RDF terms with their identifiers. This schema allows to reduce the space required to store datasets.
+- the `sqlite` backend allows a SaGe server to create, query and update RDF datasets stored in [SQLite](https://docs.python.org/3/library/sqlite3.html). Datasets are stored using the same schema as the `postgres` backend.
+- the `sqlite-catalog` is another backend for SQLite that uses a dictionary based schema as the `postgres-catalog` backend.
+- the `hbase` backend allows a SaGe server to create, query and update RDF datasets stored in [HBase](https://hbase.apache.org/). To have a sorted access on dataset triples, triples are inserted three times in three different tables using SPO, POS and OSP as triples keys. SaGe uses [happybase](https://happybase.readthedocs.io/en/latest/) to interact with HBase.
+
+## PostgreSQL configuration
+
+This section is optional and can be skipped if you don't use one of the PostgreSQL backends.
+
+To ensure stable performance when using PostgreSQL with SaGe, PostgreSQL needs to be configured. Open the file `postgresql.conf` in the PostgreSQL main directory and apply the following changes in the *Planner Method Configuration* section:
+- Uncomment all enable_XYZ options
+- Set *enable_indexscan*, *enable_indexonlyscan* and *enable_nestloop* to **on**
+- Set all the other enable_XYZ options to **off**
+
+These changes force the PostgreSQL query optimizer to generate the desired query plan for SaGe resume queries.
+
+## Data ingestion
+
+Different executables are available to load a RDF file depending on the backend you want to use.
+
+To load a dataset from a HDT file, just declare a new dataset in your configuration file using the `hdt-file` backend.
+
+To load a N-Triples file using one of the `postgres`, `postgres-catalog`, `hbase`, `sqlite` and `sqlite-catalog` backends, first declare a new dataset in your configuration file. For example, to load the file `my_dataset.nt` using the `sqlite` backend, we start by declaring a new dataset named `my_dataset` in our configuration file `my_config.yaml`.
+
+```yaml
+quota: 75
+max_results: 10000
+datasets:
+-
+  name: my_dataset
+  uri: http://example.org/my_dataset
+  backend: sqlite
+  database: sage-sqlite.db
+```
+
+For each backend, an example that illustrate how to declare a new dataset is available in the [`config_examples/`](https://github.com/sage-org/sage-engine/blob/master/config_examples/example.yaml) directory.
+
+To load a file into a dataset declared using one of the `SQLite` backends, use the following commands:
+
+```bash
+# Create the required SQLite tables to store the dataset
+sage-sqlite-init --no-index my_config.yaml my_dataset
+# Insert the RDF triples in SQLite
+sage-sqlite-put my_dataset.nt my_config.yaml my_dataset
+# Create the SPO, OSP and POS indexes
+sage-sqlite-index my_config.yaml my_dataset_name
+```
+
+To load a file into a dataset declared using one of the `PostgreSQL` backends, use the following commands:
+
+```bash
+# Create the required PostgreSQL tables to store the dataset
+sage-postgres-init --no-index my_config.yaml my_dataset
+# Insert the RDF triples in PostgreSQL
+sage-postgres-put my_dataset.nt my_config.yaml my_dataset
+# Create the SPO, OSP and POS indexes
+sage-postgres-index my_config.yaml my_dataset_name
+```
+
+To load a file into a dataset declared using the `hbase` backend, use the following commands:
+
+```bash
+# Create the required HBase tables to store the dataset
+sage-hbase-init my_config.yaml my_dataset
+# Insert the RDF triples in HBase
+sage-hbase-put my_dataset.nt my_config.yaml my_dataset
+```
 
 ## Starting the server
 
-The `sage` executable, installed alongside the Sage server, allows to easily start a Sage server from a configuration file using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
+The `sage` executable, installed alongside the SaGe server, allows to easily start a SaGe server from a configuration file using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
 
 ```bash
 # launch Sage server with 4 workers on port 8000

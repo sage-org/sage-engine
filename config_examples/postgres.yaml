@@ -21,10 +21,20 @@ graphs:
   # [OPTIONAL] Connection port number (defaults to 5432 if not provided)
   port: 5432
 -
+  name: catalog_bsbm1k
+  uri: http://example.org/catalog_bsbm1k
+  description: A dataset with serializable per row and no isolated reads
+  # Another backend for PostgreSQL that uses a dictionary based layout to reduce the space required to store RDF datasets
+  backend: postgres-catalog
+  dbname: sage
+  user: sage
+  password: ''
+-
   name: mvcc_bsbm1k
   uri: http://example.org/mvcc_bsbm1k
   description: A dataset with serializable per quantum and isolated reads
-  backend: postgres
-  dbname: minier-t
-  user: minier-t
+  # Another backend for PostgreSQL that uses a different layout to ensure isolated reads
+  backend: postgres-mvcc
+  dbname: sage
+  user: sage
   password: ''

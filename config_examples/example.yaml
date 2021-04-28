@@ -24,7 +24,7 @@ graphs:
   name: dbpedia
   uri: http://example.org/dbpedia
   description: The DBpedia dataset
-  # Type of backend (only hdt-file is available now)
+  # Type of backend
   backend: hdt-file
   # Path to the HDT file
   file: ./dbpedia.hdt

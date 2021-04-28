@@ -1,0 +1,20 @@
+name: SaGe server with PostgreSQL backend
+maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
+public_url: http://localhost:8000
+quota: 1000
+max_results: 2000
+graphs:
+-
+  name: bsbm1k
+  uri: http://example.org/bsbm1k
+  description: A dataset with serializable per row and no isolated reads
+  backend: sqlite
+  # Path to the SQLite database file (the file may not exist)
+  database: database_file
+-
+  name: catalog_bsbm1k
+  uri: http://example.org/catalog_bsbm1k
+  description: A dataset with serializable per row and no isolated reads
+  # Another backend for SQLite that uses a dictionary based layout to reduce the space required to store RDF datasets
+  backend: sqlite-catalog
+  database: ./sage-sqlite.db

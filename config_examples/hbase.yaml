@@ -1,0 +1,15 @@
+name: SaGe server with PostgreSQL backend
+maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
+public_url: http://localhost:8000
+quota: 1000
+max_results: 2000
+graphs:
+-
+  name: bsbm1k
+  uri: http://example.org/bsbm1k
+  description: A dataset with serializable per row and no isolated reads
+  backend: hbase
+  # Thrift server IP address. The thrift server is used by happybase to interact with HBase
+  thrift_host: thrift_server_ip
+  # [OPTIONAL] Connection port number (defaults to 9090 if not provided)
+  thrift_port: thrift_server_port
