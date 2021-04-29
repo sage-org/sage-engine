@@ -16,7 +16,7 @@ class SageClient(object):
       * options: An optional list of key-value pairs (channel args in gRPC Core runtime) to configure the channel.
       * credentials: A, optional ChannelCredentials instance. If set, the client will use a secure_channel for communicating with the server. Otherwise, it will use an insecure_channel.
       * compression: An optional value indicating the compression method to be used over the lifetime of the channel. This is an EXPERIMENTAL option.
-    
+
     Example:
       >>> with SageClient("localhost:8000") as client:
       >>>   sparql_query = "SELECT * WHERE { ?s ?p ?o }"
@@ -31,19 +31,19 @@ class SageClient(object):
       self._channel = grpc.insecure_channel(self._url, options=options, compression=compression)
     else:
       self._channel = grpc.secure_channel(self._url, self._credentials, options=options, compression=compression)
-  
+
   def __enter__(self):
     return self
 
   def __exit__(self, type, value, traceback):
     self.close()
-  
+
   def __del__(self):
     self.close()
-  
+
   def close(self) -> None:
     self._channel.close()
-  
+
   def query(self, sparql_query: str, default_graph_uri: str) -> Iterable[Dict[str, str]]:
     """
       Execute a SPARQL query using a SaGe gRPC-server.
@@ -61,7 +61,7 @@ class SageClient(object):
         >>>   print(bindings)
     """
     client = service_pb2_grpc.SageSPARQLStub(self._channel)
-    grpc_query = SageQuery(query = query, default_graph_uri = default_graph_uri)
+    grpc_query = SageQuery(query = sparql_query, default_graph_uri = default_graph_uri)
     is_done = False
     next_link = None
     while not is_done:
@@ -69,11 +69,10 @@ class SageClient(object):
       # prepare next query
       is_done = response.is_done
       next_link = response.next_link
-      grpc_query = SageQuery(query = query, default_graph_uri = default_graph_uri, next_link = next_link)
+      grpc_query = SageQuery(query = sparql_query, default_graph_uri = default_graph_uri, next_link = next_link)
       # yield solution mappings in dict format
       for binding in response.bindings:
         results = dict()
         for mu in binding.values:
           results[mu.variable] = mu.value
         yield results
-      

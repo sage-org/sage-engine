@@ -228,7 +228,7 @@ def put_postgres(config, graph_name, rdf_file, format, block_size, commit_thresh
             nonlocal to_commit, inserted, dropped
             insert_bucket(cursor, bucket, graph_name, backend, block_size, cache)
             to_commit = to_commit + len(bucket)
-            if to_commit >= commit_threshold and ignore_errors:
+            if to_commit >= commit_threshold:
                 connection.commit()
                 to_commit = 0
             inserted = inserted + len(bucket)

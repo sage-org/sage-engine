@@ -8,7 +8,7 @@ from psycopg2.extensions import ISOLATION_LEVEL_SERIALIZABLE
 
 class TransactionManager:
     """A TransactionManager handles transactions for a (MVCC-)PostgreSQL connector.
-    
+
     Args:
       * dbname: the database name.
       * user: user name used to authenticate.
