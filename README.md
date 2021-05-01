@@ -155,7 +155,7 @@ sage-hbase-put my_dataset.nt my_config.yaml my_dataset
 
 ## Starting the server
 
-The `sage` executable, installed alongside the SaGe server, allows to easily start a SaGe server from a configuration file using [Gunicorn](http://gunicorn.org/), a Python WSGI HTTP Server.
+The `sage` executable, installed alongside the SaGe server, allows to easily start a SaGe server from a configuration file using [Uvicorn](https://www.uvicorn.org/), a Python ASGI HTTP Server.
 
 ```bash
 # launch Sage server with 4 workers on port 8000
@@ -176,6 +176,8 @@ Options:
                                   info]
   --help                          Show this message and exit.
 ```
+
+Once started, you can interact with the SaGe server on http://localhost:8000/docs
 
 # SaGe Docker image
 
