@@ -4,7 +4,7 @@
 [Read the online documentation](https://sage-org.github.io/sage-engine/)
 
 SaGe is a SPARQL query engine for public Linked Data providers that implements *Web preemption*. The SPARQL engine includes a smart Sage client
-and a Sage SPARQL query server hosting RDF datasets (hosted using [HDT](http://www.rdfhdt.org/)).
+and a Sage SPARQL query server hosting RDF datasets using [HDT](http://www.rdfhdt.org/), [postgres](https://www.postgresql.org/), [sqlite](https://www.sqlite.org/), or [hbase](https://hbase.apache.org/)
 This repository contains the **Python implementation of the SaGe SPARQL query server**.
 
 SPARQL queries are suspended by the web server after a fixed quantum of time and resumed upon client request. Using Web preemption, Sage ensures stable response times for query execution and completeness of results under high load.
