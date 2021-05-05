@@ -25,10 +25,11 @@ class ScanIterator(PreemptableIterator):
       * current_mappings: The current mappings when the scan is performed.
       * mu: The last triple read when the preemption occured. This triple must be the next returned triple when the query is resumed.
       * last_read: An offset ID used to resume the ScanIterator.
+      * nb_read: Number of triples read so far.
       * as_of: Perform all reads against a consistent snapshot represented by a timestamp.
     """
 
-    def __init__(self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict, current_mappings: Optional[Dict[str, str]] = None, mu: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, as_of: Optional[datetime] = None):
+    def __init__(self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict, current_mappings: Optional[Dict[str, str]] = None, mu: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, nb_read: int = 0, as_of: Optional[datetime] = None):
         super(ScanIterator, self).__init__()
         self._connector = connector
         self._pattern = pattern
@@ -48,6 +49,7 @@ class ScanIterator(PreemptableIterator):
             it, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
             self._source = it
             self._cardinality = card
+        self._nb_read = nb_read
 
     def __len__(self) -> int:
         return self._cardinality
@@ -93,6 +95,7 @@ class ScanIterator(PreemptableIterator):
         else:
             triple = self._source.next()
             if triple is not None:
+                self._nb_read += 1
                 triple = selection(triple, self._variables)
             timestamp = (time() - self._context['start_timestamp']) * 1000
             if self._context['quantum'] <= timestamp:
@@ -111,6 +114,7 @@ class ScanIterator(PreemptableIterator):
         triple.graph = self._pattern['graph']
         saved_scan.pattern.CopyFrom(triple)
         saved_scan.cardinality = self._cardinality
+        saved_scan.nb_read = self._nb_read
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_scan.muc)
         saved_scan.last_read = self._source.last_read()
