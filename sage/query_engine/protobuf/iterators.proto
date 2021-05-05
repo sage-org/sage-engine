@@ -15,6 +15,7 @@ message SavedScanIterator {
   map<string, string> mu = 3;
   string last_read = 4;
   string timestamp = 5;
+  int64 cardinality = 6;
 }
 
 message SavedProjectionIterator {

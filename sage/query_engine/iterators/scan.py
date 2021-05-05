@@ -110,6 +110,7 @@ class ScanIterator(PreemptableIterator):
         triple.object = self._pattern['object']
         triple.graph = self._pattern['graph']
         saved_scan.pattern.CopyFrom(triple)
+        saved_scan.cardinality = self._cardinality
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_scan.muc)
         saved_scan.last_read = self._source.last_read()
