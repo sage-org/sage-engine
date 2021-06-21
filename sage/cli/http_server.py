@@ -6,6 +6,7 @@ from os import environ
 import click
 import uvicorn
 import uvloop
+import logging
 
 set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -15,7 +16,7 @@ set_event_loop_policy(uvloop.EventLoopPolicy())
 @click.option("-p", "--port", type=int, default=8000, show_default=True, help="The port to bind")
 @click.option("-w", "--workers", type=int, default=4, show_default=True, help="he number of server workers")
 @click.option('-h', "--host", type=str, default="0.0.0.0", show_default=True, help="Set the host address.")
-@click.option("--log-level", type=click.Choice(["debug", "info", "warning", "error"]), default="info", show_default=True, help="The granularity of log outputs")
+@click.option("--log-level", type=click.Choice(["debug", "info", "warning", "error"]), default="error", show_default=True, help="The granularity of log outputs")
 def start_sage_server(config, port, workers, host, log_level):
   """Launch the Sage server using the CONFIG configuration file"""
   environ['SAGE_CONFIG_FILE'] = config

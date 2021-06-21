@@ -14,9 +14,11 @@ message SavedScanIterator {
   map<string, string> muc = 2;
   map<string, string> mu = 3;
   string last_read = 4;
-  string timestamp = 5;
-  int64 cardinality = 6;
-  int64 nb_read = 7;
+  int64 end = 5;
+  string timestamp = 6;
+  int64 cardinality = 7;
+  int64 nb_read = 8;
+  map<string,string> pragma = 9;
 }
 
 message SavedProjectionIterator {

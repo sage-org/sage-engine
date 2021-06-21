@@ -29,3 +29,22 @@ def equality_variables(subject: str, predicate: str, obj: str) -> Tuple[str, Tup
     elif predicate == obj:
         return f"{predicate} = {obj + '__2'}", (subject, predicate, obj + '__2')
     return None, (subject, predicate, obj)
+
+import json
+def parse_pragma(query):
+    """
+    parse pragma in the comment of the first line of a query
+    and return the correponding dictionnary
+
+    example:
+    query='#pragma {"worker":3,"workerid":2,"pattern":"?x1 pred ?x2"}...'
+    """
+
+    pragmaprefix="#pragma"
+    line=query.partition('\n')[0]
+
+    if line.startswith(pragmaprefix):
+        pragma= json.loads(line[len(pragmaprefix):])
+        return pragma
+    else:
+        return None

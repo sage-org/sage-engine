@@ -170,6 +170,8 @@ def run_app(config_file: str) -> FastAPI:
     # set recursion depth (due to pyparsing issues)
     setrecursionlimit(3000)
 
+    logging.basicConfig(level=logging.ERROR)
+
     # create the HTTP server & activate CORS
     app = FastAPI()
     app.add_middleware(

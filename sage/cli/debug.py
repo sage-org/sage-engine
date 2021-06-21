@@ -30,22 +30,12 @@ from time import time
 coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
-
-#    (results, saved, done, _) = await engine.execute(scan, 10e7)
 async def execute(engine,iterator,limit):
-#    try:
-        while iterator.has_next():
-            value = await iterator.next()
-            print(value)
-#    except:
-#        print("error in debug/execute")
-
-    # try:
-    #     (results, saved, done, _) = await engine.execute(iterator, 10e7)
-    #     for r in results:
-    #         print(str(r))
-    # except StopAsyncIteration:
-    #     pass
+    i=0
+    while iterator.has_next() and i<limit:
+        value = await iterator.next()
+        print(value)
+        i=i+1
 
 
 @click.command()
@@ -93,6 +83,7 @@ def sage_query_debug(config_file, default_graph_uri, query, file, limit ):
     from time import time
     context['start_timestamp']=time()
     iterator,cards = parse_query(query, dataset, default_graph_uri,context)
+    print(f'Iterator: {iterator}')
     loop = asyncio.get_event_loop()
     loop.run_until_complete(execute(engine,iterator,limit))
     loop.close()

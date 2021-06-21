@@ -25,6 +25,8 @@ from sage.query_engine.update.insert import InsertOperator
 from sage.query_engine.update.serializable import SerializableUpdate
 from sage.query_engine.update.update_sequence import UpdateSequenceOperator
 
+from sage.query_engine.optimizer.utils import parse_pragma
+
 # enable Packrat optimization for the rdflib SPARQL parser
 pyparsing.ParserElement.enablePackrat()
 
@@ -200,9 +202,14 @@ def parse_query(query: str, dataset: Dataset, default_graph: str, context: dict)
     # rdflib has no tool for parsing both read and update query,
     # so we must rely on a try/catch dirty trick...
     try:
+        prg=parse_pragma(query)
+        if prg is not None:
+            print(f"pragma:{prg}")
+            context.update(prg)
         logical_plan = translateQuery(parseQuery(query)).algebra
         cardinalities = list()
         iterator = parse_query_node(logical_plan, dataset, [default_graph], context, cardinalities, as_of=start_timestamp)
+
         return iterator, cardinalities
     except ParseException:
         return parse_update(query, dataset, default_graph, context, as_of=start_timestamp)
@@ -218,6 +225,7 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], co
       * context: Information about the query execution.
       * cardinalities: A dict used to track triple patterns cardinalities.
       * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
+      * pragme: A set of directives to for parsing the query
 
     Returns: An iterator used to evaluate the input node.
 

@@ -10,7 +10,7 @@ from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.utils import selection, vars_positions
 from sage.query_engine.protobuf.iterators_pb2 import SavedScanIterator, TriplePattern
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
-from sage.query_engine.iterators.utils import find_in_mappings
+from sage.query_engine.iterators.utils import find_in_mappings,worker_range
 
 
 class ScanIterator(PreemptableIterator):
@@ -29,18 +29,44 @@ class ScanIterator(PreemptableIterator):
       * as_of: Perform all reads against a consistent snapshot represented by a timestamp.
     """
 
-    def __init__(self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict, current_mappings: Optional[Dict[str, str]] = None, mu: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, nb_read: int = 0, as_of: Optional[datetime] = None):
+    def __init__(self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict, current_mappings: Optional[Dict[str, str]] = None, mu: Optional[Dict[str, str]] = None, last_read: Optional[str] = None,end: Optional[str] = None, nb_read: int = 0, as_of: Optional[datetime] = None):
         super(ScanIterator, self).__init__()
         self._connector = connector
         self._pattern = pattern
+        self._pattern_str=pattern["subject"]+" "+pattern["predicate"]+" "+pattern["object"]
         self._context = context
+
         self._variables = vars_positions(pattern['subject'], pattern['predicate'], pattern['object'])
         self._current_mappings = current_mappings
         self._mu = mu
         self._last_read = last_read
         self._start_timestamp = as_of
+        self._end=None
+        self._end=end
+        self._nb_read = nb_read
+        self._pragma=None
+
+        self.init_scan(pattern,last_read,current_mappings,as_of)
+
+        if last_read is None: #not a resume
+            start,end=self.split_scan(self._pattern_str,self._cardinality,context)
+            if start>=0: # we have split
+                self._last_read=start
+                self._end=end
+                if start!=0:
+                    self.init_scan(pattern,start,current_mappings,as_of) #reset scan accordingly
+        else:
+            if "pattern" in self._context:
+                worker=context['worker']
+                workerid=context['workerid']
+                pattern=context['pattern']
+                self._pragma={"pattern":pattern, "worker":str(worker),"workerid":str(workerid)}
+
+
+
+    def init_scan(self,pattern,last_read,current_mappings,as_of):
         # Create an iterator on the database
-        if current_mappings is None:
+        if self._current_mappings is None:
             it, card = self._connector.search(pattern['subject'], pattern['predicate'], pattern['object'], last_read=last_read, as_of=as_of)
             self._source = it
             self._cardinality = card
@@ -49,7 +75,29 @@ class ScanIterator(PreemptableIterator):
             it, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
             self._source = it
             self._cardinality = card
-        self._nb_read = nb_read
+
+        # handling parallelization
+
+    def split_scan(self,pattern,card,context):
+        ## handle parallelization
+        # need to determine the range of the this scan if this scan is the split predicate.
+        # if split predicate, then determine start and end.
+        if 'pattern' not in context:
+            return -1,-1
+        if context['pattern']==pattern:
+            worker=int(context['worker'])
+            workerid=int(context['workerid'])
+            try:
+                start,end=worker_range(card,worker,workerid)
+            except Exception as err:
+                return -1,-1
+            self._pragma={"pattern":pattern, "worker":str(worker),"workerid":str(workerid)}
+            print(f'split {pattern} ({card}) in {worker} parts. For worker {workerid}: start:{start},end:{end}')
+            return start,end
+        else: #split not for this TP
+            #print(f"no split on {pattern}")
+            return -1,-1
+
 
     def __len__(self) -> int:
         return self._cardinality
@@ -66,7 +114,11 @@ class ScanIterator(PreemptableIterator):
 
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
-        return self._source.has_next() or self._mu is not None
+        #print(f'source last_read:{self._source.last_read()} -> {type(self._source.last_read())}, end:{self._end} -> {type(self._end)}')
+        if self._end is not None:
+            return (self._source.has_next() or self._mu is not None) and (int(self._source.last_read())<self._end)
+        else:
+            return self._source.has_next() or self._mu is not None
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
@@ -77,6 +129,23 @@ class ScanIterator(PreemptableIterator):
         self._cardinality = card
         self._last_read = None
         self._mu = None
+        self._end= None
+
+#        if "likes" not in self._pattern_str:
+#            print(f"next mapping {self._pattern_str} {self._cardinality} {self._context}")
+
+        start,end=self.split_scan(self._pattern_str,self._cardinality,self._context)
+        if start>=0: # we have split
+            self._last_read=start
+            self._end=end
+            if start>100:
+                it, card = self._connector.search(s, p, o, last_read=start, as_of=self._start_timestamp)
+                self._source = it
+                self._cardinality = card
+            else:
+                for i in range(1,start):
+                    self._source.next()
+
 
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
@@ -118,8 +187,14 @@ class ScanIterator(PreemptableIterator):
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_scan.muc)
         saved_scan.last_read = self._source.last_read()
+        if self._end is not None:
+            saved_scan.end = self._end
+        else:
+            saved_scan.end=-1
         if self._start_timestamp is not None:
             saved_scan.timestamp = self._start_timestamp.isoformat()
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
+        if self._pragma is not None:
+            pyDict_to_protoDict(self._pragma, saved_scan.pragma)
         return saved_scan

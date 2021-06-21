@@ -110,7 +110,15 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
     if len(saved_plan.mu) > 0:
         mu = dict(saved_plan.mu)
     nb_read = saved_plan.nb_read
-    return ScanIterator(connector, pattern, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, nb_read=nb_read, as_of=as_of)
+    if saved_plan.end==-1:
+        #print("non....")
+        end=None
+    else:
+        end=saved_plan.end
+    if len(saved_plan.pragma)>0:
+        pragma=dict(saved_plan.pragma)
+        context.update(pragma)
+    return ScanIterator(connector, pattern, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, nb_read=nb_read,end=end, as_of=as_of)
 
 
 def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict) -> PreemptableIterator:

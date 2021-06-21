@@ -1,7 +1,7 @@
 # utils.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from typing import Dict, List, Optional, Tuple
-
+import math
 
 class EmptyIterator(object):
     """An Iterator that yields nothing"""
@@ -144,3 +144,38 @@ def tuple_to_triple(s: str, p: str, o: str) -> Dict[str, str]:
         'predicate': p,
         'object': o
     }
+
+def worker_range(card, nb, i):
+    """
+    Args:
+    * card: cardinality of the scan.
+    * nb: number of nbworkers
+    * i: id of the worker
+
+    examples:
+    worker_range(124,3,2):
+        42,82
+
+    card:124, worker:1, start:0, end:41
+    card:124, worker:2, start:42, end:82
+    card:124, worker:3, start:83, end:124
+    card:3, worker:1, start:0, end:0
+    card:3, worker:2, start:1, end:1
+    card:3, worker:3, start:2, end:2
+    card:1, worker:1, start:0, end:0
+    card:1, worker:2, start:-1, end:-1
+    card:1, worker:3, start:-1, end:-1
+    card:2, worker:1, start:0, end:0
+    card:2, worker:2, start:1, end:1
+    card:2, worker:3, start:-1, end:-1
+    """
+    if card < 1 or nb < 1 or i > nb or i < 1:
+        raise("invalid range call")
+    if card <= nb:
+        if i <= card:
+            return i - 1, i - 1
+        else:
+            return -1, -1
+    start = card / nb * (i - 1)
+    end = start + card / nb
+    return math.ceil(start), math.floor(end)
