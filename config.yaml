@@ -1,0 +1,36 @@
+# The name of the server
+name: SaGe Example Server
+# Server maintainer(s)
+maintainer: Chuck Norris
+# The public URL used to access the server
+public_url: http://server-url.com
+# Path to a markdown file whose content will be displayed on the server's webpage
+long_description: config_examples/description.md
+# Time quantum used by the server
+quota: 75
+# (Optional) Maximum number of results fetched by HTTP request
+max_results: 200
+# (Optional) Query selected by default in the "Query" section
+default_query:
+  graph_name: test
+  name: Select everything
+  value: |
+    SELECT * WHERE {
+      ?s ?p ?o.
+    }
+# RDF Graphs hosted by the server
+graphs:
+ -
+   name: test
+   uri: http://example.org/test
+   description: Just test data
+   backend: hdt-file
+   file: ./tests/data/test.hdt
+ -
+   name: watdiv-skew
+   uri: http://example.org/watdiv-skew
+   description: watdiv with skew on follows and friendof
+   backend: hdt-file
+   file: ./watdiv10M-skewed.hdt
+  
+ 

@@ -17,6 +17,8 @@ from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
+from sage.query_engine.iterators.limit import LimitIterator
+from sage.query_engine.iterators.topk import TopkIterator, order_to_string
 from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.optimizer.join_builder import build_left_join_tree
 from sage.query_engine.update.delete import DeleteOperator
@@ -229,10 +231,20 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], co
         if node.datasetClause is not None:
             graphs = [format_term(graph_iri.default) for graph_iri in node.datasetClause]
         return parse_query_node(node.p, dataset, graphs, context, cardinalities, as_of=as_of)
+    elif node.name == 'Slice':
+        context['limit']=int(node.length)
+        child = parse_query_node(node.p, dataset, current_graphs, context, cardinalities, as_of=as_of)
+        return LimitIterator(child, context, node.start, node.length)
     elif node.name == 'Project':
         query_vars = list(map(lambda t: '?' + str(t), node.PV))
         child = parse_query_node(node.p, dataset, current_graphs, context, cardinalities, as_of=as_of)
         return ProjectionIterator(child, query_vars)
+    elif node.name == 'OrderBy':
+        if 'limit' in context:
+            child = parse_query_node(node.p, dataset, current_graphs, context, cardinalities, as_of=as_of)
+            return TopkIterator(child, context, order_to_string(node.expr), context['limit'])
+        else:
+            UnsupportedSPARQL(f"Order By without Limit: {node.name}")
     elif node.name == 'BGP':
         # bgp_vars = node._vars
         triples = list(localize_triples(node.triples, current_graphs))

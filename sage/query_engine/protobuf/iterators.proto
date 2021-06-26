@@ -18,6 +18,24 @@ message SavedScanIterator {
   int64 cardinality = 6;
 }
 
+
+message mapping {
+  map<string, string> mu=1;
+}
+
+message SavedTopkIterator {
+  string expr = 1;
+  repeated mapping topk = 2;
+  int64 length =3;
+  oneof source {
+    SavedScanIterator scan_source = 4;
+    SavedIndexJoinIterator join_source = 5;
+    SavedBagUnionIterator union_source = 6;
+    SavedFilterIterator filter_source = 7;
+  }
+
+}
+
 message SavedProjectionIterator {
   repeated string values = 1;
   oneof source {
@@ -25,6 +43,15 @@ message SavedProjectionIterator {
     SavedIndexJoinIterator join_source = 3;
     SavedBagUnionIterator union_source = 4;
     SavedFilterIterator filter_source = 5;
+    SavedTopkIterator topk_source = 6;
+  }
+}
+
+message SavedLimitIterator {
+  int64 length = 1;
+  int64 start = 2;
+  oneof source {
+    SavedProjectionIterator proj_source = 3;
   }
 }
 
@@ -90,5 +117,6 @@ message RootTree {
     SavedFilterIterator filter_source = 5;
     SavedInsertData insert_source = 6;
     SavedDeleteData delete_source = 7;
+    SavedLimitIterator limit_source = 8;
   }
 }

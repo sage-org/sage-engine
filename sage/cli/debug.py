@@ -36,7 +36,7 @@ async def execute(engine,iterator,limit):
 #    try:
         while iterator.has_next():
             value = await iterator.next()
-            print(value)
+            print(f'value {value}')
 #    except:
 #        print("error in debug/execute")
 

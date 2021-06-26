@@ -6,6 +6,8 @@ from typing import Dict, Optional, Union
 from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
+from sage.query_engine.iterators.limit import LimitIterator
+from sage.query_engine.iterators.topk import TopkIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.scan import ScanIterator
@@ -13,12 +15,14 @@ from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.protobuf.iterators_pb2 import (RootTree,
                                                       SavedBagUnionIterator,
                                                       SavedFilterIterator,
+                                                      SavedTopkIterator,
+                                                      SavedLimitIterator,
                                                       SavedIndexJoinIterator,
                                                       SavedProjectionIterator,
                                                       SavedScanIterator)
 from sage.query_engine.protobuf.utils import protoTriple_to_dict
 
-SavedProtobufPlan = Union[RootTree,SavedBagUnionIterator,SavedFilterIterator,SavedIndexJoinIterator,SavedProjectionIterator,SavedScanIterator]
+SavedProtobufPlan = Union[RootTree,SavedTopkIterator,SavedLimitIterator,SavedBagUnionIterator,SavedFilterIterator,SavedIndexJoinIterator,SavedProjectionIterator,SavedScanIterator]
 
 
 def load(saved_plan: SavedProtobufPlan, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -41,6 +45,10 @@ def load(saved_plan: SavedProtobufPlan, dataset: Dataset, context: dict) -> Pree
     # load the plan based on the current node
     if type(saved_plan) is SavedFilterIterator:
         return load_filter(saved_plan, dataset, context)
+    if type(saved_plan) is SavedTopkIterator:
+        return load_topk(saved_plan, dataset, context)
+    if type(saved_plan) is SavedLimitIterator:
+        return load_limit(saved_plan, dataset, context)
     if type(saved_plan) is SavedProjectionIterator:
         return load_projection(saved_plan, dataset, context)
     elif type(saved_plan) is SavedScanIterator:
@@ -51,6 +59,45 @@ def load(saved_plan: SavedProtobufPlan, dataset: Dataset, context: dict) -> Pree
         return load_union(saved_plan, dataset, context)
     else:
         raise Exception(f"Unknown iterator type '{type(saved_plan)}' when loading controls")
+
+
+def load_topk(saved_plan: SavedTopkIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
+    """Load a Topk from a protobuf serialization.
+
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+      * context: Information about the query execution.
+
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
+    sourceField = saved_plan.WhichOneof('source')
+    source = load(getattr(saved_plan, sourceField), dataset, context)
+
+    topk=[]
+    for mu in saved_plan.topk:
+        topk.append(dict(mu.mu))
+    length=saved_plan.length
+    expr = saved_plan.expr
+    return TopkIterator(source, context, expr,length,topk)
+
+def load_limit(saved_plan: SavedLimitIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
+    """Load a Limit from a protobuf serialization.
+
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+      * context: Information about the query execution.
+
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
+    sourceField = saved_plan.WhichOneof('source')
+    source = load(getattr(saved_plan, sourceField), dataset, context)
+    length=saved_plan.length
+    start=saved_plan.start
+    return LimitIterator(source, context,start,length)
 
 
 def load_projection(saved_plan: SavedProjectionIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -68,6 +115,8 @@ def load_projection(saved_plan: SavedProjectionIterator, dataset: Dataset, conte
     source = load(getattr(saved_plan, sourceField), dataset, context)
     values = saved_plan.values if len(saved_plan.values) > 0 else None
     return ProjectionIterator(source, context, values)
+
+
 
 
 def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
