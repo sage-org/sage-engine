@@ -36,6 +36,18 @@ message SavedTopkIterator {
 
 }
 
+message SavedOneTopkIterator {
+  string expr = 1;
+  map<string, string> topk = 2;
+  oneof source {
+    SavedScanIterator scan_source = 3;
+    SavedIndexJoinIterator join_source = 4;
+    SavedBagUnionIterator union_source = 5;
+    SavedFilterIterator filter_source = 6;
+  }
+}
+
+
 message SavedProjectionIterator {
   repeated string values = 1;
   oneof source {
@@ -44,6 +56,7 @@ message SavedProjectionIterator {
     SavedBagUnionIterator union_source = 4;
     SavedFilterIterator filter_source = 5;
     SavedTopkIterator topk_source = 6;
+    SavedOneTopkIterator onetopk_source = 7;
   }
 }
 

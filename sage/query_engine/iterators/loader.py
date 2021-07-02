@@ -8,6 +8,7 @@ from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
 from sage.query_engine.iterators.limit import LimitIterator
 from sage.query_engine.iterators.topk import TopkIterator
+from sage.query_engine.iterators.onetopk import OneTopkIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.scan import ScanIterator
@@ -16,13 +17,14 @@ from sage.query_engine.protobuf.iterators_pb2 import (RootTree,
                                                       SavedBagUnionIterator,
                                                       SavedFilterIterator,
                                                       SavedTopkIterator,
+                                                      SavedOneTopkIterator,
                                                       SavedLimitIterator,
                                                       SavedIndexJoinIterator,
                                                       SavedProjectionIterator,
                                                       SavedScanIterator)
 from sage.query_engine.protobuf.utils import protoTriple_to_dict
 
-SavedProtobufPlan = Union[RootTree,SavedTopkIterator,SavedLimitIterator,SavedBagUnionIterator,SavedFilterIterator,SavedIndexJoinIterator,SavedProjectionIterator,SavedScanIterator]
+SavedProtobufPlan = Union[RootTree,SavedTopkIterator,SavedOneTopkIterator,SavedLimitIterator,SavedBagUnionIterator,SavedFilterIterator,SavedIndexJoinIterator,SavedProjectionIterator,SavedScanIterator]
 
 
 def load(saved_plan: SavedProtobufPlan, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -47,6 +49,8 @@ def load(saved_plan: SavedProtobufPlan, dataset: Dataset, context: dict) -> Pree
         return load_filter(saved_plan, dataset, context)
     if type(saved_plan) is SavedTopkIterator:
         return load_topk(saved_plan, dataset, context)
+    if type(saved_plan) is SavedOneTopkIterator:
+        return load_onetopk(saved_plan, dataset, context)
     if type(saved_plan) is SavedLimitIterator:
         return load_limit(saved_plan, dataset, context)
     if type(saved_plan) is SavedProjectionIterator:
@@ -81,6 +85,27 @@ def load_topk(saved_plan: SavedTopkIterator, dataset: Dataset, context: dict) ->
     length=saved_plan.length
     expr = saved_plan.expr
     return TopkIterator(source, context, expr,length,topk)
+
+def load_onetopk(saved_plan: SavedOneTopkIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
+    """Load a Topk from a protobuf serialization.
+
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+      * context: Information about the query execution.
+
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
+    sourceField = saved_plan.WhichOneof('source')
+    source = load(getattr(saved_plan, sourceField), dataset, context)
+
+    topk=None
+    if saved_plan.topk:
+        topk=dict(saved_plan.topk)
+    expr = saved_plan.expr
+    return OneTopkIterator(source, context, expr,topk)
+
 
 def load_limit(saved_plan: SavedLimitIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
     """Load a Limit from a protobuf serialization.

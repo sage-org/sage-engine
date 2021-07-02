@@ -4,7 +4,7 @@ from time import time
 from typing import Dict, List, Optional
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.protobuf.iterators_pb2 import SavedTopkIterator, mapping
+from sage.query_engine.protobuf.iterators_pb2 import SavedOneTopkIterator, mapping
 from sage.query_engine.iterators.utils import find_in_mappings
 from sage.query_engine.iterators.filter import to_rdflib_term
 
@@ -19,19 +19,11 @@ from rdflib.plugins.sparql.parser import OrderClause
 
 #from sage.query_engine.optimizer.query_parser import parse_filter_expr
 
-def order_to_string(expr):
-    res=""
-    for i in expr:
-        if i.order is None:
-            # res.append(f'{parse_filter_expr(i.expr)}')
-            res+=f'?{i.expr} '
-        else:
-            res+=f'{i.order}(?{i.expr})  '
-    #print(f"res:{res}")
-    return res
+import sys
 
-class TopkIterator(PreemptableIterator):
-    """A TopkIterator evaluates a SPARQL Orderby + limit k query.
+
+class OneTopkIterator(PreemptableIterator):
+    """A OneTopkIterator evaluates a SPARQL Orderby + limit k query.
 
     Args:
       * source: Previous iterator in the pipeline.
@@ -39,12 +31,12 @@ class TopkIterator(PreemptableIterator):
       * context: Information about the query execution.
     """
 
-    def __init__(self, source: PreemptableIterator, context: dict, expr, length=0, topk = None):
-        super(TopkIterator, self).__init__()
+    def __init__(self, source: PreemptableIterator, context: dict, expr, topk = None):
+        super(OneTopkIterator, self).__init__()
         self._source = source
-        self._length=length
         self._rawexpr=expr
 
+        #print(f'expr:{expr}')
         compiled_expr = parseQuery(f"SELECT * WHERE {{?s ?p ?o}} order by {expr}")
         compiled_expr = translateQuery(compiled_expr)
         self._prologue = compiled_expr.prologue
@@ -55,23 +47,21 @@ class TopkIterator(PreemptableIterator):
         #     {'?s': 'http://db.uwaterloo.ca/~galuc/wsdbm/Offer34327', '?p': 'http://purl.org/goodrelations/serialNumber', '?o': '"17519453"'}]
         # else:
         #     self._topk=topk
+        self._topk=None
         if topk is not None:
+            print(f'topk is set:{topk}')
             self._topk=topk
-        else:
-            self._topk=[]
 
     def __repr__(self) -> str:
-        return f"<TopkIterator {self._rawexpr} {self._topk} FROM {self._source}>"
+        return f"<OneTopkIterator {self._rawexpr} {self._topk} FROM {self._source}>"
 
     def serialized_name(self) -> str:
         """Get the name of the iterator, as used in the plan serialization protocol"""
-        return "topk"
+        return "onetopk"
 
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
-        b=self._source.has_next() or len(self._topk)>0
-#        if not b:
-#            print(f'topk {self._topk}')
+        b=self._source.has_next()
         return b
 
     def next_stage(self, mappings: Dict[str, str]):
@@ -90,45 +80,34 @@ class TopkIterator(PreemptableIterator):
             return None
         mappings = await self._source.next()
         if mappings is None:
-            if len(self._topk)>0:
-                #print(f'popped {len(self._topk)}')
-                top=self._topk[0]
-                self._topk=self._topk[1:]
-                return top
             return None
-        self.updatetopk(mappings)
-        return None
+        return self.updatetopk(mappings)
 
     def updatetopk(self,mappings: Dict[str,str]):
+        if self._topk is None:
+            return mappings
+        for e in self._expr:
+            try:
+                if e.order=='DESC':
+                    if to_rdflib_term(mappings['?' + e.expr]) > to_rdflib_term(self._topk['?' + e.expr]):
+                        #print(f"onetopk:saved")
+                        return None
+                else:
+                    if to_rdflib_term(mappings['?' + e.expr]) < to_rdflib_term(self._topk['?' + e.expr]):
+                        #print(f"onetopk:saved")
+                        return None
+            except:
+                print(f'error with mapping:{mappings} topk:{self._topk}')
+                print("Unexpected error:", sys.exc_info()[0])
+                raise
+        return mappings
 
-        # if len(self._topk)>=self._length:
-        #     last_mapping=self._topk[-1]
-        #     for e in self._expr:
-        #         if to_rdflib_term(mappings['?'+e.expr])<to_rdflib_term(last_mapping['?'+e.expr]):
-        #             return
-
-        self._topk.append(mappings)
-        for e in reversed(self._expr):
-            reverse = bool(e.order and e.order == 'DESC')
-
-            #val=to_rdflib_term(mappings['?'+e.expr])
-            #print(f'value {val}')
-
-            self._topk = sorted(self._topk, key=lambda x: to_rdflib_term(x['?'+e.expr]),reverse=reverse)
-        if len(self._topk)>self._length:
-             del self._topk[self._length:]
-        #print(f'topk {self._topk}')
-
-    def save(self) -> SavedTopkIterator:
+    def save(self) -> SavedOneTopkIterator:
         """Save and serialize the iterator as a Protobuf message"""
-        saved_topk = SavedTopkIterator()
+        saved_topk = SavedOneTopkIterator()
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_topk, source_field).CopyFrom(self._source.save())
         saved_topk.expr=self._rawexpr
-        saved_topk.length=self._length
-
-        for i in self._topk:
-            mu=saved_topk.topk.add()
-            pyDict_to_protoDict(i, mu.mu)
-
+        if self._topk is not None:
+            pyDict_to_protoDict(self._topk, saved_topk.topk)
         return saved_topk
