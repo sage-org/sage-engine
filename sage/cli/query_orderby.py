@@ -41,7 +41,9 @@ logger = logging.getLogger(__name__)
     help="Limit of a of SPARQL query (overwrite existing limit if it exists).")
 @click.option("--output", type=str, default=None,
     help="The file in which the query result will be stored.")
-def sage_query_orderby(entrypoint, default_graph_uri, query, file, format,measures,limit,output):
+@click.option("--tags", type=str, default="",
+    help="list of strings to tag measures (benchmark)")
+def sage_query_orderby(entrypoint, default_graph_uri, query, file, format,measures,limit,output,tags):
     """
         Send a SPARQL query to a SaGe server hosted at ENTRYPOINT, with DEFAULT_GRAPH_URI as the default RDF Graph. It does not act as a Smart client, so only queries supported by the server will be evaluated.
 
@@ -131,7 +133,7 @@ def sage_query_orderby(entrypoint, default_graph_uri, query, file, format,measur
             logger.info(f"cutting from {len(topk)} to {length}")
             del topk[length:]
 
-        if has_next is not None and len(topk)>0 :
+        if has_next is not None and len(topk)>=length :
             #updating the OneTopkIterator in the saved_plan
             plan = decode_saved_plan(json_response["next"])
             root = RootTree()
@@ -151,7 +153,7 @@ def sage_query_orderby(entrypoint, default_graph_uri, query, file, format,measur
         with open(measures, 'w') as measures_file:
             avg_loading_time = mean(loading_times)
             avg_resume_time = mean(resume_times)
-            measures_file.write(f'{query_name},{engine},{limit},{execution_time},{nb_calls},{nb_results},{avg_loading_time},{avg_resume_time}')
+            measures_file.write(f'{query_name},{engine},{limit},{execution_time},{nb_calls},{nb_results},{avg_loading_time},{avg_resume_time},{tags}')
     logger.info(f'Query complete in {execution_time}s with {nb_calls} HTTP calls. {nb_results} retreived mappings !')
 
 if __name__ == "__main__":

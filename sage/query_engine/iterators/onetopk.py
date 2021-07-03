@@ -49,7 +49,7 @@ class OneTopkIterator(PreemptableIterator):
         #     self._topk=topk
         self._topk=None
         if topk is not None:
-            print(f'topk is set:{topk}')
+            #print(f'topk is set:{topk}')
             self._topk=topk
 
     def __repr__(self) -> str:
@@ -89,11 +89,11 @@ class OneTopkIterator(PreemptableIterator):
         for e in self._expr:
             try:
                 if e.order=='DESC':
-                    if to_rdflib_term(mappings['?' + e.expr]) > to_rdflib_term(self._topk['?' + e.expr]):
+                    if to_rdflib_term(mappings['?' + e.expr]) < to_rdflib_term(self._topk['?' + e.expr]):
                         #print(f"onetopk:saved")
                         return None
                 else:
-                    if to_rdflib_term(mappings['?' + e.expr]) < to_rdflib_term(self._topk['?' + e.expr]):
+                    if to_rdflib_term(mappings['?' + e.expr]) > to_rdflib_term(self._topk['?' + e.expr]):
                         #print(f"onetopk:saved")
                         return None
             except:
