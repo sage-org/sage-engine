@@ -106,10 +106,12 @@ def sage_query_orderby(entrypoint, default_graph_uri, query, file, format,measur
     has_next = True
     count = 0
     topk=[]
+
+    start_time = time()
+
+
     while has_next:
-        start_time = time()
         response = requests.post(entrypoint, headers=headers, data=dumps(payload))
-        execution_time += time() - start_time
         nb_calls += 1
 
         json_response = response.json()
@@ -149,6 +151,7 @@ def sage_query_orderby(entrypoint, default_graph_uri, query, file, format,measur
         with open(output, 'w') as output_file:
             output_file.write(dumps(topk))
 
+    execution_time += time() - start_time
     if measures is not None:
         with open(measures, 'w') as measures_file:
             avg_loading_time = mean(loading_times)
