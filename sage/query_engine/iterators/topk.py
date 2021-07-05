@@ -91,36 +91,27 @@ class TopkIterator(PreemptableIterator):
         mappings = await self._source.next()
         if mappings is None:
             if len(self._topk)>0:
+                if len(self._topk)>self._length:
+                    self.computetopk()
                 #print(f'popped {len(self._topk)}')
                 top=self._topk[0]
                 self._topk=self._topk[1:]
                 return top
             return None
-        self.updatetopk(mappings)
+        self._topk.append(mappings)
+#        self.updatetopk(mappings)
         return None
 
-    def updatetopk(self,mappings: Dict[str,str]):
-
-        # if len(self._topk)>=self._length:
-        #     last_mapping=self._topk[-1]
-        #     for e in self._expr:
-        #         if to_rdflib_term(mappings['?'+e.expr])<to_rdflib_term(last_mapping['?'+e.expr]):
-        #             return
-
-        self._topk.append(mappings)
+    def computetopk(self):
         for e in reversed(self._expr):
             reverse = bool(e.order and e.order == 'DESC')
-
-            #val=to_rdflib_term(mappings['?'+e.expr])
-            #print(f'value {val}')
-
             self._topk = sorted(self._topk, key=lambda x: to_rdflib_term(x['?'+e.expr]),reverse=reverse)
         if len(self._topk)>self._length:
              del self._topk[self._length:]
-        #print(f'topk {self._topk}')
 
     def save(self) -> SavedTopkIterator:
         """Save and serialize the iterator as a Protobuf message"""
+        self.computetopk()
         saved_topk = SavedTopkIterator()
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_topk, source_field).CopyFrom(self._source.save())
