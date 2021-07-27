@@ -194,7 +194,6 @@ def put_sqlite(config, graph_name, rdf_file, format, block_size, commit_threshol
     # init SQlite connection
     logger.info("Connecting to the SQlite server...")
     connection = connect_sqlite(graph)
-    connection.isolation_level = None
     if connection is None:
         logger.error('Failed to establish a connection with SQlite')
         exit(1)
@@ -224,7 +223,8 @@ def put_sqlite(config, graph_name, rdf_file, format, block_size, commit_threshol
             insert_bucket(cursor, bucket, graph_name, backend, block_size, cache)
             to_commit = to_commit + len(bucket)
             if to_commit >= commit_threshold:
-                connection.commit()
+                cursor.execute("COMMIT")
+                cursor.execute("BEGIN TRANSACTION")
                 to_commit = 0
             inserted = inserted + len(bucket)
             bar.label = f"Inserting RDF triples {inserted}/{nb_triples} - {dropped} triples dropped."

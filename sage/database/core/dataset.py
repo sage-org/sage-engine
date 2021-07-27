@@ -18,9 +18,10 @@ class Dataset(object):
       * analytics: Google analytics credentials.
       * stateless: True if the dataset is queried in sateless mode, False if its is queried in statefull mode.
       * statefull_manager: StatefullManager used to store saved plan (required in statefull mode).
+      * enable_join_ordering: True to let the server perform the join ordering, False otherwise.
     """
 
-    def __init__(self, name: str, description: str, graphs: Dict[str, Graph], public_url: Optional[str] = None, default_query: Optional[str] = None, analytics=None, stateless=True, statefull_manager: Optional[StatefullManager] = None):
+    def __init__(self, name: str, description: str, graphs: Dict[str, Graph], public_url: Optional[str] = None, default_query: Optional[str] = None, analytics=None, stateless=True, statefull_manager: Optional[StatefullManager] = None, enable_join_ordering: Optional[bool] = True):
         super(Dataset, self).__init__()
         self._name = name
         self._desciption = description
@@ -30,6 +31,7 @@ class Dataset(object):
         self._analytics = analytics
         self._stateless = stateless
         self._statefull_manager = statefull_manager
+        self._enable_join_ordering = enable_join_ordering
         # open the statefull manager (if needed)
         if (not self._stateless) and self._statefull_manager is not None:
             self._statefull_manager.open()
@@ -45,6 +47,14 @@ class Dataset(object):
     @property
     def statefull_manager(self) -> StatefullManager:
         return self._statefull_manager
+
+    @property
+    def enable_join_ordering(self) -> bool:
+        return self._enable_join_ordering
+
+    @enable_join_ordering.setter
+    def enable_join_ordering(self, value: bool) -> None:
+        self._enable_join_ordering = value
 
     @property
     def default_query(self):

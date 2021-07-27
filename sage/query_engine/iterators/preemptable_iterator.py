@@ -13,6 +13,15 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
+    def cardinality(self) -> float:
+        """Return an estimation of the query cardinality"""
+
+    @abstractmethod
+    def progression(self, input_size: int = 1) -> float:
+        """Return an estimation of the query progression"""
+        pass
+
+    @abstractmethod
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         pass

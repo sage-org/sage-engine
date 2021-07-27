@@ -109,7 +109,16 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
     mu = None
     if len(saved_plan.mu) > 0:
         mu = dict(saved_plan.mu)
-    return ScanIterator(connector, pattern, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, as_of=as_of)
+    return ScanIterator(
+        connector, pattern, context,
+        cumulative_size=saved_plan.cumulative_size,
+        stages=saved_plan.stages,
+        produced=saved_plan.produced,
+        current_mappings=current_mappings, mu=mu,
+        last_read=saved_plan.last_read,
+        as_of=as_of
+    )
+    # return ScanIterator(connector, pattern, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, as_of=as_of)
 
 
 def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -130,7 +139,13 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict
     current_mappings = None
     if len(saved_plan.muc) > 0:
         current_mappings = dict(saved_plan.muc)
-    return IndexJoinIterator(left, right, context, current_mappings=current_mappings)
+    return IndexJoinIterator(
+        left, right, context,
+        produced=saved_plan.produced,
+        consumed=saved_plan.consumed,
+        current_mappings=current_mappings
+    )
+    # return IndexJoinIterator(left, right, context, current_mappings=current_mappings)
 
 
 def load_union(saved_plan: SavedBagUnionIterator, dataset: Dataset, context: dict) -> PreemptableIterator:

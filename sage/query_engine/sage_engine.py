@@ -66,6 +66,8 @@ class SageEngine(object):
         # save the plan if query execution is not done yet and no abort has occurred
         if not query_done and abort_reason is None:
             root = RootTree()
+            root.progression = plan.progression()
+            print(f'progression: {root.progression * 100}%')
             source_field = plan.serialized_name() + '_source'
             getattr(root, source_field).CopyFrom(plan.save())
         return (results, root, query_done, abort_reason)

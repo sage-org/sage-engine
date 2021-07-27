@@ -17,10 +17,16 @@ class IndexJoinIterator(PreemptableIterator):
       * current_mappings: The current mappings when the join is performed.
     """
 
-    def __init__(self, left: PreemptableIterator, right: PreemptableIterator, context: dict, current_mappings: Optional[Dict[str, str]] = None):
+    def __init__(
+        self, left: PreemptableIterator, right: PreemptableIterator, context: dict,
+        produced: int = 0, consumed: int = 0,
+        current_mappings: Optional[Dict[str, str]] = None
+    ):
         super(IndexJoinIterator, self).__init__()
         self._left = left
         self._right = right
+        self._produced = produced
+        self._consumed = consumed
         self._current_mappings = current_mappings
 
     def __repr__(self) -> str:
@@ -29,6 +35,22 @@ class IndexJoinIterator(PreemptableIterator):
     def serialized_name(self) -> str:
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "join"
+
+    def cardinality(self) -> float:
+        """Return an estimation of the query cardinality"""
+        if self._consumed == 0:
+            return 0.0
+        left_cardinality = self._left.cardinality()
+        return left_cardinality * (self._produced / self._consumed)
+
+    def progression(self, input_size: int = 1) -> float:
+        """Return an estimation of the query progression"""
+        left_cardinality = self._left.cardinality()
+        left_progression = self._left.progression(input_size=1)
+        right_progression = self._right.progression(input_size=left_cardinality)
+        if right_progression == 0.0:
+            return left_progression
+        return left_progression * right_progression
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
@@ -53,9 +75,11 @@ class IndexJoinIterator(PreemptableIterator):
             self._current_mappings = await self._left.next()
             if self._current_mappings is None:
                 return None
+            self._consumed += 1
             self._right.next_stage(self._current_mappings)
         mu = await self._right.next()
         if mu is not None:
+            self._produced += 1
             return {**self._current_mappings, **mu}
         return None
 
@@ -70,4 +94,7 @@ class IndexJoinIterator(PreemptableIterator):
         getattr(saved_join, right_field).CopyFrom(self._right.save())
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_join.muc)
+        # export statistics used to estimate the cardinality of the query
+        saved_join.produced = self._produced
+        saved_join.consumed = self._consumed
         return saved_join

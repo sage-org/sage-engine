@@ -1,7 +1,7 @@
 # join_builder.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.filter import FilterIterator
@@ -9,10 +9,61 @@ from sage.query_engine.iterators.nlj import IndexJoinIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.utils import EmptyIterator
-from sage.query_engine.optimizer.utils import (equality_variables,
-                                               find_connected_pattern,
-                                               get_vars)
+from sage.query_engine.optimizer.utils import equality_variables, find_connected_pattern, get_vars
 
+def analyze_triple_patterns(
+    bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str,
+    context: dict, as_of: Optional[datetime] = None
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    triples = []
+    cardinalities = []
+    # analyze each triple pattern in the BGP
+    for triple in bgp:
+        # select the graph used to evaluate the pattern
+        graph_uri = triple['graph'] if 'graph' in triple and len(triple['graph']) > 0 else default_graph
+        triple['graph'] = graph_uri
+        # get iterator and statistics about the pattern
+        if dataset.has_graph(graph_uri):
+            it = ScanIterator(dataset.get_graph(graph_uri), triple, context, as_of=as_of)
+            c = it.__len__()
+        else:
+            it, c = EmptyIterator(), 0
+        triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
+        cardinalities += [{'triple': triple, 'cardinality': c}]
+    return triples, cardinalities
+
+def build_ascending_cardinalities_tree(triples: List[Dict[str, Any]], context: dict) -> Tuple[PreemptableIterator, List[str]]:
+    print('build ascending cardinalities tree')
+    # sort triples by ascending cardinality
+    triples = sorted(triples, key=lambda v: v['cardinality'])
+    # start the pipeline with the Scan with the most selective pattern
+    pattern = triples.pop(0)
+    query_vars = get_vars(pattern['triple'])
+    pipeline = pattern['iterator']
+    # build the left linear tree of joins
+    while len(triples) > 0:
+        pattern, pos, query_vars = find_connected_pattern(query_vars, triples)
+        # no connected pattern = disconnected BGP => pick the first remaining pattern in the BGP
+        if pattern is None:
+            pattern = triples[0]
+            query_vars = query_vars | get_vars(pattern['triple'])
+            pos = 0
+        pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
+        triples.pop(pos)
+    return pipeline, query_vars
+
+def build_naive_tree(triples: List[Dict[str, Any]], context: dict) -> Tuple[PreemptableIterator, List[str]]:
+    print('build naive tree')
+    pattern = triples.pop(0)
+    query_vars = get_vars(pattern['triple'])
+    pipeline = pattern['iterator']
+    # build the left linear tree of joins
+    while len(triples) > 0:
+        pattern = triples.pop(0)
+        query_vars = query_vars | get_vars(pattern['triple'])
+        graph_uri = pattern['triple']['graph']
+        pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
+    return pipeline, query_vars
 
 def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str, context: dict, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, List[str], Dict[str, str]]:
     """Build a Left-linear join tree from a Basic Graph pattern.
@@ -30,29 +81,38 @@ def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_gr
       * `cardinalities` is the list of estimated cardinalities of all triple patterns in the BGP.
     """
     # gather metadata about triple patterns
-    triples = []
-    cardinalities = []
+    triples, cardinalities = analyze_triple_patterns(bgp, dataset, default_graph, context, as_of=as_of)
 
-    # analyze each triple pattern in the BGP
-    for triple in bgp:
-        # select the graph used to evaluate the pattern
-        graph_uri = triple['graph'] if 'graph' in triple and len(triple['graph']) > 0 else default_graph
-        triple['graph'] = graph_uri
-        # get iterator and statistics about the pattern
-        if dataset.has_graph(graph_uri):
-            it = ScanIterator(dataset.get_graph(graph_uri), triple, context, as_of=as_of)
-            c = it.__len__()
-        else:
-            it, c = EmptyIterator(), 0
-        triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
-        cardinalities += [{'triple': triple, 'cardinality': c}]
+    if dataset.enable_join_ordering:
+        pipeline, query_vars = build_ascending_cardinalities_tree(triples, context)
+    else:
+        pipeline, query_vars = build_naive_tree(triples, context)
+    print(pipeline.__repr__())
+    return pipeline, query_vars, cardinalities
+
+    # triples = []
+    # cardinalities = []
+    #
+    # # analyze each triple pattern in the BGP
+    # for triple in bgp:
+    #     # select the graph used to evaluate the pattern
+    #     graph_uri = triple['graph'] if 'graph' in triple and len(triple['graph']) > 0 else default_graph
+    #     triple['graph'] = graph_uri
+    #     # get iterator and statistics about the pattern
+    #     if dataset.has_graph(graph_uri):
+    #         it = ScanIterator(dataset.get_graph(graph_uri), triple, context, as_of=as_of)
+    #         c = it.__len__()
+    #     else:
+    #         it, c = EmptyIterator(), 0
+    #     triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
+    #     cardinalities += [{'triple': triple, 'cardinality': c}]
 
     # sort triples by ascending cardinality
-    triples = sorted(triples, key=lambda v: v['cardinality'])
+    # triples = sorted(triples, key=lambda v: v['cardinality'])
 
     # start the pipeline with the Scan with the most selective pattern
-    pattern = triples.pop(0)
-    query_vars = get_vars(pattern['triple'])
+    # pattern = triples.pop(0)
+    # query_vars = get_vars(pattern['triple'])
 
     # add a equality filter if the pattern has several variables that binds to the same value
     # example: ?s rdf:type ?s => Filter(Scan(?s rdf:type ?s_2), ?s == ?s_2)
@@ -71,17 +131,17 @@ def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_gr
     # else:
     #     pipeline = ScanIterator(pattern['iterator'], pattern['triple'], pattern['cardinality'])
 
-    pipeline = pattern['iterator']
+    # pipeline = pattern['iterator']
 
     # build the left linear tree of joins
-    while len(triples) > 0:
-        pattern, pos, query_vars = find_connected_pattern(query_vars, triples)
-        # no connected pattern = disconnected BGP => pick the first remaining pattern in the BGP
-        if pattern is None:
-            pattern = triples[0]
-            query_vars = query_vars | get_vars(pattern['triple'])
-            pos = 0
-        graph_uri = pattern['triple']['graph']
-        pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
-        triples.pop(pos)
-    return pipeline, query_vars, cardinalities
+    # while len(triples) > 0:
+    #     pattern, pos, query_vars = find_connected_pattern(query_vars, triples)
+    #     # no connected pattern = disconnected BGP => pick the first remaining pattern in the BGP
+    #     if pattern is None:
+    #         pattern = triples[0]
+    #         query_vars = query_vars | get_vars(pattern['triple'])
+    #         pos = 0
+    #     graph_uri = pattern['triple']['graph']
+    #     pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
+    #     triples.pop(pos)
+    # return pipeline, query_vars, cardinalities

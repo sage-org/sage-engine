@@ -31,6 +31,16 @@ class BagUnionIterator(PreemptableIterator):
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "union"
 
+    def cardinality(self) -> float:
+        """Return an estimation of the query cardinality"""
+        return self._left.cardinality() + self._right.cardinality()
+
+    def progression(self, input_size: int = 1) -> float:
+        """Return an estimation of the query progression"""
+        left_progression = self._left.progression(input_size=1)
+        right_progression = self._right.progression(input_size=1)
+        return (left_progression + right_progression) / 2
+
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
         return self._left.has_next() or self._right.has_next()

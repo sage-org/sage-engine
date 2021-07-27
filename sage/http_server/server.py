@@ -206,26 +206,30 @@ def run_app(config_file: str) -> FastAPI:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))
 
-    @app.post("/sparql")
-    async def sparql_post(request: Request, item: SagePostQuery):
+    async def execute_post(request: Request, item: SagePostQuery):
         """Execute a SPARQL query using the Web Preemption model"""
         try:
-            start = time()
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            exec_start = time()
             bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset)
-            logging.info(f'query execution time: {(time() - exec_start) * 1000}ms')
-            serialization_start = time()
             response = create_response(mimetypes, bindings, next_page, stats, server_url)
-            logging.info(f'serialization time: {(time() - serialization_start) * 1000}ms')
-            logging.info(f'execution time: {(time() - start) * 1000}ms')
             return response
         except HTTPException as err:
             raise err
         except Exception as err:
             logging.error(err)
             raise HTTPException(status_code=500, detail=str(err))
+
+    @app.post("/sparql")
+    async def sparql_post(request: Request, item: SagePostQuery):
+        dataset.enable_join_ordering = True
+        return await execute_post(request, item)
+
+    @app.post("/sparql-no-join-ordering")
+    async def sparql_post_test(request: Request, item: SagePostQuery):
+        """Execute a SPARQL query using the Web Preemption model"""
+        dataset.enable_join_ordering = False
+        return await execute_post(request, item)
 
     @app.get("/void/", description="Get the VoID description of the SaGe server")
     async def server_void(request: Request):
