@@ -30,7 +30,7 @@ class ScanIterator(PreemptableIterator):
 
     def __init__(
         self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict,
-        cumulative_size: int = 0, stages: int = 0, produced: int = 0,
+        stages: int = 1, produced: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -56,7 +56,7 @@ class ScanIterator(PreemptableIterator):
             self._source = it
             self._cardinality = card
         # statistics to estimate the query progression
-        self._cumulative_size = cumulative_size
+        _, self._relation_size = self._connector.search(None, pattern['predicate'], None, as_of=as_of)
         self._stages = stages
         self._produced = produced
 
@@ -69,19 +69,6 @@ class ScanIterator(PreemptableIterator):
     def serialized_name(self):
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "scan"
-
-    def cardinality(self) -> float:
-        """Return an estimation of the query cardinality"""
-        if self._stages == 0:
-            return 0.0
-        return self._cumulative_size / self._stages
-
-    def progression(self, input_size: int = 1) -> float:
-        """Return an estimation of the query progression"""
-        estimated_cardinality = input_size * self.cardinality()
-        if estimated_cardinality == 0.0:
-            return 0.0
-        return self._produced / estimated_cardinality
 
     def last_read(self) -> str:
         return self._source.last_read()
@@ -100,7 +87,6 @@ class ScanIterator(PreemptableIterator):
         self._last_read = None
         self._mu = None
         self._stages += 1
-        self._cumulative_size += self._cardinality
 
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
@@ -110,27 +96,22 @@ class ScanIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if self._stages == 0: # its the left-most triple pattern
-            self._cumulative_size = self._cardinality
-            self._stages = 1
         if self._mu is not None:
             triple = self._mu
             self._mu = None
-            self._produced += 1
             return triple
         elif not self.has_next():
             return None
         else:
             triple = self._source.next()
             if triple is not None:
+                self._produced += 1
                 triple = selection(triple, self._variables)
             timestamp = (time() - self._context['start_timestamp']) * 1000
             if self._context['quantum'] <= timestamp:
                 self._mu = triple
                 raise QuantumExhausted()
-            else:
-                self._produced += 1
-                return triple
+            return triple
 
     def save(self) -> SavedScanIterator:
         """Save and serialize the iterator as a Protobuf message"""
@@ -150,7 +131,7 @@ class ScanIterator(PreemptableIterator):
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
         # export statistics used to estimate the cardinality of the query
-        saved_scan.cumulative_size = self._cumulative_size
+        saved_scan.relation_size = self._relation_size
         saved_scan.stages = self._stages
         saved_scan.produced = self._produced
         return saved_scan

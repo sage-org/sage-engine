@@ -12,14 +12,6 @@ class EmptyIterator(object):
     def __len__(self) -> int:
         return 0
 
-    def cardinality(self) -> float:
-        """Return an estimation of the query cardinality"""
-        return 0.0
-
-    def progression(self, input_size: int = 1) -> float:
-        """Return an estimation of the query progression"""
-        return 1.0
-
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
         return False
@@ -46,17 +38,6 @@ class ArrayIterator(object):
         super(ArrayIterator, self).__init__()
         self._array = array
         self._produced = produced
-
-    def cardinality(self) -> float:
-        """Return an estimation of the query cardinality"""
-        return self._produced + len(self._array)
-
-    def progression(self, input_size: int = 1) -> float:
-        """Return an estimation of the query progression"""
-        card = self.cardinality()
-        if card == 0:
-            return 1.0
-        return self._produced / self.cardinality()
 
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""

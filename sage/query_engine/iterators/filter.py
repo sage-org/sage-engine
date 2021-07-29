@@ -54,14 +54,6 @@ class FilterIterator(PreemptableIterator):
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "filter"
 
-    def cardinality(self) -> float:
-        """Return an estimation of the query cardinality"""
-        return self._source.cardinality()
-
-    def progression(self, input_size: int = 1) -> float:
-        """Return an estimation of the query progression"""
-        return self._source.progression(input_size=1)
-
     def _evaluate(self, bindings: Dict[str, str]) -> bool:
         """Evaluate the FILTER expression with a set mappings.
 

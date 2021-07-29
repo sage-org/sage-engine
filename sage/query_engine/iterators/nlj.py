@@ -36,22 +36,6 @@ class IndexJoinIterator(PreemptableIterator):
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "join"
 
-    def cardinality(self) -> float:
-        """Return an estimation of the query cardinality"""
-        if self._consumed == 0:
-            return 0.0
-        left_cardinality = self._left.cardinality()
-        return left_cardinality * (self._produced / self._consumed)
-
-    def progression(self, input_size: int = 1) -> float:
-        """Return an estimation of the query progression"""
-        left_cardinality = self._left.cardinality()
-        left_progression = self._left.progression(input_size=1)
-        right_progression = self._right.progression(input_size=left_cardinality)
-        if right_progression == 0.0:
-            return left_progression
-        return left_progression * right_progression
-
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         self._current_mappings = None

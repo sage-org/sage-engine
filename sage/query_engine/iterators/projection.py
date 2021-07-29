@@ -28,14 +28,6 @@ class ProjectionIterator(PreemptableIterator):
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "proj"
 
-    def cardinality(self) -> float:
-        """Return an estimation of the query cardinality"""
-        return self._source.cardinality()
-
-    def progression(self, input_size: int = 1) -> float:
-        """Return an estimation of the query progression"""
-        return self._source.progression(input_size=1)
-
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
         return self._source.has_next()

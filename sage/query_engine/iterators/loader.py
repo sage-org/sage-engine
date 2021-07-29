@@ -111,7 +111,6 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
         mu = dict(saved_plan.mu)
     return ScanIterator(
         connector, pattern, context,
-        cumulative_size=saved_plan.cumulative_size,
         stages=saved_plan.stages,
         produced=saved_plan.produced,
         current_mappings=current_mappings, mu=mu,

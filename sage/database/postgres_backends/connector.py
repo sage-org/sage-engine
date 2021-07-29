@@ -71,6 +71,8 @@ class PostgresConnector(DatabaseConnector):
         # build selectivity table
         selectivities = {}
         cpt = 0
+        if most_common_vals is None:
+            return (null_frac, n_distinct, selectivities, 0)
         for common_val in most_common_vals[1:-1].split(","):
             if cpt < len(most_common_freqs):
                 selectivities[common_val] = most_common_freqs[cpt]
@@ -145,27 +147,36 @@ class PostgresConnector(DatabaseConnector):
           The estimated cardinality of the triple pattern.
         """
         # estimate the selectivity of the triple pattern using PostgreSQL histograms
-        selectivity = 1
+        subject_selectivity = 1
+        predicate_selectivity = 1
+        obj_selectivity = 1
         # avoid division per zero when some histograms are not fully up-to-date
         try:
             # compute the selectivity of a bounded subject
             if subject is not None:
                 if subject in self._subject_histograms['selectivities']:
-                    selectivity *= self._subject_histograms['selectivities'][str(subject)]
+                    subject_selectivity = self._subject_histograms['selectivities'][str(subject)]
                 else:
-                    selectivity *= (1 - self._subject_histograms['sum_freqs'])/(self._subject_histograms['n_distinct'] - len(self._subject_histograms['selectivities']))
+                    dividend = 1 - self._subject_histograms['sum_freqs']
+                    divisor = self._subject_histograms['n_distinct'] - len(self._subject_histograms['selectivities'])
+                    subject_selectivity = dividend / max(divisor, 1)
             # compute the selectivity of a bounded predicate
             if predicate is not None:
                 if predicate in self._predicate_histograms['selectivities']:
-                    selectivity *= self._predicate_histograms['selectivities'][str(predicate)]
+                    predicate_selectivity = self._predicate_histograms['selectivities'][str(predicate)]
                 else:
-                    selectivity *= (1 - self._predicate_histograms['sum_freqs'])/(self._predicate_histograms['n_distinct'] - len(self._predicate_histograms['selectivities']))
+                    dividend = 1 - self._predicate_histograms['sum_freqs']
+                    divisor = self._predicate_histograms['n_distinct'] - len(self._predicate_histograms['selectivities'])
+                    predicate_selectivity = dividend / max(divisor, 1)
             # compute the selectivity of a bounded object
             if obj is not None:
                 if obj in self._object_histograms['selectivities']:
-                    selectivity *= self._object_histograms['selectivities'][str(obj)]
+                    obj_selectivity = self._object_histograms['selectivities'][str(obj)]
                 else:
-                    selectivity *= (1 - self._object_histograms['sum_freqs'])/(self._object_histograms['n_distinct'] - len(self._object_histograms['selectivities']))
+                    dividend = 1 - self._object_histograms['sum_freqs']
+                    divisor = self._object_histograms['n_distinct'] - len(self._object_histograms['selectivities'])
+                    obj_selectivity = dividend / max(divisor, 1)
+            selectivity = subject_selectivity * predicate_selectivity * obj_selectivity
         except ZeroDivisionError:
             pass
         # estimate the cardinality from the estimated selectivity
