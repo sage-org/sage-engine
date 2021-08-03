@@ -112,6 +112,7 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
     return ScanIterator(
         connector, pattern, context,
         stages=saved_plan.stages,
+        read=saved_plan.read,
         produced=saved_plan.produced,
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,
@@ -142,6 +143,8 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict
         left, right, context,
         produced=saved_plan.produced,
         consumed=saved_plan.consumed,
+        matches=saved_plan.matches,
+        inner_size=saved_plan.inner_size,
         current_mappings=current_mappings
     )
     # return IndexJoinIterator(left, right, context, current_mappings=current_mappings)

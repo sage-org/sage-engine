@@ -30,7 +30,7 @@ class ScanIterator(PreemptableIterator):
 
     def __init__(
         self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict,
-        stages: int = 1, produced: int = 0,
+        stages: int = 1, read: int = 0, produced: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -56,12 +56,12 @@ class ScanIterator(PreemptableIterator):
             self._source = it
             self._cardinality = card
         # statistics to estimate the query progression
-        _, self._relation_size = self._connector.search(None, pattern['predicate'], None, as_of=as_of)
-        self._stages = stages
+        # _, self._relation_size = self._connector.search(None, pattern['predicate'], None, as_of=as_of)
+        self._read = read
         self._produced = produced
 
     def __len__(self) -> int:
-        return self._cardinality
+        return max(self._read, self._cardinality)
 
     def __repr__(self) -> str:
         return f"<ScanIterator ({self._pattern['subject']} {self._pattern['predicate']} {self._pattern['object']})>"
@@ -86,7 +86,7 @@ class ScanIterator(PreemptableIterator):
         self._cardinality = card
         self._last_read = None
         self._mu = None
-        self._stages += 1
+        self._read = 0
 
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
@@ -105,6 +105,7 @@ class ScanIterator(PreemptableIterator):
         else:
             triple = self._source.next()
             if triple is not None:
+                self._read += 1
                 self._produced += 1
                 triple = selection(triple, self._variables)
             timestamp = (time() - self._context['start_timestamp']) * 1000
@@ -130,8 +131,6 @@ class ScanIterator(PreemptableIterator):
             saved_scan.timestamp = self._start_timestamp.isoformat()
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
-        # export statistics used to estimate the cardinality of the query
-        saved_scan.relation_size = self._relation_size
-        saved_scan.stages = self._stages
+        saved_scan.read = self._read
         saved_scan.produced = self._produced
         return saved_scan
