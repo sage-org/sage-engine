@@ -173,6 +173,8 @@ def parse_filter_expr(expr: dict) -> str:
             for other in expr.other:
                 expression = f"({expression} || {parse_filter_expr(other)})"
             return expression
+        elif expr.name.startswith('Builtin_REGEX'):
+            return f"REGEX({parse_filter_expr(expr.text)},\"{expr.pattern}\")"
         elif expr.name.startswith('Builtin_'):
             return f"{expr.name[8:]}({parse_filter_expr(expr.arg)})"
         raise UnsupportedSPARQL(f"Unsupported SPARQL FILTER expression: {expr.name}")
