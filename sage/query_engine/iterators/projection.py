@@ -20,6 +20,7 @@ class ProjectionIterator(PreemptableIterator):
         super(ProjectionIterator, self).__init__()
         self._source = source
         self._projection = projection
+        # print(f'proj on {self._projection}')
 
     def __repr__(self) -> str:
         return f"<ProjectionIterator SELECT {self._projection} FROM {self._source}>"

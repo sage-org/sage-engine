@@ -37,10 +37,11 @@ class FilterIterator(PreemptableIterator):
       * context: Information about the query execution.
     """
 
-    def __init__(self, source: PreemptableIterator, expression: str, context: dict):
+    def __init__(self, source: PreemptableIterator, expression: str, context: dict, mu: Optional[Dict[str, str]] = None):
         super(FilterIterator, self).__init__()
         self._source = source
         self._raw_expression = expression
+        self._mu = mu
         # compile the expression using rdflib
         compiled_expr = parseQuery(f"SELECT * WHERE {{?s ?p ?o . FILTER({expression})}}")
         compiled_expr = translateQuery(compiled_expr)
@@ -81,9 +82,13 @@ class FilterIterator(PreemptableIterator):
         """
         if not self.has_next():
             return None
-        mu = await self._source.next()
-        while mu is None or not self._evaluate(mu):
-            mu = await self._source.next()
+        self._mu = await self._source.next()
+        while self._mu is None or not self._evaluate(self._mu):
+            if not self.has_next():
+                return None
+            self._mu = await self._source.next()
+        mu=self._mu
+        self._mu=None        
         return mu
 
     def has_next(self) -> bool:
@@ -96,4 +101,6 @@ class FilterIterator(PreemptableIterator):
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_filter, source_field).CopyFrom(self._source.save())
         saved_filter.expression = self._raw_expression
+        if self._mu is not None:
+            pyDict_to_protoDict(self._mu, saved_filter.mu)
         return saved_filter

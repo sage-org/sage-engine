@@ -83,7 +83,10 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset, context: dict
     """
     sourceField = saved_plan.WhichOneof('source')
     source = load(getattr(saved_plan, sourceField), dataset, context)
-    return FilterIterator(source, saved_plan.expression, context)
+    mu = None
+    if len(saved_plan.mu) > 0:
+        mu = saved_plan.mu
+    return FilterIterator(source, saved_plan.expression, context, mu=mu)
 
 
 def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
