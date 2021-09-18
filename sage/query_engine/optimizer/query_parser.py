@@ -234,7 +234,7 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], co
     elif node.name == 'Project':
         query_vars = list(map(lambda t: '?' + str(t), node.PV))
         child = parse_query_node(node.p, dataset, current_graphs, context, cardinalities, as_of=as_of)
-        return ProjectionIterator(child, query_vars)
+        return ProjectionIterator(child, context, query_vars)
     elif node.name == 'BGP':
         # bgp_vars = node._vars
         triples = list(localize_triples(node.triples, current_graphs))
