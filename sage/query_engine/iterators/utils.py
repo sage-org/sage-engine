@@ -24,8 +24,7 @@ class EmptyIterator(object):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        return  None
-
+        return None
 
 
 class ArrayIterator(object):
@@ -34,7 +33,7 @@ class ArrayIterator(object):
     Argument: List of solution mappings.
     """
 
-    def __init__(self, array: List[Dict[str, str]]):
+    def __init__(self, array: List[Dict[str, str]], produced: int = 0):
         super(ArrayIterator, self).__init__()
         self._array = array
         self._produced = produced

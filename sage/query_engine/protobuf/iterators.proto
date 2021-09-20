@@ -16,8 +16,8 @@ message SavedScanIterator {
   string last_read = 4;
   string timestamp = 5;
   int64 cardinality = 6;
-  int64 stages = 7;
-  int64 read = 8;
+  int64 runtime_cardinality = 7;
+  int64 pattern_cardinality = 8;
   int64 produced = 9;
 }
 
@@ -50,7 +50,6 @@ message SavedIndexJoinIterator {
   int64 produced = 12;
   int64 consumed = 13;
   int64 matches = 14;
-  int64 inner_size = 15;
 }
 
 message SavedBagUnionIterator {

@@ -30,7 +30,11 @@ class ScanIterator(PreemptableIterator):
 
     def __init__(
         self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict,
-        stages: int = 1, read: int = 0, produced: int = 0,
+        produced: int = 0,
+        cardinality: Optional[int] = None,
+        runtime_cardinality: Optional[int] = None,
+        pattern_cardinality: Optional[int] = None,
+        # last_position: Optional[int] = None, current_position: Optional[int] = None,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -48,20 +52,30 @@ class ScanIterator(PreemptableIterator):
         # create an iterator on the database
         if current_mappings is None:
             it, card = self._connector.search(pattern['subject'], pattern['predicate'], pattern['object'], last_read=last_read, as_of=as_of)
-            self._source = it
-            self._cardinality = card
         else:
             (s, p, o) = (find_in_mappings(pattern['subject'], current_mappings), find_in_mappings(pattern['predicate'], current_mappings), find_in_mappings(pattern['object'], current_mappings))
             it, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
-            self._source = it
+        self._source = it
+
+        if cardinality is not None:
+            self._cardinality = cardinality
+        else:
             self._cardinality = card
-        # statistics to estimate the query progression
-        # _, self._relation_size = self._connector.search(None, pattern['predicate'], None, as_of=as_of)
-        self._read = read
+
+        if runtime_cardinality is not None:
+            self._runtime_cardinality = runtime_cardinality
+        else:
+            self._runtime_cardinality = 0
+
+        if pattern_cardinality is not None:
+            self._pattern_cardinality = pattern_cardinality
+        else:
+            self._pattern_cardinality = card
+
         self._produced = produced
 
     def __len__(self) -> int:
-        return max(self._read, self._cardinality)
+        return self._cardinality
 
     def __repr__(self) -> str:
         return f"<ScanIterator ({self._pattern['subject']} {self._pattern['predicate']} {self._pattern['object']})>"
@@ -83,10 +97,10 @@ class ScanIterator(PreemptableIterator):
         it, card = self._connector.search(s, p, o, as_of=self._start_timestamp)
         self._current_mappings = mappings
         self._source = it
-        self._cardinality = card
         self._last_read = None
         self._mu = None
-        self._read = 0
+        self._cardinality = card
+        self._runtime_cardinality += card
 
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
@@ -105,7 +119,6 @@ class ScanIterator(PreemptableIterator):
         else:
             triple = self._source.next()
             if triple is not None:
-                self._read += 1
                 self._produced += 1
                 triple = selection(triple, self._variables)
             timestamp = (time() - self._context['start_timestamp']) * 1000
@@ -123,7 +136,6 @@ class ScanIterator(PreemptableIterator):
         triple.object = self._pattern['object']
         triple.graph = self._pattern['graph']
         saved_scan.pattern.CopyFrom(triple)
-        saved_scan.cardinality = self._cardinality
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_scan.muc)
         saved_scan.last_read = self._source.last_read()
@@ -131,6 +143,11 @@ class ScanIterator(PreemptableIterator):
             saved_scan.timestamp = self._start_timestamp.isoformat()
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
-        saved_scan.read = self._read
+        saved_scan.cardinality = self._cardinality
+        saved_scan.pattern_cardinality = self._pattern_cardinality
+        if (self._runtime_cardinality == 0) and (self._produced > 0):
+            saved_scan.runtime_cardinality = self._cardinality
+        else:
+            saved_scan.runtime_cardinality = self._runtime_cardinality
         saved_scan.produced = self._produced
         return saved_scan

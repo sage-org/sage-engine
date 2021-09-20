@@ -30,6 +30,7 @@ def analyze_triple_patterns(
             it, c = EmptyIterator(), 0
         triples += [{'triple': triple, 'cardinality': c, 'iterator': it}]
         cardinalities += [{'triple': triple, 'cardinality': c}]
+        print({'triple': triple, 'cardinality': c})
     return triples, cardinalities
 
 def build_ascending_cardinalities_tree(triples: List[Dict[str, Any]], context: dict) -> Tuple[PreemptableIterator, List[str]]:

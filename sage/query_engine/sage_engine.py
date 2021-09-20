@@ -64,7 +64,8 @@ class SageEngine(object):
         except DeleteInsertConflict as err:
             abort_reason = str(err)
         # save the plan if query execution is not done yet and no abort has occurred
-        if not query_done and abort_reason is None:
+        # if not query_done and abort_reason is None:
+        if abort_reason is None:
             root = RootTree()
             source_field = plan.serialized_name() + '_source'
             getattr(root, source_field).CopyFrom(plan.save())

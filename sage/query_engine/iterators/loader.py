@@ -1,7 +1,7 @@
 # loader.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
-from typing import Dict, Optional, Union
+from typing import Union
 
 from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.filter import FilterIterator
@@ -18,7 +18,7 @@ from sage.query_engine.protobuf.iterators_pb2 import (RootTree,
                                                       SavedScanIterator)
 from sage.query_engine.protobuf.utils import protoTriple_to_dict
 
-SavedProtobufPlan = Union[RootTree,SavedBagUnionIterator,SavedFilterIterator,SavedIndexJoinIterator,SavedProjectionIterator,SavedScanIterator]
+SavedProtobufPlan = Union[RootTree, SavedBagUnionIterator, SavedFilterIterator, SavedIndexJoinIterator, SavedProjectionIterator, SavedScanIterator]
 
 
 def load(saved_plan: SavedProtobufPlan, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -111,9 +111,10 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
         mu = dict(saved_plan.mu)
     return ScanIterator(
         connector, pattern, context,
-        stages=saved_plan.stages,
-        read=saved_plan.read,
         produced=saved_plan.produced,
+        cardinality=saved_plan.cardinality,
+        runtime_cardinality=saved_plan.runtime_cardinality,
+        pattern_cardinality=saved_plan.pattern_cardinality,
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,
         as_of=as_of
@@ -144,7 +145,6 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict
         produced=saved_plan.produced,
         consumed=saved_plan.consumed,
         matches=saved_plan.matches,
-        inner_size=saved_plan.inner_size,
         current_mappings=current_mappings
     )
     # return IndexJoinIterator(left, right, context, current_mappings=current_mappings)

@@ -18,6 +18,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
 
 import sage.http_server.responses as responses
+import sage.http_server.metrics as metrics
 from sage.database.core.dataset import Dataset
 from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
@@ -116,10 +117,18 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             # delete the saved plan, as it will not be reloaded anymore
             dataset.statefull_manager.delete_plan(next_link)
 
-        logging.info(f'export time: {(time() - start) * 1000}ms')
         exportTime = (time() - start) * 1000
-        stats = {"cardinalities": cardinalities, "import": loading_time, "export": exportTime}
-
+        logging.info(f'export time: {exportTime}ms')
+        stats = {
+            "cardinalities": cardinalities,
+            "import": loading_time,
+            "export": exportTime,
+            "metrics": {
+                "triples_scanned": metrics.triples_scanned(saved_plan),
+                "coverage": metrics.coverage(saved_plan, runtime_cardinality=True)
+            }
+        }
+        print(stats['metrics'])
         return (bindings, next_page, stats)
     except Exception as err:
         # abort all ongoing transactions, then forward the exception to the main loop

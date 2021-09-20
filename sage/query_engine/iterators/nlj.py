@@ -3,7 +3,7 @@
 from typing import Dict, Optional
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.protobuf.iterators_pb2 import SavedIndexJoinIterator, TriplePattern
+from sage.query_engine.protobuf.iterators_pb2 import SavedIndexJoinIterator
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 
 
@@ -19,21 +19,16 @@ class IndexJoinIterator(PreemptableIterator):
 
     def __init__(
         self, left: PreemptableIterator, right: PreemptableIterator, context: dict,
-        produced: int = 0, consumed: int = 0, matches: int = 0, inner_size: int = 0,
+        produced: int = 0, consumed: int = 0, matches: int = 0,
         current_mappings: Optional[Dict[str, str]] = None
     ):
         super(IndexJoinIterator, self).__init__()
         self._left = left
         self._right = right
-        # self._produced = produced
-        # self._consumed = consumed
-        # self._match = match
         self._current_mappings = current_mappings
-        #########
-        self._produced = produced # right.produced
-        self._consumed = consumed # left.produced
-        self._matches = matches # right.stages
-        self._inner_size = inner_size
+        self._produced = produced
+        self._consumed = consumed
+        self._matches = matches
 
     def __repr__(self) -> str:
         return f"<IndexJoinIterator ({self._left} JOIN {self._right} WITH {self._current_mappings})>"
@@ -41,25 +36,6 @@ class IndexJoinIterator(PreemptableIterator):
     def serialized_name(self) -> str:
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "join"
-
-    def cardinality(self) -> float:
-        left_cardinality = self._left.cardinality()
-        if self._produced == 0:
-            return left_cardinality
-        right_cardinality = self._inner_size / self._matches
-        return left_cardinality * (self._matches / self._consumed) * right_cardinality
-
-    def progression(self) -> float:
-        left_progression = self._left.progression()
-        print(f'left: {left_progression}')
-        if self._produced == 0:
-            return left_progression
-        join_cardinality = self.cardinality()
-        if self._produced >= join_cardinality:
-            return left_progression
-        join_progression = self._produced / join_cardinality
-        print(f'join: {join_progression}')
-        return left_progression * join_progression
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
@@ -88,7 +64,6 @@ class IndexJoinIterator(PreemptableIterator):
             self._right.next_stage(self._current_mappings)
             if self._right.has_next():
                 self._matches += 1
-                self._inner_size += self._right.__len__()
         mu = await self._right.next()
         if mu is not None:
             self._produced += 1
@@ -110,5 +85,4 @@ class IndexJoinIterator(PreemptableIterator):
         saved_join.produced = self._produced
         saved_join.consumed = self._consumed
         saved_join.matches = self._matches
-        saved_join.inner_size = self._inner_size
         return saved_join

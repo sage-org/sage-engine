@@ -10,7 +10,6 @@ from rdflib.util import from_n3
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
-from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 
 
 def to_rdflib_term(value: str) -> Union[Literal, URIRef, Variable]:
