@@ -25,6 +25,7 @@ exclude = [ "tests" ]
 sage = "sage.cli.http_server:start_sage_server"
 sage-query = "sage.cli.commons:sage_query"
 sage-debug= "sage.cli.debug:sage_query_debug"
+sage-explain= "sage.cli.explain:explain"
 sage-grpc = "sage.cli.grpc_server:start_grpc_server"
 sage-postgres-init = "sage.cli.postgres:init_postgres"
 sage-postgres-index = "sage.cli.postgres:index_postgres"
