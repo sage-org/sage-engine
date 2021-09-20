@@ -87,8 +87,8 @@ class FilterIterator(PreemptableIterator):
             if not self.has_next():
                 return None
             self._mu = await self._source.next()
-        mu=self._mu
-        self._mu=None        
+        mu = self._mu
+        self._mu = None
         return mu
 
     def has_next(self) -> bool:

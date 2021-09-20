@@ -1,6 +1,5 @@
 # projection.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from time import time
 from typing import Dict, List, Optional
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
