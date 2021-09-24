@@ -12,12 +12,14 @@ from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.union import BagUnionIterator
+from sage.query_engine.iterators.values import ValuesIterator
 from sage.query_engine.protobuf.iterators_pb2 import (RootTree,
                                                       SavedBagUnionIterator,
                                                       SavedFilterIterator,
                                                       SavedIndexJoinIterator,
                                                       SavedProjectionIterator,
-                                                      SavedScanIterator)
+                                                      SavedScanIterator,
+                                                      SavedValuesIterator)
 from sage.query_engine.protobuf.utils import protoTriple_to_dict
 
 SavedProtobufPlan = Union[RootTree, SavedBagUnionIterator, SavedFilterIterator, SavedIndexJoinIterator, SavedProjectionIterator, SavedScanIterator]
@@ -51,6 +53,8 @@ def load(saved_plan: SavedProtobufPlan, dataset: Dataset, context: dict) -> Pree
         return load_nlj(saved_plan, dataset, context)
     elif type(saved_plan) is SavedBagUnionIterator:
         return load_union(saved_plan, dataset, context)
+    elif type(saved_plan) is SavedValuesIterator:
+        return load_values(saved_plan, dataset, context)
     else:
         raise Exception(f"Unknown iterator type '{type(saved_plan)}' when loading controls")
 
@@ -124,6 +128,28 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,
         as_of=as_of
+    )
+
+
+def load_values(saved_plan: SavedValuesIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
+    """Load a ValuesIterator from a protobuf serialization.
+
+    Args:
+      * saved_plan: Saved query execution plan.
+      * dataset: RDF dataset used to execute the plan.
+      * context: Information about the query execution.
+
+    Returns:
+      The pipeline of iterator used to continue query execution.
+    """
+    values = list()
+    for value in saved_plan.values:
+        values.append(dict(value.bindings))
+    return ValuesIterator(
+        values,
+        next_value=saved_plan.next_value,
+        produced=saved_plan.produced,
+        runtime_cardinality=saved_plan.runtime_cardinality
     )
 
 
