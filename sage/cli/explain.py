@@ -5,7 +5,9 @@ from rdflib.plugins.sparql.algebra import pprintAlgebra
 from rdflib.plugins.sparql.parserutils import prettify_parsetree
 
 from sage.database.core.yaml_config import load_config
-from sage.query_engine.optimizer.query_parser import parse_query
+from sage.query_engine.optimizer.parser import Parser
+from sage.query_engine.optimizer.optimizer import Optimizer
+# from sage.query_engine.optimizer.query_parser import parse_query
 
 import click
 import pprint
@@ -100,7 +102,11 @@ def explain(query, file, config_file, graph_uri, indentnb, update, parse):
 
     cards = list()
     context = dict()
-    iterator, cards = parse_query(query, dataset, graph_uri, context)
+    logical_plan = Parser.parse(query)
+    iterator = Optimizer.get_default(context).optimize(
+        logical_plan, dataset, graph_uri, context
+    )
+    # iterator, cards = parse_query(query, dataset, graph_uri, context)
 
     print("-----------------")
     print("Iterator pipeline")

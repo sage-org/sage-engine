@@ -2,7 +2,9 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 # Author: Pascal Molli - MIT License 2017-2019
 
-from sage.query_engine.optimizer.query_parser import parse_query
+# from sage.query_engine.optimizer.query_parser import parse_query
+from sage.query_engine.optimizer.parser import Parser
+from sage.query_engine.optimizer.optimizer import Optimizer
 from sage.database.core.yaml_config import load_config
 from sage.query_engine.sage_engine import SageEngine
 
@@ -78,7 +80,11 @@ def sage_query_debug(config_file, default_graph_uri, query, file, limit):
     context = {'quantum': 1000000, 'max_results': 1000000}
     from time import time
     context['start_timestamp'] = time()
-    iterator, cards = parse_query(query, dataset, default_graph_uri, context)
+    logical_plan = Parser.parse(query)
+    iterator = Optimizer.get_default(context).optimize(
+        logical_plan, dataset, default_graph_uri, context
+    )
+    # iterator, cards = parse_query(query, dataset, default_graph_uri, context)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(execute(engine, iterator, limit))
     loop.close()

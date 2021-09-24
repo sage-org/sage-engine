@@ -2,8 +2,6 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 import signal
 from asyncio import set_event_loop_policy
-from os.path import isfile
-from time import time
 
 import click
 import uvloop
@@ -16,6 +14,7 @@ def stop_server(server, grace=None):
   def __fn__(signum, frame):
     server.stop(grace)
   return __fn__
+
 
 @click.command()
 @click.argument("config")

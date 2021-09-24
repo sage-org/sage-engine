@@ -1,0 +1,44 @@
+from abc import ABC
+from typing import Any
+from sage.query_engine.exceptions import UnsupportedSPARQL
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
+
+
+class PhysicalPlanVisitor(ABC):
+
+    def __init__(self):
+        pass
+
+    def visit(self, node: PreemptableIterator) -> Any:
+        if node.serialized_name() == 'proj':
+            return self.visit_projection(node)
+        elif node.serialized_name() == 'join':
+            return self.visit_join(node)
+        elif node.serialized_name() == 'union':
+            return self.visit_union(node)
+        elif node.serialized_name() == 'filter':
+            return self.visit_filter(node)
+        elif node.serialized_name() == 'values':
+            return self.visit_values(node)
+        elif node.serialized_name() == 'scan':
+            return self.visit_scan(node)
+        else:
+            raise UnsupportedSPARQL(f'Unsupported SPARQL iterator: {node.serialized_name()}')
+
+    def visit_projection(self, node: PreemptableIterator) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
+
+    def visit_values(self, node: PreemptableIterator) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
+
+    def visit_filter(self, node: PreemptableIterator) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
+
+    def visit_join(self, node: PreemptableIterator) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
+
+    def visit_union(self, node: PreemptableIterator) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
+
+    def visit_scan(self, node: PreemptableIterator) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')

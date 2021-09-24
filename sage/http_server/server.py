@@ -10,6 +10,7 @@ from time import time
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlunparse
 from uuid import uuid4
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -24,7 +25,9 @@ from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
 from sage.http_server.utils import decode_saved_plan, encode_saved_plan
 from sage.query_engine.iterators.loader import load
-from sage.query_engine.optimizer.query_parser import parse_query
+from sage.query_engine.optimizer.parser import Parser
+from sage.query_engine.optimizer.optimizer import Optimizer
+# from sage.query_engine.optimizer.query_parser import parse_query
 from sage.query_engine.sage_engine import SageEngine
 
 
@@ -88,7 +91,13 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
                 saved_plan = dataset.statefull_manager.get_plan(next_link)
             plan = load(decode_saved_plan(saved_plan), dataset, context)
         else:
-            plan, cardinalities = parse_query(query, dataset, default_graph_uri, context)
+            start_timestamp = datetime.now()
+            logical_plan = Parser.parse(query)
+            plan = Optimizer.get_default(context).optimize(
+                logical_plan, dataset, default_graph_uri, context, as_of=start_timestamp
+            )
+            cardinalities = list()  # need to be computed or returned by the optimizer
+            # plan, cardinalities = parse_query(query, dataset, default_graph_uri, context)
         logging.info(f'loading time: {(time() - start) * 1000}ms')
         loading_time = (time() - start) * 1000
 
@@ -125,7 +134,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             "export": exportTime,
             "metrics": {
                 "triples_scanned": metrics.triples_scanned(saved_plan),
-                "coverage": metrics.coverage(saved_plan, runtime_cardinality=True)
+                "coverage": metrics.coverage(saved_plan)
             }
         }
         print(stats['metrics'])
