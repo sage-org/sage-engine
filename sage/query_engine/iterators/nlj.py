@@ -1,6 +1,6 @@
 # nlj.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Optional
+from typing import Dict, Optional, Set
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedIndexJoinIterator
@@ -37,6 +37,18 @@ class IndexJoinIterator(PreemptableIterator):
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "join"
 
+    def explain(self, height: int = 0, step: int = 3) -> None:
+        prefix = ''
+        if height > step:
+            prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
+        prefix += ('|' + ('-' * (step - 1)))
+        print(f'{prefix}IndexJoinIterator MAPPINGS <{self._current_mappings}>')
+        self._left.explain(height=(height + step), step=step)
+        self._right.explain(height=(height + step), step=step)
+
+    def variables(self) -> Set[str]:
+        return self._left.variables().union(self._right.variables())
+
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         self._current_mappings = None
@@ -67,7 +79,7 @@ class IndexJoinIterator(PreemptableIterator):
         mu = await self._right.next()
         if mu is not None:
             self._produced += 1
-            return {**self._current_mappings, **mu}
+            return mu
         return None
 
     def save(self) -> SavedIndexJoinIterator:

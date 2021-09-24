@@ -2,6 +2,8 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
 from typing import Union
+from rdflib.plugins.sparql.parser import parseQuery
+from rdflib.plugins.sparql.algebra import translateQuery
 
 from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.filter import FilterIterator
@@ -86,7 +88,9 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset, context: dict
     mu = None
     if len(saved_plan.mu) > 0:
         mu = saved_plan.mu
-    return FilterIterator(source, saved_plan.expression, context, mu=mu)
+    compiled_expr = parseQuery(f"SELECT * WHERE {{ ?s ?p ?o . FILTER({saved_plan.expression}) }}")
+    compiled_expr = translateQuery(compiled_expr).algebra.p.p.expr
+    return FilterIterator(source, compiled_expr, context, mu=mu)
 
 
 def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -117,12 +121,10 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) ->
         produced=saved_plan.produced,
         cardinality=saved_plan.cardinality,
         runtime_cardinality=saved_plan.runtime_cardinality,
-        pattern_cardinality=saved_plan.pattern_cardinality,
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,
         as_of=as_of
     )
-    # return ScanIterator(connector, pattern, context, current_mappings=current_mappings, mu=mu, last_read=saved_plan.last_read, as_of=as_of)
 
 
 def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict) -> PreemptableIterator:
@@ -150,7 +152,6 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict
         matches=saved_plan.matches,
         current_mappings=current_mappings
     )
-    # return IndexJoinIterator(left, right, context, current_mappings=current_mappings)
 
 
 def load_union(saved_plan: SavedBagUnionIterator, dataset: Dataset, context: dict) -> PreemptableIterator:

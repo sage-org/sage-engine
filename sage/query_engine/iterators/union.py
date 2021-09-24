@@ -1,6 +1,6 @@
 # union.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Optional
+from typing import Dict, Optional, Set
 from random import random
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -30,6 +30,18 @@ class BagUnionIterator(PreemptableIterator):
     def serialized_name(self) -> str:
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "union"
+
+    def explain(self, height: int = 0, step: int = 3) -> None:
+        prefix = ''
+        if height > step:
+            prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
+        prefix += ('|' + ('-' * (step - 1)))
+        print(f'{prefix}BagUnionIterator')
+        self._left.explain(height=(height + step), step=step)
+        self._right.explain(height=(height + step), step=step)
+
+    def variables(self) -> Set[str]:
+        return self._left.variables().union(self._right.variables())
 
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""

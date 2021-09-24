@@ -35,6 +35,7 @@ r_decimal = re.compile(r'([0-9]+\.[0-9]*|\.[0-9]+)')
 r_double = re.compile(rf'([0-9]+\.[0-9]*{exponent}|\.[0-9]+{exponent}|[0-9]+{exponent})')
 r_boolean = re.compile(r'(true|false)')
 
+
 class ConsistencyLevel(Enum):
     """The consistency level choosen for executing the query"""
     ATOMIC_PER_ROW = 1
@@ -247,9 +248,9 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], co
         right = parse_query_node(node.p2, dataset, current_graphs, context, cardinalities, as_of=as_of)
         return BagUnionIterator(left, right, context)
     elif node.name == 'Filter':
-        expression = parse_filter_expr(node.expr)
+        # expression = parse_filter_expr(node.expr)
         iterator = parse_query_node(node.p, dataset, current_graphs, context, cardinalities, as_of=as_of)
-        return FilterIterator(iterator, expression, context)
+        return FilterIterator(iterator, node.expr, context)
     elif node.name == 'Join':
         # only allow for joining BGPs from different GRAPH clauses
         triples = get_triples_from_graph(node.p1, current_graphs) + get_triples_from_graph(node.p2, current_graphs)

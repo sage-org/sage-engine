@@ -4,12 +4,12 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 
 from sage.database.core.dataset import Dataset
-from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.utils import EmptyIterator
-from sage.query_engine.optimizer.utils import equality_variables, find_connected_pattern, get_vars
+from sage.query_engine.optimizer.utils import find_connected_pattern, get_vars
+
 
 def analyze_triple_patterns(
     bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str,
@@ -33,7 +33,10 @@ def analyze_triple_patterns(
         print({'triple': triple, 'cardinality': c})
     return triples, cardinalities
 
-def build_ascending_cardinalities_tree(triples: List[Dict[str, Any]], context: dict) -> Tuple[PreemptableIterator, List[str]]:
+
+def build_ascending_cardinalities_tree(
+    triples: List[Dict[str, Any]], context: dict
+) -> Tuple[PreemptableIterator, List[str]]:
     print('build ascending cardinalities tree')
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
@@ -53,7 +56,10 @@ def build_ascending_cardinalities_tree(triples: List[Dict[str, Any]], context: d
         triples.pop(pos)
     return pipeline, query_vars
 
-def build_naive_tree(triples: List[Dict[str, Any]], context: dict) -> Tuple[PreemptableIterator, List[str]]:
+
+def build_naive_tree(
+    triples: List[Dict[str, Any]], context: dict
+) -> Tuple[PreemptableIterator, List[str]]:
     print('build naive tree')
     pattern = triples.pop(0)
     query_vars = get_vars(pattern['triple'])
@@ -62,11 +68,14 @@ def build_naive_tree(triples: List[Dict[str, Any]], context: dict) -> Tuple[Pree
     while len(triples) > 0:
         pattern = triples.pop(0)
         query_vars = query_vars | get_vars(pattern['triple'])
-        graph_uri = pattern['triple']['graph']
         pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
     return pipeline, query_vars
 
-def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str, context: dict, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, List[str], Dict[str, str]]:
+
+def build_left_join_tree(
+    bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str,
+    context: dict, as_of: Optional[datetime] = None
+) -> Tuple[PreemptableIterator, List[str], Dict[str, str]]:
     """Build a Left-linear join tree from a Basic Graph pattern.
 
     Args:

@@ -8,7 +8,7 @@ from sage.query_engine.protobuf.iterators_pb2 import RootTree
 
 def secure_url(url: str) -> str:
     """Secure potentially ill formatted urls.
-    
+
     Argument: URL to secure.
 
     Returns: Secured URL.

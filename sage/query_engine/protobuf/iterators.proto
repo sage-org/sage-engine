@@ -17,8 +17,7 @@ message SavedScanIterator {
   string timestamp = 5;
   int64 cardinality = 6;
   int64 runtime_cardinality = 7;
-  int64 pattern_cardinality = 8;
-  int64 produced = 9;
+  int64 produced = 8;
 }
 
 message SavedProjectionIterator {
@@ -98,5 +97,4 @@ message RootTree {
     SavedInsertData insert_source = 6;
     SavedDeleteData delete_source = 7;
   }
-  double progression = 8;
 }

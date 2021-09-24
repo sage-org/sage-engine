@@ -1,13 +1,12 @@
 # filter.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Optional, Union
-
+from typing import Dict, Optional, Union, Set
 from rdflib import Literal, URIRef, Variable
-from rdflib.plugins.sparql.algebra import translateQuery
-from rdflib.plugins.sparql.parser import parseQuery
+from rdflib.plugins.sparql.parserutils import Expr
 from rdflib.plugins.sparql.sparql import Bindings, QueryContext
 from rdflib.util import from_n3
 
+from sage.query_engine.optimizer.logical.visitors.expression_stringifier import ExpressionStringifier
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
@@ -37,25 +36,31 @@ class FilterIterator(PreemptableIterator):
       * context: Information about the query execution.
     """
 
-    def __init__(self, source: PreemptableIterator, expression: str, context: dict, mu: Optional[Dict[str, str]] = None):
+    def __init__(self, source: PreemptableIterator, expression: Expr, context: dict, mu: Optional[Dict[str, str]] = None):
         super(FilterIterator, self).__init__()
         self._source = source
-        self._raw_expression = expression
+        self._expression = expression
         self._mu = mu
-        # compile the expression using rdflib
-        compiled_expr = parseQuery(f"SELECT * WHERE {{?s ?p ?o . FILTER({expression})}}")
-        compiled_expr = translateQuery(compiled_expr)
-        self._prologue = compiled_expr.prologue
-        self._compiled_expression = compiled_expr.algebra.p.p.expr
 
     def __repr__(self) -> str:
-        return f"<FilterIterator '{self._raw_expression}' on {self._source}>"
+        return f"<FilterIterator '{self._expression.name}' on {self._source}>"
 
     def serialized_name(self) -> str:
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "filter"
 
-    def _evaluate(self, bindings: Dict[str, str]) -> bool:
+    def explain(self, height: int = 0, step: int = 3) -> None:
+        prefix = ''
+        if height > step:
+            prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
+        prefix += ('|' + ('-' * (step - 1)))
+        print(f'{prefix}FilterIterator <{str(self._expression.vars)}>')
+        self._source.explain(height=(height + step), step=step)
+
+    def variables(self) -> Set[str]:
+        return self._source.variables()
+
+    def __evaluate__(self, bindings: Dict[str, str]) -> bool:
         """Evaluate the FILTER expression with a set mappings.
 
         Argument: A set of solution mappings.
@@ -65,8 +70,8 @@ class FilterIterator(PreemptableIterator):
         d = {Variable(key[1:]): to_rdflib_term(value) for key, value in bindings.items()}
         b = Bindings(d=d)
         context = QueryContext(bindings=b)
-        context.prologue = self._prologue
-        return self._compiled_expression.eval(context)
+        # context.prologue = self._prologue
+        return self._expression.eval(context)
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
@@ -83,7 +88,7 @@ class FilterIterator(PreemptableIterator):
         if not self.has_next():
             return None
         self._mu = await self._source.next()
-        while self._mu is None or not self._evaluate(self._mu):
+        while self._mu is None or not self.__evaluate__(self._mu):
             if not self.has_next():
                 return None
             self._mu = await self._source.next()
@@ -100,7 +105,7 @@ class FilterIterator(PreemptableIterator):
         saved_filter = SavedFilterIterator()
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_filter, source_field).CopyFrom(self._source.save())
-        saved_filter.expression = self._raw_expression
+        saved_filter.expression = ExpressionStringifier().visit(self._expression)
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_filter.mu)
         return saved_filter

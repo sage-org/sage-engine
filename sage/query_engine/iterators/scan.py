@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
 from time import time
-from typing import Dict, Optional
+from typing import Dict, Optional, Set
 
 from sage.database.db_connector import DatabaseConnector
 from sage.query_engine.exceptions import QuantumExhausted
@@ -33,8 +33,6 @@ class ScanIterator(PreemptableIterator):
         produced: int = 0,
         cardinality: Optional[int] = None,
         runtime_cardinality: Optional[int] = None,
-        pattern_cardinality: Optional[int] = None,
-        # last_position: Optional[int] = None, current_position: Optional[int] = None,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -56,22 +54,15 @@ class ScanIterator(PreemptableIterator):
             (s, p, o) = (find_in_mappings(pattern['subject'], current_mappings), find_in_mappings(pattern['predicate'], current_mappings), find_in_mappings(pattern['object'], current_mappings))
             it, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
         self._source = it
-
+        # statistics to compute the query progression
         if cardinality is not None:
             self._cardinality = cardinality
         else:
             self._cardinality = card
-
         if runtime_cardinality is not None:
             self._runtime_cardinality = runtime_cardinality
         else:
             self._runtime_cardinality = 0
-
-        if pattern_cardinality is not None:
-            self._pattern_cardinality = pattern_cardinality
-        else:
-            self._pattern_cardinality = card
-
         self._produced = produced
 
     def __len__(self) -> int:
@@ -83,6 +74,26 @@ class ScanIterator(PreemptableIterator):
     def serialized_name(self):
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "scan"
+
+    def explain(self, height: int = 0, step: int = 3) -> None:
+        prefix = ''
+        if height > step:
+            prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
+        prefix += ('|' + ('-' * (step - 1)))
+        subject = self._pattern['subject']
+        predicate = self._pattern['predicate']
+        object = self._pattern['object']
+        print(f'{prefix}ScanIterator <({subject} {predicate} {object})>')
+
+    def variables(self) -> Set[str]:
+        vars = set()
+        if self._pattern['subject'].startswith('?'):
+            vars.add(self._pattern['subject'])
+        if self._pattern['predicate'].startswith('?'):
+            vars.add(self._pattern['predicate'])
+        if self._pattern['object'].startswith('?'):
+            vars.add(self._pattern['object'])
+        return vars
 
     def last_read(self) -> str:
         return self._source.last_read()
@@ -110,22 +121,23 @@ class ScanIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if self._mu is not None:
-            triple = self._mu
-            self._mu = None
-            return triple
-        elif not self.has_next():
-            return None
-        else:
-            triple = self._source.next()
-            if triple is not None:
+        if self._mu is None:
+            if not self.has_next():
+                return None
+            mappings = self._source.next()
+            if mappings is not None:
                 self._produced += 1
-                triple = selection(triple, self._variables)
+                self._mu = selection(mappings, self._variables)
             timestamp = (time() - self._context['start_timestamp']) * 1000
             if self._context['quantum'] <= timestamp:
-                self._mu = triple
                 raise QuantumExhausted()
-            return triple
+        if self._mu is not None:
+            if self._current_mappings is not None:
+                mappings = {**self._current_mappings, **self._mu}
+            else:
+                mappings = self._mu
+            self._mu = None
+            return mappings
 
     def save(self) -> SavedScanIterator:
         """Save and serialize the iterator as a Protobuf message"""
@@ -144,7 +156,6 @@ class ScanIterator(PreemptableIterator):
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
         saved_scan.cardinality = self._cardinality
-        saved_scan.pattern_cardinality = self._pattern_cardinality
         if (self._runtime_cardinality == 0) and (self._produced > 0):
             saved_scan.runtime_cardinality = self._cardinality
         else:

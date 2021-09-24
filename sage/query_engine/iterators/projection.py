@@ -1,6 +1,6 @@
 # projection.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedProjectionIterator
@@ -26,6 +26,17 @@ class ProjectionIterator(PreemptableIterator):
     def serialized_name(self) -> str:
         """Get the name of the iterator, as used in the plan serialization protocol"""
         return "proj"
+
+    def explain(self, height: int = 0, step: int = 3) -> None:
+        prefix = ''
+        if height > step:
+            prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
+        prefix += ('|' + ('-' * (step - 1)))
+        print(f'{prefix}ProjectionIterator SELECT {self._projection}')
+        self._source.explain(height=(height + step), step=step)
+
+    def variables(self) -> Set[str]:
+        return set(self._projection)
 
     def has_next(self) -> bool:
         """Return True if the iterator has more item to yield"""
