@@ -92,9 +92,12 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset, context: dict
     mu = None
     if len(saved_plan.mu) > 0:
         mu = saved_plan.mu
-    compiled_expr = parseQuery(f"SELECT * WHERE {{ ?s ?p ?o . FILTER({saved_plan.expression}) }}")
+    query = f'SELECT * WHERE {{ ?s ?p ?o . FILTER({saved_plan.expression}) }}'
+    compiled_expr = parseQuery(query)
     compiled_expr = translateQuery(compiled_expr).algebra.p.p.expr
-    return FilterIterator(source, compiled_expr, context, mu=mu)
+    return FilterIterator(
+        source, saved_plan.expression, compiled_expr, context, mu=mu
+    )
 
 
 def load_scan(saved_plan: SavedScanIterator, dataset: Dataset, context: dict) -> PreemptableIterator:

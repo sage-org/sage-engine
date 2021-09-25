@@ -5,7 +5,6 @@ from rdflib.plugins.sparql.parserutils import Expr
 from sage.query_engine.optimizer.physical.plan_visitor import PhysicalPlanVisitor
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, RDFTerm
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.optimizer.logical.visitors.expression_stringifier import ExpressionStringifier
 from sage.query_engine.iterators.filter import FilterIterator
 
 SOURCE = 0
@@ -124,8 +123,7 @@ class FilterPushDown(PhysicalPlanVisitor):
         self._moved = dict()
 
     def __has_already_been_moved__(self, filter: PreemptableIterator) -> bool:
-        expression = ExpressionStringifier().visit(filter._expression)
-        key = md5(expression.encode()).hexdigest()
+        key = md5(filter._raw_expression.encode()).hexdigest()
         if key not in self._moved:
             self._moved[key] = None
             return False
@@ -138,15 +136,15 @@ class FilterPushDown(PhysicalPlanVisitor):
         for (iterator, position) in targets:
             if position == SOURCE:
                 iterator._source = FilterIterator(
-                    iterator._source, filter._expression, self._context
+                    iterator._source, filter._raw_expression, filter._expression, self._context
                 )
             elif position == LEFT:
                 iterator._left = FilterIterator(
-                    iterator._left, filter._expression, self._context
+                    iterator._left, filter._raw_expression, filter._expression, self._context
                 )
             elif position == RIGHT:
                 iterator._right = FilterIterator(
-                    iterator._right, filter._expression, self._context
+                    iterator._right, filter._raw_expression, filter._expression, self._context
                 )
             else:
                 message = f'Unexpected relative position {position}'
@@ -218,15 +216,15 @@ class FilterPushDown(PhysicalPlanVisitor):
 #             updated = True
 #             if position == SOURCE:
 #                 iterator._source = FilterIterator(
-#                     iterator._source, filter._expression, self._context
+#                     iterator._source, filter._raw_expression, filter._expression, self._context
 #                 )
 #             elif position == LEFT:
 #                 iterator._left = FilterIterator(
-#                     iterator._left, filter._expression, self._context
+#                     iterator._left, filter._raw_expression, filter._expression, self._context
 #                 )
 #             elif position == RIGHT:
 #                 iterator._right = FilterIterator(
-#                     iterator._right, filter._expression, self._context
+#                     iterator._right, filter._raw_expression, filter._expression, self._context
 #                 )
 #             else:
 #                 message = f'Unexpected relative position {position}'

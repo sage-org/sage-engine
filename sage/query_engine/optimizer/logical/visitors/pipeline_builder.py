@@ -22,6 +22,39 @@ from sage.query_engine.update.serializable import SerializableUpdate
 from sage.query_engine.update.update_sequence import UpdateSequenceOperator
 
 
+class ExpressionStringifier(LogicalPlanVisitor):
+
+    def __init__(self):
+        super().__init__()
+
+    def visit_rdfterm(self, node: RDFTerm) -> str:
+        return utils.format_term(node)
+
+    def visit_conditional_and_expression(self, node: Expr) -> str:
+        expression = self.visit(node.expr)
+        for other in node.other:
+            expression = f'({expression} && {self.visit(other)})'
+        return expression
+
+    def visit_conditional_or_expression(self, node: Expr) -> str:
+        expression = self.visit(node.expr)
+        for other in node.other:
+            expression = f'({expression} || {self.visit(other)})'
+        return expression
+
+    def visit_regex_expression(self, node: Expr) -> str:
+        return f'regex({self.visit(node.text)}, {self.visit(node.pattern)})'
+
+    def visit_relational_expression(self, node: Expr) -> str:
+        return f'({self.visit(node.expr)} {node.op} {self.visit(node.other)})'
+
+    def visit_unary_not_expression(self, node: Expr) -> str:
+        return f'!({self.visit(node.expr)})'
+
+    def visit_str_expression(self, node: Expr) -> str:
+        return f'str({self.visit(node.arg)})'
+
+
 class PipelineBuilder(LogicalPlanVisitor):
 
     def __init__(
@@ -112,8 +145,9 @@ class PipelineBuilder(LogicalPlanVisitor):
         )
 
     def visit_filter(self, node: CompValue) -> PreemptableIterator:
+        raw_expression = ExpressionStringifier().visit(node.expr)
         return FilterIterator(
-            self.visit(node.p), node.expr, self._context
+            self.visit(node.p), raw_expression, node.expr, self._context
         )
 
     def visit_to_multiset(self, node: CompValue) -> PreemptableIterator:
@@ -141,33 +175,6 @@ class PipelineBuilder(LogicalPlanVisitor):
             )
         else:
             return EmptyIterator()
-
-    def visit_rdfterm(self, node: RDFTerm) -> str:
-        return utils.format_term(node)
-
-    def visit_conditional_and_expression(self, node: Expr) -> str:
-        expression = self.visit(node.expr)
-        for other in node.other:
-            expression = f'({expression} && {self.visit(other)})'
-        return expression
-
-    def visit_conditional_or_expression(self, node: Expr) -> str:
-        expression = self.visit(node.expr)
-        for other in node.other:
-            expression = f'({expression} || {self.visit(other)})'
-        return expression
-
-    def visit_regex_expression(self, node: Expr) -> str:
-        return f'REGEX({self.visit(node.text)}, {self.visit(node.pattern)})'
-
-    def visit_relational_expression(self, node: Expr) -> str:
-        return f'({self.visit(node.expr)} {node.op} {self.visit(node.other)})'
-
-    def visit_unary_not_expression(self, node: Expr) -> str:
-        return f'!({self.visit(node.arg)})'
-
-    def visit_str_expression(self, node: Expr) -> str:
-        return f'str({self.visit(node.arg)})'
 
     def visit_insert(self, node: CompValue) -> PreemptableIterator:
         quads = utils.get_quads_from_update(node, self._default_graph)

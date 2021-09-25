@@ -294,4 +294,4 @@ if 'SAGE_CONFIG_FILE' in environ:
     config_file = environ['SAGE_CONFIG_FILE']
     app = run_app(config_file)
 elif __name__ == "__main__":
-    raise RuntimeError("You cannot run the script server.py as a plain script. Please the use the SaGe CLI to start you own server.")
+    raise RuntimeError("You cannot run the script server.py as a plain script. Please use the SaGe CLI to start you own server.")

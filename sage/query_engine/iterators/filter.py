@@ -6,7 +6,6 @@ from rdflib.plugins.sparql.parserutils import Expr
 from rdflib.plugins.sparql.sparql import Bindings, QueryContext
 from rdflib.util import from_n3
 
-from sage.query_engine.optimizer.logical.visitors.expression_stringifier import ExpressionStringifier
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
@@ -36,9 +35,14 @@ class FilterIterator(PreemptableIterator):
       * context: Information about the query execution.
     """
 
-    def __init__(self, source: PreemptableIterator, expression: Expr, context: dict, mu: Optional[Dict[str, str]] = None):
+    def __init__(
+        self, source: PreemptableIterator,
+        raw_expression: str, expression: Expr,
+        context: dict, mu: Optional[Dict[str, str]] = None
+    ):
         super(FilterIterator, self).__init__()
         self._source = source
+        self._raw_expression = raw_expression
         self._expression = expression
         self._mu = mu
 
@@ -105,7 +109,7 @@ class FilterIterator(PreemptableIterator):
         saved_filter = SavedFilterIterator()
         source_field = self._source.serialized_name() + '_source'
         getattr(saved_filter, source_field).CopyFrom(self._source.save())
-        saved_filter.expression = ExpressionStringifier().visit(self._expression)
+        saved_filter.expression = self._raw_expression
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_filter.mu)
         return saved_filter
