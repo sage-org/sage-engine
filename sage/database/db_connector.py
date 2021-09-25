@@ -58,19 +58,11 @@ class DatabaseConnector(ABC):
         """Build a DatabaseConnector from a dictionnary"""
         pass
 
-    def open(self) -> None:
-        """Open the database connection"""
-        pass
-
-    def close(self) -> None:
-        """Close the database connection"""
-        pass
-
     def insert(self, subject: str, predicate: str, obj: str) -> None:
         """Insert a RDF triple into the RDF graph.
 
         If not overrided, this method raises an exception as it consider the graph as read-only.
-        
+
         Args:
           * subject: Subject of the RDF triple.
           * predicate: Predicate of the RDF triple.
@@ -105,19 +97,6 @@ class DatabaseConnector(ABC):
     def abort_transaction(self) -> None:
         """Abort any ongoing transaction (if supported by this type of connector)"""
         pass
-
-    def __enter__(self):
-        """Implementation of the __enter__ method from the context manager spec"""
-        self.open()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        """Implementation of the __close__ method from the context manager spec"""
-        self.close()
-
-    def __del__(self):
-        """Destructor"""
-        self.close()
 
     @property
     def nb_triples(self) -> int:

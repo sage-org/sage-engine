@@ -38,10 +38,6 @@ class ProjectionIterator(PreemptableIterator):
     def variables(self) -> Set[str]:
         return set(self._projection)
 
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return self._source.has_next()
-
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         self._source.next_stage(mappings)
@@ -54,8 +50,6 @@ class ProjectionIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if not self.has_next():
-            return None
         mappings = await self._source.next()
         if mappings is None:
             return None

@@ -1,6 +1,7 @@
 # hdt_file_connector.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
+from datetime import datetime
 from hdt import TripleIterator
 
 from sage.database.db_iterator import DBIterator
@@ -24,13 +25,14 @@ class HDTIterator(DBIterator):
         """Return the ID of the last element read"""
         return str(self._source.nb_reads + self._start_offset)
 
-    def next(self) -> Tuple[str, str, str]:
+    def next(self) -> Optional[Tuple[str, str, str, Optional[datetime], Optional[datetime]]]:
         """Return the next solution mapping or None if there are no more solutions"""
         try:
-            return next(self._source)
+            triple = next(self._source)
+            return (triple[0], triple[1], triple[2], None, None)
         except StopIteration:
             return None
 
-    def has_next(self) -> bool:
-        """Return True if there is still results to read, and False otherwise"""
-        return self._source.has_next()
+    # def has_next(self) -> bool:
+    #     """Return True if there is still results to read, and False otherwise"""
+    #     return self._source.has_next()

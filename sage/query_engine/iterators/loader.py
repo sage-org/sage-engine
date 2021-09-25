@@ -178,7 +178,6 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset, context: dict
         left, right, context,
         produced=saved_plan.produced,
         consumed=saved_plan.consumed,
-        matches=saved_plan.matches,
         current_mappings=current_mappings
     )
 

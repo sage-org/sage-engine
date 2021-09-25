@@ -17,7 +17,6 @@ def get_start_query(subj: str, pred: str, obj: str, table_name: str) -> Tuple[st
     """
     kind = get_kind(subj, pred, obj)
     query = f"SELECT * FROM {table_name} "
-    params = None
     if kind == 'spo':
         query += """WHERE subject = %s
                     AND predicate = %s
@@ -60,7 +59,7 @@ def get_start_query(subj: str, pred: str, obj: str, table_name: str) -> Tuple[st
         raise Exception(f"Unkown pattern type: {kind}")
 
 
-def get_resume_query(subj: str, pred: str, obj: str, last_read: Tuple[str, str, str], table_name: str, symbol: str = ">=") -> Tuple[str, str]:
+def get_resume_query(subj: str, pred: str, obj: str, last_read: Tuple[str, str, str], table_name: str, symbol: str = ">") -> Tuple[str, str]:
     """Get a prepared SQL query which resumes scanning for a triple pattern.
 
     The SQL query rely on keyset pagination to resume query processing using an optimized Index Scan.

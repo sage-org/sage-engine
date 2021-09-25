@@ -1,7 +1,8 @@
 # db_iterator.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
+from datetime import datetime
+from typing import Dict, Tuple, Optional
 
 
 class DBIterator(ABC):
@@ -38,13 +39,8 @@ class DBIterator(ABC):
         pass
 
     @abstractmethod
-    def next(self) -> Tuple[str, str, str]:
+    def next(self) -> Optional[Tuple[str, str, str, Optional[datetime], Optional[datetime]]]:
         """Return the next RDF triple or raise `StopIteration` if there are no more triples to scan"""
-        pass
-
-    @abstractmethod
-    def has_next(self) -> bool:
-        """Return True if there is still results to read, and False otherwise"""
         pass
 
 
@@ -58,7 +54,3 @@ class EmptyIterator(DBIterator):
     def next(self) -> None:
         """Return the next solution mapping or raise `StopIteration` if there are no more solutions"""
         return None
-
-    def has_next(self) -> bool:
-        """Return True if there is still results to read, and False otherwise"""
-        return False

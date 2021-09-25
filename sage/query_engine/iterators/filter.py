@@ -44,7 +44,7 @@ class FilterIterator(PreemptableIterator):
         self._source = source
         self._raw_expression = raw_expression
         self._expression = expression
-        self._mu = mu
+        self._mu = mu  # check if this attribute is necessary !!!
 
     def __repr__(self) -> str:
         return f"<FilterIterator '{self._expression.name}' on {self._source}>"
@@ -72,8 +72,7 @@ class FilterIterator(PreemptableIterator):
         Returns: The outcome of evaluating the SPARQL FILTER on the input set of solution mappings.
         """
         d = {Variable(key[1:]): to_rdflib_term(value) for key, value in bindings.items()}
-        b = Bindings(d=d)
-        context = QueryContext(bindings=b)
+        context = QueryContext(bindings=Bindings(d=d))
         # context.prologue = self._prologue
         return self._expression.eval(context)
 
@@ -89,20 +88,12 @@ class FilterIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if not self.has_next():
-            return None
-        self._mu = await self._source.next()
-        while self._mu is None or not self.__evaluate__(self._mu):
-            if not self.has_next():
+        mappings = None
+        while mappings is None or not self.__evaluate__(mappings):
+            mappings = await self._source.next()
+            if mappings is None:
                 return None
-            self._mu = await self._source.next()
-        mu = self._mu
-        self._mu = None
-        return mu
-
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return self._source.has_next()
+        return mappings
 
     def save(self) -> SavedFilterIterator:
         """Save and serialize the iterator as a Protobuf message"""

@@ -43,10 +43,6 @@ class BagUnionIterator(PreemptableIterator):
     def variables(self) -> Set[str]:
         return self._left.variables().union(self._right.variables())
 
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return self._left.has_next() or self._right.has_next()
-
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         self._left.next_stage(mappings)
@@ -60,12 +56,10 @@ class BagUnionIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if not self.has_next():
-            return None
-        elif self._left.has_next():
-            return await self._left.next()
-        else:
-            return await self._right.next()
+        mappings = await self._left.next()
+        if mappings is not None:
+            return mappings
+        return await self._right.next()
 
     def save(self) -> SavedBagUnionIterator:
         """Save and serialize the iterator as a Protobuf message"""

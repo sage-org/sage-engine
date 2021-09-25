@@ -98,10 +98,6 @@ class ScanIterator(PreemptableIterator):
     def last_read(self) -> str:
         return self._source.last_read()
 
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return self._source.has_next() or self._mu is not None
-
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         (s, p, o) = (find_in_mappings(self._pattern['subject'], mappings), find_in_mappings(self._pattern['predicate'], mappings), find_in_mappings(self._pattern['object'], mappings))
@@ -121,23 +117,24 @@ class ScanIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if self._mu is None:
-            if not self.has_next():
-                return None
+        while self._mu is None:
             mappings = self._source.next()
-            if mappings is not None:
-                self._produced += 1
-                self._mu = selection(mappings, self._variables)
-            timestamp = (time() - self._context['start_timestamp']) * 1000
-            if self._context['quantum'] <= timestamp:
+            if mappings is None:
+                return None
+            start_time = self._start_timestamp
+            (subject, predicate, object, insert_t, delete_t) = mappings
+            if (insert_t is None) or (insert_t <= start_time and start_time < delete_t):
+                self._mu = selection((subject, predicate, object), self._variables)
+            execution_time = (time() - self._context['start_timestamp']) * 1000
+            if execution_time > self._context['quantum']:
                 raise QuantumExhausted()
-        if self._mu is not None:
-            if self._current_mappings is not None:
-                mappings = {**self._current_mappings, **self._mu}
-            else:
-                mappings = self._mu
-            self._mu = None
-            return mappings
+        self._produced += 1
+        if self._current_mappings is not None:
+            mappings = {**self._current_mappings, **self._mu}
+        else:
+            mappings = self._mu
+        self._mu = None
+        return mappings
 
     def save(self) -> SavedScanIterator:
         """Save and serialize the iterator as a Protobuf message"""

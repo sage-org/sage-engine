@@ -1,6 +1,7 @@
 # iterator.py
 # Author: Thomas MINIER - MIT License 2019
-from typing import Optional, List, Dict, Tuple
+from datetime import datetime
+from typing import Optional, Dict, Tuple
 
 from sage.database.db_iterator import DBIterator
 
@@ -18,7 +19,7 @@ class HBaseIterator(DBIterator):
         self._current_page = list()
         self._has_next_page = False
         self._last_read_key = row_key
-        self.__fetch_many(limit=1, skip_first=False)
+        self.__fetch_many(limit=1, skip_first=(row_key is not None))
 
     def __is_relevant_triple(self, triple: Dict[bytes, str]) -> bool:
         """Return True if the RDF triple matches the triple pattern scanned"""
@@ -51,22 +52,32 @@ class HBaseIterator(DBIterator):
             self._current_page.pop(0)
         scanner.close()
 
-    def last_read(self) -> str:
+    def last_read(self) -> Optional[str]:
         """Return the index ID of the last element read"""
-        if not self.has_next():
-            return self._last_read_key # whatever as long as the key is not in the HBase database...
-        (key, triple) = self._current_page[0]
-        return key
+        if self._last_read_key is None or self._last_read_key == '':
+            return self._last_read_key
+        return self._last_read_key
+        # if not self.has_next():
+        #     return self._last_read_key  # whatever as long as the key is not in the HBase database...
+        # (key, triple) = self._current_page[0]
+        # return key
 
-    def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Tuple[str, str, str, Optional[datetime], Optional[datetime]]]:
         """Return the next solution mapping or None if there are no more solutions"""
-        if not self.has_next():
-            return None
-        self._last_read_key, triple = self._current_page.pop(0)
-        return triple
-
-    def has_next(self) -> bool:
-        """Return True if there is still results to read, False otherwise"""
         if len(self._current_page) == 0 and self._has_next_page:
             self.__fetch_many()
-        return len(self._current_page) > 0
+        if len(self._current_page) == 0:
+            self._last_read_key = ''  # scan complete
+            return None
+        # if not self.has_next():
+        #     return None
+        self._last_read_key, triple = self._current_page.pop(0)
+        return (
+            triple[0], triple[1], triple[2], None, None
+        )
+
+    # def has_next(self) -> bool:
+    #     """Return True if there is still results to read, False otherwise"""
+    #     if len(self._current_page) == 0 and self._has_next_page:
+    #         self.__fetch_many()
+    #     return len(self._current_page) > 0

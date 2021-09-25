@@ -1,7 +1,7 @@
 # responses.py
 # Author: Thomas MINIER - MIT License 2017-2020
 from json import dumps
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, Optional, Tuple
 from xml.etree import ElementTree
 
 
@@ -15,7 +15,7 @@ def analyze_term(value: str) -> Tuple[str, str, Optional[str], Optional[str]]:
       * `type` is the type of the term (literal or uri).
       * `extra_label` is the type of an extra element for this term (datatype or xml:lang).
       * `extra_value` is the value of an extra element for this term.
-    
+
     Example:
       >>> analyze_term("<http://example.org#Anna>")
       ("<http://example.org#Anna>", "uri", None, None)
@@ -49,7 +49,7 @@ def analyze_term(value: str) -> Tuple[str, str, Optional[str], Optional[str]]:
 
 def stream_json_list(iterator: Iterable[Dict[str, str]]) -> Iterable[str]:
     """A generator for streaming a list of JSON results in an HTTP response.
-    
+
     Argument: An iterator which yields solutions bindings.
 
     Yields: Solution bindings as string-encoded JSON.
@@ -84,7 +84,7 @@ def skolemize_one(bnode: str, url: str) -> str:
 
 def skolemize(bindings: Iterable[Dict[str, str]], url: str) -> Iterable[Dict[str, str]]:
     """Skolemize blank nodes in a list of solution bindings.
-    
+
     Args:
       * bindings: An iterable which yields set of solution bindings to process.
       * url: Prefix URL used for skolemization.
@@ -103,7 +103,7 @@ def ntriples_streaming(triples: Iterable[Tuple[str, str, str]]) -> Iterable[str]
     """Serialize RDF triples in N-Triples string format in a iterable-fashion.
 
     Argument: An iterable which yields RDF triples to process.
-    
+
     Yields: RDF triples in a string format, encoded in the N-Triples format.
     """
     for s, p, o in triples:
@@ -115,7 +115,7 @@ def ntriples_streaming(triples: Iterable[Tuple[str, str, str]]) -> Iterable[str]
 
 def binding_to_json(binding: Dict[str, str]) -> dict:
     """Format a set of solutions bindings in the W3C SPARQL JSON format.
-    
+
     Argument: A set of solution bindings.
 
     Returns: The input set of solution bindings, encoded in the W3C SPARQL JSON format.
@@ -134,13 +134,13 @@ def binding_to_json(binding: Dict[str, str]) -> dict:
 
 def w3c_json_streaming(bindings: Iterable[Dict[str, str]], next_link: Optional[str], stats: dict, skol_url: str) -> Iterable[str]:
     """Yield a page of SaGe results in the W3C SPARQL JSON results format, so it can be sent in an HTTP response.
-    
+
     Args:
       * bindings: An iterable which yields set of solution bindings.
       * next_link: Link to a SaGe saved plan. Use `None` if there is no one, i.e., the query execution has completed during the quantum.
       * stats: Statistics about query execution.
       * skol_url: URL used for the skolemization of blank nodes.
-    
+
     Yields:
       A page of SaGe results in the W3C SPARQL JSON results format.
     """
@@ -161,13 +161,13 @@ def w3c_json_streaming(bindings: Iterable[Dict[str, str]], next_link: Optional[s
 
 def raw_json_streaming(bindings: Iterable[Dict[str, str]], next_link: Optional[str], stats: dict, skol_url: str) -> Iterable[str]:
     """Yield a page of SaGe results in a non-standard JSON format, so it can be sent in an HTTP response.
-    
+
     Args:
       * bindings: An iterable which yields set of solution bindings.
       * next_link: Link to a SaGe saved plan. Use `None` if there is no one, i.e., the query execution has completed during the quantum.
       * stats: Statistics about query execution.
       * skol_url: URL used for the skolemization of blank nodes.
-    
+
     Yields:
       A page of SaGe results in the W3C SPARQL JSON results format.
     """
@@ -185,7 +185,7 @@ def raw_json_streaming(bindings: Iterable[Dict[str, str]], next_link: Optional[s
 
 def bindings_to_w3c_xml(bindings: Iterable[Dict[str, str]], skol_url: str) -> ElementTree.Element:
     """Formats a set of bindings into SPARQL results in the W3C SPARQL XML format.
-    
+
     Args:
       * bindings: An iterable which yields set of solution bindings.
       * skol_url: URL used for the skolemization of blank nodes.
@@ -223,13 +223,13 @@ def bindings_to_w3c_xml(bindings: Iterable[Dict[str, str]], skol_url: str) -> El
 
 def w3c_xml(bindings: Iterable[Dict[str, str]], next_link: Optional[str], stats: dict, skol_url: str) -> Iterable[str]:
     """Yield a page of SaGe results in the W3C SPARQL XML results format, so it can be sent in an HTTP response.
-    
+
     Args:
       * bindings: An iterable which yields set of solution bindings.
       * next_link: Link to a SaGe saved plan. Use `None` if there is no one, i.e., the query execution has completed during the quantum.
       * stats: Statistics about query execution.
       * skol_url: URL used for the skolemization of blank nodes.
-    
+
     Yields:
       A page of SaGe results in the W3C SPARQL JSON results format.
     """

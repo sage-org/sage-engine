@@ -3,10 +3,8 @@ import logging
 import coloredlogs
 
 from datetime import datetime
-from math import ceil
-from typing import Optional, List, Dict, Tuple
+from typing import Optional, Tuple
 from uuid import uuid4
-from time import time
 
 from sage.database.db_iterator import EmptyIterator
 from sage.database.postgres_backends.connector import PostgresConnector

@@ -39,11 +39,6 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        pass
-
-    @abstractmethod
     def save(self) -> Any:
         """Save and serialize the iterator as a Protobuf message"""
         pass

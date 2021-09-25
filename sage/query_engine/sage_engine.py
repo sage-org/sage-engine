@@ -20,12 +20,19 @@ async def executor(pipeline: PreemptableIterator, results: list, context: dict) 
 
     Throws: Any exception raised during query execution.
     """
-    while pipeline.has_next():
-        value = await pipeline.next()
-        if value is not None:
-            results.append(value)
+    value = await pipeline.next()
+    while value is not None:
+        results.append(value)
         if len(results) >= context['max_results']:
             raise TooManyResults()
+        value = await pipeline.next()
+
+    # while pipeline.has_next():
+    #     value = await pipeline.next()
+    #     if value is not None:
+    #         results.append(value)
+    #     if len(results) >= context['max_results']:
+    #         raise TooManyResults()
 
 
 class SageEngine(object):

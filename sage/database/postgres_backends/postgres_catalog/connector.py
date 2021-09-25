@@ -3,7 +3,6 @@ import logging
 import coloredlogs
 
 from datetime import datetime
-from math import ceil
 from uuid import uuid4
 from typing import Optional, Dict, Tuple
 from psycopg2.extras import execute_values
@@ -143,7 +142,7 @@ class CatalogPostgresConnector(PostgresConnector):
             values[subject] = 0
             values[predicate] = 0
             values[obj] = 0
-            execute_values(transaction, insert_query, [ [x] for x in values.keys() ])
+            execute_values(transaction, insert_query, [[x] for x in values.keys()])
             # Retrieve inserted RDF terms identifier
             select_id_query = get_locate_query()
             transaction.execute(select_id_query, [subject])

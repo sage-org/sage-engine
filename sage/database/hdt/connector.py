@@ -1,14 +1,14 @@
 # hdt_file_connector.py
 # Author: Thomas MINIER - MIT License 2017-2020
 import os.path
-from typing import Optional, Tuple
 
+from typing import Optional, Tuple
+from datetime import datetime
 from hdt import HDTDocument
 
 from sage.database.db_connector import DatabaseConnector
 from sage.database.hdt.iterator import HDTIterator
 
-from datetime import datetime
 
 class HDTFileConnector(DatabaseConnector):
     """A HDTFileConnector search for RDF triples in a HDT file.

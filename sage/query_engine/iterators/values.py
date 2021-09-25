@@ -43,9 +43,6 @@ class ValuesIterator(PreemptableIterator):
         self._next_value = 0
         self._runtime_cardinality += len(self._values)
 
-    def has_next(self) -> bool:
-        return self._next_value < len(self._values)
-
     async def next(self) -> Optional[Dict[str, str]]:
         if self._next_value >= len(self._values):
             return None

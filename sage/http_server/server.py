@@ -115,7 +115,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
         start = time()
         # encode saved plan if query execution is not done yet and there was no abort
         next_page = None
-        if (not is_done) and abort_reason is None:
+        if (not is_done) and (abort_reason is None):
             next_page = encode_saved_plan(saved_plan)
             if not dataset.is_stateless:
                 # generate the plan ID if this is the first time we execute this plan
@@ -134,7 +134,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             "export": exportTime,
             "metrics": {
                 "triples_scanned": metrics.triples_scanned(saved_plan),
-                "coverage": metrics.coverage(saved_plan)
+                "coverage": 1.0 if is_done else metrics.coverage(saved_plan)
             }
         }
         print(stats['metrics'])

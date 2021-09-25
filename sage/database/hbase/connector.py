@@ -1,6 +1,5 @@
 import happybase
 
-from os import getpid
 from datetime import datetime
 from typing import Optional, Tuple
 
@@ -100,7 +99,7 @@ class HBaseConnector(DatabaseConnector):
     def __refresh_connection(self):
         try:
             list(self._connection.table('spo').scan(limit=1))
-        except:
+        except Exception:
             self._connection = happybase.Connection(self._thrift_host, protocol="compact", transport="framed", port=self._thrift_port, table_prefix=self._graph_name)
 
     def search(self, subject: str, predicate: str, obj: str, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[HBaseIterator, int]:

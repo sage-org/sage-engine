@@ -35,7 +35,6 @@ def flatten_leaves(
         source_iterator = getattr(saved_iterator, saved_iterator.WhichOneof('source'))
         flatten_leaves(source_iterator, iterators)
     elif type(saved_iterator) is SavedScanIterator or type(saved_iterator) is SavedValuesIterator:
-        print(saved_iterator)
         iterators.append(saved_iterator)
     elif type(saved_iterator) is SavedIndexJoinIterator:
         left_iterator = getattr(saved_iterator, saved_iterator.WhichOneof('left'))

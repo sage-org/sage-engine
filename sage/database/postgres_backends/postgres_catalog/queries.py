@@ -54,7 +54,7 @@ def get_start_query(subj, pred, obj, table_name):
         raise Exception(f"Unkown pattern type: {kind}")
 
 
-def get_resume_query(subj, pred, obj, last_read, table_name, symbol=">="):
+def get_resume_query(subj, pred, obj, last_read, table_name, symbol=">"):
     """
         Get a prepared SQL query which resumes scanning for a triple pattern
         and the parameters used to execute it.
@@ -135,12 +135,12 @@ def get_insert_many_query(table_name):
 
 def get_catalog_insert_query():
     """Build a SQL query to insert a RDF term into a PostgreSQL dataset"""
-    return f"INSERT INTO catalog (value) VALUES (%s) ON CONFLICT (md5(value)) DO UPDATE SET value=EXCLUDED.value RETURNING ID"
+    return "INSERT INTO catalog (value) VALUES (%s) ON CONFLICT (md5(value)) DO UPDATE SET value=EXCLUDED.value RETURNING ID"
 
 
 def get_catalog_insert_many_query():
     """Build a SQL query to insert a RDF term into a PostgreSQL dataset"""
-    return f"INSERT INTO catalog (value) VALUES %s ON CONFLICT (md5(value)) DO UPDATE SET value=EXCLUDED.value RETURNING ID"
+    return "INSERT INTO catalog (value) VALUES %s ON CONFLICT (md5(value)) DO UPDATE SET value=EXCLUDED.value RETURNING ID"
 
 
 def get_delete_query(table_name):

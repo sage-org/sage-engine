@@ -19,7 +19,7 @@ class IndexJoinIterator(PreemptableIterator):
 
     def __init__(
         self, left: PreemptableIterator, right: PreemptableIterator, context: dict,
-        produced: int = 0, consumed: int = 0, matches: int = 0,
+        produced: int = 0, consumed: int = 0,
         current_mappings: Optional[Dict[str, str]] = None
     ):
         super(IndexJoinIterator, self).__init__()
@@ -28,7 +28,6 @@ class IndexJoinIterator(PreemptableIterator):
         self._current_mappings = current_mappings
         self._produced = produced
         self._consumed = consumed
-        self._matches = matches
 
     def __repr__(self) -> str:
         return f"<IndexJoinIterator ({self._left} JOIN {self._right} WITH {self._current_mappings})>"
@@ -54,10 +53,6 @@ class IndexJoinIterator(PreemptableIterator):
         self._current_mappings = None
         self._left.next_stage(mappings)
 
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return self._left.has_next() or (self._current_mappings is not None and self._right.has_next())
-
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
@@ -66,21 +61,19 @@ class IndexJoinIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if not self.has_next():
-            return None
-        while self._current_mappings is None or not self._right.has_next():
-            self._current_mappings = await self._left.next()
+        while True:
             if self._current_mappings is None:
-                return None
-            self._consumed += 1
-            self._right.next_stage(self._current_mappings)
-            if self._right.has_next():
-                self._matches += 1
-        mu = await self._right.next()
-        if mu is not None:
-            self._produced += 1
-            return mu
-        return None
+                self._current_mappings = await self._left.next()
+                if self._current_mappings is None:
+                    return None
+                self._consumed += 1
+                self._right.next_stage(self._current_mappings)
+            else:
+                mappings = await self._right.next()
+                if mappings is not None:
+                    self._produced += 1
+                    return mappings
+                self._current_mappings = None
 
     def save(self) -> SavedIndexJoinIterator:
         """Save and serialize the iterator as a Protobuf message"""
@@ -96,5 +89,4 @@ class IndexJoinIterator(PreemptableIterator):
         # export statistics used to estimate the cardinality of the query
         saved_join.produced = self._produced
         saved_join.consumed = self._consumed
-        saved_join.matches = self._matches
         return saved_join
