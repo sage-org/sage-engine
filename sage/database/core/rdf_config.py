@@ -8,7 +8,7 @@ from rdflib.plugins.sparql import prepareQuery
 
 from sage.database.core.dataset import Dataset
 from sage.database.core.graph import Graph
-from sage.database.import_manager import builtin_backends, import_backend
+from sage.database.backends.import_manager import builtin_backends
 
 
 def load_config(config_file: str, format="ttl") -> Dataset:
@@ -17,7 +17,7 @@ def load_config(config_file: str, format="ttl") -> Dataset:
     Args:
       * config_file: Path to the SaGe configuration file (in RDF format) to load.
       * format: Format of the RDF configuration file (ttl, nt, n3). Defaults to Turtle (ttl).
-    
+
     Returns:
       A RDF dataset built according to the input configuration file.
     """
@@ -134,7 +134,7 @@ def load_config(config_file: str, format="ttl") -> Dataset:
         backend_config = dict()
         backend_name = None
         # fetch backend config. parameters first
-        backend_res = graph.query(backend_query, initBindings = { "backend": row.backend })
+        backend_res = graph.query(backend_query, initBindings={"backend": row.backend})
         if len(backend_res) == 0:
             logging.error(f"Graph with name '{g_name}' has a backend declared with an invalid syntax. Please check your configuration file using the documentation.")
         else:

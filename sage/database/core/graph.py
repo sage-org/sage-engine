@@ -4,8 +4,8 @@ from datetime import datetime
 from math import inf
 from typing import List, Optional, Tuple
 
-from sage.database.db_connector import DatabaseConnector
-from sage.database.db_iterator import DBIterator
+from sage.database.backends.db_connector import DatabaseConnector
+from sage.database.backends.db_iterator import DBIterator
 
 
 class Graph(object):

@@ -17,7 +17,7 @@ W3C_FORMATS = Namespace("http://www.w3.org/ns/formats/")
 
 def bind_prefixes(graph: Graph) -> None:
     """Bind commons prefixes to a rdflib Graph.
-    
+
     Generate readable prefixes when serializing the graph to turtle.
 
     Argument: The rdflib Graph to which prefixes should be added.
@@ -32,7 +32,7 @@ def bind_prefixes(graph: Graph) -> None:
 
 def many_void(endpoint_uri: str, dataset: Dataset, rdf_format: str, encoding: str = "utf-8") -> str:
     """Describe a RDF dataset hosted by a Sage server using the VOID and SPARQL Description languages.
-    
+
     Supported RDF formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
 
     Args:
@@ -93,7 +93,7 @@ class AbstractDescriptor(ABC):
 
 class VoidDescriptor(AbstractDescriptor):
     """A descriptor that describes a Sage dataset using the VOID standard.
-    
+
     Args:
       * uri: URI of the RDF graph to describe.
       * graph: the RDF Graph to describe.

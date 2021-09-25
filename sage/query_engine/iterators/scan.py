@@ -4,7 +4,7 @@ from datetime import datetime
 from time import time
 from typing import Dict, Optional, Set
 
-from sage.database.db_connector import DatabaseConnector
+from sage.database.backends.db_connector import DatabaseConnector
 from sage.query_engine.exceptions import QuantumExhausted
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.utils import selection, vars_positions
@@ -147,7 +147,9 @@ class ScanIterator(PreemptableIterator):
         saved_scan.pattern.CopyFrom(triple)
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_scan.muc)
-        saved_scan.last_read = self._source.last_read()
+        last_read = self._source.last_read()
+        if last_read is not None:
+            saved_scan.last_read = last_read
         if self._start_timestamp is not None:
             saved_scan.timestamp = self._start_timestamp.isoformat()
         if self._mu is not None:

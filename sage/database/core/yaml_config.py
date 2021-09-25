@@ -8,7 +8,7 @@ from yaml import FullLoader, load
 
 from sage.database.core.dataset import Dataset
 from sage.database.core.graph import Graph
-from sage.database.import_manager import builtin_backends, import_backend
+from sage.database.backends.import_manager import builtin_backends, import_backend
 from sage.database.statefull.hashmap_manager import HashMapManager
 
 

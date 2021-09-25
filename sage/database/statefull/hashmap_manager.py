@@ -14,7 +14,7 @@ class HashMapManager(StatefullManager):
 
     def get_plan(self, plan_id: str) -> str:
         """Get a saved plan by ID.
-        
+
         Argument: ID of the saved plan to retrieve.
 
         Returns: The saved plan corresponding to the input ID.
@@ -23,7 +23,7 @@ class HashMapManager(StatefullManager):
 
     def save_plan(self, id: str, plan: str) -> None:
         """Store a saved plan by ID.
-        
+
         Args:
           * id: Unique ID associated with the saved plan.
           * plan: Plan to save.
@@ -32,7 +32,7 @@ class HashMapManager(StatefullManager):
 
     def delete_plan(self, plan_id: str) -> None:
         """Delete a saved plan by ID.
-        
+
         Argument: ID of the saved plan to delete.
         """
         del self._plans[plan_id]
