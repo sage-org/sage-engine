@@ -199,6 +199,25 @@ def run_app(config_file: str) -> FastAPI:
     else:
         saved_plan_manager = StatefullManager()
 
+    async def execute_sparql_query(
+        request: Request, query: str, default_graph_uri: str, next_link: Optional[str]
+    ) -> Response:
+        """Execute a SPARQL query using the Web Preemption model"""
+        try:
+            mimetypes = request.headers['accept'].split(",")
+            server_url = urlunparse(request.url.components[0:3] + (None, None, None))
+            bindings, next_page, stats = await execute_query(
+                query, default_graph_uri, next_link, dataset, saved_plan_manager
+            )
+            response = create_response(
+                mimetypes, bindings, next_page, stats, server_url
+            )
+            return response
+        except HTTPException as err:
+            raise err
+        except Exception as err:
+            raise HTTPException(status_code=500, detail=str(err))
+
     @app.get("/")
     async def root():
         return "The SaGe SPARQL query server is running!"
@@ -210,42 +229,25 @@ def run_app(config_file: str) -> FastAPI:
         default_graph_uri: str = Query(..., alias="default-graph-uri", description="The URI of the default RDF graph queried."),
         next_link: str = Query(None, alias="next", description="(Optional) A next link used to resume query execution from a saved state.")
     ):
-        """Execute a SPARQL query using the Web Preemption model"""
-        try:
-            mimetypes = request.headers['accept'].split(",")
-            server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset, saved_plan_manager)
-            return create_response(mimetypes, bindings, next_page, stats, server_url)
-        except HTTPException as err:
-            raise err
-        except Exception as err:
-            logging.error(err)
-            raise HTTPException(status_code=500, detail=str(err))
-
-    async def execute_post(request: Request, item: SagePostQuery):
-        """Execute a SPARQL query using the Web Preemption model"""
-        try:
-            mimetypes = request.headers['accept'].split(",")
-            server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset, saved_plan_manager)
-            response = create_response(mimetypes, bindings, next_page, stats, server_url)
-            return response
-        except HTTPException as err:
-            raise err
-        except Exception as err:
-            logging.error(err)
-            raise HTTPException(status_code=500, detail=str(err))
+        dataset.join_ordering = True
+        return await execute_sparql_query(
+            request, query, default_graph_uri, next_link
+        )
 
     @app.post("/sparql")
     async def sparql_post(request: Request, item: SagePostQuery):
-        dataset.enable_join_ordering = True
-        return await execute_post(request, item)
+        dataset.join_ordering = True
+        return await execute_sparql_query(
+            request, item.query, item.defaultGraph, item.next
+        )
 
     @app.post("/sparql-no-join-ordering")
     async def sparql_post_test(request: Request, item: SagePostQuery):
         """Execute a SPARQL query using the Web Preemption model"""
-        dataset.enable_join_ordering = False
-        return await execute_post(request, item)
+        dataset.join_ordering = False
+        return await execute_sparql_query(
+            request, item.query, item.defaultGraph, item.next
+        )
 
     @app.get("/void/", description="Get the VoID description of the SaGe server")
     async def server_void(request: Request):

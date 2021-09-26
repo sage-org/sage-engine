@@ -71,11 +71,6 @@ def load_config(config_file: str) -> Dataset:
         logging.warning("You are using SaGe without limitations on the number of results sent per page. This is fine, but be carefull as very large page of results can have unexpected serialization time.")
         max_results = inf
 
-    if 'join_ordering' in config:
-        enable_join_ordering = config['join_ordering']
-    else:
-        enable_join_ordering = True
-
     # build all RDF graphs found in the configuration file
     graphs = dict()
     if "graphs" not in config:
@@ -107,6 +102,5 @@ def load_config(config_file: str) -> Dataset:
         public_url=public_url,
         default_query=default_query,
         analytics=analytics,
-        stateless=stateless,
-        enable_join_ordering=enable_join_ordering
+        stateless=stateless
     )

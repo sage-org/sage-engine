@@ -150,7 +150,7 @@ class PipelineBuilder(LogicalPlanVisitor):
         scan_iterators = list()
         for triple_pattern in node.triples:
             scan_iterators.append(self.visit(triple_pattern))
-        if self._dataset.enable_join_ordering:
+        if self._dataset.join_ordering:
             return self.__build_ascending_cardinalities_tree__(scan_iterators)
         else:
             return self.__build_naive_tree__(scan_iterators)

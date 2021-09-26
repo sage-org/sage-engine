@@ -88,7 +88,7 @@ def build_left_join_tree(
     # gather metadata about triple patterns
     triples, cardinalities = analyze_triple_patterns(bgp, dataset, default_graph, as_of=as_of)
 
-    if dataset.enable_join_ordering:
+    if dataset.join_ordering:
         pipeline, query_vars = build_ascending_cardinalities_tree(triples)
     else:
         pipeline, query_vars = build_naive_tree(triples)
