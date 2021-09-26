@@ -6,37 +6,37 @@ def get_create_tables_queries(graph_name, backend):
     if backend == "postgres":
         return [(
             f"CREATE TABLE {graph_name} ("
-            f"subject TEXT, "
-            f"predicate TEXT, "
-            f"object TEXT);"
+            "subject TEXT, "
+            "predicate TEXT, "
+            "object TEXT);"
         )]
     elif backend == "postgres-mvcc":
         return [(
             f"CREATE TABLE {graph_name} ("
-            f"subject TEXT, "
-            f"predicate TEXT, "
-            f"object TEXT, "
-            f"insert_t abstime DEFAULT transaction_timestamp(), "
-            f"delete_t abstime DEFAULT \"infinity\");"
+            "subject TEXT, "
+            "predicate TEXT, "
+            "object TEXT, "
+            "insert_t abstime DEFAULT transaction_timestamp(), "
+            "delete_t abstime DEFAULT \"infinity\");"
         )]
     elif backend == "postgres-catalog":
         return [
             (
-                f"CREATE TABLE IF NOT EXISTS catalog ("
-                f"id BIGSERIAL, "
-                f"value TEXT);"
+                "CREATE TABLE IF NOT EXISTS catalog ("
+                "id BIGSERIAL, "
+                "value TEXT);"
             ),
             (
-                f"CREATE UNIQUE INDEX IF NOT EXISTS catalog_locate_index ON catalog (md5(value));"
+                "CREATE UNIQUE INDEX IF NOT EXISTS catalog_locate_index ON catalog (md5(value));"
             ),
             (
-                f"CREATE INDEX IF NOT EXISTS catalog_extract_index ON catalog using HASH (id);"
+                "CREATE INDEX IF NOT EXISTS catalog_extract_index ON catalog using HASH (id);"
             ),
             (
-                f"CREATE TABLE {graph_name} ("
-                f"subject BIGINT, "
-                f"predicate BIGINT, "
-                f"object BIGINT);"
+                "CREATE TABLE {graph_name} ("
+                "subject BIGINT, "
+                "predicate BIGINT, "
+                "object BIGINT);"
             )
         ]
     else:
@@ -74,7 +74,7 @@ def get_insert_into_query(graph_name):
 
 def get_insert_into_catalog_query():
     """Get an INSERT INTO query compatible with "psycopg2.extras.execute_values" to support the bulk loading."""
-    return f"INSERT INTO catalog (value) VALUES %s ON CONFLICT (md5(value)) DO UPDATE SET value=EXCLUDED.value RETURNING ID"
+    return "INSERT INTO catalog (value) VALUES %s ON CONFLICT (md5(value)) DO UPDATE SET value=EXCLUDED.value RETURNING ID"
 
 
 def get_analyze_query(graph_name):

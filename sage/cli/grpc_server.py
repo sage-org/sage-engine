@@ -1,10 +1,10 @@
 # grpc_server.py
 # Author: Thomas MINIER - MIT License 2017-2020
 import signal
-from asyncio import set_event_loop_policy
-
 import click
 import uvloop
+
+from asyncio import set_event_loop_policy
 
 from sage.grpc.grpc_server import get_server
 
@@ -18,9 +18,18 @@ def stop_server(server, grace=None):
 
 @click.command()
 @click.argument("config")
-@click.option("-p", "--port", type=int, default=8000, show_default=True, help="The port to bind")
-@click.option("-w", "--workers", type=int, default=4, show_default=True, help="he number of server workers")
-@click.option("--log-level", type=click.Choice(["debug", "info", "warning", "error"]), default="info", show_default=True, help="The granularity of log outputs")
+@click.option(
+    "-p", "--port", type=click.INT, default=8000, show_default=True,
+    help="The port to bind"
+)
+@click.option(
+    "-w", "--workers", type=click.INT, default=4, show_default=True,
+    help="he number of server workers"
+)
+@click.option(
+    "--log-level", type=click.Choice(["debug", "info", "warning", "error"]),
+    default="info", show_default=True, help="The granularity of log outputs"
+)
 def start_grpc_server(config: str, port: int, workers: int, log_level: str) -> None:
   """Launch the Sage gRPC server using the CONFIG configuration file"""
   # Enable uvloop

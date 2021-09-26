@@ -3,28 +3,28 @@ def get_create_tables_queries(graph_name, backend):
     if backend == "sqlite":
         return [(
             f"CREATE TABLE {graph_name} ("
-            f"subject TEXT, "
-            f"predicate TEXT, "
-            f"object TEXT);"
+            "subject TEXT, "
+            "predicate TEXT, "
+            "object TEXT);"
         )]
     elif backend == "sqlite-catalog":
         return [
             (
-                f"CREATE TABLE IF NOT EXISTS catalog ("
-                f"id INTEGER PRIMARY KEY, "
-                f"value TEXT);"
+                "CREATE TABLE IF NOT EXISTS catalog ("
+                "id INTEGER PRIMARY KEY, "
+                "value TEXT);"
             ),
             (
-                f"CREATE UNIQUE INDEX IF NOT EXISTS catalog_locate_index ON catalog (value);"
+                "CREATE UNIQUE INDEX IF NOT EXISTS catalog_locate_index ON catalog (value);"
             ),
             # (
             #     f"CREATE INDEX IF NOT EXISTS catalog_extract_index ON catalog (id);"
             # ),
             (
                 f"CREATE TABLE {graph_name} ("
-                f"subject INTEGER, "
-                f"predicate INTEGER, "
-                f"object INTEGER);"
+                "subject INTEGER, "
+                "predicate INTEGER, "
+                "object INTEGER);"
             )
         ]
     else:
@@ -50,12 +50,12 @@ def get_insert_into_query(graph_name):
 
 def get_insert_into_catalog_query():
     """Get an INSERT INTO statement compatible with the "executemany" function of SQlite to support the bulk loading."""
-    return f"INSERT INTO catalog (value) VALUES (?) ON CONFLICT DO NOTHING"
+    return "INSERT INTO catalog (value) VALUES (?) ON CONFLICT DO NOTHING"
 
 
 def get_select_identifier_query():
     """Get a SELECT statement to retrieve the identifier of a RDF term."""
-    return f"SELECT id FROM catalog WHERE value = ?"
+    return "SELECT id FROM catalog WHERE value = ?"
 
 
 def get_analyze_query(graph_name):

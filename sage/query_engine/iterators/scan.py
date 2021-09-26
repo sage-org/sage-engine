@@ -1,8 +1,8 @@
 # scan.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from datetime import datetime
 from time import time
-from typing import Dict, Optional, Set
+from datetime import datetime
+from typing import Dict, Optional, Set, Any
 
 from sage.database.backends.db_connector import DatabaseConnector
 from sage.query_engine.exceptions import QuantumExhausted
@@ -21,7 +21,6 @@ class ScanIterator(PreemptableIterator):
     Args:
       * connector: The database connector that will be used to evaluate a triple pattern.
       * pattern: The evaluated triple pattern.
-      * context: Information about the query execution.
       * current_mappings: The current mappings when the scan is performed.
       * mu: The last triple read when the preemption occured. This triple must be the next returned triple when the query is resumed.
       * last_read: An offset ID used to resume the ScanIterator.
@@ -29,7 +28,7 @@ class ScanIterator(PreemptableIterator):
     """
 
     def __init__(
-        self, connector: DatabaseConnector, pattern: Dict[str, str], context: dict,
+        self, connector: DatabaseConnector, pattern: Dict[str, str],
         produced: int = 0,
         cardinality: Optional[int] = None,
         runtime_cardinality: Optional[int] = None,
@@ -41,7 +40,6 @@ class ScanIterator(PreemptableIterator):
         super(ScanIterator, self).__init__()
         self._connector = connector
         self._pattern = pattern
-        self._context = context
         self._variables = vars_positions(pattern['subject'], pattern['predicate'], pattern['object'])
         self._current_mappings = current_mappings
         self._mu = mu
@@ -109,7 +107,7 @@ class ScanIterator(PreemptableIterator):
         self._cardinality = card
         self._runtime_cardinality += card
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -121,13 +119,13 @@ class ScanIterator(PreemptableIterator):
             mappings = self._source.next()
             if mappings is None:
                 return None
-            start_time = self._start_timestamp
             (subject, predicate, object, insert_t, delete_t) = mappings
-            if (insert_t is None) or (insert_t <= start_time and start_time < delete_t):
+            if (insert_t is None) or (insert_t <= self._start_timestamp and self._start_timestamp < delete_t):
                 self._mu = selection((subject, predicate, object), self._variables)
-            execution_time = (time() - self._context['start_timestamp']) * 1000
-            if execution_time > self._context['quantum']:
-                raise QuantumExhausted()
+            if 'quota' in context and 'start_timestamp' in context:
+                execution_time = (time() - context['start_timestamp']) * 1000
+                if execution_time > context['quota']:
+                    raise QuantumExhausted()
         self._produced += 1
         if self._current_mappings is not None:
             mappings = {**self._current_mappings, **self._mu}

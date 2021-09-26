@@ -1,6 +1,6 @@
 # union.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, Any
 from random import random
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -16,10 +16,9 @@ class BagUnionIterator(PreemptableIterator):
     Args:
       * left: left operand of the union.
       * right: right operand of the union.
-      * context: Information about the query execution.
     """
 
-    def __init__(self, left: PreemptableIterator, right: PreemptableIterator, context: dict):
+    def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
         super(BagUnionIterator, self).__init__()
         self._left = left
         self._right = right
@@ -48,7 +47,7 @@ class BagUnionIterator(PreemptableIterator):
         self._left.next_stage(mappings)
         self._right.next_stage(mappings)
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -56,19 +55,19 @@ class BagUnionIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        mappings = await self._left.next()
+        mappings = await self._left.next(context=context)
         if mappings is not None:
             return mappings
-        return await self._right.next()
+        return await self._right.next(context=context)
 
     def save(self) -> SavedBagUnionIterator:
         """Save and serialize the iterator as a Protobuf message"""
         saved_union = SavedBagUnionIterator()
         # export left source
-        left_field = self._left.serialized_name() + '_left'
+        left_field = f'{self._left.serialized_name()}_left'
         getattr(saved_union, left_field).CopyFrom(self._left.save())
         # export right source
-        right_field = self._right.serialized_name() + '_right'
+        right_field = f'{self._right.serialized_name()}_right'
         getattr(saved_union, right_field).CopyFrom(self._right.save())
         return saved_union
 
@@ -81,19 +80,12 @@ class RandomBagUnionIterator(BagUnionIterator):
     Args:
       * left: left operand of the union.
       * right: right operand of the union.
-      * context: Information about the query execution.
     """
 
-    def __init__(self, left: PreemptableIterator, right: PreemptableIterator, context: dict):
-        super(BagUnionIterator, self).__init__()
-        self._left = left
-        self._right = right
+    def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
+        super(BagUnionIterator, self).__init__(left, right)
 
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return self._left.has_next() or self._right.has_next()
-
-    async def next(self) -> Optional[Dict[str, str]]:
+    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -101,15 +93,13 @@ class RandomBagUnionIterator(BagUnionIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        if not self.has_next():
-            return None
-        elif random() < 0.5:
-            if self._left.has_next():
-                return await self._left.next()
-            else:
-                return await self._right.next()
+        if random() < 0.5:
+            left = self._left
+            right = self._right
         else:
-            if self._right.has_next():
-                return await self._right.next()
-            else:
-                return await self._left.next()
+            left = self._right
+            right = self._left
+        mappings = await left.next(context=context)
+        if mappings is not None:
+            return mappings
+        return await right.next(context=context)

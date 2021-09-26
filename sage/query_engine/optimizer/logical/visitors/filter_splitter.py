@@ -1,6 +1,7 @@
 from typing import List
 from rdflib.plugins.sparql.parserutils import CompValue, Expr
 from rdflib.plugins.sparql.algebra import Filter
+
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor
 
 

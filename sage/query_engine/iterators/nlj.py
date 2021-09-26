@@ -1,6 +1,6 @@
 # nlj.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, Any
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedIndexJoinIterator
@@ -13,12 +13,11 @@ class IndexJoinIterator(PreemptableIterator):
     Args:
       * left: Previous iterator in the pipeline, i.e., the outer relation of the join.
       * right: Next iterator in the pipeline, i.e., the inner relation of the join.
-      * context: Information about the query execution.
       * current_mappings: The current mappings when the join is performed.
     """
 
     def __init__(
-        self, left: PreemptableIterator, right: PreemptableIterator, context: dict,
+        self, left: PreemptableIterator, right: PreemptableIterator,
         produced: int = 0, consumed: int = 0,
         current_mappings: Optional[Dict[str, str]] = None
     ):
@@ -53,7 +52,7 @@ class IndexJoinIterator(PreemptableIterator):
         self._current_mappings = None
         self._left.next_stage(mappings)
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -63,13 +62,13 @@ class IndexJoinIterator(PreemptableIterator):
         """
         while True:
             if self._current_mappings is None:
-                self._current_mappings = await self._left.next()
+                self._current_mappings = await self._left.next(context=context)
                 if self._current_mappings is None:
                     return None
                 self._consumed += 1
                 self._right.next_stage(self._current_mappings)
             else:
-                mappings = await self._right.next()
+                mappings = await self._right.next(context=context)
                 if mappings is not None:
                     self._produced += 1
                     return mappings
@@ -79,10 +78,10 @@ class IndexJoinIterator(PreemptableIterator):
         """Save and serialize the iterator as a Protobuf message"""
         saved_join = SavedIndexJoinIterator()
         # export left source
-        left_field = self._left.serialized_name() + '_left'
+        left_field = f'{self._left.serialized_name()}_left'
         getattr(saved_join, left_field).CopyFrom(self._left.save())
         # export right source
-        right_field = self._right.serialized_name() + '_right'
+        right_field = f'{self._right.serialized_name()}_right'
         getattr(saved_join, right_field).CopyFrom(self._right.save())
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_join.muc)

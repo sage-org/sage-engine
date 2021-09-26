@@ -5,7 +5,6 @@ import subprocess
 from sys import exit
 from os.path import isfile
 from yaml import load, FullLoader
-from rdflib import Graph
 from hdt import HDTDocument
 
 

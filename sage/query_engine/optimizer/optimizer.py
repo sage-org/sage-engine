@@ -1,6 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Optional
 
 from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -17,10 +17,10 @@ class Optimizer():
         self._physical_optimizer = None
 
     @staticmethod
-    def get_default(context: Dict[str, Any]) -> Optimizer:
+    def get_default() -> Optimizer:
         optimizer = Optimizer()
         optimizer.set_logical_optimizer(LogicalPlanOptimizer.get_default())
-        optimizer.set_physical_optimizer(PhysicalPlanOptimizer.get_default(context))
+        optimizer.set_physical_optimizer(PhysicalPlanOptimizer.get_default())
         return optimizer
 
     def set_logical_optimizer(self, optimizer: LogicalPlanOptimizer) -> None:
@@ -31,12 +31,12 @@ class Optimizer():
 
     def optimize(
         self, logical_plan: Node, dataset: Dataset, default_graph: str,
-        context: Dict[str, Any], as_of: Optional[datetime] = None
+        as_of: Optional[datetime] = None
     ) -> PreemptableIterator:
         if self._logical_optimizer is not None:
             logical_plan = self._logical_optimizer.optimize(logical_plan)
         physical_plan = PipelineBuilder(
-            dataset, default_graph, context, as_of=as_of
+            dataset, default_graph, as_of=as_of
         ).visit(logical_plan)
         if self._physical_optimizer is not None:
             physical_plan = self._physical_optimizer.optimize(physical_plan)

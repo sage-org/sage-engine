@@ -2,51 +2,55 @@
 # Author: Thomas MINIER - MIT License 2017-2019
 # Author: Pascal Molli - MIT License 2017-2019
 
+import click
+import asyncio
+import logging
+import coloredlogs
+
+from time import time
+from math import inf
+from sys import exit
+
 # from sage.query_engine.optimizer.query_parser import parse_query
 from sage.query_engine.optimizer.parser import Parser
 from sage.query_engine.optimizer.optimizer import Optimizer
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.database.core.yaml_config import load_config
-from sage.query_engine.sage_engine import SageEngine
 
-import click
-from math import inf
-from sys import exit
-import asyncio
 
-import coloredlogs
-import logging
-from time import time
-
-# install logger
+# install the logger
 coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
 
-#    (results, saved, done, _) = await engine.execute(scan, 10e7)
-async def execute(engine, iterator, limit):
+async def execute(iterator: PreemptableIterator, limit: int):
     nb_solutions = 0
     start_time = time()
-    while iterator.has_next() and nb_solutions <= limit:
-        value = await iterator.next()
+    while nb_solutions <= limit:
+        solution = await iterator.next()
+        if solution is None:
+            break
         nb_solutions += 1
-        print(value)
+        print(solution)
     elapsed_time = time() - start_time
     print(f'Number of solution mappings: {nb_solutions} - execution time: {elapsed_time}sec')
-
-    # try:
-    #     (results, saved, done, _) = await engine.execute(iterator, 10e7)
-    #     for r in results:
-    #         print(str(r))
-    # except StopAsyncIteration:
-    #     pass
 
 
 @click.command()
 @click.argument("config_file")
 @click.argument("default_graph_uri")
-@click.option("-q", "--query", type=str, default=None, help="SPARQL query to execute (passed in command-line)")
-@click.option("-f", "--file", type=str, default=None, help="File containing a SPARQL query to execute")
-@click.option("-l", "--limit", type=int, default=None, help="Maximum number of solutions bindings to fetch, similar to the SPARQL LIMIT modifier.")
+@click.option(
+    "-q", "--query", type=click.STRING, default=None,
+    help="SPARQL query to execute (passed in command-line)"
+)
+@click.option(
+    "-f", "--file", type=click.STRING, default=None,
+    help="File containing a SPARQL query to execute"
+)
+@click.option(
+    "-l", "--limit", type=click.INT, default=None,
+    help="Maximum number of solutions bindings to fetch, similar to the SPARQL LIMIT modifier."
+)
 def sage_query_debug(config_file, default_graph_uri, query, file, limit):
     """
         debug a SPARQL query on an embedded Sage Server.
@@ -76,17 +80,14 @@ def sage_query_debug(config_file, default_graph_uri, query, file, limit):
     if graph is None:
         print(f"RDF Graph  not found: {default_graph_uri}")
         exit(1)
-    engine = SageEngine()
-    context = {'quantum': 1000000, 'max_results': 1000000}
-    from time import time
-    context['start_timestamp'] = time()
+
     logical_plan = Parser.parse(query)
-    iterator = Optimizer.get_default(context).optimize(
-        logical_plan, dataset, default_graph_uri, context
+    iterator = Optimizer.get_default().optimize(
+        logical_plan, dataset, default_graph_uri
     )
-    # iterator, cards = parse_query(query, dataset, default_graph_uri, context)
+    # iterator, cards = parse_query(query, dataset, default_graph_uri)
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(execute(engine, iterator, limit))
+    loop.run_until_complete(execute(iterator, limit))
     loop.close()
 
 

@@ -32,23 +32,26 @@ def load_config(config_file: str, format="ttl") -> Dataset:
     # TODO
 
     # get default time quantum & maximum number of results per page
-    qres = graph.query("""
-    PREFIX sage: <http://sage.univ-nantes.fr/sage-voc#>
-    SELECT * WHERE {
-        ?server a sage:SageEndpoint; foaf:name ?name.
-        OPTIONAL { ?server sage:longDescription ?description }
-        OPTIONAL { ?server sage:publicUrl ?url }
-        OPTIONAL { ?server sage:quantum ?quantum }
-        OPTIONAL { ?server sage:pageSize ?pageSize }
-        OPTIONAL { ?server sage:analytics ?analytics }
-        OPTIONAL {
-            ?server sage:defaultQuery ?query.
-            ?query a sage:ExampleQuery;
-                sage:targetGraph ?queryGraphName;
-                foaf:name ?queryName;
-                rdf:value ?queryValue.
+    qres = graph.query(
+        """
+        PREFIX sage: <http://sage.univ-nantes.fr/sage-voc#>
+        SELECT * WHERE {
+            ?server a sage:SageEndpoint; foaf:name ?name.
+            OPTIONAL { ?server sage:longDescription ?description }
+            OPTIONAL { ?server sage:publicUrl ?url }
+            OPTIONAL { ?server sage:quantum ?quantum }
+            OPTIONAL { ?server sage:pageSize ?pageSize }
+            OPTIONAL { ?server sage:analytics ?analytics }
+            OPTIONAL {
+                ?server sage:defaultQuery ?query.
+                ?query a sage:ExampleQuery;
+                    sage:targetGraph ?queryGraphName;
+                    foaf:name ?queryName;
+                    rdf:value ?queryValue.
+            }
         }
-    }""")
+        """
+    )
     if len(qres) != 1:
         raise SyntaxError("A valid SaGe RDF configuration file must contains exactly one sage:SageEndpoint.")
     for row in qres:
@@ -89,32 +92,37 @@ def load_config(config_file: str, format="ttl") -> Dataset:
         break
 
     # prepare the query used to fetch backend informations per graph
-    backend_query = prepareQuery("""
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX sage: <http://sage.univ-nantes.fr/sage-voc#>
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    SELECT ?name ?paramName ?paramValue WHERE {
-        ?backend a sage:Backend;
-                foaf:name ?name;
-                sage:param ?param.
-        ?param foaf:name ?paramName;
-               rdf:value ?paramValue.
-    }""")
+    backend_query = prepareQuery(
+        """
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX sage: <http://sage.univ-nantes.fr/sage-voc#>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        SELECT ?name ?paramName ?paramValue WHERE {
+            ?backend a sage:Backend;
+                    foaf:name ?name;
+                    sage:param ?param.
+            ?param foaf:name ?paramName;
+                   rdf:value ?paramValue.
+        }
+        """
+    )
 
     # build all RDF graphs found in the configuration file
     graphs = dict()
-    qres = graph.query("""
-    PREFIX sage: <http://sage.univ-nantes.fr/sage-voc#>
-    SELECT * WHERE {
-        ?server a sage:SageEndpoint;
-                sage:graph ?graph.
-        ?graph  a sage:SageGraph;
-                foaf:name ?name ;
-                sage:backend ?backend.
-        OPTIONAL { ?graph dcterms:description ?desc . }
-        OPTIONAL { ?graph sage:quantum ?quantum . }
-        OPTIONAL { ?graph sage:pageSize ?pageSize . }
-    }""")
+    qres = graph.query(
+        """
+        PREFIX sage: <http://sage.univ-nantes.fr/sage-voc#>
+        SELECT * WHERE {
+            ?server a sage:SageEndpoint;
+                    sage:graph ?graph.
+            ?graph  a sage:SageGraph;
+                    foaf:name ?name ;
+                    sage:backend ?backend.
+            OPTIONAL { ?graph dcterms:description ?desc . }
+            OPTIONAL { ?graph sage:quantum ?quantum . }
+            OPTIONAL { ?graph sage:pageSize ?pageSize . }
+        }"""
+    )
     for row in qres:
         # load basic information about the graph
         if row.name is None:

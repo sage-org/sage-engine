@@ -1,6 +1,6 @@
 # projection.py
 # Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Any
 
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedProjectionIterator
@@ -12,10 +12,9 @@ class ProjectionIterator(PreemptableIterator):
     Args:
       * source: Previous iterator in the pipeline.
       * projection: Projection variables.
-      * context: Information about the query execution.
     """
 
-    def __init__(self, source: PreemptableIterator, context: dict, projection: List[str] = None):
+    def __init__(self, source: PreemptableIterator, projection: List[str] = None):
         super(ProjectionIterator, self).__init__()
         self._source = source
         self._projection = projection
@@ -42,7 +41,7 @@ class ProjectionIterator(PreemptableIterator):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         self._source.next_stage(mappings)
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -50,7 +49,7 @@ class ProjectionIterator(PreemptableIterator):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
-        mappings = await self._source.next()
+        mappings = await self._source.next(context=context)
         if mappings is None:
             return None
         elif self._projection is None:
@@ -61,6 +60,6 @@ class ProjectionIterator(PreemptableIterator):
         """Save and serialize the iterator as a Protobuf message"""
         saved_proj = SavedProjectionIterator()
         saved_proj.values.extend(self._projection)
-        source_field = self._source.serialized_name() + '_source'
+        source_field = f'{self._source.serialized_name()}_source'
         getattr(saved_proj, source_field).CopyFrom(self._source.save())
         return saved_proj

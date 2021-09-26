@@ -6,9 +6,6 @@ import coloredlogs
 import logging
 
 from sys import exit
-from os.path import isfile
-from yaml import load
-from hdt import HDTDocument
 from time import time
 from sage.database.hbase.utils import build_row_key
 from sage.cli.utils import load_graph, get_nb_triples
@@ -48,11 +45,15 @@ def init_hbase(config, graph_name):
 @click.argument("rdf_file")
 @click.argument("config")
 @click.argument("graph_name")
-@click.option("-f", "--format", type=click.Choice(["nt", "hdt"]),
+@click.option(
+    "-f", "--format", type=click.Choice(["nt", "hdt"]),
     default="nt", show_default=True,
-    help="Format of the input file. Supported: nt (N-triples) and hdt (HDT).")
-@click.option("-b", "--batch-size", type=int, default=1000, show_default=True,
-              help="Batch size used for batch loading")
+    help="Format of the input file. Supported: nt (N-triples) and hdt (HDT)."
+)
+@click.option(
+    "-b", "--batch-size", type=int, default=1000, show_default=True,
+    help="Batch size used for batch loading"
+)
 def put_hbase(rdf_file, config, graph_name, format, batch_size):
     """
         Insert RDF triples from HDT file HDT_FILE into the RDF Graph graph_name, described in the configuration file CONFIG. The dataset must use the Apache HBase backend.

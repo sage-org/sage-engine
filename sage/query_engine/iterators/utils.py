@@ -12,10 +12,6 @@ class EmptyIterator(object):
     def __len__(self) -> int:
         return 0
 
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return False
-
     async def next(self) -> None:
         """Get the next item from the iterator, following the iterator protocol.
 
@@ -38,10 +34,6 @@ class ArrayIterator(object):
         self._array = array
         self._produced = produced
 
-    def has_next(self) -> bool:
-        """Return True if the iterator has more item to yield"""
-        return len(self._array) > 0
-
     async def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
@@ -50,11 +42,14 @@ class ArrayIterator(object):
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
         """
+        try:
+            mappings = self._array.pop(0)
+            self._produced += 1
+            return mappings
+        except StopIteration:
+            return None
         if not self.has_next():
             return None
-        self._produced += 1
-        mu = self._array.pop(0)
-        return mu
 
 
 def selection(triple: Tuple[str, str, str], variables: List[str]) -> Dict[str, str]:

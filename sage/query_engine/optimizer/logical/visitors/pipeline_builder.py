@@ -59,12 +59,11 @@ class PipelineBuilder(LogicalPlanVisitor):
 
     def __init__(
         self, dataset: Dataset, default_graph: str,
-        context: dict, as_of: Optional[datetime] = None
+        as_of: Optional[datetime] = None
     ):
         super().__init__()
         self._dataset = dataset
         self._default_graph = default_graph
-        self._context = context
         self._as_of = as_of
 
     def __find_connected_pattern__(
@@ -89,7 +88,7 @@ class PipelineBuilder(LogicalPlanVisitor):
             else:
                 scan_iterator = scan_iterators.pop(0)
             variables = variables | utils.get_vars(scan_iterator._pattern)
-            pipeline = IndexJoinIterator(pipeline, scan_iterator, self._context)
+            pipeline = IndexJoinIterator(pipeline, scan_iterator)
         return pipeline
 
     def __build_naive_tree__(
@@ -97,9 +96,7 @@ class PipelineBuilder(LogicalPlanVisitor):
     ) -> PreemptableIterator:
         pipeline = scan_iterators.pop(0)
         while len(scan_iterators) > 0:
-            pipeline = IndexJoinIterator(
-                pipeline, scan_iterators.pop(0), self._context
-            )
+            pipeline = IndexJoinIterator(pipeline, scan_iterators.pop(0))
         return pipeline
 
     def __format_solution_mappings__(
@@ -130,25 +127,17 @@ class PipelineBuilder(LogicalPlanVisitor):
 
     def visit_projection(self, node: CompValue) -> PreemptableIterator:
         projected_variables = list(map(lambda t: '?' + str(t), node.PV))
-        return ProjectionIterator(
-            self.visit(node.p), self._context, projected_variables
-        )
+        return ProjectionIterator(self.visit(node.p), projected_variables)
 
     def visit_join(self, node: CompValue) -> PreemptableIterator:
-        return IndexJoinIterator(
-            self.visit(node.p1), self.visit(node.p2), self._context
-        )
+        return IndexJoinIterator(self.visit(node.p1), self.visit(node.p2))
 
     def visit_union(self, node: CompValue) -> PreemptableIterator:
-        return BagUnionIterator(
-            self.visit(node.p1), self.visit(node.p2), self._context
-        )
+        return BagUnionIterator(self.visit(node.p1), self.visit(node.p2))
 
     def visit_filter(self, node: CompValue) -> PreemptableIterator:
         raw_expression = ExpressionStringifier().visit(node.expr)
-        return FilterIterator(
-            self.visit(node.p), raw_expression, node.expr, self._context
-        )
+        return FilterIterator(self.visit(node.p), raw_expression, node.expr)
 
     def visit_to_multiset(self, node: CompValue) -> PreemptableIterator:
         return self.visit(node.p)
@@ -171,7 +160,7 @@ class PipelineBuilder(LogicalPlanVisitor):
         if self._dataset.has_graph(triple_pattern['graph']):
             return ScanIterator(
                 self._dataset.get_graph(triple_pattern['graph']),
-                triple_pattern, self._context, as_of=self._as_of
+                triple_pattern, as_of=self._as_of
             )
         else:
             return EmptyIterator()
@@ -185,12 +174,13 @@ class PipelineBuilder(LogicalPlanVisitor):
         return DeleteOperator(quads, self._dataset)
 
     def visit_modify(self, node: CompValue) -> PreemptableIterator:
+        consistency_level = "serializable"
         if node.where.name == 'Join':
             if node.where.p1.name == 'BGP' and len(node.where.p1.triples) == 0:
                 bgp = node.where.p2
             elif node.where.p2.name == 'BGP' and len(node.where.p2.triples) == 0:
                 bgp = node.where.p1
-        if self._context['consistency-level'] == "serializable":
+        if consistency_level == "serializable":
             source = self.visit(bgp)
             delete_templates = list()
             insert_templates = list()

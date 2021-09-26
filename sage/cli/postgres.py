@@ -33,8 +33,10 @@ def connect_postgres(graph):
 @click.command()
 @click.argument("config")
 @click.argument("graph_name")
-@click.option('--index/--no-index', default=True,
-    help="Enable/disable indexing of SQL tables. The indexes can be created separately using the command sage-postgres-index")
+@click.option(
+    '--index/--no-index', default=True,
+    help="Enable/disable indexing of SQL tables. The indexes can be created separately using the command sage-postgres-index"
+)
 def init_postgres(config, graph_name, index):
     """Initialize the RDF graph GRAPH_NAME with a PostgreSQL backend, described in the configuration file CONFIG."""
     # load graph from config file
@@ -180,18 +182,26 @@ def insert_bucket(cursor, bucket, graph_name, backend, block_size, cache):
 @click.argument("rdf_file")
 @click.argument("config")
 @click.argument("graph_name")
-@click.option("-f", "--format", type=click.Choice(["nt", "hdt"]),
+@click.option(
+    "-f", "--format", type=click.Choice(["nt", "hdt"]),
     default="nt", show_default=True,
-    help="Format of the input file. Supported: nt (N-triples) and hdt (HDT).")
-@click.option("--block-size", type=int,
+    help="Format of the input file. Supported: nt (N-triples) and hdt (HDT)."
+)
+@click.option(
+    "--block-size", type=click.INT,
     default=100, show_default=True,
-    help="Block size used for the bulk loading")
-@click.option("--commit-threshold", type=int,
+    help="Block size used for the bulk loading"
+)
+@click.option(
+    "--commit-threshold", type=click.INT,
     default=500000, show_default=True,
-    help="Commit after sending this number of RDF triples")
-@click.option("--cache-size", type=int,
+    help="Commit after sending this number of RDF triples"
+)
+@click.option(
+    "--cache-size", type=click.INT,
     default=300, show_default=True,
-    help="Store terms identifier when using the catalog schema to improve loading performance")
+    help="Store terms identifier when using the catalog schema to improve loading performance"
+)
 def put_postgres(config, graph_name, rdf_file, format, block_size, commit_threshold, cache_size):
     """Insert RDF triples from file RDF_FILE into the RDF graph GRAPH_NAME, described in the configuration file CONFIG. The graph must use the PostgreSQL or PostgreSQL-MVCC backend."""
     # load graph from config file

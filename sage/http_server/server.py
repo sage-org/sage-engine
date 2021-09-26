@@ -1,17 +1,16 @@
 # server.py
 # Author: Thomas MINIER - MIT License 2017-2020
 import logging
-import traceback
-import uvloop
+
+from traceback import format_exc
+from uvloop import EventLoopPolicy
 from asyncio import set_event_loop_policy
 from os import environ
 from sys import setrecursionlimit
 from time import time
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlunparse
-from uuid import uuid4
-from datetime import datetime
-
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
@@ -23,11 +22,12 @@ import sage.http_server.metrics as metrics
 from sage.database.core.dataset import Dataset
 from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
-from sage.http_server.utils import decode_saved_plan, encode_saved_plan
-from sage.query_engine.iterators.loader import load
 from sage.query_engine.optimizer.parser import Parser
 from sage.query_engine.optimizer.optimizer import Optimizer
 # from sage.query_engine.optimizer.query_parser import parse_query
+from sage.database.saved_plan.saved_plan_manager import SavedPlanManager
+from sage.database.saved_plan.stateless_manager import StatelessManager
+from sage.database.saved_plan.statefull_manager import StatefullManager
 from sage.query_engine.sage_engine import SageEngine
 
 
@@ -52,7 +52,10 @@ def choose_void_format(mimetypes):
     return "ntriples", "application/n-triples"
 
 
-async def execute_query(query: str, default_graph_uri: str, next_link: Optional[str], dataset: Dataset) -> Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]:
+async def execute_query(
+    query: str, default_graph_uri: str, next_link: Optional[str],
+    dataset: Dataset, saved_plan_manager: SavedPlanManager
+) -> Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]:
     """Execute a query using the SageEngine and returns the appropriate HTTP response.
 
     Any failure will results in a rollback/abort on the current query execution.
@@ -62,6 +65,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
       * default_graph_uri: URI of the default RDF graph to use.
       * next_link: URI to a saved plan. Can be `None` if query execution should starts from the beginning.
       * dataset: RDF dataset on which the query is executed.
+      * saved_plan_manager: The saved plan manager to save and restore SPARQL query execution plans.
 
     Returns:
       A tuple (`bindings`, `next_page`, `stats`) where:
@@ -77,33 +81,27 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             raise HTTPException(status_code=404, detail=f"RDF Graph {default_graph_uri} not found on the server.")
         graph = dataset.get_graph(default_graph_uri)
 
-        context = dict()
-        context['quantum'] = graph.quota
-        context['max_results'] = graph.max_results
-
         # decode next_link or build query execution plan
         cardinalities = dict()
-        start = time()
+        loadin_start = time()
         if next_link is not None:
-            if dataset.is_stateless:
-                saved_plan = next_link
-            else:
-                saved_plan = dataset.statefull_manager.get_plan(next_link)
-            plan = load(decode_saved_plan(saved_plan), dataset, context)
+            plan = saved_plan_manager.get_plan(next_link, dataset)
+            saved_plan_manager.delete_plan(next_link)
         else:
             start_timestamp = datetime.now()
             logical_plan = Parser.parse(query)
-            plan = Optimizer.get_default(context).optimize(
-                logical_plan, dataset, default_graph_uri, context, as_of=start_timestamp
+            plan = Optimizer.get_default().optimize(
+                logical_plan, dataset, default_graph_uri, as_of=start_timestamp
             )
-            cardinalities = list()  # need to be computed or returned by the optimizer
-            # plan, cardinalities = parse_query(query, dataset, default_graph_uri, context)
-        logging.info(f'loading time: {(time() - start) * 1000}ms')
-        loading_time = (time() - start) * 1000
+            # plan, cardinalities = parse_query(query, dataset, default_graph_uri)
+        loading_time = (time() - loadin_start) * 1000
+        logging.info(f'loading time: {loading_time}ms')
 
-        # execute query
+        # execute the query
         engine = SageEngine()
-        bindings, saved_plan, is_done, abort_reason = await engine.execute(plan, context)
+        bindings, is_done, abort_reason = await engine.execute(
+            plan, quota=graph.quota, max_results=graph.max_results
+        )
 
         # commit or abort (if necessary)
         if abort_reason is not None:
@@ -112,36 +110,30 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
         else:
             graph.commit()
 
-        start = time()
-        # encode saved plan if query execution is not done yet and there was no abort
-        next_page = None
+        # encode the saved plan if the query execution is not done
+        export_start = time()
         if (not is_done) and (abort_reason is None):
-            next_page = encode_saved_plan(saved_plan)
-            if not dataset.is_stateless:
-                # generate the plan ID if this is the first time we execute this plan
-                plan_id = next_link if next_link is not None else str(uuid4())
-                dataset.statefull_manager.save_plan(plan_id, next_page)
-                next_page = plan_id
-        elif is_done and (not dataset.is_stateless) and next_link is not None:
-            # delete the saved plan, as it will not be reloaded anymore
-            dataset.statefull_manager.delete_plan(next_link)
+            next_page = saved_plan_manager.save_plan(plan)
+        else:
+            next_page = None
+        export_time = (time() - export_start) * 1000
+        logging.info(f'export time: {export_time}ms')
 
-        exportTime = (time() - start) * 1000
-        logging.info(f'export time: {exportTime}ms')
+        # compute statistics about the query execution
         stats = {
             "cardinalities": cardinalities,
             "import": loading_time,
-            "export": exportTime,
+            "export": export_time,
             "metrics": {
-                "triples_scanned": metrics.triples_scanned(saved_plan),
-                "coverage": 1.0 if is_done else metrics.coverage(saved_plan)
+                "triples_scanned": metrics.triples_scanned(plan),
+                "coverage": 1.0 if is_done else metrics.coverage(plan)
             }
         }
         print(stats['metrics'])
         return (bindings, next_page, stats)
     except Exception as err:
-        # abort all ongoing transactions, then forward the exception to the main loop
-        logging.error(traceback.format_exc())
+        # abort all ongoing transactions, then forward the exception
+        logging.error(format_exc())
         if graph is not None:
             graph.abort()
         raise err
@@ -184,7 +176,7 @@ def run_app(config_file: str) -> FastAPI:
     Returns: The FastAPI HTTP application.
     """
     # enable uvloop for SPARQL query processing
-    set_event_loop_policy(uvloop.EventLoopPolicy())
+    set_event_loop_policy(EventLoopPolicy())
     # set recursion depth (due to pyparsing issues)
     setrecursionlimit(3000)
 
@@ -201,6 +193,12 @@ def run_app(config_file: str) -> FastAPI:
     # Build the RDF dataset from the configuration file
     dataset = load_config(config_file)
 
+    # Build the saved plan manager
+    if dataset.is_stateless:
+        saved_plan_manager = StatelessManager()
+    else:
+        saved_plan_manager = StatefullManager()
+
     @app.get("/")
     async def root():
         return "The SaGe SPARQL query server is running!"
@@ -216,7 +214,7 @@ def run_app(config_file: str) -> FastAPI:
         try:
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset)
+            bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset, saved_plan_manager)
             return create_response(mimetypes, bindings, next_page, stats, server_url)
         except HTTPException as err:
             raise err
@@ -229,7 +227,7 @@ def run_app(config_file: str) -> FastAPI:
         try:
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset)
+            bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset, saved_plan_manager)
             response = create_response(mimetypes, bindings, next_page, stats, server_url)
             return response
         except HTTPException as err:

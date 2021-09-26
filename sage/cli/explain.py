@@ -1,4 +1,7 @@
 #!/usr/bin/python
+import click
+import pprint
+
 from rdflib.plugins.sparql.algebra import translateQuery, translateUpdate
 from rdflib.plugins.sparql.parser import parseQuery, parseUpdate
 from rdflib.plugins.sparql.algebra import pprintAlgebra
@@ -8,9 +11,6 @@ from sage.database.core.yaml_config import load_config
 from sage.query_engine.optimizer.parser import Parser
 from sage.query_engine.optimizer.optimizer import Optimizer
 # from sage.query_engine.optimizer.query_parser import parse_query
-
-import click
-import pprint
 
 # be sure to load what i beleive ;)
 # print(inspect.getfile(register_custom_function))
@@ -41,11 +41,23 @@ import pprint
 @click.command()
 @click.argument("config_file")
 @click.argument("graph_uri")
-@click.option("-q", "--query", type=str, default=None, help="SPARQL query to execute (passed in command-line)")
-@click.option("-f", "--file", type=str, default=None, help="File containing a SPARQL query to execute")
-@click.option("-u", "--update", is_flag=True, help="explain a SPARQL update query")
-@click.option("-p", "--parse", is_flag=True, help="print the query parse tree")
-@click.option("-i", "--indentnb", default=2, help="pretty print indent value")
+@click.option(
+    "-q", "--query", type=click.STRING, default=None,
+    help="SPARQL query to execute (passed in command-line)"
+)
+@click.option(
+    "-f", "--file", type=click.STRING, default=None,
+    help="File containing a SPARQL query to execute"
+)
+@click.option(
+    "-u", "--update", is_flag=True, help="explain a SPARQL update query"
+)
+@click.option(
+    "-p", "--parse", is_flag=True, help="print the query parse tree"
+)
+@click.option(
+    "-i", "--indentnb", default=2, help="pretty print indent value"
+)
 def explain(query, file, config_file, graph_uri, indentnb, update, parse):
     if query is None and file is None:
         print("Error: you must specificy a query to execute, either with --query or --file. See sage-query --help for more informations.")
@@ -101,12 +113,11 @@ def explain(query, file, config_file, graph_uri, indentnb, update, parse):
     print(pprintAlgebra(tq))
 
     cards = list()
-    context = dict()
     logical_plan = Parser.parse(query)
-    iterator = Optimizer.get_default(context).optimize(
-        logical_plan, dataset, graph_uri, context
+    iterator = Optimizer.get_default().optimize(
+        logical_plan, dataset, graph_uri
     )
-    # iterator, cards = parse_query(query, dataset, graph_uri, context)
+    # iterator, cards = parse_query(query, dataset, graph_uri)
 
     print("-----------------")
     print("Iterator pipeline")

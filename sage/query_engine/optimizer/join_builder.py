@@ -13,7 +13,7 @@ from sage.query_engine.optimizer.utils import find_connected_pattern, get_vars
 
 def analyze_triple_patterns(
     bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str,
-    context: dict, as_of: Optional[datetime] = None
+    as_of: Optional[datetime] = None
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     triples = []
     cardinalities = []
@@ -24,7 +24,7 @@ def analyze_triple_patterns(
         triple['graph'] = graph_uri
         # get iterator and statistics about the pattern
         if dataset.has_graph(graph_uri):
-            it = ScanIterator(dataset.get_graph(graph_uri), triple, context, as_of=as_of)
+            it = ScanIterator(dataset.get_graph(graph_uri), triple, as_of=as_of)
             c = it.__len__()
         else:
             it, c = EmptyIterator(), 0
@@ -34,9 +34,7 @@ def analyze_triple_patterns(
     return triples, cardinalities
 
 
-def build_ascending_cardinalities_tree(
-    triples: List[Dict[str, Any]], context: dict
-) -> Tuple[PreemptableIterator, List[str]]:
+def build_ascending_cardinalities_tree(triples: List[Dict[str, Any]]) -> Tuple[PreemptableIterator, List[str]]:
     print('build ascending cardinalities tree')
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
@@ -52,14 +50,12 @@ def build_ascending_cardinalities_tree(
             pattern = triples[0]
             query_vars = query_vars | get_vars(pattern['triple'])
             pos = 0
-        pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
+        pipeline = IndexJoinIterator(pipeline, pattern['iterator'])
         triples.pop(pos)
     return pipeline, query_vars
 
 
-def build_naive_tree(
-    triples: List[Dict[str, Any]], context: dict
-) -> Tuple[PreemptableIterator, List[str]]:
+def build_naive_tree(triples: List[Dict[str, Any]]) -> Tuple[PreemptableIterator, List[str]]:
     print('build naive tree')
     pattern = triples.pop(0)
     query_vars = get_vars(pattern['triple'])
@@ -68,13 +64,13 @@ def build_naive_tree(
     while len(triples) > 0:
         pattern = triples.pop(0)
         query_vars = query_vars | get_vars(pattern['triple'])
-        pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
+        pipeline = IndexJoinIterator(pipeline, pattern['iterator'])
     return pipeline, query_vars
 
 
 def build_left_join_tree(
     bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str,
-    context: dict, as_of: Optional[datetime] = None
+    as_of: Optional[datetime] = None
 ) -> Tuple[PreemptableIterator, List[str], Dict[str, str]]:
     """Build a Left-linear join tree from a Basic Graph pattern.
 
@@ -82,7 +78,6 @@ def build_left_join_tree(
       * bgp: Basic Graph pattern used to build the join tree.
       * dataset: RDF dataset on which the BGPC is evaluated.
       * default_graph: URI of the default graph used for BGP evaluation.
-      * context: Information about the query execution.
       * as_of: A timestamp used to perform all reads against a consistent version of the dataset. If `None`, use the latest version of the dataset, which does not guarantee snapshot isolation.
 
     Returns: A tuple (`iterator`, `query_vars`, `cardinalities`) where:
@@ -91,13 +86,13 @@ def build_left_join_tree(
       * `cardinalities` is the list of estimated cardinalities of all triple patterns in the BGP.
     """
     # gather metadata about triple patterns
-    triples, cardinalities = analyze_triple_patterns(bgp, dataset, default_graph, context, as_of=as_of)
+    triples, cardinalities = analyze_triple_patterns(bgp, dataset, default_graph, as_of=as_of)
 
     if dataset.enable_join_ordering:
-        pipeline, query_vars = build_ascending_cardinalities_tree(triples, context)
+        pipeline, query_vars = build_ascending_cardinalities_tree(triples)
     else:
-        pipeline, query_vars = build_naive_tree(triples, context)
-    print(pipeline.__repr__())
+        pipeline, query_vars = build_naive_tree(triples)
+
     return pipeline, query_vars, cardinalities
 
     # triples = []
@@ -110,7 +105,7 @@ def build_left_join_tree(
     #     triple['graph'] = graph_uri
     #     # get iterator and statistics about the pattern
     #     if dataset.has_graph(graph_uri):
-    #         it = ScanIterator(dataset.get_graph(graph_uri), triple, context, as_of=as_of)
+    #         it = ScanIterator(dataset.get_graph(graph_uri), triple, as_of=as_of)
     #         c = it.__len__()
     #     else:
     #         it, c = EmptyIterator(), 0
@@ -152,6 +147,6 @@ def build_left_join_tree(
     #         query_vars = query_vars | get_vars(pattern['triple'])
     #         pos = 0
     #     graph_uri = pattern['triple']['graph']
-    #     pipeline = IndexJoinIterator(pipeline, pattern['iterator'], context)
+    #     pipeline = IndexJoinIterator(pipeline, pattern['iterator'])
     #     triples.pop(pos)
     # return pipeline, query_vars, cardinalities

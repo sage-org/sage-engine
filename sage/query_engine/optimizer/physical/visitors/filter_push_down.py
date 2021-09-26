@@ -1,7 +1,8 @@
 from hashlib import md5
-from typing import Any, Dict, Set, Tuple, List
+from typing import Set, Tuple, List
 from rdflib.term import Variable
 from rdflib.plugins.sparql.parserutils import Expr
+
 from sage.query_engine.optimizer.physical.plan_visitor import PhysicalPlanVisitor
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, RDFTerm
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -117,9 +118,8 @@ class FilterTargets(PhysicalPlanVisitor):
 
 class FilterPushDown(PhysicalPlanVisitor):
 
-    def __init__(self, context: Dict[str, Any]):
+    def __init__(self):
         super().__init__()
-        self._context = context
         self._moved = dict()
 
     def __has_already_been_moved__(self, filter: PreemptableIterator) -> bool:
@@ -136,15 +136,15 @@ class FilterPushDown(PhysicalPlanVisitor):
         for (iterator, position) in targets:
             if position == SOURCE:
                 iterator._source = FilterIterator(
-                    iterator._source, filter._raw_expression, filter._expression, self._context
+                    iterator._source, filter._raw_expression, filter._expression
                 )
             elif position == LEFT:
                 iterator._left = FilterIterator(
-                    iterator._left, filter._raw_expression, filter._expression, self._context
+                    iterator._left, filter._raw_expression, filter._expression
                 )
             elif position == RIGHT:
                 iterator._right = FilterIterator(
-                    iterator._right, filter._raw_expression, filter._expression, self._context
+                    iterator._right, filter._raw_expression, filter._expression
                 )
             else:
                 message = f'Unexpected relative position {position}'
@@ -204,9 +204,8 @@ class FilterPushDown(PhysicalPlanVisitor):
 
 # class FilterPushDown(PhysicalPlanVisitor):
 #
-#     def __init__(self, context: Dict[str, Any]):
+#     def __init__(self):
 #         super().__init__()
-#         self._context = context
 #
 #     def __push_filter__(self, filter, targets) -> bool:
 #         updated = False
@@ -216,15 +215,15 @@ class FilterPushDown(PhysicalPlanVisitor):
 #             updated = True
 #             if position == SOURCE:
 #                 iterator._source = FilterIterator(
-#                     iterator._source, filter._raw_expression, filter._expression, self._context
+#                     iterator._source, filter._raw_expression, filter._expression
 #                 )
 #             elif position == LEFT:
 #                 iterator._left = FilterIterator(
-#                     iterator._left, filter._raw_expression, filter._expression, self._context
+#                     iterator._left, filter._raw_expression, filter._expression
 #                 )
 #             elif position == RIGHT:
 #                 iterator._right = FilterIterator(
-#                     iterator._right, filter._raw_expression, filter._expression, self._context
+#                     iterator._right, filter._raw_expression, filter._expression
 #                 )
 #             else:
 #                 message = f'Unexpected relative position {position}'

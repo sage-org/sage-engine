@@ -9,7 +9,7 @@ from yaml import FullLoader, load
 from sage.database.core.dataset import Dataset
 from sage.database.core.graph import Graph
 from sage.database.backends.import_manager import builtin_backends, import_backend
-from sage.database.statefull.hashmap_manager import HashMapManager
+# from sage.database.statefull.hashmap_manager import HashMapManager
 
 
 def load_config(config_file: str) -> Dataset:
@@ -45,16 +45,16 @@ def load_config(config_file: str) -> Dataset:
 
     # load the mode of the server: stateless or statefull
     if 'stateless' in config:
-        is_stateless = config['stateless']
+        stateless = config['stateless']
     else:
-        is_stateless = True
+        stateless = True
 
-    # if statefull, load the saved plan storage backend to use
-    statefull_manager = None
-    if not is_stateless:
-        # TODO allow use of custom backend for saved plans
-        # same kind of usage than custom DB backends
-        statefull_manager = HashMapManager()
+    # # if statefull, load the saved plan storage backend to use
+    # statefull_manager = None
+    # if not is_stateless:
+    #     # TODO allow use of custom backend for saved plans
+    #     # same kind of usage than custom DB backends
+    #     statefull_manager = HashMapManager()
 
     # get default time quantum & maximum number of results per page
     if 'quota' in config:
@@ -102,4 +102,11 @@ def load_config(config_file: str) -> Dataset:
         graphs[g_uri] = Graph(g_uri, g_name, g_description, g_connector, quantum=g_quantum, max_results=g_max_results, default_queries=g_queries)
         logging.info(f"RDF Graph '{g_name}' (backend: {g_config['backend']}) successfully loaded")
 
-    return Dataset(dataset_name, dataset_description, graphs, public_url=public_url, default_query=default_query, analytics=analytics, stateless=is_stateless, statefull_manager=statefull_manager, enable_join_ordering=enable_join_ordering)
+    return Dataset(
+        dataset_name, dataset_description, graphs,
+        public_url=public_url,
+        default_query=default_query,
+        analytics=analytics,
+        stateless=stateless,
+        enable_join_ordering=enable_join_ordering
+    )

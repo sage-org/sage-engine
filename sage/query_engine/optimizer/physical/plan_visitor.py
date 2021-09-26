@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import Any
+
 from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 

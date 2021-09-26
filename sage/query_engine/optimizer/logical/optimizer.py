@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, Node
 from sage.query_engine.optimizer.logical.visitors.filter_splitter import FilterSplitter
 

@@ -5,34 +5,30 @@ from typing import Dict, List, Optional, Tuple
 
 from sage.query_engine.exceptions import DeleteInsertConflict, TooManyResults, QuantumExhausted
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.protobuf.iterators_pb2 import RootTree
 
-ExecutionResults = Tuple[List[Dict[str, str]], Optional[RootTree], bool, Optional[str]]
+ExecutionResults = Tuple[List[Dict[str, str]], bool, Optional[str]]
 
 
-async def executor(pipeline: PreemptableIterator, results: list, context: dict) -> None:
+async def executor(
+    pipeline: PreemptableIterator, results: list, quota: int, max_results: int
+) -> None:
     """Execute a pipeline of iterator under a time quantum.
 
     Args:
       * pipeline: Root of the pipeline of iterator.
       * results: List used to store query results.
-      * context: Information about the query execution.
+      * quota: Duration of a quantum.
+      * max_results: Maximum number of results that can be returned per quantum.
 
     Throws: Any exception raised during query execution.
     """
-    value = await pipeline.next()
+    context = {'quota': quota, 'start_timestamp': time()}
+    value = await pipeline.next(context=context)
     while value is not None:
         results.append(value)
-        if len(results) >= context['max_results']:
+        if len(results) >= max_results:
             raise TooManyResults()
-        value = await pipeline.next()
-
-    # while pipeline.has_next():
-    #     value = await pipeline.next()
-    #     if value is not None:
-    #         results.append(value)
-    #     if len(results) >= context['max_results']:
-    #         raise TooManyResults()
+        value = await pipeline.next(context=context)
 
 
 class SageEngine(object):
@@ -41,16 +37,18 @@ class SageEngine(object):
     def __init__(self):
         super(SageEngine, self).__init__()
 
-    async def execute(self, plan: PreemptableIterator, context: dict) -> ExecutionResults:
+    async def execute(
+        self, plan: PreemptableIterator, quota: int = 75, max_results: int = 10000
+    ) -> ExecutionResults:
         """Execute a preemptable physical query execution plan under a time quantum.
 
         Args:
           * plan: Root of the pipeline of iterator.
-          * context: Information about the query execution.
+          * quota: Duration of a quantum.
+          * max_results: Maximum number of results that can be returned per quantum.
 
         Returns: A tuple (``results``, ``saved_plan``, ``is_done``, ``abort_reason``) where:
           * ``results`` is a list of solution mappings found during query execution
-          * ``saved_plan`` is the state of the plan saved using protocol-buffers
           * ``is_done`` is True when the plan has completed query evalution, False otherwise
           * ``abort_reason`` is True if the query was aborted due a to concurrency control issue
 
@@ -58,11 +56,9 @@ class SageEngine(object):
         """
         results: List[Dict[str, str]] = list()
         query_done = False
-        root = None
         abort_reason = None
         try:
-            context['start_timestamp'] = time()
-            await executor(plan, results, context)
+            await executor(plan, results, quota, max_results)
             query_done = True
         except QuantumExhausted:
             pass
@@ -70,10 +66,4 @@ class SageEngine(object):
             pass
         except DeleteInsertConflict as err:
             abort_reason = str(err)
-        # save the plan if query execution is not done yet and no abort has occurred
-        # if not query_done and abort_reason is None:
-        if abort_reason is None:
-            root = RootTree()
-            source_field = plan.serialized_name() + '_source'
-            getattr(root, source_field).CopyFrom(plan.save())
-        return (results, root, query_done, abort_reason)
+        return (results, query_done, abort_reason)

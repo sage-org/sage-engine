@@ -1,5 +1,4 @@
-
-from typing import List, Optional, Dict, Set
+from typing import List, Optional, Dict, Set, Any
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedValuesIterator, SolutionMapping
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
@@ -13,6 +12,7 @@ class ValuesIterator(PreemptableIterator):
     ):
         self._values = values
         self._next_value = next_value
+        self._cardinality = len(values)
         self._produced = produced
         if runtime_cardinality is None:
             self._runtime_cardinality = len(self._values)
@@ -43,7 +43,7 @@ class ValuesIterator(PreemptableIterator):
         self._next_value = 0
         self._runtime_cardinality += len(self._values)
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         if self._next_value >= len(self._values):
             return None
         else:

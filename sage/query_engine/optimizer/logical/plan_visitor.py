@@ -2,6 +2,7 @@ from abc import ABC
 from typing import Any, Union, Tuple
 from rdflib.term import BNode, Literal, URIRef, Variable
 from rdflib.plugins.sparql.parserutils import CompValue, Expr
+
 from sage.query_engine.exceptions import UnsupportedSPARQL
 
 RDFTerm = Union[BNode, Literal, URIRef, Variable]

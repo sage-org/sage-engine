@@ -1,4 +1,3 @@
-import sys
 import re
 
 from abc import ABC, abstractmethod
@@ -24,6 +23,7 @@ r_boolean = re.compile(r'(true|false)')
 class ParseError(Exception):
     """Raised Raised when an error occurs while parsing an RDF file."""
     pass
+
 
 class Parser(ABC):
 
@@ -94,7 +94,7 @@ class CustomNTriplesParser(Parser, NTriplesParser):
             self.bucket.append((subject, predicate, object))
         except ParseError as error:
             self.on_error(error)
-        except:
+        except Exception:
             self.on_error(ParseError(f"Invalid triple: {line}"))
         finally:
             if len(self.bucket) >= self.bucket_size:
