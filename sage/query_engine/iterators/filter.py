@@ -71,7 +71,7 @@ class FilterIterator(PreemptableIterator):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         self._source.next_stage(mappings)
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -81,9 +81,9 @@ class FilterIterator(PreemptableIterator):
         """
         if not self.has_next():
             return None
-        mu = await self._source.next()
+        mu = self._source.next()
         while mu is None or not self._evaluate(mu):
-            mu = await self._source.next()
+            mu = self._source.next()
         return mu
 
     def has_next(self) -> bool:

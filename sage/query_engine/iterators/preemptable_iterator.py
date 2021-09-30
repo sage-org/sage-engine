@@ -18,7 +18,7 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must

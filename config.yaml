@@ -1,0 +1,38 @@
+# The name of the server
+name: SaGe Example Server
+# Server maintainer(s)
+maintainer: Chuck Norris
+# The public URL used to access the server
+public_url: http://server-url.com
+# Path to a markdown file whose content will be displayed on the server's webpage
+long_description: config_examples/description.md
+# Time quantum used by the server
+quota: 75000
+# (Optional) Maximum number of results fetched by HTTP request
+max_results: 200000000
+# (Optional) Query selected by default in the "Query" section
+default_query:
+  graph_name: test
+  name: Select everything
+  value: |
+    SELECT * WHERE {
+      ?s ?p ?o.
+    }
+# RDF Graphs hosted by the server
+graphs:
+-
+   name: watdiv
+   uri: http://example.org/watdiv
+   description: Just test data
+   backend: hdt-file
+   file: ./watdiv.10M.hdt
+-
+  name: watdiv_postgres
+  uri: http://example.org/watdiv_postgres
+  description: watdiv in postgres
+  backend: postgres
+  dbname: watdiv
+  user: molli-p
+  password: ''
+
+ 

@@ -16,24 +16,24 @@ triple = {
 
 
 @pytest.mark.asyncio
-async def test_scan_read():
+def test_scan_read():
     context = { 'quantum': 10e7, 'max_results': 10e7 }
     scan = ScanIterator(hdtDoc, triple, context)
-    (results, saved, done, _) = await engine.execute(scan, context)
+    (results, saved, done, _) = engine.execute(scan, context)
     assert len(results) == scan.__len__()
     assert done
 
 
 @pytest.mark.asyncio
-async def test_scan_save_nointerrupt():
+def test_scan_save_nointerrupt():
     context = { 'quantum': 10e7, 'max_results': 10e7 }
     scan = ScanIterator(hdtDoc, triple, context)
-    (results, saved, done, _) = await engine.execute(scan, context)
+    (results, saved, done, _) = engine.execute(scan, context)
 
 
 @pytest.mark.asyncio
-async def test_scan_save_interrupt():
+def test_scan_save_interrupt():
     context = { 'quantum': 10e7, 'max_results': 1e-3 }
     scan = ScanIterator(hdtDoc, triple, context)
-    (results, saved, done, _) = await engine.execute(scan, context)
+    (results, saved, done, _) = engine.execute(scan, context)
     assert len(results) <= scan.__len__()

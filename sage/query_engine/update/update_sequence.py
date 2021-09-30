@@ -35,7 +35,7 @@ class UpdateSequenceOperator(PreemptableIterator):
             raise DeleteInsertConflict('A read-write conflict has been detected. It seems that a concurrent SPARQL query has already deleted some RDF triples that you previously read.')
         return self._if_exists_op.has_next() or self._delete_op.has_next() or self._insert_op.has_next()
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Advance in the sequence of operations.
 
         This function works in an iterator fashion, so it can be used in a pipeline of iterators.
@@ -56,11 +56,11 @@ class UpdateSequenceOperator(PreemptableIterator):
 
         # advance the sequence
         if self._if_exists_op.has_next():
-            await self._if_exists_op.next()
+            self._if_exists_op.next()
         elif self._delete_op.has_next():
-            await self._delete_op.next()
+            self._delete_op.next()
         elif self._insert_op.has_next():
-            await self._insert_op.next()
+            self._insert_op.next()
         return None
 
     def save(self) -> str:

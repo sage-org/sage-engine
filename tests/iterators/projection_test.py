@@ -17,11 +17,11 @@ triple = {
 
 
 @pytest.mark.asyncio
-async def test_projection_read():
+def test_projection_read():
     context = { 'quantum': 10e7, 'max_results': 10e7 }
     scan = ScanIterator(hdtDoc, triple, context)
     proj = ProjectionIterator(scan, context, ['?common'])
-    (results, saved, done, _) = await engine.execute(proj, context)
+    (results, saved, done, _) = engine.execute(proj, context)
     assert len(results) == scan.__len__()
     for res in results:
         assert '?common' in res and '?s1' not in res
@@ -29,11 +29,11 @@ async def test_projection_read():
 
 
 @pytest.mark.asyncio
-async def test_projection_read_stopped():
+def test_projection_read_stopped():
     context = { 'quantum': 10e7, 'max_results': 10e-4 }
     scan = ScanIterator(hdtDoc, triple, context)
     proj = ProjectionIterator(scan, context, ['?common'])
-    (results, saved, done, _) = await engine.execute(proj, context)
+    (results, saved, done, _) = engine.execute(proj, context)
     assert len(results) <= scan.__len__()
     for res in results:
         assert '?common' in res and '?s1' not in res

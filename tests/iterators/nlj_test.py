@@ -23,12 +23,12 @@ innerTriple = {
 
 
 @pytest.mark.asyncio
-async def test_nlj_read():
+def test_nlj_read():
     context = { 'quantum': 10e7, 'max_results': 10e7 }
     left_scan = ScanIterator(hdtDoc, triple, context)
     right_scan = ScanIterator(hdtDoc, innerTriple, context)
     join = IndexJoinIterator(left_scan, right_scan, context)
-    (results, saved, done, _) = await engine.execute(join, context)
+    (results, saved, done, _) = engine.execute(join, context)
     assert len(results) == 20
     for res in results:
         assert '?s1' in res and '?s2' in res and '?common' in res
@@ -36,10 +36,10 @@ async def test_nlj_read():
 
 
 @pytest.mark.asyncio
-async def test_nlj_interrupt():
+def test_nlj_interrupt():
     context = { 'quantum': 10e7, 'max_results': 10e-5 }
     left_scan = ScanIterator(hdtDoc, triple, context)
     right_scan = ScanIterator(hdtDoc, innerTriple, context)
     join = IndexJoinIterator(left_scan, right_scan, context)
-    (results, saved, done, _) = await engine.execute(join, context)
+    (results, saved, done, _) = engine.execute(join, context)
     assert len(results) <= 20

@@ -36,7 +36,7 @@ class ProjectionIterator(PreemptableIterator):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         self._source.next_stage(mappings)
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -46,7 +46,7 @@ class ProjectionIterator(PreemptableIterator):
         """
         if not self.has_next():
             return None
-        mappings = await self._source.next()
+        mappings = self._source.next()
         if mappings is None:
             return None
         elif self._projection is None:

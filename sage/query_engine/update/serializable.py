@@ -64,7 +64,7 @@ class SerializableUpdate(PreemptableIterator):
         """
         return self._read_input.has_next()
 
-    async def next(self) -> None:
+    def next(self) -> None:
         """Execute the SPARQL INSERT/DELETE query.
 
         This function blocks until the whole query has been processed.
@@ -84,7 +84,7 @@ class SerializableUpdate(PreemptableIterator):
         # read all mappings from the predecessor
         mappings = list()
         while self._read_input.has_next():
-            mu = await self._read_input.next()
+            mu = self._read_input.next()
             mappings.append(mu)
 
         # apply all deletes

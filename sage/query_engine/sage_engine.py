@@ -10,7 +10,7 @@ from sage.query_engine.protobuf.iterators_pb2 import RootTree
 ExecutionResults = Tuple[List[Dict[str, str]], Optional[RootTree], bool, Optional[str]]
 
 
-async def executor(pipeline: PreemptableIterator, results: list, context: dict) -> None:
+def executor(pipeline: PreemptableIterator, results: list, context: dict) -> None:
     """Execute a pipeline of iterator under a time quantum.
 
     Args:
@@ -21,7 +21,7 @@ async def executor(pipeline: PreemptableIterator, results: list, context: dict) 
     Throws: Any exception raised during query execution.
     """
     while pipeline.has_next():
-        value = await pipeline.next()
+        value = pipeline.next()
         if value is not None:
             results.append(value)
         if len(results) >= context['max_results']:
@@ -34,7 +34,7 @@ class SageEngine(object):
     def __init__(self):
         super(SageEngine, self).__init__()
 
-    async def execute(self, plan: PreemptableIterator, context: dict) -> ExecutionResults:
+    def execute(self, plan: PreemptableIterator, context: dict) -> ExecutionResults:
         """Execute a preemptable physical query execution plan under a time quantum.
 
         Args:
@@ -55,7 +55,7 @@ class SageEngine(object):
         abort_reason = None
         try:
             context['start_timestamp'] = time()
-            await executor(plan, results, context)
+            executor(plan, results, context)
             query_done = True
         except QuantumExhausted:
             pass

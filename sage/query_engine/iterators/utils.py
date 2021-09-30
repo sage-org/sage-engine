@@ -16,7 +16,7 @@ class EmptyIterator(object):
         """Return True if the iterator has more item to yield"""
         return False
 
-    async def next(self) -> None:
+    def next(self) -> None:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -42,7 +42,7 @@ class ArrayIterator(object):
         """Return True if the iterator has more item to yield"""
         return len(self._array) > 0
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must

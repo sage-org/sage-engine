@@ -48,6 +48,6 @@ class PostgresIterator(DBIterator):
 
     def has_next(self) -> bool:
         """Return True if there is still results to read, False otherwise"""
-        if len(self._last_reads) == 0:
+        if len(self._last_reads) == 0:        
             self._last_reads = self._cursor.fetchmany(size=self._fetch_size)
         return len(self._last_reads) > 0

@@ -39,7 +39,7 @@ class IndexJoinIterator(PreemptableIterator):
         """Return True if the iterator has more item to yield"""
         return self._left.has_next() or (self._current_mappings is not None and self._right.has_next())
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -50,11 +50,11 @@ class IndexJoinIterator(PreemptableIterator):
         if not self.has_next():
             return None
         while self._current_mappings is None or not self._right.has_next():
-            self._current_mappings = await self._left.next()
+            self._current_mappings = self._left.next()
             if self._current_mappings is None:
                 return None
             self._right.next_stage(self._current_mappings)
-        mu = await self._right.next()
+        mu = self._right.next()
         if mu is not None:
             return {**self._current_mappings, **mu}
         return None

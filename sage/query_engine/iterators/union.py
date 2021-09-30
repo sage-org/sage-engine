@@ -40,7 +40,7 @@ class BagUnionIterator(PreemptableIterator):
         self._left.next_stage(mappings)
         self._right.next_stage(mappings)
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -51,9 +51,9 @@ class BagUnionIterator(PreemptableIterator):
         if not self.has_next():
             return None
         elif self._left.has_next():
-            return await self._left.next()
+            return self._left.next()
         else:
-            return await self._right.next()
+            return self._right.next()
 
     def save(self) -> SavedBagUnionIterator:
         """Save and serialize the iterator as a Protobuf message"""
@@ -87,7 +87,7 @@ class RandomBagUnionIterator(BagUnionIterator):
         """Return True if the iterator has more item to yield"""
         return self._left.has_next() or self._right.has_next()
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
@@ -99,11 +99,11 @@ class RandomBagUnionIterator(BagUnionIterator):
             return None
         elif random() < 0.5:
             if self._left.has_next():
-                return await self._left.next()
+                return self._left.next()
             else:
-                return await self._right.next()
+                return self._right.next()
         else:
             if self._right.has_next():
-                return await self._right.next()
+                return self._right.next()
             else:
-                return await self._left.next()
+                return self._left.next()

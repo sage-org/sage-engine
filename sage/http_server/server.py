@@ -48,7 +48,7 @@ def choose_void_format(mimetypes):
     return "ntriples", "application/n-triples"
 
 
-async def execute_query(query: str, default_graph_uri: str, next_link: Optional[str], dataset: Dataset) -> Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]:
+def execute_query(query: str, default_graph_uri: str, next_link: Optional[str], dataset: Dataset) -> Tuple[List[Dict[str, str]], Optional[str], Dict[str, str]]:
     """Execute a query using the SageEngine and returns the appropriate HTTP response.
 
     Any failure will results in a rollback/abort on the current query execution.
@@ -93,7 +93,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
 
         # execute query
         engine = SageEngine()
-        bindings, saved_plan, is_done, abort_reason = await engine.execute(plan, context)
+        bindings, saved_plan, is_done, abort_reason = engine.execute(plan, context)
 
         # commit or abort (if necessary)
         if abort_reason is not None:
@@ -184,11 +184,11 @@ def run_app(config_file: str) -> FastAPI:
     dataset = load_config(config_file)
 
     @app.get("/")
-    async def root():
+    def root():
         return "The SaGe SPARQL query server is running!"
 
     @app.get("/sparql")
-    async def sparql_get(
+    def sparql_get(
         request: Request,
         query: str = Query(..., description="The SPARQL query to execute."),
         default_graph_uri: str = Query(..., alias="default-graph-uri", description="The URI of the default RDF graph queried."),
@@ -198,7 +198,7 @@ def run_app(config_file: str) -> FastAPI:
         try:
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset)
+            bindings, next_page, stats = execute_query(query, default_graph_uri, next_link, dataset)
             return create_response(mimetypes, bindings, next_page, stats, server_url)
         except HTTPException as err:
             raise err
@@ -207,14 +207,14 @@ def run_app(config_file: str) -> FastAPI:
             raise HTTPException(status_code=500, detail=str(err))
 
     @app.post("/sparql")
-    async def sparql_post(request: Request, item: SagePostQuery):
+    def sparql_post(request: Request, item: SagePostQuery):
         """Execute a SPARQL query using the Web Preemption model"""
         try:
             start = time()
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
             exec_start = time()
-            bindings, next_page, stats = await execute_query(item.query, item.defaultGraph, item.next, dataset)
+            bindings, next_page, stats = execute_query(item.query, item.defaultGraph, item.next, dataset)
             logging.info(f'query execution time: {(time() - exec_start) * 1000}ms')
             serialization_start = time()
             response = create_response(mimetypes, bindings, next_page, stats, server_url)
@@ -228,7 +228,7 @@ def run_app(config_file: str) -> FastAPI:
             raise HTTPException(status_code=500, detail=str(err))
 
     @app.get("/void/", description="Get the VoID description of the SaGe server")
-    async def server_void(request: Request):
+    def server_void(request: Request):
         """Describe all RDF datasets hosted by the Sage endpoint"""
         try:
             mimetypes = request.headers['accept'].split(",")
@@ -243,12 +243,12 @@ def run_app(config_file: str) -> FastAPI:
             raise HTTPException(status_code=500, detail=str(err))
 
     @app.get("/.well-known/void/")
-    async def well_known():
+    def well_known():
         """Alias for /void/"""
         return RedirectResponse(url="/void/")
 
     @app.get("/void/{graph_name}", description="Get the VoID description of a RDF Graph hosted by the SaGe server")
-    async def graph_void(request: Request, graph_name: str = Field(..., description="Name of the RDF Graph")):
+    def graph_void(request: Request, graph_name: str = Field(..., description="Name of the RDF Graph")):
         """Get the VoID description of a RDF Graph hosted by the SaGe server"""
         graph = dataset.get_graph(graph_name)
         if graph is None:

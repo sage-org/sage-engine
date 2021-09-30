@@ -5,7 +5,7 @@ import requests
 from json import dumps
 from math import inf
 from sys import exit
-
+import time
 
 @click.command()
 @click.argument("entrypoint")
@@ -14,7 +14,8 @@ from sys import exit
 @click.option("-f", "--file", type=str, default=None, help="File containing a SPARQL query to execute")
 @click.option("--format", type=click.Choice(["json", "xml"]), default="json", help="Format of the results set, formatted according to W3C SPARQL standards.")
 @click.option("-l", "--limit", type=int, default=None, help="Maximum number of solutions bindings to fetch, similar to the SPARQL LIMIT modifier.")
-def sage_query(entrypoint, default_graph_uri, query, file, format, limit):
+@click.option("-lat", "--latency", type=float, default=None, help="wait time between 2 qeries, in second")
+def sage_query(entrypoint, default_graph_uri, query, file, format, limit,latency):
     """
         Send a SPARQL query to a SaGe server hosted at ENTRYPOINT, with DEFAULT_GRAPH_URI as the default RDF Graph. It does not act as a Smart client, so only queries supported by the server will be evaluated.
 
@@ -59,3 +60,5 @@ def sage_query(entrypoint, default_graph_uri, query, file, format, limit):
             count += 1
             if count >= limit:
                 break
+        if latency is not None:
+            time.sleep(latency)

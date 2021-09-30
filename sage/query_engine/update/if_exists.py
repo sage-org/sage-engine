@@ -41,7 +41,7 @@ class IfExistsOperator(PreemptableIterator):
         """Return True if the iterator has more quads to validate"""
         return (not self._found_missing) and len(self._quads) > 0
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Validate the next quad using the RDF dataset.
 
         This function works in an iterator fashion, so it can be used in a pipeline of iterators.

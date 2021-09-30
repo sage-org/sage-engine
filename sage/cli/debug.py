@@ -31,17 +31,17 @@ coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
 
-#    (results, saved, done, _) = await engine.execute(scan, 10e7)
-async def execute(engine,iterator,limit):
+#    (results, saved, done, _) = engine.execute(scan, 10e7)
+def execute(engine,iterator,limit):
 #    try:
         while iterator.has_next():
-            value = await iterator.next()
+            value = iterator.next()
             print(value)
 #    except:
 #        print("error in debug/execute")
 
     # try:
-    #     (results, saved, done, _) = await engine.execute(iterator, 10e7)
+    #     (results, saved, done, _) = engine.execute(iterator, 10e7)
     #     for r in results:
     #         print(str(r))
     # except StopAsyncIteration:

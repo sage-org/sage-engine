@@ -38,7 +38,7 @@ class InsertOperator(PreemptableIterator):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
         pass
 
-    async def next(self) -> Optional[Dict[str, str]]:
+    def next(self) -> Optional[Dict[str, str]]:
         """Insert the next quad into the RDF dataset.
 
         This function works in an iterator fashion, so it can be used in a pipeline of iterators.

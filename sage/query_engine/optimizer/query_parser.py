@@ -28,6 +28,11 @@ from sage.query_engine.update.update_sequence import UpdateSequenceOperator
 # enable Packrat optimization for the rdflib SPARQL parser
 pyparsing.ParserElement.enablePackrat()
 
+## test !!
+import threading
+lock = threading.Lock()
+
+
 exponent = r'[eE][+-]?[0-9]+'
 
 r_integer = re.compile(r'[0-9]+')
@@ -195,15 +200,17 @@ def parse_query(query: str, dataset: Dataset, default_graph: str, context: dict)
 
     Throws: `UnsupportedSPARQL` is the SPARQL query contains features not supported by the SaGe query engine.
     """
-    # transaction timestamp
-    start_timestamp = datetime.now()
     # rdflib has no tool for parsing both read and update query,
     # so we must rely on a try/catch dirty trick...
     try:
-        logical_plan = translateQuery(parseQuery(query)).algebra
-        cardinalities = list()
-        iterator = parse_query_node(logical_plan, dataset, [default_graph], context, cardinalities, as_of=start_timestamp)
-        return iterator, cardinalities
+        with lock:
+            # transaction timestamp
+            start_timestamp = datetime.now()
+
+            logical_plan = translateQuery(parseQuery(query)).algebra
+            cardinalities = list()
+            iterator = parse_query_node(logical_plan, dataset, [default_graph], context, cardinalities, as_of=start_timestamp)
+            return iterator, cardinalities
     except ParseException:
         return parse_update(query, dataset, default_graph, context, as_of=start_timestamp)
 
