@@ -1,4 +1,4 @@
-! Testing a workload with many clients
+# Testing a workload with many clients
 
 A simple way to test the performance of SaGe with many clients running in parallel.
 
@@ -19,7 +19,7 @@ To execute the workload ("queries") with a pool of 10 process:
 
 ```
 time cat queries |  xargs -t -I % -P 10 -n1   poetry run sage-query  http://localhost:8000/sparql http://example.org/watdiv  -f % > /dev/null
-``
+```
 
 Then we can compare performance of // by just comparing the time with a pool a 1
 ```
