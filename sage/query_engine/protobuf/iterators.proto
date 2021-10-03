@@ -29,6 +29,7 @@ message SavedValuesIterator {
   int64 next_value = 2;
   int64 produced = 3;
   int64 runtime_cardinality = 4;
+  map<string, string> muc = 5;
 }
 
 message SavedProjectionIterator {
@@ -60,9 +61,6 @@ message SavedIndexJoinIterator {
     SavedValuesIterator values_right = 12;
   }
   map<string, string> muc = 13;
-  int64 produced = 14;
-  int64 consumed = 15;
-  int64 matches = 16;
 }
 
 message SavedBagUnionIterator {

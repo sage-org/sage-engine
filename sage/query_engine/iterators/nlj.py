@@ -18,15 +18,12 @@ class IndexJoinIterator(PreemptableIterator):
 
     def __init__(
         self, left: PreemptableIterator, right: PreemptableIterator,
-        produced: int = 0, consumed: int = 0,
         current_mappings: Optional[Dict[str, str]] = None
     ):
         super(IndexJoinIterator, self).__init__()
         self._left = left
         self._right = right
         self._current_mappings = current_mappings
-        self._produced = produced
-        self._consumed = consumed
 
     def __repr__(self) -> str:
         return f"<IndexJoinIterator ({self._left} JOIN {self._right} WITH {self._current_mappings})>"
@@ -65,12 +62,10 @@ class IndexJoinIterator(PreemptableIterator):
                 self._current_mappings = await self._left.next(context=context)
                 if self._current_mappings is None:
                     return None
-                self._consumed += 1
                 self._right.next_stage(self._current_mappings)
             else:
                 mappings = await self._right.next(context=context)
                 if mappings is not None:
-                    self._produced += 1
                     return mappings
                 self._current_mappings = None
 
@@ -85,7 +80,4 @@ class IndexJoinIterator(PreemptableIterator):
         getattr(saved_join, right_field).CopyFrom(self._right.save())
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_join.muc)
-        # export statistics used to estimate the cardinality of the query
-        saved_join.produced = self._produced
-        saved_join.consumed = self._consumed
         return saved_join

@@ -28,10 +28,11 @@ def flatten_leaves(
 
 
 def get_cardinality(iterator: Union[ScanIterator, ValuesIterator]) -> int:
-    if (iterator._runtime_cardinality == 0) and (iterator._produced > 0):
-        return iterator._cardinality
-    else:
-        return iterator._runtime_cardinality
+    return max(iterator._cardinality, iterator._produced)
+    # if (iterator._runtime_cardinality == 0) and (iterator._produced > 0):
+    #     return iterator._cardinality
+    # else:
+    #     return iterator._runtime_cardinality
 
 
 def estimate_coverage(iterator: PreemptableIterator) -> float:

@@ -122,8 +122,8 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
     return ScanIterator(
         connector, pattern,
         produced=saved_plan.produced,
-        cardinality=saved_plan.cardinality,
-        runtime_cardinality=saved_plan.runtime_cardinality,
+        # cardinality=saved_plan.cardinality,
+        # runtime_cardinality=saved_plan.runtime_cardinality,
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,
         as_of=as_of
@@ -143,11 +143,15 @@ def load_values(saved_plan: SavedValuesIterator, dataset: Dataset) -> Preemptabl
     values = list()
     for value in saved_plan.values:
         values.append(dict(value.bindings))
+    current_mappings = None
+    if len(saved_plan.muc) > 0:
+        current_mappings = dict(saved_plan.muc)
     return ValuesIterator(
         values,
         next_value=saved_plan.next_value,
         produced=saved_plan.produced,
-        runtime_cardinality=saved_plan.runtime_cardinality
+        runtime_cardinality=saved_plan.runtime_cardinality,
+        current_mappings=current_mappings
     )
 
 
@@ -169,10 +173,7 @@ def load_nlj(saved_plan: SavedIndexJoinIterator, dataset: Dataset) -> Preemptabl
     if len(saved_plan.muc) > 0:
         current_mappings = dict(saved_plan.muc)
     return IndexJoinIterator(
-        left, right,
-        produced=saved_plan.produced,
-        consumed=saved_plan.consumed,
-        current_mappings=current_mappings
+        left, right, current_mappings=current_mappings
     )
 
 

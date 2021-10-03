@@ -2,7 +2,7 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 import re
 
-from typing import Dict, List, Set, Tuple, Union
+from typing import Dict, List, Set, Tuple, Union, Optional
 from rdflib.namespace import XSD
 from rdflib.term import BNode, Literal, URIRef, Variable
 
@@ -83,6 +83,32 @@ def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
         return format_literal(term)
     else:
         return term.n3()
+
+
+def format_mappings(mappings: Dict[RDFTerm, RDFTerm]) -> Dict[str, str]:
+    formated_mappings = dict()
+    for variable, value in mappings.items():
+        variable = format_term(variable)
+        value = format_term(value)
+        formated_mappings[variable] = value
+    return formated_mappings
+
+
+def format_solution_mappings(
+    solution_mappings: List[Dict[RDFTerm, RDFTerm]]
+) -> List[Dict[str, str]]:
+    return [format_mappings(mappings) for mappings in solution_mappings]
+
+
+def format_triple_pattern(
+    triple_pattern: TriplePattern, graph: Optional[str] = None
+) -> Dict[str, str]:
+    return {
+        'subject': format_term(triple_pattern[0]),
+        'predicate': format_term(triple_pattern[1]),
+        'object': format_term(triple_pattern[2]),
+        'graph': graph
+    }
 
 
 def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> List[Dict[str, str]]:

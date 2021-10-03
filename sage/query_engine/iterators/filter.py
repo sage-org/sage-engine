@@ -63,14 +63,14 @@ class FilterIterator(PreemptableIterator):
     def variables(self) -> Set[str]:
         return self._source.variables()
 
-    def __evaluate__(self, bindings: Dict[str, str]) -> bool:
+    def __evaluate__(self, mappings: Dict[str, str]) -> bool:
         """Evaluate the FILTER expression with a set mappings.
 
         Argument: A set of solution mappings.
 
         Returns: The outcome of evaluating the SPARQL FILTER on the input set of solution mappings.
         """
-        d = {Variable(key[1:]): to_rdflib_term(value) for key, value in bindings.items()}
+        d = {Variable(key[1:]): to_rdflib_term(value) for key, value in mappings.items()}
         context = QueryContext(bindings=Bindings(d=d))
         # context.prologue = self._prologue
         return self._expression.eval(context)

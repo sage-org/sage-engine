@@ -40,27 +40,37 @@ class ScanIterator(PreemptableIterator):
         super(ScanIterator, self).__init__()
         self._connector = connector
         self._pattern = pattern
-        self._variables = vars_positions(pattern['subject'], pattern['predicate'], pattern['object'])
+        self._pattern_variables = vars_positions(
+            pattern['subject'], pattern['predicate'], pattern['object']
+        )
         self._current_mappings = current_mappings
         self._mu = mu
         self._last_read = last_read
         self._start_timestamp = as_of
         # create an iterator on the database
         if current_mappings is None:
-            it, card = self._connector.search(pattern['subject'], pattern['predicate'], pattern['object'], last_read=last_read, as_of=as_of)
+            self._source, card = self._connector.search(
+                pattern['subject'], pattern['predicate'], pattern['object'],
+                last_read=last_read, as_of=as_of
+            )
         else:
-            (s, p, o) = (find_in_mappings(pattern['subject'], current_mappings), find_in_mappings(pattern['predicate'], current_mappings), find_in_mappings(pattern['object'], current_mappings))
-            it, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
-        self._source = it
+            (s, p, o) = (
+                find_in_mappings(pattern['subject'], current_mappings),
+                find_in_mappings(pattern['predicate'], current_mappings),
+                find_in_mappings(pattern['object'], current_mappings)
+            )
+            self._source, card = self._connector.search(
+                s, p, o, last_read=last_read, as_of=as_of
+            )
         # statistics to compute the query progression
         if cardinality is not None:
             self._cardinality = cardinality
         else:
             self._cardinality = card
-        if runtime_cardinality is not None:
-            self._runtime_cardinality = runtime_cardinality
-        else:
-            self._runtime_cardinality = 0
+        # if runtime_cardinality is not None:
+        #     self._runtime_cardinality = runtime_cardinality
+        # else:
+        #     self._runtime_cardinality = 0
         self._produced = produced
 
     def __len__(self) -> int:
@@ -105,7 +115,8 @@ class ScanIterator(PreemptableIterator):
         self._last_read = None
         self._mu = None
         self._cardinality = card
-        self._runtime_cardinality += card
+        # self._runtime_cardinality += card
+        self._produced = 0
 
     async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
@@ -121,7 +132,7 @@ class ScanIterator(PreemptableIterator):
                 return None
             (subject, predicate, object, insert_t, delete_t) = mappings
             if (insert_t is None) or (insert_t <= self._start_timestamp and self._start_timestamp < delete_t):
-                self._mu = selection((subject, predicate, object), self._variables)
+                self._mu = selection((subject, predicate, object), self._pattern_variables)
             if 'quota' in context and 'start_timestamp' in context:
                 execution_time = (time() - context['start_timestamp']) * 1000
                 if execution_time > context['quota']:
@@ -153,9 +164,9 @@ class ScanIterator(PreemptableIterator):
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
         saved_scan.cardinality = self._cardinality
-        if (self._runtime_cardinality == 0) and (self._produced > 0):
-            saved_scan.runtime_cardinality = self._cardinality
-        else:
-            saved_scan.runtime_cardinality = self._runtime_cardinality
+        # if (self._runtime_cardinality == 0) and (self._produced > 0):
+        #     saved_scan.runtime_cardinality = self._cardinality
+        # else:
+        #     saved_scan.runtime_cardinality = self._runtime_cardinality
         saved_scan.produced = self._produced
         return saved_scan

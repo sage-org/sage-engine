@@ -7,17 +7,21 @@ from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 class ValuesIterator(PreemptableIterator):
 
     def __init__(
-        self, values: List[str], next_value: int = 0, produced: int = 0,
-        runtime_cardinality: Optional[int] = None
+        self, values: List[str],
+        next_value: int = 0,
+        produced: int = 0,
+        runtime_cardinality: Optional[int] = None,
+        current_mappings: Optional[Dict[str, str]] = None,
     ):
         self._values = values
         self._next_value = next_value
         self._cardinality = len(values)
         self._produced = produced
-        if runtime_cardinality is None:
-            self._runtime_cardinality = len(self._values)
-        else:
-            self._runtime_cardinality = runtime_cardinality
+        self._current_mappings = current_mappings
+        # if runtime_cardinality is None:
+        #     self._runtime_cardinality = len(self._values)
+        # else:
+        #     self._runtime_cardinality = runtime_cardinality
 
     def __len__(self) -> int:
         return len(self._values)
@@ -40,27 +44,35 @@ class ValuesIterator(PreemptableIterator):
         return set(self._values[0].keys())
 
     def next_stage(self, mappings: Dict[str, str]):
+        self._current_mappings = mappings
         self._next_value = 0
-        self._runtime_cardinality += len(self._values)
+        # self._runtime_cardinality += len(self._values)
+        self._produced = 0
 
     async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         if self._next_value >= len(self._values):
             return None
         else:
-            value = self._values[self._next_value]
+            mu = self._values[self._next_value]
             self._next_value += 1
             self._produced += 1
-            return value
+            if self._current_mappings is not None:
+                mappings = {**self._current_mappings, **mu}
+            else:
+                mappings = mu
+            return mappings
 
     def save(self) -> SavedValuesIterator:
-        saved_iterator = SavedValuesIterator()
+        saved_values = SavedValuesIterator()
         values = list()
         for value in self._values:
             solution_mapping = SolutionMapping()
             pyDict_to_protoDict(value, solution_mapping.bindings)
             values.append(solution_mapping)
-        saved_iterator.values.extend(values)
-        saved_iterator.next_value = self._next_value
-        saved_iterator.produced = self._produced
-        saved_iterator.runtime_cardinality = self._runtime_cardinality
-        return saved_iterator
+        saved_values.values.extend(values)
+        saved_values.next_value = self._next_value
+        saved_values.produced = self._produced
+        if self._current_mappings is not None:
+            pyDict_to_protoDict(self._current_mappings, saved_values.muc)
+        # saved_iterator.runtime_cardinality = self._runtime_cardinality
+        return saved_values

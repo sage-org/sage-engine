@@ -1,7 +1,7 @@
 import sage.query_engine.optimizer.utils as utils
 
 from datetime import datetime
-from typing import Optional, Dict, List
+from typing import Optional, List
 from rdflib.plugins.sparql.parserutils import CompValue, Expr
 
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, RDFTerm, TriplePattern
@@ -99,29 +99,6 @@ class PipelineBuilder(LogicalPlanVisitor):
             pipeline = IndexJoinIterator(pipeline, scan_iterators.pop(0))
         return pipeline
 
-    def __format_solution_mappings__(
-        self, solution_mappings: List[Dict[RDFTerm, RDFTerm]]
-    ) -> List[Dict[str, str]]:
-        formated_solution_mappings = list()
-        for solution_mapping in solution_mappings:
-            formated_solution_mapping = dict()
-            for variable, value in solution_mapping.items():
-                variable = utils.format_term(variable)
-                value = utils.format_term(value)
-                formated_solution_mapping[variable] = value
-            formated_solution_mappings.append(formated_solution_mapping)
-        return formated_solution_mappings
-
-    def __format_triple_pattern__(
-        self, triple_pattern: TriplePattern
-    ) -> Dict[str, str]:
-        return {
-            'subject': utils.format_term(triple_pattern[0]),
-            'predicate': utils.format_term(triple_pattern[1]),
-            'object': utils.format_term(triple_pattern[2]),
-            'graph': self._default_graph
-        }
-
     def visit_select_query(self, node: CompValue) -> PreemptableIterator:
         return self.visit(node.p)
 
@@ -143,8 +120,7 @@ class PipelineBuilder(LogicalPlanVisitor):
         return self.visit(node.p)
 
     def visit_values(self, node: CompValue) -> PreemptableIterator:
-        values = self.__format_solution_mappings__(node.res)
-        return ValuesIterator(values)
+        return ValuesIterator(utils.format_solution_mappings(node.res))
 
     def visit_bgp(self, node: CompValue) -> PreemptableIterator:
         scan_iterators = list()
@@ -156,7 +132,7 @@ class PipelineBuilder(LogicalPlanVisitor):
             return self.__build_naive_tree__(scan_iterators)
 
     def visit_scan(self, node: TriplePattern) -> PreemptableIterator:
-        triple_pattern = self.__format_triple_pattern__(node)
+        triple_pattern = utils.format_triple_pattern(node, graph=self._default_graph)
         if self._dataset.has_graph(triple_pattern['graph']):
             return ScanIterator(
                 self._dataset.get_graph(triple_pattern['graph']),
