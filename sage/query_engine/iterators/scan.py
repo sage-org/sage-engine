@@ -31,7 +31,6 @@ class ScanIterator(PreemptableIterator):
         self, connector: DatabaseConnector, pattern: Dict[str, str],
         produced: int = 0,
         cardinality: Optional[int] = None,
-        runtime_cardinality: Optional[int] = None,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -67,10 +66,6 @@ class ScanIterator(PreemptableIterator):
             self._cardinality = cardinality
         else:
             self._cardinality = card
-        # if runtime_cardinality is not None:
-        #     self._runtime_cardinality = runtime_cardinality
-        # else:
-        #     self._runtime_cardinality = 0
         self._produced = produced
 
     def __len__(self) -> int:
@@ -108,14 +103,17 @@ class ScanIterator(PreemptableIterator):
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
-        (s, p, o) = (find_in_mappings(self._pattern['subject'], mappings), find_in_mappings(self._pattern['predicate'], mappings), find_in_mappings(self._pattern['object'], mappings))
+        (s, p, o) = (
+            find_in_mappings(self._pattern['subject'], mappings),
+            find_in_mappings(self._pattern['predicate'], mappings),
+            find_in_mappings(self._pattern['object'], mappings)
+        )
         it, card = self._connector.search(s, p, o, as_of=self._start_timestamp)
         self._current_mappings = mappings
         self._source = it
         self._last_read = None
         self._mu = None
         self._cardinality = card
-        # self._runtime_cardinality += card
         self._produced = 0
 
     async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
@@ -164,9 +162,5 @@ class ScanIterator(PreemptableIterator):
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
         saved_scan.cardinality = self._cardinality
-        # if (self._runtime_cardinality == 0) and (self._produced > 0):
-        #     saved_scan.runtime_cardinality = self._cardinality
-        # else:
-        #     saved_scan.runtime_cardinality = self._runtime_cardinality
         saved_scan.produced = self._produced
         return saved_scan

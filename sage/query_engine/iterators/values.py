@@ -10,7 +10,6 @@ class ValuesIterator(PreemptableIterator):
         self, values: List[str],
         next_value: int = 0,
         produced: int = 0,
-        runtime_cardinality: Optional[int] = None,
         current_mappings: Optional[Dict[str, str]] = None,
     ):
         self._values = values
@@ -18,10 +17,6 @@ class ValuesIterator(PreemptableIterator):
         self._cardinality = len(values)
         self._produced = produced
         self._current_mappings = current_mappings
-        # if runtime_cardinality is None:
-        #     self._runtime_cardinality = len(self._values)
-        # else:
-        #     self._runtime_cardinality = runtime_cardinality
 
     def __len__(self) -> int:
         return len(self._values)
@@ -74,5 +69,4 @@ class ValuesIterator(PreemptableIterator):
         saved_values.produced = self._produced
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_values.muc)
-        # saved_iterator.runtime_cardinality = self._runtime_cardinality
         return saved_values

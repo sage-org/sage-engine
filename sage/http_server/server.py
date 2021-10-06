@@ -99,9 +99,11 @@ async def execute_query(
 
         # execute the query
         engine = SageEngine()
+        coverage_before = metrics.coverage(plan)
         bindings, is_done, abort_reason = await engine.execute(
             plan, quota=graph.quota, max_results=graph.max_results
         )
+        coverage_after = 1.0 if is_done else metrics.coverage(plan)
 
         # commit or abort (if necessary)
         if abort_reason is not None:
@@ -125,8 +127,8 @@ async def execute_query(
             "import": loading_time,
             "export": export_time,
             "metrics": {
-                "triples_scanned": metrics.triples_scanned(plan),
-                "coverage": 1.0 if is_done else metrics.coverage(plan)
+                "coverage": coverage_after,
+                "quantum-coverage": coverage_after - coverage_before
             }
         }
         print(stats['metrics'])

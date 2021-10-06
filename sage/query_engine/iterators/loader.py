@@ -122,8 +122,6 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
     return ScanIterator(
         connector, pattern,
         produced=saved_plan.produced,
-        # cardinality=saved_plan.cardinality,
-        # runtime_cardinality=saved_plan.runtime_cardinality,
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,
         as_of=as_of
@@ -150,7 +148,6 @@ def load_values(saved_plan: SavedValuesIterator, dataset: Dataset) -> Preemptabl
         values,
         next_value=saved_plan.next_value,
         produced=saved_plan.produced,
-        runtime_cardinality=saved_plan.runtime_cardinality,
         current_mappings=current_mappings
     )
 

@@ -9,10 +9,6 @@ def coverage(plan: PreemptableIterator) -> float:
     return estimate_coverage(plan)
 
 
-def triples_scanned(plan: PreemptableIterator) -> float:
-    return count_triples_scanned(plan)
-
-
 def flatten_leaves(
     iterator: PreemptableIterator, iterators: List[Union[ScanIterator, ValuesIterator]]
 ) -> None:
@@ -29,10 +25,6 @@ def flatten_leaves(
 
 def get_cardinality(iterator: Union[ScanIterator, ValuesIterator]) -> int:
     return max(iterator._cardinality, iterator._produced)
-    # if (iterator._runtime_cardinality == 0) and (iterator._produced > 0):
-    #     return iterator._cardinality
-    # else:
-    #     return iterator._runtime_cardinality
 
 
 def estimate_coverage(iterator: PreemptableIterator) -> float:
@@ -51,16 +43,3 @@ def estimate_coverage(iterator: PreemptableIterator) -> float:
             iterator_coverage *= (1 / previous_iterator_cardinality)
         space_covered += iterator_coverage
     return space_covered
-
-
-def count_triples_scanned(iterator: PreemptableIterator) -> int:
-    if (iterator.serialized_name() == 'filter') or (iterator.serialized_name() == 'proj'):
-        return count_triples_scanned(iterator._source)
-    elif iterator.serialized_name() == 'scan':
-        return iterator._produced
-    elif iterator.serialized_name() == 'values':
-        return 0
-    elif (iterator.serialized_name() == 'join') or (iterator.serialized_name() == 'union'):
-        return count_triples_scanned(iterator._left) + count_triples_scanned(iterator._right)
-    else:
-        raise Exception(f'Unsupported iterator type {iterator.serialized_name()}')

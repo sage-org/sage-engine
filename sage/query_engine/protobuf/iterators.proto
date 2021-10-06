@@ -20,16 +20,14 @@ message SavedScanIterator {
   string last_read = 4;
   string timestamp = 5;
   int64 cardinality = 6;
-  int64 runtime_cardinality = 7;
-  int64 produced = 8;
+  int64 produced = 7;
 }
 
 message SavedValuesIterator {
   repeated SolutionMapping values = 1;
   int64 next_value = 2;
   int64 produced = 3;
-  int64 runtime_cardinality = 4;
-  map<string, string> muc = 5;
+  map<string, string> muc = 4;
 }
 
 message SavedProjectionIterator {
