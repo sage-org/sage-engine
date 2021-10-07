@@ -10,6 +10,7 @@ from rdflib.plugins.sparql.parserutils import prettify_parsetree
 from sage.database.core.yaml_config import load_config
 from sage.query_engine.optimizer.parser import Parser
 from sage.query_engine.optimizer.optimizer import Optimizer
+from sage.query_engine.optimizer.physical.visitors.query_plan_stringifier import QueryPlanStringifier
 # from sage.query_engine.optimizer.query_parser import parse_query
 
 # be sure to load what i beleive ;)
@@ -56,9 +57,15 @@ from sage.query_engine.optimizer.optimizer import Optimizer
     "-p", "--parse", is_flag=True, help="print the query parse tree"
 )
 @click.option(
-    "-i", "--indentnb", default=2, help="pretty print indent value"
+    "-i", "--indentnb", default=1, help="pretty print indent value"
 )
-def explain(query, file, config_file, graph_uri, indentnb, update, parse):
+@click.option(
+    "-o", "--output", type=click.STRING, default=None,
+    help="File containing a SPARQL query to execute"
+)
+def explain(
+    query, file, config_file, graph_uri, indentnb, update, parse, output
+):
     if query is None and file is None:
         print("Error: you must specificy a query to execute, either with --query or --file. See sage-query --help for more informations.")
         exit(1)
@@ -69,7 +76,7 @@ def explain(query, file, config_file, graph_uri, indentnb, update, parse):
 
     dataset = load_config(config_file)
     if dataset is None:
-        print("config file {config_file} not found")
+        print(f"config file {config_file} not found")
         exit(1)
 
     graph = dataset.get_graph(graph_uri)
@@ -99,7 +106,6 @@ def explain(query, file, config_file, graph_uri, indentnb, update, parse):
         print("------------")
         print("Parsed Query")
         print("------------")
-        pp.pprint(pq)
         print(prettify_parsetree(pq))
 
     if update:
@@ -123,6 +129,10 @@ def explain(query, file, config_file, graph_uri, indentnb, update, parse):
     print("Iterator pipeline")
     print("-----------------")
     print(iterator.explain(step=2))
+    if output is not None:
+        with open(output, 'w') as outfile:
+            outfile.write(QueryPlanStringifier().visit(iterator))
+
     print("-----------------")
     print("Cardinalities")
     print("-----------------")

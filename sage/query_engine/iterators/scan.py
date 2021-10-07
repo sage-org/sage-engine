@@ -30,7 +30,6 @@ class ScanIterator(PreemptableIterator):
     def __init__(
         self, connector: DatabaseConnector, pattern: Dict[str, str],
         produced: int = 0,
-        cardinality: Optional[int] = None,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -61,11 +60,7 @@ class ScanIterator(PreemptableIterator):
             self._source, card = self._connector.search(
                 s, p, o, last_read=last_read, as_of=as_of
             )
-        # statistics to compute the query progression
-        if cardinality is not None:
-            self._cardinality = cardinality
-        else:
-            self._cardinality = card
+        self._cardinality = card
         self._produced = produced
 
     def __len__(self) -> int:

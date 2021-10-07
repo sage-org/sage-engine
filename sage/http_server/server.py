@@ -24,6 +24,7 @@ from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
 from sage.query_engine.optimizer.parser import Parser
 from sage.query_engine.optimizer.optimizer import Optimizer
+from sage.query_engine.optimizer.physical.visitors.query_plan_stringifier import QueryPlanStringifier
 # from sage.query_engine.optimizer.query_parser import parse_query
 from sage.database.saved_plan.saved_plan_manager import SavedPlanManager
 from sage.database.saved_plan.stateless_manager import StatelessManager
@@ -141,6 +142,16 @@ async def execute_query(
         raise err
 
 
+async def explain_query(
+    query: str, default_graph_uri: str, dataset: Dataset
+) -> str:
+    logical_plan = Parser.parse(query)
+    plan = Optimizer.get_default().optimize(
+        logical_plan, dataset, default_graph_uri
+    )
+    return QueryPlanStringifier().visit(plan)
+
+
 def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_page: Optional[str], stats: dict, skol_url: str) -> Response:
     """Create an HTTP response for the results of SPARQL query execution.
 
@@ -243,13 +254,18 @@ def run_app(config_file: str) -> FastAPI:
             request, item.query, item.defaultGraph, item.next
         )
 
-    @app.post("/sparql-no-join-ordering")
-    async def sparql_post_test(request: Request, item: SagePostQuery):
+    @app.post("/sparql/force-order")
+    async def sparql_post_force_order(request: Request, item: SagePostQuery):
         """Execute a SPARQL query using the Web Preemption model"""
         dataset.join_ordering = False
         return await execute_sparql_query(
             request, item.query, item.defaultGraph, item.next
         )
+
+    @app.post("/sparql/explain")
+    async def sparql_post_explain(request: Request, item: SagePostQuery):
+        dataset.join_ordering = True
+        return await explain_query(item.query, item.defaultGraph, dataset)
 
     @app.get("/void/", description="Get the VoID description of the SaGe server")
     async def server_void(request: Request):
