@@ -121,6 +121,7 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
         mu = dict(saved_plan.mu)
     return ScanIterator(
         connector, pattern,
+        pattern_cardinality=saved_plan.pattern_cardinality,
         produced=saved_plan.produced,
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,

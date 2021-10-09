@@ -35,9 +35,9 @@ class Optimizer():
     ) -> PreemptableIterator:
         if self._logical_optimizer is not None:
             logical_plan = self._logical_optimizer.optimize(logical_plan)
-        physical_plan = PipelineBuilder(
+        physical_plan, cardinalities = PipelineBuilder(
             dataset, default_graph, as_of=as_of
         ).visit(logical_plan)
         if self._physical_optimizer is not None:
             physical_plan = self._physical_optimizer.optimize(physical_plan)
-        return physical_plan
+        return physical_plan, cardinalities

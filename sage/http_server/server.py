@@ -91,7 +91,7 @@ async def execute_query(
         else:
             start_timestamp = datetime.now()
             logical_plan = Parser.parse(query)
-            plan = Optimizer.get_default().optimize(
+            plan, cardinalities = Optimizer.get_default().optimize(
                 logical_plan, dataset, default_graph_uri, as_of=start_timestamp
             )
             # plan, cardinalities = parse_query(query, dataset, default_graph_uri)

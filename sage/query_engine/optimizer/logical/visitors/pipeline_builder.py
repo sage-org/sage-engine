@@ -1,7 +1,7 @@
 import sage.query_engine.optimizer.utils as utils
 
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any, Tuple
 from rdflib.plugins.sparql.parserutils import CompValue, Expr
 
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, RDFTerm, TriplePattern
@@ -99,57 +99,73 @@ class PipelineBuilder(LogicalPlanVisitor):
             pipeline = IndexJoinIterator(pipeline, scan_iterators.pop(0))
         return pipeline
 
-    def visit_select_query(self, node: CompValue) -> PreemptableIterator:
+    def visit_select_query(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         return self.visit(node.p)
 
-    def visit_projection(self, node: CompValue) -> PreemptableIterator:
+    def visit_projection(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         projected_variables = list(map(lambda t: '?' + str(t), node.PV))
-        return ProjectionIterator(self.visit(node.p), projected_variables)
+        child, cardinalities = self.visit(node.p)
+        return ProjectionIterator(child, projected_variables), cardinalities
 
-    def visit_join(self, node: CompValue) -> PreemptableIterator:
-        return IndexJoinIterator(self.visit(node.p1), self.visit(node.p2))
+    def visit_join(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
+        left_child, left_cardinalities = self.visit(node.p1)
+        right_child, right_cardinalities = self.visit(node.p2)
+        cardinalities = left_cardinalities + right_cardinalities
+        return IndexJoinIterator(left_child, right_child), cardinalities
 
-    def visit_union(self, node: CompValue) -> PreemptableIterator:
-        return BagUnionIterator(self.visit(node.p1), self.visit(node.p2))
+    def visit_union(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
+        left_child, left_cardinalities = self.visit(node.p1)
+        right_child, right_cardinalities = self.visit(node.p2)
+        cardinalities = left_cardinalities + right_cardinalities
+        return BagUnionIterator(left_child, right_child), cardinalities
 
-    def visit_filter(self, node: CompValue) -> PreemptableIterator:
+    def visit_filter(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         raw_expression = ExpressionStringifier().visit(node.expr)
-        return FilterIterator(self.visit(node.p), raw_expression, node.expr)
+        child, cardinalities = self.visit(node.p)
+        return FilterIterator(child, raw_expression, node.expr), cardinalities
 
-    def visit_to_multiset(self, node: CompValue) -> PreemptableIterator:
+    def visit_to_multiset(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         return self.visit(node.p)
 
-    def visit_values(self, node: CompValue) -> PreemptableIterator:
-        return ValuesIterator(utils.format_solution_mappings(node.res))
+    def visit_values(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
+        return ValuesIterator(utils.format_solution_mappings(node.res)), []
 
-    def visit_bgp(self, node: CompValue) -> PreemptableIterator:
+    def visit_bgp(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         scan_iterators = list()
+        cardinalities = list()
         for triple_pattern in node.triples:
-            scan_iterators.append(self.visit(triple_pattern))
+            child, cardinality = self.visit(triple_pattern)
+            scan_iterators.append(child)
+            cardinalities.extend(cardinality)
         if self._dataset.join_ordering:
-            return self.__build_ascending_cardinalities_tree__(scan_iterators)
+            iterator = self.__build_ascending_cardinalities_tree__(scan_iterators)
         else:
-            return self.__build_naive_tree__(scan_iterators)
+            iterator = self.__build_naive_tree__(scan_iterators)
+        return iterator, cardinalities
 
-    def visit_scan(self, node: TriplePattern) -> PreemptableIterator:
+    def visit_scan(self, node: TriplePattern) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         triple_pattern = utils.format_triple_pattern(node, graph=self._default_graph)
         if self._dataset.has_graph(triple_pattern['graph']):
-            return ScanIterator(
+            iterator = ScanIterator(
                 self._dataset.get_graph(triple_pattern['graph']),
                 triple_pattern, as_of=self._as_of
             )
         else:
-            return EmptyIterator()
+            iterator = EmptyIterator()
+        cardinality = {
+            'pattern': triple_pattern, 'cardinality': iterator.__len__()
+        }
+        return iterator, [cardinality]
 
-    def visit_insert(self, node: CompValue) -> PreemptableIterator:
+    def visit_insert(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         quads = utils.get_quads_from_update(node, self._default_graph)
-        return InsertOperator(quads, self._dataset)
+        return InsertOperator(quads, self._dataset), []
 
-    def visit_delete(self, node: CompValue) -> PreemptableIterator:
+    def visit_delete(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         quads = utils.get_quads_from_update(node, self._default_graph)
-        return DeleteOperator(quads, self._dataset)
+        return DeleteOperator(quads, self._dataset), []
 
-    def visit_modify(self, node: CompValue) -> PreemptableIterator:
+    def visit_modify(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         consistency_level = "serializable"
         if node.where.name == 'Join':
             if node.where.p1.name == 'BGP' and len(node.where.p1.triples) == 0:
@@ -157,7 +173,7 @@ class PipelineBuilder(LogicalPlanVisitor):
             elif node.where.p2.name == 'BGP' and len(node.where.p2.triples) == 0:
                 bgp = node.where.p1
         if consistency_level == "serializable":
-            source = self.visit(bgp)
+            source, cardinalities = self.visit(bgp)
             delete_templates = list()
             insert_templates = list()
             if node.delete is not None:
@@ -168,9 +184,10 @@ class PipelineBuilder(LogicalPlanVisitor):
                 insert_templates = utils.get_quads_from_update(
                     node.insert, self._default_graph
                 )
-            return SerializableUpdate(
+            iterator = SerializableUpdate(
                 self._dataset, source, delete_templates, insert_templates
             )
+            return iterator, cardinalities
         else:
             # Build the IF EXISTS style query from an UPDATE query with bounded
             # RDF triples in the WHERE, INSERT and DELETE clause.
@@ -197,4 +214,5 @@ class PipelineBuilder(LogicalPlanVisitor):
             if_exists_op = IfExistsOperator(triples, self._dataset, self._as_of)
             delete_op = DeleteOperator(delete_templates, self._dataset)
             insert_op = DeleteOperator(insert_templates, self._dataset)
-            return UpdateSequenceOperator(if_exists_op, delete_op, insert_op)
+            iterator = UpdateSequenceOperator(if_exists_op, delete_op, insert_op)
+            return iterator, []

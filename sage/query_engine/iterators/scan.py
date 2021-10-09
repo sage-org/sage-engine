@@ -29,7 +29,7 @@ class ScanIterator(PreemptableIterator):
 
     def __init__(
         self, connector: DatabaseConnector, pattern: Dict[str, str],
-        produced: int = 0,
+        pattern_cardinality: Optional[int] = None, produced: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -60,6 +60,10 @@ class ScanIterator(PreemptableIterator):
             self._source, card = self._connector.search(
                 s, p, o, last_read=last_read, as_of=as_of
             )
+        if pattern_cardinality is None:
+            self._pattern_cardinality = card
+        else:
+            self._pattern_cardinality = pattern_cardinality
         self._cardinality = card
         self._produced = produced
 
@@ -156,6 +160,7 @@ class ScanIterator(PreemptableIterator):
             saved_scan.timestamp = self._start_timestamp.isoformat()
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
+        saved_scan.pattern_cardinality = self._pattern_cardinality
         saved_scan.cardinality = self._cardinality
         saved_scan.produced = self._produced
         return saved_scan
