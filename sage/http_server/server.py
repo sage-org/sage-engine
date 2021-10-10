@@ -94,6 +94,7 @@ async def execute_query(
             plan, cardinalities = Optimizer.get_default().optimize(
                 logical_plan, dataset, default_graph_uri, as_of=start_timestamp
             )
+            plan.explain()
             # plan, cardinalities = parse_query(query, dataset, default_graph_uri)
         loading_time = (time() - loadin_start) * 1000
         logging.info(f'loading time: {loading_time}ms')
@@ -143,12 +144,16 @@ async def execute_query(
 
 
 async def explain_query(
-    query: str, default_graph_uri: str, dataset: Dataset
+    query: str, default_graph_uri: str, next_link: Optional[str],
+    dataset: Dataset
 ) -> str:
-    logical_plan = Parser.parse(query)
-    plan = Optimizer.get_default().optimize(
-        logical_plan, dataset, default_graph_uri
-    )
+    if next_link is not None:
+        plan = StatelessManager().get_plan(next_link, dataset)
+    else:
+        logical_plan = Parser.parse(query)
+        plan, cardinalities = Optimizer.get_default().optimize(
+            logical_plan, dataset, default_graph_uri
+        )
     return QueryPlanStringifier().visit(plan)
 
 
@@ -265,7 +270,9 @@ def run_app(config_file: str) -> FastAPI:
     @app.post("/sparql/explain")
     async def sparql_post_explain(request: Request, item: SagePostQuery):
         dataset.join_ordering = True
-        return await explain_query(item.query, item.defaultGraph, dataset)
+        return await explain_query(
+            item.query, item.defaultGraph, item.next, dataset
+        )
 
     @app.get("/void/", description="Get the VoID description of the SaGe server")
     async def server_void(request: Request):
