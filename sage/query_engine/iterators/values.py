@@ -35,6 +35,12 @@ class ValuesIterator(PreemptableIterator):
         prefix += ('|' + ('-' * (step - 1)))
         print(f'{prefix}ValuesIterator <{self._values}>')
 
+    def cost(self, context: Dict[str, float] = {}) -> float:
+        """Return a cost estimation of the iterator"""
+        cost = len(self._values)
+        context['last-cost'] = cost
+        return cost
+
     def variables(self) -> Set[str]:
         return set(self._values[0].keys())
 

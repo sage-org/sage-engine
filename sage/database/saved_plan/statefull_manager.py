@@ -14,9 +14,8 @@ from sage.query_engine.protobuf.iterators_pb2 import RootTree
 class StatefullManager(SavedPlanManager):
     """A HashMapManager stores saved plans in main memory using a simple HashMap"""
 
-    def __init__(self, encode_plan: bool = False):
+    def __init__(self):
         super(StatefullManager, self).__init__()
-        self._encode_plan = encode_plan
         self._plans = dict()
 
     def get_plan(self, plan_id: str, dataset: Dataset) -> PreemptableIterator:
@@ -28,11 +27,8 @@ class StatefullManager(SavedPlanManager):
 
         Returns: The saved plan corresponding to the input ID.
         """
-        if self._encode_plan:
-            saved_plan = self._plans[plan_id]
-            return load(decode_saved_plan(saved_plan), dataset)
-        else:
-            return self._plans[plan_id]
+        saved_plan = self._plans[plan_id]
+        return load(decode_saved_plan(saved_plan), dataset)
 
     def save_plan(self, plan: PreemptableIterator) -> str:
         """Store a saved plan.
@@ -42,13 +38,10 @@ class StatefullManager(SavedPlanManager):
         Returns: The ID of the saved plan.
         """
         plan_id = str(uuid4())
-        if self._encode_plan:
-            saved_plan = RootTree()
-            source_field = f'{plan.serialized_name()}_source'
-            getattr(saved_plan, source_field).CopyFrom(plan.save())
-            self._plans[plan_id] = encode_saved_plan(saved_plan)
-        else:
-            self._plans[plan_id] = plan
+        saved_plan = RootTree()
+        source_field = f'{plan.serialized_name()}_source'
+        getattr(saved_plan, source_field).CopyFrom(plan.save())
+        self._plans[plan_id] = encode_saved_plan(saved_plan)
         return plan_id
 
     def delete_plan(self, plan_id: str) -> None:

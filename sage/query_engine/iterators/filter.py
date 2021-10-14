@@ -37,13 +37,16 @@ class FilterIterator(PreemptableIterator):
 
     def __init__(
         self, source: PreemptableIterator, raw_expression: str, expression: Expr,
-        mu: Optional[Dict[str, str]] = None
+        mu: Optional[Dict[str, str]] = None,
+        consumed: int = 0, produced: int = 0
     ):
         super(FilterIterator, self).__init__()
         self._source = source
         self._raw_expression = raw_expression
         self._expression = expression
         self._mu = mu  # check if this attribute is necessary !!!
+        self._consumed = consumed
+        self._produced = produced
 
     def __repr__(self) -> str:
         return f"<FilterIterator '{self._expression.name}' on {self._source}>"
@@ -59,6 +62,18 @@ class FilterIterator(PreemptableIterator):
         prefix += ('|' + ('-' * (step - 1)))
         print(f'{prefix}FilterIterator <{str(self._expression.vars)}>')
         self._source.explain(height=(height + step), step=step)
+
+    def cost(self, context: Dict[str, float] = {}) -> float:
+        """Return a cost estimation of the iterator"""
+        if self._produced == 0:
+            selectivity = 1
+        else:
+            selectivity = self._produced / self._consumed
+        source_cost = self._source.cost(context=context)
+        cost = selectivity * source_cost
+        print(f'Cout({self._raw_expression}) = {selectivity} x {source_cost} = {cost}')
+        context['last-cost'] = cost
+        return cost
 
     def variables(self) -> Set[str]:
         return self._source.variables()
@@ -92,6 +107,8 @@ class FilterIterator(PreemptableIterator):
             mappings = await self._source.next(context=context)
             if mappings is None:
                 return None
+            self._consumed += 1
+        self._produced += 1
         return mappings
 
     def save(self) -> SavedFilterIterator:
@@ -102,4 +119,6 @@ class FilterIterator(PreemptableIterator):
         saved_filter.expression = self._raw_expression
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_filter.mu)
+        saved_filter.consumed = self._consumed
+        saved_filter.produced = self._produced
         return saved_filter

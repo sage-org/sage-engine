@@ -29,7 +29,8 @@ class ScanIterator(PreemptableIterator):
 
     def __init__(
         self, connector: DatabaseConnector, pattern: Dict[str, str],
-        pattern_cardinality: Optional[int] = None, produced: int = 0,
+        cumulative_cardinality: int = 0, pattern_cardinality: int = -1,
+        pattern_produced: int = 0, produced: int = 0, stages: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
@@ -60,12 +61,15 @@ class ScanIterator(PreemptableIterator):
             self._source, card = self._connector.search(
                 s, p, o, last_read=last_read, as_of=as_of
             )
-        if pattern_cardinality is None:
+        self._cardinality = card
+        self._cumulative_cardinality = cumulative_cardinality
+        if pattern_cardinality < 0:
             self._pattern_cardinality = card
         else:
             self._pattern_cardinality = pattern_cardinality
-        self._cardinality = card
+        self._pattern_produced = pattern_produced
         self._produced = produced
+        self._stages = stages
 
     def __len__(self) -> int:
         return self._cardinality
@@ -78,6 +82,7 @@ class ScanIterator(PreemptableIterator):
         return "scan"
 
     def explain(self, height: int = 0, step: int = 3) -> None:
+        """Print a description of the iterator"""
         prefix = ''
         if height > step:
             prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
@@ -86,6 +91,20 @@ class ScanIterator(PreemptableIterator):
         predicate = self._pattern['predicate']
         object = self._pattern['object']
         print(f'{prefix}ScanIterator <({subject} {predicate} {object})>')
+
+    def cost(self, context: Dict[str, float] = {}) -> float:
+        """Return a cost estimation of the iterator"""
+        prev_cost = context['last-cost'] if 'last-cost' in context else None
+        cardinality = max(max(self._cardinality, self._cumulative_cardinality), self._pattern_produced)
+        if (self._produced == 0) and (self._stages == 0) and (prev_cost is not None):
+            cost = prev_cost * self._cardinality
+        elif prev_cost is not None:
+            cost = prev_cost * (cardinality / (self._stages + 1))
+        else:
+            cost = cardinality / (self._stages + 1)
+        print(f'Cout({self._pattern}) = {prev_cost} x {cardinality} = {cost}')
+        context['last-cost'] = cost
+        return cost
 
     def variables(self) -> Set[str]:
         vars = set()
@@ -113,7 +132,9 @@ class ScanIterator(PreemptableIterator):
         self._last_read = None
         self._mu = None
         self._cardinality = card
+        self._cumulative_cardinality += card
         self._produced = 0
+        self._stages += 1
 
     async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
@@ -135,6 +156,7 @@ class ScanIterator(PreemptableIterator):
                 if execution_time > context['quota']:
                     raise QuantumExhausted()
         self._produced += 1
+        self._pattern_produced += 1
         if self._current_mappings is not None:
             mappings = {**self._current_mappings, **self._mu}
         else:
@@ -160,7 +182,10 @@ class ScanIterator(PreemptableIterator):
             saved_scan.timestamp = self._start_timestamp.isoformat()
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
-        saved_scan.pattern_cardinality = self._pattern_cardinality
         saved_scan.cardinality = self._cardinality
+        saved_scan.cumulative_cardinality = self._cumulative_cardinality
+        saved_scan.pattern_cardinality = self._pattern_cardinality
+        saved_scan.pattern_produced = self._pattern_produced
         saved_scan.produced = self._produced
+        saved_scan.stages = self._stages
         return saved_scan

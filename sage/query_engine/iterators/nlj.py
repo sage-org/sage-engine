@@ -41,6 +41,10 @@ class IndexJoinIterator(PreemptableIterator):
         self._left.explain(height=(height + step), step=step)
         self._right.explain(height=(height + step), step=step)
 
+    def cost(self, context: Dict[str, float] = {}) -> float:
+        """Return a cost estimation of the iterator"""
+        return self._left.cost(context=context) + self._right.cost(context=context)
+
     def variables(self) -> Set[str]:
         return self._left.variables().union(self._right.variables())
 

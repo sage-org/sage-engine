@@ -94,7 +94,6 @@ async def execute_query(
             plan, cardinalities = Optimizer.get_default().optimize(
                 logical_plan, dataset, default_graph_uri, as_of=start_timestamp
             )
-            plan.explain()
             # plan, cardinalities = parse_query(query, dataset, default_graph_uri)
         loading_time = (time() - loadin_start) * 1000
         logging.info(f'loading time: {loading_time}ms')
@@ -129,8 +128,9 @@ async def execute_query(
             "import": loading_time,
             "export": export_time,
             "metrics": {
-                "coverage": coverage_after,
-                "quantum-coverage": coverage_after - coverage_before
+                "progression": coverage_after,
+                "coverage": coverage_after - coverage_before,
+                "cost": plan.cost(context={})
             }
         }
         print(stats['metrics'])

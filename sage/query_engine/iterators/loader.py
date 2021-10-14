@@ -93,7 +93,8 @@ def load_filter(saved_plan: SavedFilterIterator, dataset: Dataset) -> Preemptabl
     compiled_expr = parseQuery(query)
     compiled_expr = translateQuery(compiled_expr).algebra.p.p.expr
     return FilterIterator(
-        source, saved_plan.expression, compiled_expr, mu=mu
+        source, saved_plan.expression, compiled_expr,
+        mu=mu, consumed=saved_plan.consumed, produced=saved_plan.produced
     )
 
 
@@ -121,8 +122,11 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
         mu = dict(saved_plan.mu)
     return ScanIterator(
         connector, pattern,
+        cumulative_cardinality=saved_plan.cumulative_cardinality,
         pattern_cardinality=saved_plan.pattern_cardinality,
+        pattern_produced=saved_plan.pattern_produced,
         produced=saved_plan.produced,
+        stages=saved_plan.stages,
         current_mappings=current_mappings, mu=mu,
         last_read=saved_plan.last_read,
         as_of=as_of

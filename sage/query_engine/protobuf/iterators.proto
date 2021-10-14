@@ -19,9 +19,12 @@ message SavedScanIterator {
   map<string, string> mu = 3;
   string last_read = 4;
   string timestamp = 5;
-  int64 pattern_cardinality = 6;
-  int64 cardinality = 7;
-  int64 produced = 8;
+  int64 cardinality = 6;
+  int64 cumulative_cardinality = 7;
+  int64 pattern_cardinality = 8;
+  int64 pattern_produced = 9;
+  int64 produced = 10;
+  int64 stages = 11;
 }
 
 message SavedValuesIterator {
@@ -91,6 +94,8 @@ message SavedFilterIterator {
   }
   string expression = 6;
   map<string, string> mu = 7;
+  int64 consumed = 8;
+  int64 produced = 9;
 }
 
 message SavedInsertData {
