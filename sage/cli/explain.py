@@ -118,9 +118,8 @@ def explain(
     print("------------")
     print(pprintAlgebra(tq))
 
-    cards = list()
     logical_plan = Parser.parse(query)
-    iterator = Optimizer.get_default().optimize(
+    iterator, cardinalities = Optimizer.get_default().optimize(
         logical_plan, dataset, graph_uri
     )
     # iterator, cards = parse_query(query, dataset, graph_uri)
@@ -136,7 +135,7 @@ def explain(
     print("-----------------")
     print("Cardinalities")
     print("-----------------")
-    pp.pprint(cards)
+    pp.pprint(cardinalities)
 
     # if you want to run it call sage-query !
     # print("-----------------")

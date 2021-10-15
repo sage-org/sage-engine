@@ -82,7 +82,7 @@ def sage_query_debug(config_file, default_graph_uri, query, file, limit):
         exit(1)
 
     logical_plan = Parser.parse(query)
-    iterator = Optimizer.get_default().optimize(
+    iterator, cardinalities = Optimizer.get_default().optimize(
         logical_plan, dataset, default_graph_uri
     )
     # iterator, cards = parse_query(query, dataset, default_graph_uri)

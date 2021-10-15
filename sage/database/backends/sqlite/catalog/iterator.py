@@ -20,10 +20,6 @@ class SQliteIterator(DBIterator):
         self._buffer = self._cursor.fetchmany(size=1)
         self._last_read = None
 
-    def __del__(self) -> None:
-        """Destructor (close the database cursor)"""
-        self._cursor.close()
-
     def last_read(self) -> str:
         """Return the index ID of the last element read"""
         if self._last_read is None or self._last_read == '':

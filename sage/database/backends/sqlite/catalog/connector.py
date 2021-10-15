@@ -71,6 +71,9 @@ class CatalogSQliteConnector(SQliteConnector):
 
         start_params = self.__get_identifiers(cursor, start_params)
 
+        if -1 in start_params:
+            return EmptyIterator(pattern), 0
+
         # create the iterator to yield the matching RDF triples
         iterator = SQliteIterator(
             cursor, self._manager.get_connection(),

@@ -84,7 +84,10 @@ class CustomNTriplesParser(Parser, NTriplesParser):
             object.n3()
             self.eat(r_tail)
 
-            subject = str(subject)
+            if isinstance(subject, BNode):
+                subject = subject.n3()
+            else:
+                subject = str(subject)
             predicate = str(predicate)
             if isinstance(object, Literal) or isinstance(object, BNode):
                 object = object.n3()
