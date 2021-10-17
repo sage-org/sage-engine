@@ -8,6 +8,7 @@ from sage.query_engine.optimizer.logical.plan_visitor import Node
 from sage.query_engine.optimizer.logical.visitors.pipeline_builder import PipelineBuilder
 from sage.query_engine.optimizer.logical.optimizer import LogicalPlanOptimizer
 from sage.query_engine.optimizer.physical.optimizer import PhysicalPlanOptimizer
+from sage.query_engine.optimizer.physical.visitors.cost_estimator import CostEstimartor
 
 
 class Optimizer():
@@ -41,3 +42,6 @@ class Optimizer():
         if self._physical_optimizer is not None:
             physical_plan = self._physical_optimizer.optimize(physical_plan)
         return physical_plan, cardinalities
+
+    def cost(self, physical_plan: PreemptableIterator) -> float:
+        return CostEstimartor().visit(physical_plan, context={})

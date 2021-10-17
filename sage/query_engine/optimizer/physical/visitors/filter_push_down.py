@@ -1,5 +1,5 @@
 from hashlib import md5
-from typing import Set, Tuple, List
+from typing import Set, Tuple, List, Dict, Any
 from rdflib.term import Variable
 from rdflib.plugins.sparql.parserutils import Expr
 
@@ -58,7 +58,7 @@ class FilterTargets(PhysicalPlanVisitor):
             filter._expression.vars = variables
         self._constrained_variables = filter._expression.vars
 
-    def visit_projection(self, node: PreemptableIterator) -> List[Tuple[PreemptableIterator, int]]:
+    def visit_projection(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> List[Tuple[PreemptableIterator, int]]:
         # can be moved at a lower level than the current iterator
         targets = self.visit(node._source)
         if len(targets) > 0:
@@ -69,7 +69,7 @@ class FilterTargets(PhysicalPlanVisitor):
         # projection is the top iterator, something wrong...
         raise Exception('Malformed FILTER clause')
 
-    def visit_filter(self, node: PreemptableIterator) -> List[Tuple[PreemptableIterator, int]]:
+    def visit_filter(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> List[Tuple[PreemptableIterator, int]]:
         # can be moved at a lower level than the current iterator
         targets = self.visit(node._source)
         if len(targets) > 0:
@@ -80,7 +80,7 @@ class FilterTargets(PhysicalPlanVisitor):
         # cannot be moved after this iterator
         return []
 
-    def visit_join(self, node: PreemptableIterator) -> List[Tuple[PreemptableIterator, int]]:
+    def visit_join(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> List[Tuple[PreemptableIterator, int]]:
         # can be moved at a lower level than the current iterator
         targets = self.visit(node._left) + self.visit(node._right)
         if len(targets) > 0:
@@ -93,7 +93,7 @@ class FilterTargets(PhysicalPlanVisitor):
         # cannot be moved after this iterator
         return []
 
-    def visit_union(self, node: PreemptableIterator) -> List[Tuple[PreemptableIterator, int]]:
+    def visit_union(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> List[Tuple[PreemptableIterator, int]]:
         # can be moved at a lower level than the current iterator
         targets = self.visit(node._left) + self.visit(node._right)
         if len(targets) > 0:
@@ -109,10 +109,10 @@ class FilterTargets(PhysicalPlanVisitor):
         # cannot be moved after this iterator
         return targets
 
-    def visit_values(self, node: PreemptableIterator) -> List[Tuple[PreemptableIterator, int]]:
+    def visit_values(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> List[Tuple[PreemptableIterator, int]]:
         return []  # cannot be moved after a leaf iterator
 
-    def visit_scan(self, node: PreemptableIterator) -> List[Tuple[PreemptableIterator, int]]:
+    def visit_scan(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> List[Tuple[PreemptableIterator, int]]:
         return []  # cannot be moved after a leaf iterator
 
 
@@ -162,10 +162,10 @@ class FilterPushDown(PhysicalPlanVisitor):
         node._source = self.visit(node._source)
         return node
 
-    def visit_projection(self, node: PreemptableIterator) -> PreemptableIterator:
+    def visit_projection(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> PreemptableIterator:
         return self.__process_unary_iterator__(node)
 
-    def visit_filter(self, node: PreemptableIterator) -> PreemptableIterator:
+    def visit_filter(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> PreemptableIterator:
         return self.__process_unary_iterator__(node)
 
     def __process_binary_iterator__(self, node: PreemptableIterator) -> PreemptableIterator:
@@ -189,16 +189,16 @@ class FilterPushDown(PhysicalPlanVisitor):
         node._right = self.visit(node._right)
         return node
 
-    def visit_join(self, node: PreemptableIterator) -> PreemptableIterator:
+    def visit_join(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> PreemptableIterator:
         return self.__process_binary_iterator__(node)
 
-    def visit_union(self, node: PreemptableIterator) -> PreemptableIterator:
+    def visit_union(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> PreemptableIterator:
         return self.__process_binary_iterator__(node)
 
-    def visit_values(self, node: PreemptableIterator) -> PreemptableIterator:
+    def visit_values(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> PreemptableIterator:
         return node
 
-    def visit_scan(self, node: PreemptableIterator) -> PreemptableIterator:
+    def visit_scan(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> PreemptableIterator:
         return node
 
 

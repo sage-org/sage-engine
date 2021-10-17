@@ -34,10 +34,6 @@ class ProjectionIterator(PreemptableIterator):
         print(f'{prefix}ProjectionIterator SELECT {self._projection}')
         self._source.explain(height=(height + step), step=step)
 
-    def cost(self, context: Dict[str, float] = {}) -> float:
-        """Return a cost estimation of the iterator"""
-        return self._source.cost(context=context)
-
     def variables(self) -> Set[str]:
         return set(self._projection)
 

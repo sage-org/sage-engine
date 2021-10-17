@@ -92,20 +92,6 @@ class ScanIterator(PreemptableIterator):
         object = self._pattern['object']
         print(f'{prefix}ScanIterator <({subject} {predicate} {object})>')
 
-    def cost(self, context: Dict[str, float] = {}) -> float:
-        """Return a cost estimation of the iterator"""
-        prev_cost = context['last-cost'] if 'last-cost' in context else None
-        cardinality = max(max(self._cardinality, self._cumulative_cardinality), self._pattern_produced)
-        if (self._produced == 0) and (self._stages == 0) and (prev_cost is not None):
-            cost = prev_cost * self._cardinality
-        elif prev_cost is not None:
-            cost = prev_cost * (cardinality / (self._stages + 1))
-        else:
-            cost = cardinality / (self._stages + 1)
-        print(f'Cout({self._pattern}) = {prev_cost} x {cardinality} = {cost}')
-        context['last-cost'] = cost
-        return cost
-
     def variables(self) -> Set[str]:
         vars = set()
         if self._pattern['subject'].startswith('?'):

@@ -63,18 +63,6 @@ class FilterIterator(PreemptableIterator):
         print(f'{prefix}FilterIterator <{str(self._expression.vars)}>')
         self._source.explain(height=(height + step), step=step)
 
-    def cost(self, context: Dict[str, float] = {}) -> float:
-        """Return a cost estimation of the iterator"""
-        if self._produced == 0:
-            selectivity = 1
-        else:
-            selectivity = self._produced / self._consumed
-        source_cost = self._source.cost(context=context)
-        cost = selectivity * source_cost
-        print(f'Cout({self._raw_expression}) = {selectivity} x {source_cost} = {cost}')
-        context['last-cost'] = cost
-        return cost
-
     def variables(self) -> Set[str]:
         return self._source.variables()
 

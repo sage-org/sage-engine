@@ -130,7 +130,7 @@ async def execute_query(
             "metrics": {
                 "progression": coverage_after,
                 "coverage": coverage_after - coverage_before,
-                "cost": plan.cost(context={})
+                "cost": Optimizer.get_default().cost(plan)
             }
         }
         print(stats['metrics'])
