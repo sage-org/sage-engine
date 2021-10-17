@@ -18,11 +18,6 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
-    def cost(self, context: Dict[str, float] = {}) -> float:
-        """Return a cost estimation of the iterator"""
-        pass
-
-    @abstractmethod
     def variables(self) -> Set[str]:
         """Return the domain of the iterator"""
         pass
