@@ -1,10 +1,12 @@
 # scan.py
 # Author: Thomas MINIER - MIT License 2017-2020
+import sage.database.voids.imdb.void as imdb_void
+
 from time import time
 from datetime import datetime
 from typing import Dict, Optional, Set, Any
 
-from sage.database.backends.db_connector import DatabaseConnector
+from sage.database.core.dataset import Dataset
 from sage.query_engine.exceptions import QuantumExhausted
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.utils import selection, vars_positions
@@ -28,7 +30,7 @@ class ScanIterator(PreemptableIterator):
     """
 
     def __init__(
-        self, connector: DatabaseConnector, pattern: Dict[str, str],
+        self, dataset: Dataset, pattern: Dict[str, str],
         cumulative_cardinality: int = 0, pattern_cardinality: int = -1,
         pattern_produced: int = 0, produced: int = 0, stages: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
@@ -37,8 +39,9 @@ class ScanIterator(PreemptableIterator):
         as_of: Optional[datetime] = None
     ):
         super(ScanIterator, self).__init__()
-        self._connector = connector
+        self._dataset = dataset
         self._pattern = pattern
+        self._connector = dataset.get_graph(pattern['graph'])
         self._pattern_variables = vars_positions(
             pattern['subject'], pattern['predicate'], pattern['object']
         )
@@ -48,23 +51,19 @@ class ScanIterator(PreemptableIterator):
         self._start_timestamp = as_of
         # create an iterator on the database
         if current_mappings is None:
-            self._source, card = self._connector.search(
-                pattern['subject'], pattern['predicate'], pattern['object'],
-                last_read=last_read, as_of=as_of
-            )
+            (s, p, o) = (pattern['subject'], pattern['predicate'], pattern['object'])
+            self._source, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
         else:
             (s, p, o) = (
                 find_in_mappings(pattern['subject'], current_mappings),
                 find_in_mappings(pattern['predicate'], current_mappings),
                 find_in_mappings(pattern['object'], current_mappings)
             )
-            self._source, card = self._connector.search(
-                s, p, o, last_read=last_read, as_of=as_of
-            )
-        self._cardinality = card
+            self._source, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
+        self._cardinality = imdb_void.estimate_cardinality(self._dataset, (s, p, o), default=card)
         self._cumulative_cardinality = cumulative_cardinality
         if pattern_cardinality < 0:
-            self._pattern_cardinality = card
+            self._pattern_cardinality = self._cardinality
         else:
             self._pattern_cardinality = pattern_cardinality
         self._pattern_produced = pattern_produced
@@ -117,8 +116,8 @@ class ScanIterator(PreemptableIterator):
         self._source = it
         self._last_read = None
         self._mu = None
-        self._cardinality = card
-        self._cumulative_cardinality += card
+        self._cardinality = imdb_void.estimate_cardinality(self._dataset, (s, p, o), default=card)
+        self._cumulative_cardinality += self._cardinality
         self._produced = 0
         self._stages += 1
 
