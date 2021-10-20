@@ -109,6 +109,7 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
       The pipeline of iterator used to continue query execution.
     """
     pattern = protoTriple_to_dict(saved_plan.pattern)
+    connector = dataset.get_graph(pattern['graph'])
     if saved_plan.timestamp is not None and saved_plan.timestamp != '':
         as_of = datetime.fromisoformat(saved_plan.timestamp)
     else:
@@ -120,7 +121,7 @@ def load_scan(saved_plan: SavedScanIterator, dataset: Dataset) -> PreemptableIte
     if len(saved_plan.mu) > 0:
         mu = dict(saved_plan.mu)
     return ScanIterator(
-        dataset, pattern,
+        connector, pattern,
         cumulative_cardinality=saved_plan.cumulative_cardinality,
         pattern_cardinality=saved_plan.pattern_cardinality,
         pattern_produced=saved_plan.pattern_produced,

@@ -1,12 +1,10 @@
 # scan.py
 # Author: Thomas MINIER - MIT License 2017-2020
-import sage.database.voids.imdb.void as imdb_void
-
 from time import time
 from datetime import datetime
 from typing import Dict, Optional, Set, Any
 
-from sage.database.core.dataset import Dataset
+from sage.database.backends.db_connector import DatabaseConnector
 from sage.query_engine.exceptions import QuantumExhausted
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.utils import selection, vars_positions
@@ -30,7 +28,7 @@ class ScanIterator(PreemptableIterator):
     """
 
     def __init__(
-        self, dataset: Dataset, pattern: Dict[str, str],
+        self, connector: DatabaseConnector, pattern: Dict[str, str],
         cumulative_cardinality: int = 0, pattern_cardinality: int = -1,
         pattern_produced: int = 0, produced: int = 0, stages: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
@@ -39,9 +37,8 @@ class ScanIterator(PreemptableIterator):
         as_of: Optional[datetime] = None
     ):
         super(ScanIterator, self).__init__()
-        self._dataset = dataset
+        self._connector = connector
         self._pattern = pattern
-        self._connector = dataset.get_graph(pattern['graph'])
         self._pattern_variables = vars_positions(
             pattern['subject'], pattern['predicate'], pattern['object']
         )
@@ -60,7 +57,7 @@ class ScanIterator(PreemptableIterator):
                 find_in_mappings(pattern['object'], current_mappings)
             )
             self._source, card = self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
-        self._cardinality = imdb_void.estimate_cardinality(self._dataset, (s, p, o), default=card)
+        self._cardinality = card
         self._cumulative_cardinality = cumulative_cardinality
         if pattern_cardinality < 0:
             self._pattern_cardinality = self._cardinality
@@ -116,7 +113,7 @@ class ScanIterator(PreemptableIterator):
         self._source = it
         self._last_read = None
         self._mu = None
-        self._cardinality = imdb_void.estimate_cardinality(self._dataset, (s, p, o), default=card)
+        self._cardinality = card
         self._cumulative_cardinality += self._cardinality
         self._produced = 0
         self._stages += 1

@@ -20,15 +20,13 @@ class CostEstimartor(PhysicalPlanVisitor):
             context['attributes'] = dict()
         if 'input-size' not in context:
             context['input-size'] = 1
+        # context['height'] = 1
         return super().visit(node, context=context)
 
     def visit_projection(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> float:
         return self.visit(node._source, context=context)
 
     def visit_values(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> float:
-        # update the list of the query attributes with their number of distinct values
-        # for variable in node._values[0].keys():
-        #     self.__update_attributes__(context, variable, 1)
         # estimate the cardinality of the VALUES iterator
         input_size = context['input-size']
         output_size = input_size * len(node._values)
@@ -53,6 +51,7 @@ class CostEstimartor(PhysicalPlanVisitor):
         return self.visit(node._left, context=context) + self.visit(node._right, context=context)
 
     def visit_scan(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> float:
+        print(f'pattern produced: {node._pattern_produced}/{node._pattern_cardinality}')
         subject = node._pattern['subject']
         predicate = node._pattern['predicate']
         object = node._pattern['object']
@@ -87,4 +86,6 @@ class CostEstimartor(PhysicalPlanVisitor):
             output_size = input_size * selectivity
             print(f'C_out({node._pattern}) = {input_size} x ({cardinality} / {stages}) = {output_size}')
         context['input-size'] = output_size
-        return output_size
+        # weighted_output = output_size * (0.5**context['height'])
+        # context['height'] += 1
+        return output_size  # weighted_output

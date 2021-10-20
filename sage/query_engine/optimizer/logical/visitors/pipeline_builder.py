@@ -147,7 +147,8 @@ class PipelineBuilder(LogicalPlanVisitor):
         triple_pattern = utils.format_triple_pattern(node, graph=self._default_graph)
         if self._dataset.has_graph(triple_pattern['graph']):
             iterator = ScanIterator(
-                self._dataset, triple_pattern, as_of=self._as_of
+                self._dataset.get_graph(triple_pattern['graph']),
+                triple_pattern, as_of=self._as_of
             )
         else:
             iterator = EmptyIterator()
