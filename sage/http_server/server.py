@@ -154,7 +154,10 @@ async def explain_query(
         plan, cardinalities = Optimizer.get_default().optimize(
             logical_plan, dataset, default_graph_uri
         )
-    return QueryPlanStringifier().visit(plan)
+    return JSONResponse({
+        "query": QueryPlanStringifier().visit(plan),
+        "cost": Optimizer.get_default().cost(plan)
+    })
 
 
 def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_page: Optional[str], stats: dict, skol_url: str) -> Response:
