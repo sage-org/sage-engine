@@ -37,6 +37,7 @@ class SagePostQuery(BaseModel):
     query: str = Field(..., description="The SPARQL query to execute.")
     defaultGraph: str = Field(..., description="The URI of the default RDF graph queried.")
     next: str = Field(None, description="(Optional) A next link used to resume query execution from a saved state.")
+    forceOrder: bool = Field(False, description="True to fix the join ordering, False otherwise.")
 
 
 def choose_void_format(mimetypes):
@@ -248,31 +249,24 @@ def run_app(config_file: str) -> FastAPI:
         request: Request,
         query: str = Query(..., description="The SPARQL query to execute."),
         default_graph_uri: str = Query(..., alias="default-graph-uri", description="The URI of the default RDF graph queried."),
-        next_link: str = Query(None, alias="next", description="(Optional) A next link used to resume query execution from a saved state.")
+        next_link: str = Query(None, alias="next", description="(Optional) A next link used to resume query execution from a saved state."),
+        join_order: bool = Query(False, alias="join-order", description="True to fix the join ordering, False otherwise.")
     ):
-        dataset.join_ordering = True
+        dataset.force_order = join_order
         return await execute_sparql_query(
             request, query, default_graph_uri, next_link
         )
 
     @app.post("/sparql")
     async def sparql_post(request: Request, item: SagePostQuery):
-        dataset.join_ordering = True
-        return await execute_sparql_query(
-            request, item.query, item.defaultGraph, item.next
-        )
-
-    @app.post("/sparql/force-order")
-    async def sparql_post_force_order(request: Request, item: SagePostQuery):
-        """Execute a SPARQL query using the Web Preemption model"""
-        dataset.join_ordering = False
+        dataset.force_order = item.forceOrder
         return await execute_sparql_query(
             request, item.query, item.defaultGraph, item.next
         )
 
     @app.post("/sparql/explain")
     async def sparql_post_explain(request: Request, item: SagePostQuery):
-        dataset.join_ordering = True
+        dataset.force_order = item.forceOrder
         return await explain_query(
             item.query, item.defaultGraph, item.next, dataset
         )

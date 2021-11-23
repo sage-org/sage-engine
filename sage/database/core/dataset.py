@@ -33,7 +33,7 @@ class Dataset(object):
         self._default_query = default_query
         self._analytics = analytics
         self._stateless = stateless
-        self._join_ordering = True
+        self._force_order = False
 
     @property
     def name(self) -> str:
@@ -44,12 +44,12 @@ class Dataset(object):
         return self._stateless
 
     @property
-    def join_ordering(self) -> bool:
-        return self._join_ordering
+    def force_order(self) -> bool:
+        return self._force_order
 
-    @join_ordering.setter
-    def join_ordering(self, value: bool) -> None:
-        self._join_ordering = value
+    @force_order.setter
+    def force_order(self, value: bool) -> None:
+        self._force_order = value
 
     @property
     def default_query(self):

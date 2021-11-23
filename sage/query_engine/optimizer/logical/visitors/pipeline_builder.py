@@ -78,6 +78,7 @@ class PipelineBuilder(LogicalPlanVisitor):
     def __build_ascending_cardinalities_tree__(
         self, scan_iterators: List[ScanIterator]
     ) -> PreemptableIterator:
+        print('building ascending cardinalities tree')
         scan_iterators = sorted(scan_iterators, key=lambda it: it.__len__())
         pipeline = scan_iterators.pop(0)
         variables = utils.get_vars(pipeline._pattern)
@@ -94,6 +95,7 @@ class PipelineBuilder(LogicalPlanVisitor):
     def __build_naive_tree__(
         self, scan_iterators: List[ScanIterator]
     ) -> PreemptableIterator:
+        print('building naive tree')
         pipeline = scan_iterators.pop(0)
         while len(scan_iterators) > 0:
             pipeline = IndexJoinIterator(pipeline, scan_iterators.pop(0))
@@ -137,10 +139,10 @@ class PipelineBuilder(LogicalPlanVisitor):
             child, cardinality = self.visit(triple_pattern)
             scan_iterators.append(child)
             cardinalities.extend(cardinality)
-        if self._dataset.join_ordering:
-            iterator = self.__build_ascending_cardinalities_tree__(scan_iterators)
-        else:
+        if self._dataset.force_order:
             iterator = self.__build_naive_tree__(scan_iterators)
+        else:
+            iterator = self.__build_ascending_cardinalities_tree__(scan_iterators)
         return iterator, cardinalities
 
     def visit_scan(self, node: TriplePattern) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
