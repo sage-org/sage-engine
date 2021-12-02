@@ -79,7 +79,10 @@ class PipelineBuilder(LogicalPlanVisitor):
         self, scan_iterators: List[ScanIterator]
     ) -> PreemptableIterator:
         print('building ascending cardinalities tree')
-        scan_iterators = sorted(scan_iterators, key=lambda it: it.__len__())
+        scan_iterators = sorted(
+            scan_iterators,
+            key=lambda it: (it.__len__(), it._pattern['predicate'])
+        )
         pipeline = scan_iterators.pop(0)
         variables = utils.get_vars(pipeline._pattern)
         while len(scan_iterators) > 0:

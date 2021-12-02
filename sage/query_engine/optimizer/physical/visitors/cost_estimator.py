@@ -96,7 +96,7 @@ class CostEstimartor(PhysicalPlanVisitor):
                     context['attributes'][object].remove(max_value)
                     distinct_values *= max_value
             output_size = (input_size * node._pattern_cardinality) / distinct_values
-            print(f'C_out({node._pattern}) = ({input_size} x {node._pattern_cardinality}) / {distinct_values} = {output_size}')
+            print(f'C_out({node._pattern}) = {input_size} x ({node._pattern_cardinality} / {distinct_values}) = {output_size}')
 
         # if node._pattern_produced == 0:
         #     distinct_subject = 0
