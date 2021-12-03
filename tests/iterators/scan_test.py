@@ -3,7 +3,7 @@
 import pytest
 from sage.query_engine.sage_engine import SageEngine
 from sage.query_engine.iterators.scan import ScanIterator
-from sage.database.hdt.connector import HDTFileConnector
+from sage.database.backends.hdt.connector import HDTFileConnector
 
 hdtDoc = HDTFileConnector('tests/data/test.hdt')
 engine = SageEngine()

@@ -1,7 +1,7 @@
 # postgre_backend_test.py
 # Author: Thomas MINIER - MIT License 2017-2019
 import pytest
-from sage.database.postgres_backends.postgres.connector import PostgresConnector
+from sage.database.backends.postgres.connector import PostgresConnector
 from tests.database.fixtures import index_scan_fixtures
 
 DB_NAME = 'watdiv'

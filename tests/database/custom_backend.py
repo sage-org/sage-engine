@@ -1,6 +1,6 @@
 # custom_backend.py
 # Author: Thomas MINIER - MIT License 2017-2018
-from sage.database.db_connector import DatabaseConnector
+from sage.database.backends.db_connector import DatabaseConnector
 
 
 class SillyConnector(DatabaseConnector):

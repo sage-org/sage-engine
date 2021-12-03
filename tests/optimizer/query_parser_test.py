@@ -3,9 +3,8 @@
 import pytest
 from sage.query_engine.sage_engine import SageEngine
 from sage.query_engine.optimizer.query_parser import parse_query
-from sage.database.hdt.connector import HDTFileConnector
+from sage.database.backends.hdt.connector import HDTFileConnector
 from tests.utils import DummyDataset
-import math
 
 
 hdtDoc = HDTFileConnector('tests/data/watdiv.10M.hdt')

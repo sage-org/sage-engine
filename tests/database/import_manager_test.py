@@ -1,7 +1,7 @@
 # custom_backend.py
 # Author: Thomas MINIER - MIT License 2017-2019
 import pytest
-from sage.database.import_manager import import_backend
+from sage.database.backends.import_manager import import_backend
 from sage.database.core.yaml_config import load_config
 
 

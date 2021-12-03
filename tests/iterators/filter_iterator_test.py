@@ -6,9 +6,8 @@ from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.loader import load
-from sage.database.hdt.connector import HDTFileConnector
+from sage.database.backends.hdt.connector import HDTFileConnector
 from tests.utils import DummyDataset
-import math
 
 
 hdtDoc = HDTFileConnector('tests/data/watdiv.10M.hdt')
