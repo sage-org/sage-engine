@@ -131,7 +131,8 @@ async def execute_query(
             "metrics": {
                 "progression": coverage_after,
                 "coverage": coverage_after - coverage_before,
-                "cost": Optimizer.get_default().cost(plan)
+                "cost": Optimizer.get_default().cost(plan),
+                "cardinality": Optimizer.get_default().cardinality(plan)
             }
         }
         print(stats['metrics'])
@@ -157,7 +158,8 @@ async def explain_query(
         )
     return JSONResponse({
         "query": QueryPlanStringifier().visit(plan),
-        "cost": Optimizer.get_default().cost(plan)
+        "cost": Optimizer.get_default().cost(plan),
+        "cardinality": Optimizer.get_default().cardinality(plan)
     })
 
 

@@ -9,6 +9,7 @@ from sage.query_engine.optimizer.logical.visitors.pipeline_builder import Pipeli
 from sage.query_engine.optimizer.logical.optimizer import LogicalPlanOptimizer
 from sage.query_engine.optimizer.physical.optimizer import PhysicalPlanOptimizer
 from sage.query_engine.optimizer.physical.visitors.cost_estimator import CostEstimartor
+from sage.query_engine.optimizer.physical.visitors.cardinality_estimator import CardinalityEstimartor
 
 
 class Optimizer():
@@ -45,3 +46,6 @@ class Optimizer():
 
     def cost(self, physical_plan: PreemptableIterator) -> float:
         return CostEstimartor().visit(physical_plan, context={})
+
+    def cardinality(self, physical_plan: PreemptableIterator) -> float:
+        return CardinalityEstimartor().visit(physical_plan, context={})

@@ -6,7 +6,7 @@ from sage.query_engine.optimizer.physical.plan_visitor import PhysicalPlanVisito
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
 
-class CostEstimartor(PhysicalPlanVisitor):
+class CardinalityEstimartor(PhysicalPlanVisitor):
 
     def __update_attributes__(
         self, context: Dict[str, Any], attribute: str, distinct_values: int
@@ -24,7 +24,6 @@ class CostEstimartor(PhysicalPlanVisitor):
             context['attributes'] = dict()
         if 'input-size' not in context:
             context['input-size'] = 1
-        # context['height'] = 1
         return super().visit(node, context=context)
 
     def visit_projection(
@@ -61,14 +60,13 @@ class CostEstimartor(PhysicalPlanVisitor):
             f'Card({node._raw_expression}) = ' +
             f'{input_size} x {selectivity} = {output_size}'
         )
-        return input_size
+        return output_size
 
     def visit_join(
         self, node: PreemptableIterator, context: Dict[str, Any] = {}
     ) -> float:
-        left = self.visit(node._left, context=context)
-        right = self.visit(node._right, context=context)
-        return left + right
+        self.visit(node._left, context=context)
+        return self.visit(node._right, context=context)
 
     def visit_union(
         self, node: PreemptableIterator, context: Dict[str, Any] = {}
@@ -109,7 +107,7 @@ class CostEstimartor(PhysicalPlanVisitor):
             selectivity = cardinality / distinct_values
             output_size = input_size * selectivity
             print(
-                f'C_out({node._pattern}) = ' +
+                f'Card({node._pattern}) = ' +
                 f'{input_size} x ({cardinality} / {distinct_values}) = ' +
                 f'{output_size}'
             )
@@ -122,7 +120,7 @@ class CostEstimartor(PhysicalPlanVisitor):
             selectivity = cardinality / stages
             output_size = input_size * selectivity
             print(
-                f'C_out({node._pattern}) = ' +
+                f'Card({node._pattern}) = ' +
                 f'{input_size} x ({cardinality} / {stages}) = {output_size}'
             )
         context['input-size'] = output_size
