@@ -109,7 +109,7 @@ class CostEstimartor(PhysicalPlanVisitor):
             selectivity = cardinality / distinct_values
             output_size = input_size * selectivity
             print(
-                f'C_out({node._pattern}) = ' +
+                f'C_out({node._pattern}, runtime=False) = ' +
                 f'{input_size} x ({cardinality} / {distinct_values}) = ' +
                 f'{output_size}'
             )
@@ -122,7 +122,7 @@ class CostEstimartor(PhysicalPlanVisitor):
             selectivity = cardinality / stages
             output_size = input_size * selectivity
             print(
-                f'C_out({node._pattern}) = ' +
+                f'C_out({node._pattern}, runtime=True) = ' +
                 f'{input_size} x ({cardinality} / {stages}) = {output_size}'
             )
         context['input-size'] = output_size

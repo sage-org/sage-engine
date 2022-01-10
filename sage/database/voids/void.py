@@ -43,22 +43,22 @@ def count_distinct_objects(graph: str, predicate: str) -> int:
         return distinct_objects[graph][predicate]
 
 
-cardinalities['http://localhost:8080/sparql/imdb'] = load_csv(
-    'sage/database/voids/imdb/cardinalities.csv'
+cardinalities['http://localhost:8080/sparql/jobrdf'] = load_csv(
+    'sage/database/voids/jobrdf/cardinalities.csv'
 )
 cardinalities['http://localhost:8080/sparql/watdiv10M'] = load_csv(
     'sage/database/voids/watdiv10M/cardinalities.csv'
 )
 
-distinct_subjects['http://localhost:8080/sparql/imdb'] = load_csv(
-    'sage/database/voids/imdb/distinct_subjects.csv'
+distinct_subjects['http://localhost:8080/sparql/jobrdf'] = load_csv(
+    'sage/database/voids/jobrdf/distinct_subjects.csv'
 )
 distinct_subjects['http://localhost:8080/sparql/watdiv10M'] = load_csv(
     'sage/database/voids/watdiv10M/distinct_subjects.csv'
 )
 
-distinct_objects['http://localhost:8080/sparql/imdb'] = load_csv(
-    'sage/database/voids/imdb/distinct_objects.csv'
+distinct_objects['http://localhost:8080/sparql/jobrdf'] = load_csv(
+    'sage/database/voids/jobrdf/distinct_objects.csv'
 )
 distinct_objects['http://localhost:8080/sparql/watdiv10M'] = load_csv(
     'sage/database/voids/watdiv10M/distinct_objects.csv'
