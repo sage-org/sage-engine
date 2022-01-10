@@ -73,10 +73,13 @@ class FilterIterator(PreemptableIterator):
 
         Returns: The outcome of evaluating the SPARQL FILTER on the input set of solution mappings.
         """
-        d = {Variable(key[1:]): to_rdflib_term(value) for key, value in mappings.items()}
-        context = QueryContext(bindings=Bindings(d=d))
-        # context.prologue = self._prologue
-        return self._expression.eval(context)
+        try:
+            d = {Variable(key[1:]): to_rdflib_term(value) for key, value in mappings.items()}
+            context = QueryContext(bindings=Bindings(d=d))
+            # context.prologue = self._prologue
+            return self._expression.eval(context)
+        except Exception:
+            return False
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""

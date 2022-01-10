@@ -7,7 +7,7 @@ from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 class ValuesIterator(PreemptableIterator):
 
     def __init__(
-        self, values: List[str],
+        self, values: List[Dict[str, str]],
         next_value: int = 0,
         produced: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
