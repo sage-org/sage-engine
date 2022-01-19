@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from sage.database.core.dataset import Dataset
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, Node
 from sage.query_engine.optimizer.logical.visitors.filter_splitter import FilterSplitter
 
@@ -10,7 +11,7 @@ class LogicalPlanOptimizer():
         self._visitors = []
 
     @staticmethod
-    def get_default() -> LogicalPlanOptimizer:
+    def get_default(dataset: Dataset) -> LogicalPlanOptimizer:
         optimizer = LogicalPlanOptimizer()
         optimizer.add_visitor(FilterSplitter())
         return optimizer

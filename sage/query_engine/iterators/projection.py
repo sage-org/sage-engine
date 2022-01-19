@@ -34,8 +34,11 @@ class ProjectionIterator(PreemptableIterator):
         print(f'{prefix}ProjectionIterator SELECT {self._projection}')
         self._source.explain(height=(height + step), step=step)
 
-    def variables(self) -> Set[str]:
-        return set(self._projection)
+    def variables(self, include_values: bool = False) -> Set[str]:
+        if self._projection is None:
+            return self._source.variables(include_values=include_values)
+        else:
+            return set(self._projection)
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""

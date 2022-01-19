@@ -23,7 +23,9 @@ class Dataset(object):
         public_url: Optional[str] = None,
         default_query: Optional[str] = None,
         analytics=None,
-        stateless=True
+        stateless=True,
+        filter_push_down=True,
+        values_push_down=True
     ):
         super(Dataset, self).__init__()
         self._name = name
@@ -33,6 +35,8 @@ class Dataset(object):
         self._default_query = default_query
         self._analytics = analytics
         self._stateless = stateless
+        self._filter_push_down = filter_push_down
+        self._values_push_down = values_push_down
         self._force_order = False
 
     @property
@@ -42,6 +46,14 @@ class Dataset(object):
     @property
     def is_stateless(self) -> bool:
         return self._stateless
+
+    @property
+    def do_filter_push_down(self) -> bool:
+        return self._filter_push_down
+
+    @property
+    def do_values_push_down(self) -> bool:
+        return self._values_push_down
 
     @property
     def force_order(self) -> bool:

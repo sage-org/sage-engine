@@ -40,7 +40,7 @@ class CostEstimartor(PhysicalPlanVisitor):
         output_size = input_size * len(node._values)
         context['input-size'] = output_size
         print(
-            f'Card({node._values}) = {input_size} x {len(node._values)} = ' +
+            f'Cout({list(node._values[0].keys())}) = {input_size} x {len(node._values)} = ' +
             f'{output_size}'
         )
         return output_size
@@ -58,7 +58,7 @@ class CostEstimartor(PhysicalPlanVisitor):
         output_size = input_size * selectivity
         context['input-size'] = output_size
         print(
-            f'Card({node._raw_expression}) = ' +
+            f'Cout({node._raw_expression}) = ' +
             f'{input_size} x {selectivity} = {output_size}'
         )
         return input_size

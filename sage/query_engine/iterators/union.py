@@ -40,8 +40,10 @@ class BagUnionIterator(PreemptableIterator):
         self._left.explain(height=(height + step), step=step)
         self._right.explain(height=(height + step), step=step)
 
-    def variables(self) -> Set[str]:
-        return self._left.variables().union(self._right.variables())
+    def variables(self, include_values: bool = False) -> Set[str]:
+        return self._left.variables(include_values=include_values).union(
+            self._right.variables(include_values=include_values)
+        )
 
     def next_stage(self, mappings: Dict[str, str]):
         """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""

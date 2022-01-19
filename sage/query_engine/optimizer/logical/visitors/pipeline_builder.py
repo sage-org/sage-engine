@@ -54,6 +54,12 @@ class ExpressionStringifier(LogicalPlanVisitor):
     def visit_str_expression(self, node: Expr) -> str:
         return f'str({self.visit(node.arg)})'
 
+    def visit_additive_expression(self, node: Expr) -> str:
+        expression = self.visit(node.expr)
+        for index, operator in enumerate(node.op):
+            expression += f' {operator} {self.visit(node.other[index])}'
+        return f'({expression})'
+
 
 class PipelineBuilder(LogicalPlanVisitor):
 

@@ -49,13 +49,6 @@ def load_config(config_file: str) -> Dataset:
     else:
         stateless = True
 
-    # # if statefull, load the saved plan storage backend to use
-    # statefull_manager = None
-    # if not is_stateless:
-    #     # TODO allow use of custom backend for saved plans
-    #     # same kind of usage than custom DB backends
-    #     statefull_manager = HashMapManager()
-
     # get default time quantum & maximum number of results per page
     if 'quota' in config:
         if config['quota'] == 'inf':
@@ -71,7 +64,17 @@ def load_config(config_file: str) -> Dataset:
         logging.warning("You are using SaGe without limitations on the number of results sent per page. This is fine, but be carefull as very large page of results can have unexpected serialization time.")
         max_results = inf
 
-    # build all RDF graphs found in the configuration file
+    # load debug parameters
+    if 'filter_push_down' in config:
+        filter_push_down = config['filter_push_down']
+    else:
+        filter_push_down = True
+    if 'values_push_down' in config:
+        values_push_down = config['values_push_down']
+    else:
+        values_push_down = True
+
+        # build all RDF graphs found in the configuration file
     graphs = dict()
     if "graphs" not in config:
         raise SyntaxError("Np RDF graphs found in the configuration file. Please refers to the documentation to see how to declare RDF graphs in a SaGe YAML configuration file.")
@@ -102,5 +105,7 @@ def load_config(config_file: str) -> Dataset:
         public_url=public_url,
         default_query=default_query,
         analytics=analytics,
-        stateless=stateless
+        stateless=stateless,
+        filter_push_down=filter_push_down,
+        values_push_down=values_push_down
     )

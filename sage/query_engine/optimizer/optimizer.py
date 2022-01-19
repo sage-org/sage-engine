@@ -19,10 +19,10 @@ class Optimizer():
         self._physical_optimizer = None
 
     @staticmethod
-    def get_default() -> Optimizer:
+    def get_default(dataset: Dataset) -> Optimizer:
         optimizer = Optimizer()
-        optimizer.set_logical_optimizer(LogicalPlanOptimizer.get_default())
-        optimizer.set_physical_optimizer(PhysicalPlanOptimizer.get_default())
+        optimizer.set_logical_optimizer(LogicalPlanOptimizer.get_default(dataset))
+        optimizer.set_physical_optimizer(PhysicalPlanOptimizer.get_default(dataset))
         return optimizer
 
     def set_logical_optimizer(self, optimizer: LogicalPlanOptimizer) -> None:

@@ -18,7 +18,7 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
-    def variables(self) -> Set[str]:
+    def variables(self, include_values: bool = False) -> Set[str]:
         """Return the domain of the iterator"""
         pass
 

@@ -77,6 +77,8 @@ class LogicalPlanVisitor(ABC):
             return self.visit_conditional_or_expression(node)
         elif node.name == 'RelationalExpression':
             return self.visit_relational_expression(node)
+        elif node.name == 'AdditiveExpression':
+            return self.visit_additive_expression(node)
         elif node.name == 'Builtin_REGEX':
             return self.visit_regex_expression(node)
         elif node.name == 'Builtin_NOTEXISTS':
@@ -134,6 +136,9 @@ class LogicalPlanVisitor(ABC):
         raise UnsupportedSPARQL(f'The {node.name} expressions are not implemented')
 
     def visit_relational_expression(self, node: Expr) -> Any:
+        raise UnsupportedSPARQL(f'The {node.name} expressions are not implemented')
+
+    def visit_additive_expression(self, node: Expr) -> Any:
         raise UnsupportedSPARQL(f'The {node.name} expressions are not implemented')
 
     def visit_regex_expression(self, node: Expr) -> Any:

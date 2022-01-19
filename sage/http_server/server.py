@@ -25,7 +25,6 @@ from sage.database.descriptors import VoidDescriptor, many_void
 from sage.query_engine.optimizer.parser import Parser
 from sage.query_engine.optimizer.optimizer import Optimizer
 from sage.query_engine.optimizer.physical.visitors.query_plan_stringifier import QueryPlanStringifier
-# from sage.query_engine.optimizer.query_parser import parse_query
 from sage.database.saved_plan.saved_plan_manager import SavedPlanManager
 from sage.database.saved_plan.stateless_manager import StatelessManager
 from sage.database.saved_plan.statefull_manager import StatefullManager
@@ -83,6 +82,8 @@ async def execute_query(
             raise HTTPException(status_code=404, detail=f"RDF Graph {default_graph_uri} not found on the server.")
         graph = dataset.get_graph(default_graph_uri)
 
+        optimizer = Optimizer.get_default(dataset)
+
         # decode next_link or build query execution plan
         cardinalities = dict()
         loadin_start = time()
@@ -92,7 +93,7 @@ async def execute_query(
         else:
             start_timestamp = datetime.now()
             logical_plan = Parser.parse(query)
-            plan, cardinalities = Optimizer.get_default().optimize(
+            plan, cardinalities = optimizer.optimize(
                 logical_plan, dataset, default_graph_uri, as_of=start_timestamp
             )
             # plan, cardinalities = parse_query(query, dataset, default_graph_uri)
@@ -131,8 +132,8 @@ async def execute_query(
             "metrics": {
                 "progression": coverage_after,
                 "coverage": coverage_after - coverage_before,
-                "cost": Optimizer.get_default().cost(plan),
-                "cardinality": Optimizer.get_default().cardinality(plan)
+                "cost": optimizer.cost(plan),
+                "cardinality": optimizer.cardinality(plan)
             }
         }
         print(stats['metrics'])
@@ -149,17 +150,18 @@ async def explain_query(
     query: str, default_graph_uri: str, next_link: Optional[str],
     dataset: Dataset
 ) -> str:
+    optimizer = Optimizer.get_default(dataset)
     if next_link is not None:
         plan = StatelessManager().get_plan(next_link, dataset)
     else:
         logical_plan = Parser.parse(query)
-        plan, cardinalities = Optimizer.get_default().optimize(
+        plan, cardinalities = optimizer.optimize(
             logical_plan, dataset, default_graph_uri
         )
     return JSONResponse({
         "query": QueryPlanStringifier().visit(plan),
-        "cost": Optimizer.get_default().cost(plan),
-        "cardinality": Optimizer.get_default().cardinality(plan)
+        "cost": optimizer.cost(plan),
+        "cardinality": optimizer.cardinality(plan)
     })
 
 

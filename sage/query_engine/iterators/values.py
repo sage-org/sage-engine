@@ -22,7 +22,7 @@ class ValuesIterator(PreemptableIterator):
         return len(self._values)
 
     def __repr__(self) -> str:
-        return f"<ValuesIterator ({self._values})>"
+        return f"<ValuesIterator ({self.variables()})>"
 
     def serialized_name(self):
         """Get the name of the iterator, as used in the plan serialization protocol"""
@@ -33,10 +33,10 @@ class ValuesIterator(PreemptableIterator):
         if height > step:
             prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
         prefix += ('|' + ('-' * (step - 1)))
-        print(f'{prefix}ValuesIterator <{self._values}>')
+        print(f'{prefix}ValuesIterator <{self.variables()}>')
 
-    def variables(self) -> Set[str]:
-        return set(self._values[0].keys())
+    def variables(self, include_values: bool = True) -> Set[str]:
+        return set(self._values[0].keys()) if include_values else set()
 
     def next_stage(self, mappings: Dict[str, str]):
         self._current_mappings = mappings
@@ -55,7 +55,6 @@ class ValuesIterator(PreemptableIterator):
                 mappings = {**self._current_mappings, **mu}
             else:
                 mappings = mu
-            print(mappings)
             return mappings
 
     def save(self) -> SavedValuesIterator:

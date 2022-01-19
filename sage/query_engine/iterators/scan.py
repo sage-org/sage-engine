@@ -88,7 +88,7 @@ class ScanIterator(PreemptableIterator):
         object = self._pattern['object']
         print(f'{prefix}ScanIterator <({subject} {predicate} {object})>')
 
-    def variables(self) -> Set[str]:
+    def variables(self, include_values: bool = False) -> Set[str]:
         vars = set()
         if self._pattern['subject'].startswith('?'):
             vars.add(self._pattern['subject'])

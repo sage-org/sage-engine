@@ -119,7 +119,7 @@ def explain(
     print(pprintAlgebra(tq))
 
     logical_plan = Parser.parse(query)
-    iterator, cardinalities = Optimizer.get_default().optimize(
+    iterator, cardinalities = Optimizer.get_default(dataset).optimize(
         logical_plan, dataset, graph_uri
     )
     # iterator, cards = parse_query(query, dataset, graph_uri)
@@ -131,6 +131,11 @@ def explain(
     if output is not None:
         with open(output, 'w') as outfile:
             outfile.write(QueryPlanStringifier().visit(iterator))
+
+    print("-----------------")
+    print("Optimized query")
+    print("-----------------")
+    print(QueryPlanStringifier().visit(iterator))
 
     print("-----------------")
     print("Cardinalities")
