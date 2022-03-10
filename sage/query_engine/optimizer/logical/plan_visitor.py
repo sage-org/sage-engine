@@ -29,8 +29,7 @@ class LogicalPlanVisitor(ABC):
             isinstance(node, Variable) or
             isinstance(node, Literal) or
             isinstance(node, URIRef) or
-            isinstance(node, BNode)
-        )
+            isinstance(node, BNode))
 
     def visit(self, node: Node) -> Any:
         if self.__is_expression__(node):
@@ -41,8 +40,7 @@ class LogicalPlanVisitor(ABC):
             return self.visit_scan(node)
         elif self.__is_rdf_term(node):
             return self.visit_rdfterm(node)
-        else:
-            raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {type(node)}')
+        raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {type(node)}')
 
     def visit_operator(self, node: CompValue) -> Any:
         if node.name == 'SelectQuery':
@@ -67,8 +65,7 @@ class LogicalPlanVisitor(ABC):
             return self.visit_delete(node)
         elif node.name == 'Modify':
             return self.visit_modify(node)
-        else:
-            raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {node.name}')
+        raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {node.name}')
 
     def visit_expression(self, node: Expr) -> Any:
         if node.name == 'ConditionalAndExpression':
@@ -87,8 +84,7 @@ class LogicalPlanVisitor(ABC):
             return self.visit_str_expression(node)
         elif node.name == 'UnaryNot':
             return self.visit_unary_not_expression(node)
-        else:
-            raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {node.name}')
+        raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {node.name}')
 
     def visit_select_query(self, node: CompValue) -> Any:
         raise UnsupportedSPARQL(f'The {node.name} operator is not implemented')

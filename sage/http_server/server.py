@@ -2,6 +2,8 @@
 # Author: Thomas MINIER - MIT License 2017-2020
 import logging
 
+import sage.http_server.responses as responses
+
 from traceback import format_exc
 from uvloop import EventLoopPolicy
 from asyncio import set_event_loop_policy
@@ -17,8 +19,6 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
 
-import sage.http_server.responses as responses
-import sage.http_server.metrics as metrics
 from sage.database.core.dataset import Dataset
 from sage.database.core.yaml_config import load_config
 from sage.database.descriptors import VoidDescriptor, many_void
@@ -84,7 +84,7 @@ async def execute_query(
 
         optimizer = Optimizer.get_default(dataset)
 
-        # decode next_link or build query execution plan
+        # decode next_link or build the query execution plan
         cardinalities = dict()
         loadin_start = time()
         if next_link is not None:
@@ -93,27 +93,22 @@ async def execute_query(
         else:
             start_timestamp = datetime.now()
             logical_plan = Parser.parse(query)
-            plan, cardinalities = optimizer.optimize(
-                logical_plan, dataset, default_graph_uri, as_of=start_timestamp
-            )
-            # plan, cardinalities = parse_query(query, dataset, default_graph_uri)
+            plan, cardinalities = optimizer.optimize(logical_plan, dataset, default_graph_uri, as_of=start_timestamp)
         loading_time = (time() - loadin_start) * 1000
         logging.info(f'loading time: {loading_time}ms')
 
         # execute the query
         engine = SageEngine()
-        coverage_before = metrics.coverage(plan)
+        coverage_before = optimizer.coverage(plan)
         bindings, is_done, abort_reason = await engine.execute(
-            plan, quota=graph.quota, max_results=graph.max_results
-        )
-        coverage_after = 1.0 if is_done else metrics.coverage(plan)
+            plan, quota=graph.quota, max_results=graph.max_results)
+        coverage_after = 1.0 if is_done else optimizer.coverage(plan)
 
         # commit or abort (if necessary)
         if abort_reason is not None:
             graph.abort()
             raise HTTPException(status_code=500, detail=f"The SPARQL query has been aborted for the following reason: '{abort_reason}'")
-        else:
-            graph.commit()
+        graph.commit()
 
         # encode the saved plan if the query execution is not done
         export_start = time()
@@ -133,10 +128,9 @@ async def execute_query(
                 "progression": coverage_after,
                 "coverage": coverage_after - coverage_before,
                 "cost": optimizer.cost(plan),
-                "cardinality": optimizer.cardinality(plan)
-            }
-        }
-        print(stats['metrics'])
+                "cardinality": optimizer.cardinality(plan)}}
+        logging.info(stats['metrics'])
+
         return (bindings, next_page, stats)
     except Exception as err:
         # abort all ongoing transactions, then forward the exception
@@ -155,14 +149,11 @@ async def explain_query(
         plan = StatelessManager().get_plan(next_link, dataset)
     else:
         logical_plan = Parser.parse(query)
-        plan, cardinalities = optimizer.optimize(
-            logical_plan, dataset, default_graph_uri
-        )
+        plan, cardinalities = optimizer.optimize(logical_plan, dataset, default_graph_uri)
     return JSONResponse({
         "query": QueryPlanStringifier().visit(plan),
         "cost": optimizer.cost(plan),
-        "cardinality": optimizer.cardinality(plan)
-    })
+        "cardinality": optimizer.cardinality(plan)})
 
 
 def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_page: Optional[str], stats: dict, skol_url: str) -> Response:
@@ -187,11 +178,7 @@ def create_response(mimetypes: List[str], bindings: List[Dict[str, str]], next_p
     elif "application/xml" in mimetypes or "application/sparql-results+xml" in mimetypes:
         iterator = responses.w3c_xml(bindings, next_page, stats)
         return Response(iterator, media_type="application/xml")
-    return JSONResponse({
-        "bindings": bindings,
-        "next": next_page,
-        "stats": stats
-    })
+    return JSONResponse({"bindings": bindings, "next": next_page, "stats": stats})
 
 
 def run_app(config_file: str) -> FastAPI:
@@ -213,8 +200,7 @@ def run_app(config_file: str) -> FastAPI:
         allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
-        allow_headers=["*"],
-    )
+        allow_headers=["*"])
 
     # Build the RDF dataset from the configuration file
     dataset = load_config(config_file)
@@ -232,12 +218,8 @@ def run_app(config_file: str) -> FastAPI:
         try:
             mimetypes = request.headers['accept'].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))
-            bindings, next_page, stats = await execute_query(
-                query, default_graph_uri, next_link, dataset, saved_plan_manager
-            )
-            response = create_response(
-                mimetypes, bindings, next_page, stats, server_url
-            )
+            bindings, next_page, stats = await execute_query(query, default_graph_uri, next_link, dataset, saved_plan_manager)
+            response = create_response(mimetypes, bindings, next_page, stats, server_url)
             return response
         except HTTPException as err:
             raise err
@@ -257,23 +239,17 @@ def run_app(config_file: str) -> FastAPI:
         join_order: bool = Query(False, alias="join-order", description="True to fix the join ordering, False otherwise.")
     ):
         dataset.force_order = join_order
-        return await execute_sparql_query(
-            request, query, default_graph_uri, next_link
-        )
+        return await execute_sparql_query(request, query, default_graph_uri, next_link)
 
     @app.post("/sparql")
     async def sparql_post(request: Request, item: SagePostQuery):
         dataset.force_order = item.forceOrder
-        return await execute_sparql_query(
-            request, item.query, item.defaultGraph, item.next
-        )
+        return await execute_sparql_query(request, item.query, item.defaultGraph, item.next)
 
     @app.post("/sparql/explain")
     async def sparql_post_explain(request: Request, item: SagePostQuery):
         dataset.force_order = item.forceOrder
-        return await explain_query(
-            item.query, item.defaultGraph, item.next, dataset
-        )
+        return await explain_query(item.query, item.defaultGraph, item.next, dataset)
 
     @app.get("/void/", description="Get the VoID description of the SaGe server")
     async def server_void(request: Request):

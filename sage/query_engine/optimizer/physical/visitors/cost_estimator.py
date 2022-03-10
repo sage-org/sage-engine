@@ -1,3 +1,5 @@
+import logging
+
 import sage.database.voids.void as void
 
 from typing import Dict, Any
@@ -24,7 +26,6 @@ class CostEstimartor(PhysicalPlanVisitor):
             context['attributes'] = dict()
         if 'input-size' not in context:
             context['input-size'] = 1
-        # context['height'] = 1
         return super().visit(node, context=context)
 
     def visit_projection(
@@ -39,10 +40,7 @@ class CostEstimartor(PhysicalPlanVisitor):
         input_size = context['input-size']
         output_size = input_size * len(node._values)
         context['input-size'] = output_size
-        print(
-            f'Cout({list(node._values[0].keys())}) = {input_size} x {len(node._values)} = ' +
-            f'{output_size}'
-        )
+        logging.debug(f'Cout({list(node._values[0].keys())}) = {input_size} x {len(node._values)} = {output_size}')
         return output_size
 
     def visit_filter(
@@ -50,17 +48,14 @@ class CostEstimartor(PhysicalPlanVisitor):
     ) -> float:
         # estimate the selectivity of the FILTER iterator
         if node._produced == 0:
-            selectivity = 1 / 3
+            selectivity = 1.0 / 3.0
         else:
-            selectivity = node._produced / node._consumed
+            selectivity = float(node._produced) / float(node._consumed)
         # estimate the cardinality of the FILTER iterator
         input_size = self.visit(node._source, context=context)
         output_size = input_size * selectivity
         context['input-size'] = output_size
-        print(
-            f'Cout({node._raw_expression}) = ' +
-            f'{input_size} x {selectivity} = {output_size}'
-        )
+        logging.debug(f'Cout({node._raw_expression}) = {input_size} x {selectivity} = {output_size}')
         return input_size
 
     def visit_join(
@@ -85,12 +80,8 @@ class CostEstimartor(PhysicalPlanVisitor):
         object = node._pattern['object']
         graph = node._pattern['graph']
         # update the number of distinct values for each joined attributes
-        self.__update_attributes__(
-            context, subject, void.count_distinct_subjects(graph, predicate)
-        )
-        self.__update_attributes__(
-            context, object, void.count_distinct_objects(graph, predicate)
-        )
+        self.__update_attributes__(context, subject, void.count_distinct_subjects(graph, predicate))
+        self.__update_attributes__(context, object, void.count_distinct_objects(graph, predicate))
         # estimate the cardinality of the SCAN iterator
         input_size = context['input-size']
         if node._pattern_produced == 0:
@@ -106,24 +97,14 @@ class CostEstimartor(PhysicalPlanVisitor):
                     context['attributes'][object].remove(max_value)
                     distinct_values *= max_value
             cardinality = node._pattern_cardinality
-            selectivity = cardinality / distinct_values
+            selectivity = float(cardinality) / float(distinct_values)
             output_size = input_size * selectivity
-            print(
-                f'C_out({node._pattern}, runtime=False) = ' +
-                f'{input_size} x ({cardinality} / {distinct_values}) = ' +
-                f'{output_size}'
-            )
+            logging.debug(f'C_out({node._pattern}, runtime=False) = {input_size} x ({cardinality} / {distinct_values}) = {output_size}')
         else:
-            cardinality = max(
-                max(node._cardinality, node._cumulative_cardinality),
-                node._pattern_produced
-            )
+            cardinality = max(max(node._cardinality, node._cumulative_cardinality), node._pattern_produced)
             stages = max(1, node._stages)
-            selectivity = cardinality / stages
+            selectivity = float(cardinality) / float(stages)
             output_size = input_size * selectivity
-            print(
-                f'C_out({node._pattern}, runtime=True) = ' +
-                f'{input_size} x ({cardinality} / {stages}) = {output_size}'
-            )
+            logging.debug(f'C_out({node._pattern}, runtime=True) = {input_size} x ({cardinality} / {stages}) = {output_size}')
         context['input-size'] = output_size
         return output_size

@@ -80,7 +80,6 @@ class FilterIterator(PreemptableIterator):
         try:
             d = {Variable(key[1:]): to_rdflib_term(value) for key, value in mappings.items()}
             context = QueryContext(bindings=Bindings(d=d))
-            # context.prologue = self._prologue
             return self._expression.eval(context)
         except Exception:
             return False

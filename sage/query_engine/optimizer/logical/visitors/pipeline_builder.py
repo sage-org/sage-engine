@@ -87,8 +87,7 @@ class PipelineBuilder(LogicalPlanVisitor):
         print('building ascending cardinalities tree')
         scan_iterators = sorted(
             scan_iterators,
-            key=lambda it: (it.__len__(), it._pattern['predicate'])
-        )
+            key=lambda it: (it.__len__(), it._pattern['predicate']))
         pipeline = scan_iterators.pop(0)
         variables = utils.get_vars(pipeline._pattern)
         while len(scan_iterators) > 0:
@@ -159,13 +158,11 @@ class PipelineBuilder(LogicalPlanVisitor):
         if self._dataset.has_graph(triple_pattern['graph']):
             iterator = ScanIterator(
                 self._dataset.get_graph(triple_pattern['graph']),
-                triple_pattern, as_of=self._as_of
-            )
+                triple_pattern, as_of=self._as_of)
         else:
             iterator = EmptyIterator()
         cardinality = {
-            'pattern': triple_pattern, 'cardinality': iterator.__len__()
-        }
+            'pattern': triple_pattern, 'cardinality': iterator.__len__()}
         return iterator, [cardinality]
 
     def visit_insert(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
@@ -189,15 +186,12 @@ class PipelineBuilder(LogicalPlanVisitor):
             insert_templates = list()
             if node.delete is not None:
                 delete_templates = utils.get_quads_from_update(
-                    node.delete, self._default_graph
-                )
+                    node.delete, self._default_graph)
             if node.insert is not None:
                 insert_templates = utils.get_quads_from_update(
-                    node.insert, self._default_graph
-                )
+                    node.insert, self._default_graph)
             iterator = SerializableUpdate(
-                self._dataset, source, delete_templates, insert_templates
-            )
+                self._dataset, source, delete_templates, insert_templates)
             return iterator, cardinalities
         else:
             # Build the IF EXISTS style query from an UPDATE query with bounded
@@ -207,21 +201,17 @@ class PipelineBuilder(LogicalPlanVisitor):
                 if utils.fully_bounded(triple_pattern):
                     continue
                 raise UnsupportedSPARQL(
-                    "The SaGe server only supports INSERT/DELETE DATA queries"
-                )
+                    "The SaGe server only supports INSERT/DELETE DATA queries")
             delete_templates = list()
             insert_templates = list()
             if node.delete is not None:
                 delete_templates = utils.get_quads_from_update(
-                    node.delete, self._default_graph
-                )
+                    node.delete, self._default_graph)
             if node.insert is not None:
                 insert_templates = utils.get_quads_from_update(
-                    node.insert, self._default_graph
-                )
+                    node.insert, self._default_graph)
             triples = list(utils.localize_triples(
-                node.where.triples, [self._default_graph])
-            )
+                node.where.triples, [self._default_graph]))
             if_exists_op = IfExistsOperator(triples, self._dataset, self._as_of)
             delete_op = DeleteOperator(delete_templates, self._dataset)
             insert_op = DeleteOperator(insert_templates, self._dataset)

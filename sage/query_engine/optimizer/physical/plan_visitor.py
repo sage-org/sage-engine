@@ -29,8 +29,7 @@ class PhysicalPlanVisitor(ABC):
             return self.visit_values(node, context=context)
         elif node.serialized_name() == 'scan':
             return self.visit_scan(node, context=context)
-        else:
-            raise UnsupportedSPARQL(f'Unsupported SPARQL iterator: {node.serialized_name()}')
+        raise UnsupportedSPARQL(f'Unsupported SPARQL iterator: {node.serialized_name()}')
 
     def visit_projection(self, node: ProjectionIterator, context: Dict[str, Any] = {}) -> Any:
         raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')

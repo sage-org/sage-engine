@@ -98,8 +98,7 @@ class FilterPushDown(PhysicalPlanVisitor):
         if key not in self._moved:
             self._moved[key] = None
             return False
-        else:
-            return True
+        return True
 
     def __push_filter__(
         self, filter: FilterIterator,
@@ -110,16 +109,13 @@ class FilterPushDown(PhysicalPlanVisitor):
         for (iterator, position) in targets:
             if position == SOURCE:
                 iterator._source = FilterIterator(
-                    iterator._source, filter._raw_expression, filter._expression
-                )
+                    iterator._source, filter._raw_expression, filter._expression)
             elif position == LEFT:
                 iterator._left = FilterIterator(
-                    iterator._left, filter._raw_expression, filter._expression
-                )
+                    iterator._left, filter._raw_expression, filter._expression)
             elif position == RIGHT:
                 iterator._right = FilterIterator(
-                    iterator._right, filter._raw_expression, filter._expression
-                )
+                    iterator._right, filter._raw_expression, filter._expression)
             else:
                 message = f'Unexpected relative position {position}'
                 raise Exception(f'FilterPushDownError: {message}')
@@ -133,8 +129,7 @@ class FilterPushDown(PhysicalPlanVisitor):
         if node._source.serialized_name() == 'filter':
             targets = FilterTargets().visit(
                 context['root'],
-                {'variables': node._source.constrained_variables()}
-            )
+                {'variables': node._source.constrained_variables()})
             if self.__push_filter__(node._source, targets):
                 node._source = node._source._source
         return node
@@ -158,16 +153,14 @@ class FilterPushDown(PhysicalPlanVisitor):
         if node._left.serialized_name() == 'filter':
             targets = FilterTargets().visit(
                 context['root'],
-                {'variables': node._left.constrained_variables()}
-            )
+                {'variables': node._left.constrained_variables()})
             if self.__push_filter__(node._left, targets):
                 node._left = node._left._source
         node._right = self.visit(node._right, context=context)
         if node._right.serialized_name() == 'filter':
             targets = FilterTargets().visit(
                 context['root'],
-                {'variables': node._right.constrained_variables()}
-            )
+                {'variables': node._right.constrained_variables()})
             if self.__push_filter__(node._right, targets):
                 node._right = node._right._source
         return node

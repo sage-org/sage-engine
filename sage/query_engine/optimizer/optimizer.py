@@ -10,6 +10,7 @@ from sage.query_engine.optimizer.logical.optimizer import LogicalPlanOptimizer
 from sage.query_engine.optimizer.physical.optimizer import PhysicalPlanOptimizer
 from sage.query_engine.optimizer.physical.visitors.cost_estimator import CostEstimartor
 from sage.query_engine.optimizer.physical.visitors.cardinality_estimator import CardinalityEstimartor
+from sage.query_engine.optimizer.physical.visitors.coverage_estimator import CoverageEstimartor
 
 
 class Optimizer():
@@ -38,8 +39,7 @@ class Optimizer():
         if self._logical_optimizer is not None:
             logical_plan = self._logical_optimizer.optimize(logical_plan)
         physical_plan, cardinalities = PipelineBuilder(
-            dataset, default_graph, as_of=as_of
-        ).visit(logical_plan)
+            dataset, default_graph, as_of=as_of).visit(logical_plan)
         if self._physical_optimizer is not None:
             physical_plan = self._physical_optimizer.optimize(physical_plan)
         return physical_plan, cardinalities
@@ -49,3 +49,6 @@ class Optimizer():
 
     def cardinality(self, physical_plan: PreemptableIterator) -> float:
         return CardinalityEstimartor().visit(physical_plan, context={})
+
+    def coverage(self, physical_plan: PreemptableIterator) -> float:
+        return CoverageEstimartor().visit(physical_plan, context={})
