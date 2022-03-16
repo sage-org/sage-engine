@@ -151,6 +151,8 @@ class PipelineBuilder(LogicalPlanVisitor):
             iterator = self.__build_naive_tree__(scan_iterators)
         else:
             iterator = self.__build_ascending_cardinalities_tree__(scan_iterators)
+        for values in node.mappings:
+            iterator = IndexJoinIterator(ValuesIterator(utils.format_solution_mappings(values.res)), iterator)
         return iterator, cardinalities
 
     def visit_scan(self, node: TriplePattern) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
@@ -161,8 +163,7 @@ class PipelineBuilder(LogicalPlanVisitor):
                 triple_pattern, as_of=self._as_of)
         else:
             iterator = EmptyIterator()
-        cardinality = {
-            'pattern': triple_pattern, 'cardinality': iterator.__len__()}
+        cardinality = {'pattern': triple_pattern, 'cardinality': iterator.__len__()}
         return iterator, [cardinality]
 
     def visit_insert(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
