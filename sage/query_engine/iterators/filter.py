@@ -9,7 +9,6 @@ from rdflib.util import from_n3
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedFilterIterator
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
-from sage.query_engine.optimizer.logical.visitors.filter_variables_extractor import FilterVariablesExtractor
 
 
 def to_rdflib_term(value: str) -> Union[Literal, URIRef, Variable]:
@@ -65,7 +64,7 @@ class FilterIterator(PreemptableIterator):
         self._source.explain(height=(height + step), step=step)
 
     def constrained_variables(self) -> List[str]:
-        return FilterVariablesExtractor().visit(self._expression)
+        return self._expression.vars
 
     def variables(self, include_values: bool = False) -> Set[str]:
         return self._source.variables(include_values=include_values)

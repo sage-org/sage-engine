@@ -8,13 +8,11 @@ from sage.query_engine.optimizer.logical.visitors.plan_rewriter import PlanRewri
 class LogicalPlanOptimizer():
 
     def __init__(self):
-        self._visitors = []
+        self._visitors = [PlanRewriter()]
 
     @staticmethod
     def get_default(dataset: Dataset) -> LogicalPlanOptimizer:
-        optimizer = LogicalPlanOptimizer()
-        optimizer.add_visitor(PlanRewriter())
-        return optimizer
+        return LogicalPlanOptimizer()
 
     def add_visitor(self, visitor: LogicalPlanVisitor) -> None:
         self._visitors.append(visitor)

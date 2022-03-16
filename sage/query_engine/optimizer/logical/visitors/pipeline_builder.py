@@ -2,9 +2,9 @@ import sage.query_engine.optimizer.utils as utils
 
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Tuple
-from rdflib.plugins.sparql.parserutils import CompValue, Expr
+from rdflib.plugins.sparql.parserutils import CompValue
 
-from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, RDFTerm, TriplePattern
+from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, TriplePattern
 from sage.database.core.dataset import Dataset
 from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.iterators.filter import FilterIterator
@@ -20,45 +20,6 @@ from sage.query_engine.update.if_exists import IfExistsOperator
 from sage.query_engine.update.insert import InsertOperator
 from sage.query_engine.update.serializable import SerializableUpdate
 from sage.query_engine.update.update_sequence import UpdateSequenceOperator
-
-
-class ExpressionStringifier(LogicalPlanVisitor):
-
-    def __init__(self):
-        super().__init__()
-
-    def visit_rdfterm(self, node: RDFTerm) -> str:
-        return utils.format_term(node)
-
-    def visit_conditional_and_expression(self, node: Expr) -> str:
-        expression = self.visit(node.expr)
-        for other in node.other:
-            expression = f'({expression} && {self.visit(other)})'
-        return expression
-
-    def visit_conditional_or_expression(self, node: Expr) -> str:
-        expression = self.visit(node.expr)
-        for other in node.other:
-            expression = f'({expression} || {self.visit(other)})'
-        return expression
-
-    def visit_regex_expression(self, node: Expr) -> str:
-        return f'regex({self.visit(node.text)}, {self.visit(node.pattern)})'
-
-    def visit_relational_expression(self, node: Expr) -> str:
-        return f'({self.visit(node.expr)} {node.op} {self.visit(node.other)})'
-
-    def visit_unary_not_expression(self, node: Expr) -> str:
-        return f'!({self.visit(node.expr)})'
-
-    def visit_str_expression(self, node: Expr) -> str:
-        return f'str({self.visit(node.arg)})'
-
-    def visit_additive_expression(self, node: Expr) -> str:
-        expression = self.visit(node.expr)
-        for index, operator in enumerate(node.op):
-            expression += f' {operator} {self.visit(node.other[index])}'
-        return f'({expression})'
 
 
 class PipelineBuilder(LogicalPlanVisitor):
@@ -130,9 +91,8 @@ class PipelineBuilder(LogicalPlanVisitor):
         return BagUnionIterator(left_child, right_child), cardinalities
 
     def visit_filter(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
-        raw_expression = ExpressionStringifier().visit(node.expr)
         child, cardinalities = self.visit(node.p)
-        return FilterIterator(child, raw_expression, node.expr), cardinalities
+        return FilterIterator(child, node.expr.repr, node.expr), cardinalities
 
     def visit_to_multiset(self, node: CompValue) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         return self.visit(node.p)
