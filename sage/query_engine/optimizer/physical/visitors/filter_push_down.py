@@ -94,7 +94,7 @@ class FilterPushDown(PhysicalPlanVisitor):
         self._moved = dict()
 
     def __has_already_been_moved__(self, filter: FilterIterator) -> bool:
-        key = md5(filter._raw_expression.encode()).hexdigest()
+        key = md5(filter._expression.encode()).hexdigest()
         if key not in self._moved:
             self._moved[key] = None
             return False
@@ -109,13 +109,13 @@ class FilterPushDown(PhysicalPlanVisitor):
         for (iterator, position) in targets:
             if position == SOURCE:
                 iterator._source = FilterIterator(
-                    iterator._source, filter._raw_expression, filter._expression)
+                    iterator._source, filter._expression, filter._constrained_variables, filter._compiled_expression)
             elif position == LEFT:
                 iterator._left = FilterIterator(
-                    iterator._left, filter._raw_expression, filter._expression)
+                    iterator._left, filter._expression, filter._constrained_variables, filter._compiled_expression)
             elif position == RIGHT:
                 iterator._right = FilterIterator(
-                    iterator._right, filter._raw_expression, filter._expression)
+                    iterator._right, filter._expression, filter._constrained_variables, filter._compiled_expression)
             else:
                 message = f'Unexpected relative position {position}'
                 raise Exception(f'FilterPushDownError: {message}')

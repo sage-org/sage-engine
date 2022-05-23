@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Dict, Any
 
 from sage.database.core.dataset import Dataset
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -24,7 +25,9 @@ class PhysicalPlanOptimizer():
     def add_visitor(self, visitor: PhysicalPlanVisitor) -> None:
         self._visitors.append(visitor)
 
-    def optimize(self, physical_plan: PreemptableIterator) -> PreemptableIterator:
+    def optimize(
+        self, physical_plan: PreemptableIterator, context: Dict[str, Any] = {}
+    ) -> PreemptableIterator:
         for visitor in self._visitors:
-            physical_plan = visitor.visit(physical_plan)
+            physical_plan = visitor.visit(physical_plan, context=context)
         return physical_plan

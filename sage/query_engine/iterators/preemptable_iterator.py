@@ -28,13 +28,33 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
-    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
+    async def next(self, context: Dict[str, Any] = dict()) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
 
         This function may contains `non interruptible` clauses which must
         be atomically evaluated before preemption occurs.
 
         Returns: A set of solution mappings, or `None` if none was produced during this call.
+        """
+        pass
+
+    @abstractmethod
+    def update_coverage(self, context: Dict[str, Any] = {}) -> float:
+        """Compute and update operators progression.
+
+        This function assumes that only nested loop joins are used.
+
+        Returns: The coverage of the query for the given plan.
+        """
+        pass
+
+    @abstractmethod
+    def update_cost(self, context: Dict[str, Any] = {}) -> float:
+        """Compute and update operators cost.
+
+        This function assumes that only nested loop joins are used.
+
+        Returns: The cost of the query for the given plan.
         """
         pass
 

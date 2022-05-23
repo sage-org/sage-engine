@@ -37,7 +37,6 @@ class Dataset(object):
         self._stateless = stateless
         self._filter_push_down = filter_push_down
         self._values_push_down = values_push_down
-        self._force_order = False
 
     @property
     def name(self) -> str:
@@ -54,14 +53,6 @@ class Dataset(object):
     @property
     def do_values_push_down(self) -> bool:
         return self._values_push_down
-
-    @property
-    def force_order(self) -> bool:
-        return self._force_order
-
-    @force_order.setter
-    def force_order(self, value: bool) -> None:
-        self._force_order = value
 
     @property
     def default_query(self):

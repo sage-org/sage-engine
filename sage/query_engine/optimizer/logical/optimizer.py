@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Dict, Any
 
 from sage.database.core.dataset import Dataset
 from sage.query_engine.optimizer.logical.plan_visitor import LogicalPlanVisitor, Node
@@ -17,7 +18,7 @@ class LogicalPlanOptimizer():
     def add_visitor(self, visitor: LogicalPlanVisitor) -> None:
         self._visitors.append(visitor)
 
-    def optimize(self, logical_plan: Node) -> Node:
+    def optimize(self, logical_plan: Node, context: Dict[str, Any] = {}) -> Node:
         for visitor in self._visitors:
-            logical_plan = visitor.visit(logical_plan)
+            logical_plan = visitor.visit(logical_plan, context=context)
         return logical_plan

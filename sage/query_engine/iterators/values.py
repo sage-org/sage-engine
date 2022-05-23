@@ -8,18 +8,17 @@ class ValuesIterator(PreemptableIterator):
 
     def __init__(
         self, values: List[Dict[str, str]],
-        next_value: int = 0,
-        produced: int = 0,
         current_mappings: Optional[Dict[str, str]] = None,
+        next_value: int = 0,
+        produced: int = 0
     ):
         self._values = values
+        self._current_mappings = current_mappings
         self._next_value = next_value
         self._cardinality = len(values)
         self._produced = produced
-        self._current_mappings = current_mappings
-
-    def __len__(self) -> int:
-        return len(self._values)
+        self._coverage = 0.0
+        self._cost = 0.0
 
     def __repr__(self) -> str:
         return f"<ValuesIterator ({self.variables()})>"
@@ -33,29 +32,62 @@ class ValuesIterator(PreemptableIterator):
         if height > step:
             prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
         prefix += ('|' + ('-' * (step - 1)))
-        print(f'{prefix}ValuesIterator <{self.variables()}>')
+        print(f'{prefix}ValuesIterator (cost={self._cost}) (coverage={self._coverage}) <{self.variables()}>')
 
     def variables(self, include_values: bool = True) -> Set[str]:
         return set(self._values[0].keys()) if include_values else set()
 
-    def next_stage(self, mappings: Dict[str, str]):
+    # def cardinality(self, instantiated: bool = False) -> int:
+    #     return len(self._values)
+
+    def next_stage(self, mappings: Dict[str, str], context: Dict[str, Any] = {}):
         self._current_mappings = mappings
         self._next_value = 0
-        # self._runtime_cardinality += len(self._values)
         self._produced = 0
 
     async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
-        if self._next_value >= len(self._values):
+        if self._next_value >= self._cardinality:
             return None
+        mu = self._values[self._next_value]
+        self._next_value += 1
+        self._produced += 1
+        if self._current_mappings is not None:
+            mappings = {**self._current_mappings, **mu}
         else:
-            mu = self._values[self._next_value]
-            self._next_value += 1
-            self._produced += 1
-            if self._current_mappings is not None:
-                mappings = {**self._current_mappings, **mu}
-            else:
-                mappings = mu
-            return mappings
+            mappings = mu
+        return mappings
+
+    def update_coverage(self, context: Dict[str, Any] = {}) -> float:
+        """Compute and update operators progression.
+
+        This function assumes that only nested loop joins are used.
+
+        Returns: The coverage of the query for the given plan.
+        """
+        context.setdefault('coverage__stop', False)
+        context.setdefault('coverage__cardinalities', [])
+        if self._produced == 0 or context['coverage__stop']:
+            context['coverage__stop'] = True
+            self._coverage = 0.0
+            return 0.0
+        cardinality = max(self._cardinality, self._produced)
+        coverage = (self._produced - 1) / cardinality
+        self._coverage = coverage
+        for previous_table_cardinality in context['coverage__cardinalities']:
+            coverage *= (1.0 / previous_table_cardinality)
+        context['coverage__cardinalities'].append(cardinality)
+        return coverage
+
+    def update_cost(self, context: Dict[str, Any] = {}) -> float:
+        """Compute and update operators cost.
+
+        This function assumes that only nested loop joins are used.
+
+        Returns: The cost of the query for the given plan.
+        """
+        context.setdefault('cost__cout', 1)
+        context['cost__cout'] *= self._cardinality
+        return context['cost__cout']
 
     def save(self) -> SavedValuesIterator:
         saved_values = SavedValuesIterator()
@@ -69,4 +101,6 @@ class ValuesIterator(PreemptableIterator):
         saved_values.produced = self._produced
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_values.muc)
+        saved_values.coverage = self._coverage
+        saved_values.cost = self._cost
         return saved_values

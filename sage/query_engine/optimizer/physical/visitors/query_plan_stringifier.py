@@ -11,8 +11,7 @@ class QueryPlanStringifier(PhysicalPlanVisitor):
         return f"SELECT {projection} WHERE {{\n{self.visit(node._source)}\n}}"
 
     def visit_filter(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> str:
-        filter_expr = node._raw_expression
-        return f"{self.visit(node._source)}\n\tFILTER ({filter_expr})."
+        return f"{self.visit(node._source)}\n\tFILTER ({node._expression})."
 
     def visit_join(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> str:
         return f"{self.visit(node._left)}\n{self.visit(node._right)}"
