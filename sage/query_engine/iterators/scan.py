@@ -190,6 +190,7 @@ class ScanIterator(PreemptableIterator):
             saved_scan.timestamp = self._timestamp.isoformat()
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
+        saved_scan.cardinality = self._cardinality
         saved_scan.produced = self._produced
         saved_scan.cumulative_produced = self._cumulative_produced
         saved_scan.cumulative_cardinality = self._cumulative_cardinality

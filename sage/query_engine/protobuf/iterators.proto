@@ -25,6 +25,7 @@ message SavedScanIterator {
   int64 stages = 11;
   float coverage = 12;
   float cost = 13;
+  int64 cardinality = 14;
 }
 
 message SavedValuesIterator {
