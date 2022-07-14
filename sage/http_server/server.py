@@ -36,7 +36,9 @@ class SagePostQuery(BaseModel):
     query: str = Field(..., description="The SPARQL query to execute.")
     defaultGraph: str = Field(..., description="The URI of the default RDF graph queried.")
     next: str = Field(None, description="(Optional) A next link used to resume query execution from a saved state.")
-    forceOrder: bool = Field(False, description="True to fix the join ordering, False otherwise.")
+    quota: int = Field(None, description="The duration of a quantum.")
+    forceOrder: bool = Field(False, description="True to fix the join order, False otherwise.")
+    topkStrategy: str = Field('FullServer', description="The strategy used to compute TOP-K queries. It can 'FullServer' or 'ClientServer-{threshold}'.")
 
 
 def choose_void_format(mimetypes):
@@ -109,9 +111,6 @@ async def execute_query(
         engine = SageEngine()
         solutions, is_done, abort_reason = await engine.execute(plan, context=context)
 
-        coverage = 1.0 if is_done else plan.update_coverage(context={})
-        cost = plan.update_cost(context={})
-
         # plan.explain()
 
         # commit or abort (if necessary)
@@ -133,10 +132,7 @@ async def execute_query(
         stats = {
             "cardinalities": cardinalities,
             "import": loading_time,
-            "export": export_time,
-            "metrics": {
-                "coverage": coverage,
-                "cost": cost}}
+            "export": export_time}
         return (solutions, next_page, stats)
     except Exception as err:
         # abort all ongoing transactions, then forward the exception
@@ -249,12 +245,24 @@ def run_app(config_file: str) -> FastAPI:
 
     @app.post("/sparql")
     async def sparql_post(request: Request, item: SagePostQuery):
-        context = {'force_order': item.forceOrder}
+        context = {}
+        if item.quota is not None:
+            context['quota'] = item.quota
+        if item.forceOrder is not None:
+            context['force_order'] = item.forceOrder
+        if item.topkStrategy is not None:
+            context['topk_strategy'] = item.topkStrategy
         return await execute_sparql_query(request, item.query, item.defaultGraph, item.next, context=context)
 
     @app.post("/sparql/explain")
     async def sparql_post_explain(request: Request, item: SagePostQuery):
-        context = {'force_order': item.forceOrder}
+        context = {}
+        if item.quota is not None:
+            context['quota'] = item.quota
+        if item.forceOrder is not None:
+            context['force_order'] = item.forceOrder
+        if item.topkStrategy is not None:
+            context['topk_strategy'] = item.topkStrategy
         return await explain_query(item.query, item.defaultGraph, item.next, dataset, context=context)
 
     @app.get("/void/", description="Get the VoID description of the SaGe server")

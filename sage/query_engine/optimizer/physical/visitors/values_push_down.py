@@ -9,6 +9,9 @@ from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
 from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.limit import LimitIterator
+from sage.query_engine.iterators.topk import TOPKIterator
+from sage.query_engine.iterators.topk_collab import TOPKCollabIterator
 
 SOURCE = 0
 LEFT = 1
@@ -26,6 +29,16 @@ class ValuesTargets(PhysicalPlanVisitor):
             return targets
         # cannot be moved elsewhere (not really efficient, can be improved...)
         return [(node, SOURCE)]
+
+    def visit_limit(
+        self, node: LimitIterator, context: Dict[str, Any] = {}
+    ) -> List[Tuple[PreemptableIterator, int]]:
+        return self.visit(node._source, context=context)
+
+    def visit_topk(
+        self, node: Union[TOPKIterator, TOPKCollabIterator], context: Dict[str, Any] = {}
+    ) -> List[Tuple[PreemptableIterator, int]]:
+        return self.visit(node._source, context=context)
 
     def visit_filter(
         self, node: FilterIterator, context: Dict[str, Any] = {}
@@ -149,6 +162,18 @@ class ValuesPushDown(PhysicalPlanVisitor):
     ) -> PreemptableIterator:
         context['root'] = node
         return self.__process_unary_iterator__(node, context=context)
+
+    def visit_limit(
+        self, node: LimitIterator, context: Dict[str, Any] = {}
+    ) -> PreemptableIterator:
+        node._source = self.visit(node._source, context=context)
+        return node
+
+    def visit_topk(
+        self, node: Union[TOPKIterator, TOPKCollabIterator], context: Dict[str, Any] = {}
+    ) -> PreemptableIterator:
+        node._source = self.visit(node._source, context=context)
+        return node
 
     def visit_filter(
         self, node: FilterIterator, context: Dict[str, Any] = {}

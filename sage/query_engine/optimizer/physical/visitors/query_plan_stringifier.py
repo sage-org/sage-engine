@@ -8,7 +8,14 @@ class QueryPlanStringifier(PhysicalPlanVisitor):
 
     def visit_projection(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> str:
         projection = ' '.join(node._projection)
-        return f"SELECT {projection} WHERE {{\n{self.visit(node._source)}\n}}"
+        if node._source.serialized_name().startswith('topk'):
+            topk = node._source
+            where_clause = self.visit(topk._source)
+            order_conditions = f"ORDER BY {topk._order_conditions} LIMIT {topk._limit}"
+        else:
+            where_clause = self.visit(node._source)
+            order_conditions = ""
+        return f"SELECT {projection} WHERE {{\n{where_clause}\n}} {order_conditions}"
 
     def visit_filter(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> str:
         return f"{self.visit(node._source)}\n\tFILTER ({node._expression})."
@@ -37,3 +44,6 @@ class QueryPlanStringifier(PhysicalPlanVisitor):
         else:
             object = node._pattern["object"]
         return f"\t{subject} {predicate} {object}."
+
+    def visit_limit(self, node: PreemptableIterator, context: Dict[str, Any] = {}) -> str:
+        return f"{self.visit(node._source, context=context)} LIMIT {node._limit}"

@@ -19,22 +19,13 @@ message SavedScanIterator {
   map<string, string> mu = 3;
   string last_read = 4;
   string timestamp = 5;
-  int64 produced = 6;
-  int64 cumulative_produced = 7;
-  int64 cumulative_cardinality = 8;
-  int64 stages = 11;
-  float coverage = 12;
-  float cost = 13;
-  int64 cardinality = 14;
+  int64 cardinality = 6;
 }
 
 message SavedValuesIterator {
   repeated SolutionMapping values = 1;
   int64 next_value = 2;
   map<string, string> muc = 3;
-  int64 produced = 4;
-  float coverage = 5;
-  float cost = 6;
 }
 
 message SavedProjectionIterator {
@@ -45,9 +36,48 @@ message SavedProjectionIterator {
     SavedBagUnionIterator union_source = 4;
     SavedFilterIterator filter_source = 5;
     SavedValuesIterator values_source = 6;
+    SavedTOPKIterator topk_source = 7;
+    SavedTOPKCollabIterator topkCollab_source = 8;
   }
-  float coverage = 7;
-  float cost = 8;
+}
+
+message SavedLimitIterator {
+  oneof source {
+    SavedScanIterator scan_source = 1;
+    SavedIndexJoinIterator join_source = 2;
+    SavedBagUnionIterator union_source = 3;
+    SavedFilterIterator filter_source = 4;
+    SavedValuesIterator values_source = 5;
+  }
+  int64 limit = 6;
+  int64 produced = 7;
+}
+
+message SavedTOPKIterator {
+  oneof source {
+    SavedScanIterator scan_source = 1;
+    SavedIndexJoinIterator join_source = 2;
+    SavedBagUnionIterator union_source = 3;
+    SavedFilterIterator filter_source = 4;
+    SavedValuesIterator values_source = 5;
+  }
+  string expression = 6;
+  int64 limit = 7;
+  repeated SolutionMapping topk = 8;
+}
+
+message SavedTOPKCollabIterator {
+  oneof source {
+    SavedScanIterator scan_source = 1;
+    SavedIndexJoinIterator join_source = 2;
+    SavedBagUnionIterator union_source = 3;
+    SavedFilterIterator filter_source = 4;
+    SavedValuesIterator values_source = 5;
+  }
+  string expression = 6;
+  int64 limit = 7;
+  map<string, string> threshold = 8;
+  float threshold_refresh_rate = 9;
 }
 
 message SavedIndexJoinIterator {
@@ -68,8 +98,6 @@ message SavedIndexJoinIterator {
     SavedValuesIterator values_right = 12;
   }
   map<string, string> muc = 13;
-  float coverage = 14;
-  float cost = 15;
 }
 
 message SavedBagUnionIterator {
@@ -89,8 +117,6 @@ message SavedBagUnionIterator {
     SavedFilterIterator filter_right = 11;
     SavedValuesIterator values_right = 12;
   }
-  float coverage = 13;
-  float cost = 14;
 }
 
 message SavedFilterIterator {
@@ -104,10 +130,6 @@ message SavedFilterIterator {
   string expression = 6;
   repeated string variables = 7;
   map<string, string> mu = 8;
-  int64 consumed = 9;
-  int64 produced = 10;
-  float coverage = 11;
-  float cost = 12;
 }
 
 message SavedInsertData {
@@ -128,5 +150,6 @@ message RootTree {
     SavedInsertData insert_source = 6;
     SavedDeleteData delete_source = 7;
     SavedValuesIterator values_right = 8;
+    SavedLimitIterator limit_source = 9;
   }
 }

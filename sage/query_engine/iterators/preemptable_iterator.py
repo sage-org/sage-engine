@@ -39,26 +39,6 @@ class PreemptableIterator(ABC):
         pass
 
     @abstractmethod
-    def update_coverage(self, context: Dict[str, Any] = {}) -> float:
-        """Compute and update operators progression.
-
-        This function assumes that only nested loop joins are used.
-
-        Returns: The coverage of the query for the given plan.
-        """
-        pass
-
-    @abstractmethod
-    def update_cost(self, context: Dict[str, Any] = {}) -> float:
-        """Compute and update operators cost.
-
-        This function assumes that only nested loop joins are used.
-
-        Returns: The cost of the query for the given plan.
-        """
-        pass
-
-    @abstractmethod
     def save(self) -> Any:
         """Save and serialize the iterator as a Protobuf message"""
         pass

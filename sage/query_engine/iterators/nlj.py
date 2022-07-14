@@ -24,8 +24,6 @@ class IndexJoinIterator(PreemptableIterator):
         self._left = left
         self._right = right
         self._current_mappings = current_mappings
-        self._coverage = 0.0
-        self._cost = 0.0
 
     def __repr__(self) -> str:
         return f"<IndexJoinIterator ({self._left} JOIN {self._right} WITH {self._current_mappings})>"
@@ -39,7 +37,7 @@ class IndexJoinIterator(PreemptableIterator):
         if height > step:
             prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
         prefix += ('|' + ('-' * (step - 1)))
-        print(f'{prefix}IndexJoinIterator (cost={self._cost}) (coverage={self._coverage}) <{self.variables()}>')
+        print(f'{prefix}IndexJoinIterator (PV={list(self.variables())})')
         self._left.explain(height=(height + step), step=step)
         self._right.explain(height=(height + step), step=step)
 
@@ -73,28 +71,6 @@ class IndexJoinIterator(PreemptableIterator):
                     return mappings
                 self._current_mappings = None
 
-    def update_coverage(self, context: Dict[str, Any] = {}) -> float:
-        """Compute and update operators progression.
-
-        This function assumes that only nested loop joins are used.
-
-        Returns: The coverage of the query for the given plan.
-        """
-        self._coverage = self._left.update_coverage(context=context)
-        self._coverage += self._right.update_coverage(context=context)
-        return self._coverage
-
-    def update_cost(self, context: Dict[str, Any] = {}) -> float:
-        """Compute and update operators cost.
-
-        This function assumes that only nested loop joins are used.
-
-        Returns: The cost of the query for the given plan.
-        """
-        self._cost = self._left.update_cost(context=context)
-        self._cost += self._right.update_cost(context=context)
-        return self._cost
-
     def save(self) -> SavedIndexJoinIterator:
         """Save and serialize the iterator as a Protobuf message"""
         saved_join = SavedIndexJoinIterator()
@@ -106,6 +82,4 @@ class IndexJoinIterator(PreemptableIterator):
         getattr(saved_join, right_field).CopyFrom(self._right.save())
         if self._current_mappings is not None:
             pyDict_to_protoDict(self._current_mappings, saved_join.muc)
-        saved_join.coverage = self._coverage
-        saved_join.cost = self._cost
         return saved_join

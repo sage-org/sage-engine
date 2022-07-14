@@ -40,11 +40,17 @@ class LogicalPlanVisitor(ABC):
             return self.visit_scan(node, context=context)
         elif self.__is_rdf_term(node):
             return self.visit_rdfterm(node)
+        else:
+            print(node)
         raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {type(node)}')
 
     def visit_operator(self, node: CompValue, context: Dict[str, Any] = {}) -> Any:
         if node.name == 'SelectQuery':
             return self.visit_select_query(node, context=context)
+        elif node.name == 'Slice':
+            return self.visit_limit_k(node, context=context)
+        elif node.name == 'OrderBy':
+            return self.visit_orderby(node, context=context)
         elif node.name == 'Project':
             return self.visit_projection(node, context=context)
         elif node.name == 'ToMultiSet':
@@ -84,10 +90,18 @@ class LogicalPlanVisitor(ABC):
             return self.visit_str_expression(node, context=context)
         elif node.name == 'UnaryNot':
             return self.visit_unary_not_expression(node, context=context)
+        elif node.name == 'Builtin_CONCAT':
+            return self.visit_concat_expression(node, context=context)
         raise UnsupportedSPARQL(f'Unsupported SPARQL feature: {node.name}')
 
     def visit_select_query(self, node: CompValue, context: Dict[str, Any]) -> Any:
         raise UnsupportedSPARQL(f'The {node.name} operator is not implemented')
+
+    def visit_limit_k(self, node: CompValue, context: Dict[str, Any]) -> Any:
+        raise UnsupportedSPARQL(f'The {node.name} operator is not implemented')
+
+    def visit_orderby(self, node: CompValue, context: Dict[str, Any]) -> Any:
+        raise UnsupportedSPARQL(f'The {node.name} operator is not preemptable')
 
     def visit_projection(self, node: CompValue, context: Dict[str, Any]) -> Any:
         raise UnsupportedSPARQL(f'The {node.name} operator is not implemented')
@@ -147,6 +161,9 @@ class LogicalPlanVisitor(ABC):
         raise UnsupportedSPARQL(f'The {node.name} expressions are not implemented')
 
     def visit_unary_not_expression(self, node: Expr, context: Dict[str, Any]) -> Any:
+        raise UnsupportedSPARQL(f'The {node.name} expressions are not implemented')
+
+    def visit_concat_expression(self, node: Expr, context: Dict[str, Any]) -> Any:
         raise UnsupportedSPARQL(f'The {node.name} expressions are not implemented')
 
 

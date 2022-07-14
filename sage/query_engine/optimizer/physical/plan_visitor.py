@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -9,6 +9,9 @@ from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
 from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.iterators.scan import ScanIterator
+from sage.query_engine.iterators.limit import LimitIterator
+from sage.query_engine.iterators.topk import TOPKIterator
+from sage.query_engine.iterators.topk_collab import TOPKCollabIterator
 
 
 class PhysicalPlanVisitor(ABC):
@@ -29,6 +32,12 @@ class PhysicalPlanVisitor(ABC):
             return self.visit_values(node, context=context)
         elif node.serialized_name() == 'scan':
             return self.visit_scan(node, context=context)
+        elif node.serialized_name() == 'limit':
+            return self.visit_limit(node, context=context)
+        elif node.serialized_name() == 'topk':
+            return self.visit_topk(node, context=context)
+        elif node.serialized_name() == 'topkCollab':
+            return self.visit_topk(node, context=context)
         raise UnsupportedSPARQL(f'Unsupported SPARQL iterator: {node.serialized_name()}')
 
     def visit_projection(self, node: ProjectionIterator, context: Dict[str, Any] = {}) -> Any:
@@ -47,4 +56,10 @@ class PhysicalPlanVisitor(ABC):
         raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
 
     def visit_scan(self, node: ScanIterator, context: Dict[str, Any] = {}) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
+
+    def visit_limit(self, node: LimitIterator, context: Dict[str, Any] = {}) -> Any:
+        raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')
+
+    def visit_topk(self, node: Union[TOPKIterator, TOPKCollabIterator], context: Dict[str, Any] = {}) -> Any:
         raise UnsupportedSPARQL(f'The {node.serialized_name()} iterator is not implemented')

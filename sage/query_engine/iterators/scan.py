@@ -38,11 +38,7 @@ class ScanIterator(PreemptableIterator):
         current_mappings: Optional[Dict[str, str]] = None,
         mu: Optional[Dict[str, str]] = None,
         last_read: Optional[str] = None,
-        as_of: Optional[datetime] = None,
-        produced: int = 0,
-        cumulative_produced: int = 0,
-        cumulative_cardinality: int = 0,
-        stages: int = 0
+        as_of: Optional[datetime] = None
     ):
         super(ScanIterator, self).__init__()
         self._connector = connector
@@ -53,12 +49,6 @@ class ScanIterator(PreemptableIterator):
         self._mu = mu
         self._last_read = last_read
         self._timestamp = as_of
-        self._produced = produced
-        self._cumulative_produced = cumulative_produced
-        self._cumulative_cardinality = cumulative_cardinality
-        self._stages = stages
-        self._coverage = 0.0
-        self._cost = 0
 
     def __repr__(self) -> str:
         return f"<ScanIterator ({self._pattern['subject']} {self._pattern['predicate']} {self._pattern['object']})>"
@@ -76,7 +66,7 @@ class ScanIterator(PreemptableIterator):
         subject = self._pattern['subject']
         predicate = self._pattern['predicate']
         object = self._pattern['object']
-        print(f'{prefix}ScanIterator (cost={self._cost}) (coverage={self._coverage}) <({subject} {predicate} {object})>')
+        print(f'{prefix}ScanIterator <({subject} {predicate} {object})>')
 
     def variables(self, include_values: bool = False) -> Set[str]:
         return set([v for v in self._mask if v is not None])
@@ -101,9 +91,6 @@ class ScanIterator(PreemptableIterator):
         self._source, self._cardinality = self.create_iterator(mappings, as_of=self._timestamp)
         self._current_mappings = mappings
         self._mu = None
-        self._cumulative_cardinality += self._cardinality
-        self._produced = 0
-        self._stages += 1
 
     async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
         """Get the next item from the iterator, following the iterator protocol.
@@ -128,49 +115,7 @@ class ScanIterator(PreemptableIterator):
         else:
             mappings = self._mu
         self._mu = None
-        self._produced += 1
-        self._cumulative_produced += 1
         return mappings
-
-    def update_coverage(self, context: Dict[str, Any] = {}) -> float:
-        """Compute and update operators progression.
-
-        This function assumes that only nested loop joins are used.
-
-        Returns: The coverage of the query for the given plan.
-        """
-        context.setdefault('coverage__stop', False)
-        context.setdefault('coverage__cardinalities', [])
-        if self._produced == 0 or context['coverage__stop']:
-            context['coverage__stop'] = True
-            self._coverage = 0.0
-            return 0.0
-        cardinality = max(self._cardinality, self._produced)
-        coverage = (self._produced - 1) / cardinality
-        self._coverage = coverage
-        for previous_table_cardinality in context['coverage__cardinalities']:
-            coverage *= (1.0 / previous_table_cardinality)
-        context['coverage__cardinalities'].append(cardinality)
-        return coverage
-
-    def update_cost(self, context: Dict[str, Any] = {}) -> float:
-        """Compute and update operators cost.
-
-        This function assumes that only nested loop joins are used.
-
-        Returns: The cost of the query for the given plan.
-        """
-        context.setdefault('cost__cout', 1)
-        _, self._cost = self.create_iterator()
-        cardinality = max(self._cardinality, self._cumulative_cardinality)
-        cardinality = max(cardinality, self._cumulative_produced)
-        if self._cumulative_produced == 0:
-            selectivity = cardinality
-        else:
-            stages = max(1, self._stages)
-            selectivity = cardinality / stages
-        context['cost__cout'] *= selectivity
-        return context['cost__cout']
 
     def save(self) -> SavedScanIterator:
         """Save and serialize the iterator as a Protobuf message"""
@@ -191,10 +136,4 @@ class ScanIterator(PreemptableIterator):
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
         saved_scan.cardinality = self._cardinality
-        saved_scan.produced = self._produced
-        saved_scan.cumulative_produced = self._cumulative_produced
-        saved_scan.cumulative_cardinality = self._cumulative_cardinality
-        saved_scan.stages = self._stages
-        saved_scan.coverage = self._coverage
-        saved_scan.cost = self._cost
         return saved_scan

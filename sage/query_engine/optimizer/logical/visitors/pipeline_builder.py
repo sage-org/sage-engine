@@ -14,6 +14,9 @@ from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
 from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.values import ValuesIterator
+from sage.query_engine.iterators.limit import LimitIterator
+from sage.query_engine.iterators.topk import TOPKIterator
+from sage.query_engine.iterators.topk_collab import TOPKCollabIterator
 from sage.query_engine.iterators.utils import EmptyIterator
 from sage.query_engine.update.delete import DeleteOperator
 from sage.query_engine.update.if_exists import IfExistsOperator
@@ -69,6 +72,25 @@ class PipelineBuilder(LogicalPlanVisitor):
 
     def visit_select_query(self, node: CompValue, context: Dict[str, Any] = {}) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         return self.visit(node.p, context=context)
+
+    def visit_limit_k(self, node: CompValue, context: Dict[str, Any]) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
+        if node.p.p.name == 'OrderBy':
+            topk_source, cardinalities = self.visit(node.p.p.p, context=context)
+            order_conditions = " ".join([orderCond.repr for orderCond in node.p.p.expr])
+            if context['topk_strategy'] == 'FullServer':
+                topk_iterator = TOPKIterator(
+                    topk_source, order_conditions, node.p.p.expr, limit=node.length)
+            else:
+                threshold_refresh_rate = float(context['topk_strategy'].split('-')[1])
+                topk_iterator = TOPKCollabIterator(
+                    topk_source, order_conditions, node.p.p.expr, limit=node.length,
+                    threshold_refresh_rate=threshold_refresh_rate)
+            projected_variables = list(map(lambda t: '?' + str(t), node.p.PV))
+            iterator = ProjectionIterator(topk_iterator, projected_variables)
+        else:
+            child, cardinalities = self.visit(node.p, context=context)
+            iterator = LimitIterator(child, limit=node.length)
+        return iterator, cardinalities
 
     def visit_projection(self, node: CompValue, context: Dict[str, Any] = {}) -> Tuple[PreemptableIterator, List[Dict[str, Any]]]:
         projected_variables = list(map(lambda t: '?' + str(t), node.PV))

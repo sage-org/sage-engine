@@ -14,24 +14,24 @@ class StatelessManager(SavedPlanManager):
     def __init__(self):
         super(StatelessManager, self).__init__()
 
-    def get_plan(self, plan_id: str, dataset: Dataset, context: Dict[str, Any] = {}) -> PreemptableIterator:
+    def get_plan(self, saved_plan: str, dataset: Dataset, context: Dict[str, Any] = {}) -> PreemptableIterator:
         """Get a saved plan by ID.
 
         Args:
-          * plan_id: ID of the saved plan to retrieve.
+          * saved_plan: The saved plan of a query.
           * dataset: RDF dataset on which the query is executed.
           * context: Information about the execution context of the query.
 
-        Returns: The saved plan corresponding to the input ID.
+        Returns: The physical plan of a query restored from a saved plan.
         """
-        return load(decode_saved_plan(plan_id), dataset, context=context)
+        return load(decode_saved_plan(saved_plan), dataset, context=context)
 
     def save_plan(self, plan: PreemptableIterator) -> str:
         """Store a saved plan.
 
-        Argument: Plan to save.
+        Argument: The physical plan of a query.
 
-        Returns: The ID of the saved plan.
+        Returns: The saved plan of a query.
         """
         saved_plan = RootTree()
         source_field = f'{plan.serialized_name()}_source'

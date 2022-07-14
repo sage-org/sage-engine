@@ -1,6 +1,8 @@
-# utils.py
-# Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union, Any
+from rdflib.plugins.sparql.sparql import Bindings, QueryContext
+from rdflib.plugins.sparql.parserutils import Expr
+from rdflib.term import Literal, URIRef, Variable
+from rdflib.util import from_n3
 
 
 class EmptyIterator(object):
@@ -140,3 +142,32 @@ def tuple_to_triple(s: str, p: str, o: str) -> Dict[str, str]:
         'predicate': p,
         'object': o
     }
+
+
+def to_rdflib_term(value: str) -> Union[Literal, URIRef, Variable]:
+    """Convert a N3 term to a RDFLib Term.
+
+    Argument: A RDF Term in N3 format.
+
+    Returns: The RDF Term in rdflib format.
+    """
+    if value.startswith('http'):
+        return URIRef(value)
+    elif '"^^http' in value:
+        index = value.find('"^^http')
+        value = f"{value[0:index+3]}<{value[index+3:]}>"
+    return from_n3(value)
+
+
+def eval_rdflib_expr(expr: Expr, mappings: Dict[str, str]) -> Any:
+    """Evaluate the FILTER expression with a set mappings.
+
+    Argument: A set of solution mappings.
+
+    Returns: The outcome of evaluating the SPARQL FILTER on the input set of solution mappings.
+    """
+    if isinstance(expr, Variable):
+        return mappings[expr.n3()]
+    d = {Variable(key[1:]): to_rdflib_term(value) for key, value in mappings.items()}
+    context = QueryContext(bindings=Bindings(d=d))
+    return expr.eval(context)
