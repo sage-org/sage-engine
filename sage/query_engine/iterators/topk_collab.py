@@ -63,10 +63,16 @@ class TOPKCollabIterator(PreemptableIterator):
         if self._threshold is None:
             return True
         for key, order in self._keys:
-            if order == "DESC" and self._threshold[key] > mappings[key]:
-                return False
-            elif order == "ASC" and self._threshold[key] < mappings[key]:
-                return False
+            if order == 'DESC':
+                if self._threshold[key] < mappings[key]:
+                    return True
+                elif self._threshold[key] > mappings[key]:
+                    return False
+            elif order == 'ASC':
+                if self._threshold[key] > mappings[key]:
+                    return True
+                elif self._threshold[key] < mappings[key]:
+                    return True
         return True
 
     def __should_refresh_threshold__(self) -> bool:

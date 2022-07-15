@@ -130,6 +130,8 @@ class PlanRewriter(LogicalPlanVisitor):
     def visit_orderby(self, node: CompValue, context: Dict[str, Any]) -> Any:
         for orderCond in node.expr:
             orderCond.repr = ExpressionStringifier().visit(orderCond.expr)
+            if orderCond.order is None or orderCond.order == 'DESC':
+                orderCond.repr = f'DESC({orderCond.repr})'
         node.p = self.visit(node.p, context=context)
         return node
 
