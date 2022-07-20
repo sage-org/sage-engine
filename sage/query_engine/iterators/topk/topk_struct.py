@@ -1,5 +1,9 @@
 # import logging
 
+from typing import List, Tuple, Optional, Union
+
+from sage.query_engine.types import Mappings
+
 
 class Node():
     """
@@ -34,7 +38,7 @@ class OrderedDict():
         self.length = 0
         self.curr = None  # needed for iteration
         self.stack = []  # needed for iteration
-        self.default = default  # the default value to return if key isn't present
+        self.default = default  # the default value to return if key isn"t present
 
     # update the value for a key, or add a new key-value pair
     def __setitem__(self, key, value):
@@ -95,10 +99,10 @@ class OrderedDict():
         for x in self:
             res.append(" "+str(x.key)+": "+str(x.value)+",")
         if len(res) == 1:
-            return '{ }'
-        res[-1] = res[-1][:len(res[-1])-1]+' }'
+            return "{ }"
+        res[-1] = res[-1][:len(res[-1])-1]+" }"
         return "".join(res)
-        return res[:len(res)-1]+' }' if len(res) > 1 else "{ }"
+        return res[:len(res)-1]+" }" if len(res) > 1 else "{ }"
 
     # returns length of dict
     def __len__(self):
@@ -187,7 +191,7 @@ class OrderedDict():
                     self.right_rotate(x.parent)
                     s = x.parent.left
 
-                if s.right.color == 0 and s.right.color == 0:
+                if s.left.color == 0 and s.right.color == 0:
                     s.color = 1
                     x = x.parent
                 else:
@@ -476,7 +480,7 @@ class OrderedDict():
         :returns: key value pair
         """
         if self.length < k or k < 1:
-            raise Exception('k should be between 1 and size of dict')
+            raise Exception("k should be between 1 and size of dict")
             return
         ksmall = [None]
         self.ksmallUtil(self.root, [k], ksmall)
@@ -505,7 +509,7 @@ class OrderedDict():
         :returns: key value pair
         """
         if self.length < k or k < 1:
-            raise Exception('k should be between 1 and size of dict')
+            raise Exception("k should be between 1 and size of dict")
             return
         klarge = [None]
         self.klargeUtil(self.root, [k], klarge)
@@ -513,21 +517,70 @@ class OrderedDict():
 
 
 class TOPKStruct():
+    """
+    This class implements a data structure that allows to maitain a
+    multiple-keys order between the solutions mappings.
 
-    def __init__(self, keys, limit=100):
+    Parameters
+    ----------
+    keys: List[Tuple[str, str]]
+        The keys that are used to define the order. A key is a 2-tuple
+        (key, order) where:
+            - key: str - is a variable in the solutions mappings.
+            - order: str ("ASC" or "DESC") - defines if solutions mappings need
+              to be ordered from the smallest (resp. largest) to the largest
+              (resp. smallest) solution for the given key.
+    limit: int
+        The limit defines the capacity of the TOPKStruct.
+
+    Example
+    -------
+    >>> topk = TOPKStruct([("?v1", "ASC"), ("?v2", "DESC")], limit=3)
+    >>> topk.insert({"?v1": 1, "?v2": 1, "?v3": "A"})
+    >>> topk.insert({"?v1": 1, "?v2": 2, "?v3": "B"})
+    >>> topk.insert({"?v1": 2, "?v2": 1, "?v3": "C"})
+    >>> topk.insert({"?v1": 3, "?v2": 1, "?v3": "D"})
+    >>> topk.flatten()
+        [
+            {"?v1": 1, "?v2": 2, "?v3": "B"},
+            {"?v1": 1, "?v2": 1, "?v3": "A"},
+            {"?v1": 2, "?v2": 1, "?v3": "C"}
+        ]
+    """
+
+    def __init__(self, keys: List[Tuple[str, str]], limit: int = 100) -> None:
         self._keys = keys
         self._limit = limit
         self._topk = OrderedDict()
         self._size = 0
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._size
 
-    # flattens the topk into an ordered list
-    def __flatten__(self, node, key_index=0):
+    def __flatten__(
+        self, node: Union[OrderedDict, Mappings], key_index: int = 0
+    ) -> List[Mappings]:
+        """
+        Returns an ordered list of the solutions mappings that are descendants
+        of the current node.
+
+        Parameters
+        ----------
+        node: Union[OrderedDict, Mappings]
+            A node in the TOPKStruct.
+        key_index: int - (default = 0)
+            The index of the key that defines the order for the children of the
+            current node.
+
+        Returns
+        -------
+        List[Mappings]
+            An ordered list of the solutions mappings that are descendants of
+            the current node.
+        """
         if isinstance(node, OrderedDict):
             nodes = []
-            if self._keys[key_index][1] == 'DESC':
+            if self._keys[key_index][1] == "DESC":
                 for item in node.reverse_iterate():
                     nodes.extend(self.__flatten__(item.value, key_index + 1))
             else:
@@ -536,56 +589,125 @@ class TOPKStruct():
             return nodes
         return node
 
-    # returns the topk as an ordered list
-    def flatten(self):
+    def flatten(self) -> List[Mappings]:
+        """
+        Returns an ordered list of the solutions mappings stored in the
+        TOPKStruct.
+
+        Returns
+        -------
+        List[Mappings]
+            An ordered list of the solutions mappings stored in the TOPKStruct.
+        """
         return self.__flatten__(self._topk)
 
-    # returns the lowest topk solution
-    def lower_bound(self):
+    def lower_bound(self) -> Mappings:
+        """
+        Returns the k-th solution mappings in the TOPKStruct (according to the
+        defined order).
+
+        Returns
+        -------
+        Mappings
+            The k-th solution mappings in the TOPKStruct.
+        """
         node = self._topk
         key_index = 0
         while isinstance(node, OrderedDict):
-            if self._keys[key_index][1] == 'DESC':
+            if self._keys[key_index][1] == "DESC":
                 node = node.smallest().value
             else:
                 node = node.biggest().value
             key_index += 1
         return node[0]
 
-    # returns the highest topk solution
-    def upper_bound(self):
+    def upper_bound(self) -> Mappings:
+        """
+        Returns the 1-th solution mappings in the TOPKStruct (according to the
+        defined order).
+
+        Returns
+        -------
+        Mappings
+            The 1-th solution mappings in the TOPKStruct.
+        """
         node = self._topk
         key_index = 0
         while isinstance(node, OrderedDict):
-            if self._keys[key_index][1] == 'DESC':
+            if self._keys[key_index][1] == "DESC":
                 node = node.biggest().value
             else:
                 node = node.smallest().value
             key_index += 1
         return node[0]
 
-    # returns True if the solution can be added to the topk, False otherwise
-    def can_insert(self, mappings):
+    def threshold(self) -> Mappings:
+        """
+        Returns the threshold for a solution mappings to enter in the TOP-K. If
+        there is less than k solution mappings in the TOPKStruct, the threshold
+        is `None`, otherwise it is the k-th solution mappings.
+
+        Returns
+        -------
+        Mappings
+            The smallest solution mappings in the TOPKStruct.
+        """
         if self._size < self._limit:
+            return None
+        return self.lower_bound()
+
+    def can_insert(self, mappings: Mappings) -> bool:
+        """
+        Checks if a solution mappings can be inserted in the TOPKStruct.
+
+        A solution mappings can be inserted if:
+            - there is enough space left in the TOPKStruct.
+            - the solution mappings is greater than the threshold.
+
+        Parameters
+        ----------
+        mappings: Mappings
+            The mappings to insert.
+
+        Returns
+        -------
+        bool
+            True if the solution mappings can be inserted, False otherwise.
+        """
+        threshold = self.threshold()
+        if threshold is None:
             return True
-        lb = self.lower_bound()
         for key, order in self._keys:
-            if order == 'DESC':
-                if lb[key] < mappings[key]:
+            if order == "DESC":
+                if mappings[key] > threshold[key]:
                     return True
-                elif lb[key] > mappings[key]:
+                elif mappings[key] < threshold[key]:
                     return False
-            elif order == 'ASC':
-                if lb[key] > mappings[key]:
+            elif order == "ASC":
+                if mappings[key] < threshold[key]:
                     return True
-                elif lb[key] < mappings[key]:
-                    return True
+                elif mappings[key] > threshold[key]:
+                    return False
         return False
 
-    # adds a new solution to the topk
-    def __insert__(self, node, mappings, key_index=0):
+    def __insert__(
+        self, node: OrderedDict, mappings: Mappings, key_index: int = 0
+    ) -> None:
+        """
+        Inserts a solution mappings as a child of the current node.
+
+        Parameters
+        ----------
+        node: OrderedDict
+            The node on which we want to insert the soluton mappings.
+        mappings: Mappings
+            The solution mappings to insert.
+        key_index: int - (default = 0)
+            The index of the key that defines the order for the children of the
+            current node.
+        """
         key = self._keys[key_index][0]
-        # logging.debug(f' __insert__ : {key} - {node}')
+        # logging.debug(f" __insert__ : {key} - {node}")
         if key_index == len(self._keys) - 1:
             if mappings[key] not in node:
                 node[mappings[key]] = []
@@ -594,11 +716,28 @@ class TOPKStruct():
             if mappings[key] not in node:
                 node[mappings[key]] = OrderedDict()
             self.__insert__(node[mappings[key]], mappings, key_index + 1)
-        # logging.debug(f' __insert__ : {key} - {node}')
+        # logging.debug(f" __insert__ : {key} - {node}")
 
-    # adds a new solution to the topk
-    def insert(self, mappings):
-        # logging.debug(f' insert : {self._size}/{self._limit} - {mappings}')
+    def insert(self, mappings: Mappings) -> bool:
+        """
+        Inserts a solution mappings in the TOPKStruct.
+
+        A solution mappings can be inserted if:
+            - there is enough space left in the TOPKStruct.
+            - the solution mappings is greater than the k-th element in the
+              TOPKStruct.
+
+        Parameters
+        ----------
+        mappings: Mappings
+            The solution mappings to insert.
+
+        Returns
+        -------
+        bool
+            True if the solution mappings has been inserted, False otherwise.
+        """
+        # logging.debug(f" insert : {self._size}/{self._limit} - {mappings}")
         if self.can_insert(mappings):
             self.__insert__(self._topk, mappings)
             self._size += 1
@@ -607,25 +746,54 @@ class TOPKStruct():
             return True
         return False
 
-    # deletes a solution from the topk
-    def __delete__(self, node, mappings, key_index=0):
+    def __delete__(
+        self, node: OrderedDict, mappings: Mappings, key_index: int = 0
+    ) -> None:
+        """
+        Deletes a solution mappings from the current node.
+
+        Parameters
+        ----------
+        node: OrderedDict
+            The node from which we want to delete the soluton mappings.
+        mappings: Mappings
+            The solution mappings to delete.
+        key_index: int - (default = 0)
+            The index of the key that defines the order for the children of the
+            current node.
+        """
         key = self._keys[key_index][0]
-        # logging.debug(f' __delete__ : {key} - {node}')
+        # logging.debug(f" __delete__ : {key} - {node}")
         if key_index == len(self._keys) - 1:
             node[mappings[key]].remove(mappings)
         else:
             self.__delete__(node[mappings[key]], mappings, key_index + 1)
         if len(node[mappings[key]]) == 0:
             node.pop(mappings[key])
-        # logging.debug(f' __delete__ : {key} - {node}')
+        # logging.debug(f" __delete__ : {key} - {node}")
 
-    # deletes a solution from the topk
-    def delete(self, mappings):
-        # logging.debug(f' delete : {self._size}/{self._limit} - {mappings}')
+    def delete(self, mappings: Mappings) -> None:
+        """
+        Deletes a solution mappings in the TOPKStruct.
+
+        Parameters
+        ----------
+        mappings: Mappings
+            The solution mappings to delete.
+        """
+        # logging.debug(f" delete : {self._size}/{self._limit} - {mappings}")
         self.__delete__(self._topk, mappings)
         self._size -= 1
 
-    def pop(self):
+    def pop(self) -> Mappings:
+        """
+        Pop the 1-th solution mappings from the TOPKStruct.
+
+        Returns
+        -------
+        Mappings
+            The 1-th solution mappings in the TOPKStruct.
+        """
         if self._size == 0:
             raise Exception("Dictionary empty")
         mappings = self.upper_bound()
@@ -633,22 +801,84 @@ class TOPKStruct():
         return mappings
 
 
+class PartialTOPKStruct(TOPKStruct):
+    """
+    This class is just a TOPKStruct with the possibility to set a threshold for
+    the insert. A solution mappings can be inserted in the TOPKStruct only if it
+    is greater than or equal to the threshold (according to the defined order).
+
+    Parameters
+    ----------
+    keys: List[Tuple[str, str]]
+        The keys that are used to define the order. A key is a 2-tuple
+        (key, order) where:
+            - key: str - is a variable in the solutions mappings.
+            - order: str ("ASC" or "DESC") - defines if solutions mappings need
+              to be ordered from the smallest (resp. largest) to the largest
+              (resp. smallest) solution for the given key.
+    limit: int
+        The limit defines the capacity of the TOPKStruct.
+    threshold: Mappings
+        A threshold such that the k elements must be greater than or equal to it.
+
+    Example
+    -------
+    >>> topk = TOPKStruct(
+        [("?v1", "ASC"), ("?v2", "DESC")],
+        limit=10,
+        threshold={"?v1": 2, "?v2": 1})
+    >>> topk.insert({"?v1": 1, "?v2": 1, "?v3": "A"})
+    >>> topk.insert({"?v1": 1, "?v2": 2, "?v3": "B"})
+    >>> topk.insert({"?v1": 2, "?v2": 1, "?v3": "C"})
+    >>> topk.insert({"?v1": 3, "?v2": 1, "?v3": "D"})
+    >>> topk.flatten()
+        [
+            {"?v1": 1, "?v2": 2, "?v3": "B"},
+            {"?v1": 1, "?v2": 1, "?v3": "A"},
+            {"?v1": 2, "?v2": 1, "?v3": "C"}
+        ]
+    """
+
+    def __init__(
+        self, keys: List[Tuple[str, str]], limit: int = 100,
+        threshold: Optional[Mappings] = None
+    ) -> None:
+        super(PartialTOPKStruct, self).__init__(keys, limit=limit)
+        self._threshold = threshold
+
+    def threshold(self) -> Mappings:
+        """
+        Returns the smallest solution mappings in the PartialTOPKStruct
+        (according to the defined order). If there is less than k solution
+        mappings in the PartialTOPKStruct, the smallest solution mappings is
+        the given threshold, otherwise it is the k-th solution mappings.
+
+        Returns
+        -------
+        Mappings
+            The smallest solution mappings in the PartialTOPKStruct.
+        """
+        if self._size < self._limit:
+            return self._threshold
+        return self.lower_bound()
+
+
 if __name__ == "__main__":
-    keys = [('__o1', 'ASC'), ('__o2', 'DESC'), ('__o3', 'ASC')]
+    keys = [("__o1", "ASC"), ("__o2", "DESC"), ("__o3", "ASC")]
     topk = TOPKStruct(keys, limit=3)
 
-    print(topk.insert({'__o1': 1, '__o2': 20, '__o3': 100, '?x': "A"}))
-    print(topk.insert({'__o1': 1, '__o2': 20, '__o3': 200, '?x': "A"}))
-    print(topk.insert({'__o1': 1, '__o2': 40, '__o3': 200, '?x': "A"}))
-    print(topk.insert({'__o1': 2, '__o2': 40, '__o3': 400, '?x': "B"}))
-    print(topk.insert({'__o1': 2, '__o2': 30, '__o3': 100, '?x': "A"}))
+    print(topk.insert({"__o1": 1, "__o2": 20, "__o3": 100, "?x": "A"}))
+    print(topk.insert({"__o1": 1, "__o2": 20, "__o3": 200, "?x": "A"}))
+    print(topk.insert({"__o1": 1, "__o2": 40, "__o3": 200, "?x": "A"}))
+    print(topk.insert({"__o1": 2, "__o2": 40, "__o3": 400, "?x": "B"}))
+    print(topk.insert({"__o1": 2, "__o2": 30, "__o3": 100, "?x": "A"}))
     print(topk.flatten())
     print(len(topk))
 
-    print(f'lower bound: {topk.lower_bound()}')
+    print(f"lower bound: {topk.lower_bound()}")
 
-    print(f'upper bound: {topk.upper_bound()}')
+    print(f"upper bound: {topk.upper_bound()}")
     print(topk.pop())
-    print(f'upper bound: {topk.upper_bound()}')
+    print(f"upper bound: {topk.upper_bound()}")
     print(topk.flatten())
     print(len(topk))

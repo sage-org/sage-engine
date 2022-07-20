@@ -1,5 +1,3 @@
-# descriptors.py
-# Author: Thomas MINIER - MIT License 2017-2020
 from abc import ABC, abstractmethod
 from math import isinf
 
@@ -16,11 +14,15 @@ W3C_FORMATS = Namespace("http://www.w3.org/ns/formats/")
 
 
 def bind_prefixes(graph: Graph) -> None:
-    """Bind commons prefixes to a rdflib Graph.
+    """
+    Binds commons prefixes to an RDFLib Graph.
 
-    Generate readable prefixes when serializing the graph to turtle.
+    Generates readable prefixes when serializing the graph to turtle.
 
-    Argument: The rdflib Graph to which prefixes should be added.
+    Parameters
+    ----------
+    graph: Graph
+        The RDFLib Graph to which prefixes should be added.
     """
     graph.bind("dcterms", "http://purl.org/dc/terms/")
     graph.bind("foaf", "http://xmlns.com/foaf/0.1/")
@@ -30,20 +32,29 @@ def bind_prefixes(graph: Graph) -> None:
     graph.bind("void", "http://rdfs.org/ns/void#")
 
 
-def many_void(endpoint_uri: str, dataset: Dataset, rdf_format: str, encoding: str = "utf-8") -> str:
-    """Describe a RDF dataset hosted by a Sage server using the VOID and SPARQL Description languages.
-
-    Supported RDF formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
-
-    Args:
-      * endpoint_uri: URI used to describe the endpoint.
-      * dataset: RDF dataset to describe.
-      * rdf_format: RDF serialization format for the description.
-      * encoding: String encoding (Default to utf-8).
-
-    Returns:
-      The description of the RDF dataset, formatted in the given RDF format.
+def many_void(endpoint_uri: str, rdf_format: str, encoding: str = "utf-8") -> str:
     """
+    Describes a RDF dataset hosted by a Sage server using the VOID and SPARQL
+    Description languages.
+
+    Supported RDF formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml',
+    'trix', 'trig' and 'nquads'.
+
+    Parameters
+    ----------
+    endpoint_uri: str
+        URI used to describe the endpoint.
+    rdf_format: str
+        RDF serialization format for the description.
+    encoding: str - (default = "utf-8")
+        String encoding.
+
+    Returns
+    -------
+    str
+        The description of the RDF dataset, formatted in the given RDF format.
+    """
+    dataset = Dataset()
     sage_uri = URIRef(endpoint_uri)
     graph_collec = BNode()
     g = Graph()
@@ -70,39 +81,52 @@ def many_void(endpoint_uri: str, dataset: Dataset, rdf_format: str, encoding: st
 
 
 class AbstractDescriptor(ABC):
-    """A descriptor describes a RDF dataset using a given vocabulary/standard"""
+    """
+    A descriptor describes a RDF dataset using a given vocabulary/standard.
+    """
 
     def __init__(self):
         super(AbstractDescriptor, self).__init__()
 
     @abstractmethod
     def describe(self, format: str, encoding="utf-8") -> str:
-        """Describe the dataset using the given format.
+        """
+        Describes the dataset using the given format.
 
-        Supported RDF formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
+        Supported RDF formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt',
+        'pretty-xml', 'trix', 'trig' and 'nquads'.
 
-        Args:
-          * rdf_format: RDF serialization format for the description.
-          * encoding: String encoding (Default to utf-8).
+        Parameters
+        ----------
+        format: str
+            RDF serialization format for the description.
+        encoding: str - (default = "utf-8")
+            String encoding.
 
-        Returns:
-          The description of the RDF dataset, formatted in the given RDF format.
+        Returns
+        -------
+            The description of the RDF dataset, formatted in the given RDF format.
         """
         pass
 
 
 class VoidDescriptor(AbstractDescriptor):
-    """A descriptor that describes a Sage dataset using the VOID standard.
+    """
+    A descriptor that describes a SaGe dataset using the VoID standard.
 
-    Args:
-      * uri: URI of the RDF graph to describe.
-      * graph: the RDF Graph to describe.
+    Parameters
+    ----------
+    uri: str
+        URI of the RDF graph to describe.
+    graph: SageGraph
+        The RDF Graph to describe.
 
-    Example:
-      >>> graph = get_some_graph() # get a RDF graph
-      >>> uri = "http://example.org#my-graph"
-      >>> desc = VoidDescriptor(uri, graph)
-      >>> print(desc.describe("turtle"))
+    Example
+    -------
+    >>> graph = get_some_graph() # get a RDF graph
+    >>> uri = "http://example.org#my-graph"
+    >>> desc = VoidDescriptor(uri, graph)
+    >>> print(desc.describe("turtle"))
     """
 
     def __init__(self, uri: str, graph: SageGraph):
@@ -114,21 +138,30 @@ class VoidDescriptor(AbstractDescriptor):
         self.__populate_graph()
 
     def describe(self, format: str, encoding="utf-8") -> str:
-        """Describe the dataset using the given format.
+        """
+        Describes the dataset using the given format.
 
-        Supported RDF formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads'.
+        Supported RDF formats: 'xml', 'json-ld', 'n3', 'turtle', 'nt',
+        'pretty-xml', 'trix', 'trig' and 'nquads'.
 
-        Args:
-          * rdf_format: RDF serialization format for the description.
-          * encoding: String encoding (Default to utf-8).
+        Parameters
+        ----------
+        format: str
+            RDF serialization format for the description.
+        encoding: str - (default = "utf-8")
+            String encoding.
 
-        Returns:
-          The description of the RDF dataset, formatted in the given RDF format.
+        Returns
+        -------
+        str
+            The description of the RDF dataset, formatted in the given RDF format.
         """
         return self._rdf_graph.serialize(format=format).decode(encoding)
 
     def __populate_graph(self) -> None:
-        """Fill the local triple store with dataset's metadata"""
+        """
+        Fills the local triple store with dataset's metadata.
+        """
         # main metadata
         self._rdf_graph.add((self._graph_uri, RDF["type"], SAGE["SageDataset"]))
         self._rdf_graph.add((self._graph_uri, FOAF["homepage"], self._graph_uri))

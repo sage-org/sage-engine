@@ -1,11 +1,8 @@
 from __future__ import annotations
-from datetime import datetime
-from typing import Optional, Dict, Any
 
-from sage.database.core.dataset import Dataset
+from sage.query_engine.types import RDFLibNode, QueryContext
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.optimizer.logical.plan_visitor import Node
-from sage.query_engine.optimizer.logical.visitors.pipeline_builder import PipelineBuilder
+from sage.query_engine.optimizer.logical.pipeline_builder import PipelineBuilder
 from sage.query_engine.optimizer.logical.optimizer import LogicalPlanOptimizer
 from sage.query_engine.optimizer.physical.optimizer import PhysicalPlanOptimizer
 
@@ -17,10 +14,10 @@ class Optimizer():
         self._physical_optimizer = None
 
     @staticmethod
-    def get_default(dataset: Dataset) -> Optimizer:
+    def get_default() -> Optimizer:
         optimizer = Optimizer()
-        optimizer.set_logical_optimizer(LogicalPlanOptimizer.get_default(dataset))
-        optimizer.set_physical_optimizer(PhysicalPlanOptimizer.get_default(dataset))
+        optimizer.set_logical_optimizer(LogicalPlanOptimizer.get_default())
+        optimizer.set_physical_optimizer(PhysicalPlanOptimizer.get_default())
         return optimizer
 
     def set_logical_optimizer(self, optimizer: LogicalPlanOptimizer) -> None:
@@ -30,13 +27,11 @@ class Optimizer():
         self._physical_optimizer = optimizer
 
     def optimize(
-        self, logical_plan: Node, dataset: Dataset, default_graph: str,
-        as_of: Optional[datetime] = None, context: Dict[str, Any] = {}
+        self, logical_plan: RDFLibNode, context: QueryContext = {}
     ) -> PreemptableIterator:
         if self._logical_optimizer is not None:
             logical_plan = self._logical_optimizer.optimize(logical_plan, context=context)
-        physical_plan, cardinalities = PipelineBuilder(
-            dataset, default_graph, as_of=as_of).visit(logical_plan, context=context)
+        physical_plan = PipelineBuilder().visit(logical_plan, context=context)
         if self._physical_optimizer is not None:
             physical_plan = self._physical_optimizer.optimize(physical_plan, context=context)
-        return physical_plan, cardinalities
+        return physical_plan

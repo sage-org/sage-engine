@@ -1,13 +1,12 @@
-# utils.py
-# Author: Thomas MINIER - MIT License 2017-2020
 import re
 
-from typing import Dict, List, Set, Tuple, Union, Optional
+from typing import List, Set, Tuple, Optional
 from rdflib.namespace import XSD
-from rdflib.term import BNode, Literal, URIRef, Variable
+from rdflib.term import BNode, Literal, URIRef
 
-RDFTerm = Union[Variable, URIRef, Literal]
-TriplePattern = Tuple[RDFTerm, RDFTerm, RDFTerm]
+from sage.query_engine.types import (
+    RDFLibTerm, RDFLibTriplePattern, RDFLibMappings, RDFLibOperator,
+    TriplePattern, Mappings)
 
 exponent = r'[eE][+-]?[0-9]+'
 
@@ -17,24 +16,30 @@ r_double = re.compile(rf'([0-9]+\.[0-9]*{exponent}|\.[0-9]+{exponent}|[0-9]+{exp
 r_boolean = re.compile(r'(true|false)')
 
 
-def get_vars(triple: Dict[str, str]) -> Set[str]:
-    """Get SPARQL variables in a triple pattern"""
-    return set([v for k, v in triple.items() if v.startswith('?')])
+def get_vars(triple_pattern: TriplePattern) -> Set[str]:
+    """
+    Extracts SPARQL variables in a triple pattern.
+
+    Parameters
+    ----------
+    triple_pattern: TriplePattern
+        The triple pattern from which we want to extract the variables.
+
+    Returns
+    -------
+    Set[str]
+        The variables that appear in the triple pattern.
+    """
+    return set([v for k, v in triple_pattern.items() if v.startswith('?')])
 
 
-def find_connected_pattern(variables: List[str], triples: List[Dict[str, str]]) -> Tuple[Dict[str, str], int, Set[str]]:
-    """Find the first pattern in a set of triples pattern connected to a set of variables"""
-    pos = 0
-    for triple in triples:
-        tripleVars = get_vars(triple['triple'])
-        if len(variables & tripleVars) > 0:
-            return triple, pos, variables | tripleVars
-        pos += 1
-    return None, None, variables
-
-
-def equality_variables(subject: str, predicate: str, obj: str) -> Tuple[str, Tuple[str, str, str]]:
-    """Find all variables from triple pattern with the same name, and then returns the equality expression + the triple pattern used to evaluate correctly the pattern.
+def equality_variables(
+    subject: str, predicate: str, obj: str
+) -> Tuple[str, Tuple[str, str, str]]:
+    """
+    Finds all variables with the same name in a triple pattern, and then returns
+    the equality expression with the triple pattern used to correctly evaluate
+    the pattern.
     """
     if subject == predicate:
         return f"{subject} = {predicate + '__2'}", (subject, predicate + '__2', obj), ""
@@ -45,35 +50,49 @@ def equality_variables(subject: str, predicate: str, obj: str) -> Tuple[str, Tup
     return None, (subject, predicate, obj)
 
 
-def format_literal(term: Literal) -> str:
-    """Convert a rdflib Literal into the format used by SaGe.
-
-    Argument: The rdflib Literal to convert.
-
-    Returns: The RDF Literal in Sage text format.
+def format_literal(literal: Literal) -> str:
     """
-    lang = term.language
-    dtype = term.datatype
-    lit = str(term)
+    Converts an RDFLib Literal into the format used by SaGe.
+
+    Parameters
+    ----------
+    literal: Literal
+        The RDFLib Literal to convert.
+
+    Returns
+    -------
+    str
+        The RDF Literal in the SaGe text format.
+    """
+    lang = literal.language
+    dtype = literal.datatype
+    value = str(literal)
     if lang is not None or dtype is not None:
-        return term.n3()
-    if re.fullmatch(r_integer, lit):
+        return literal.n3()
+    if re.fullmatch(r_integer, value):
         dtype = XSD.integer
-    elif re.fullmatch(r_decimal, lit):
+    elif re.fullmatch(r_decimal, value):
         dtype = XSD.decimal
-    elif re.fullmatch(r_double, lit):
+    elif re.fullmatch(r_double, value):
         dtype = XSD.double
-    elif re.fullmatch(r_boolean, lit):
+    elif re.fullmatch(r_boolean, value):
         dtype = XSD.boolean
-    return Literal(lit, lang, dtype).n3()
+    return Literal(value, lang, dtype).n3()
 
 
-def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
-    """Convert a rdflib RDF Term into the format used by SaGe.
+def format_term(term: RDFLibTerm) -> str:
+    """
+    Converts an RDFLib term into the format used by SaGe.
 
-    Argument: The rdflib RDF Term to convert.
+    Parameters
+    ----------
+    term: RDFLibTerm
+        The RDFLib term to convert.
 
-    Returns: The RDF term in Sage text format.
+    Returns
+    -------
+    str
+        The RDF term in the SaGe text format.
     """
     if isinstance(term, URIRef):
         return str(term)
@@ -81,11 +100,23 @@ def format_term(term: Union[BNode, Literal, URIRef, Variable]) -> str:
         return '?v_' + str(term)
     elif isinstance(term, Literal):
         return format_literal(term)
-    else:
-        return term.n3()
+    return term.n3()
 
 
-def format_mappings(mappings: Dict[RDFTerm, RDFTerm]) -> Dict[str, str]:
+def format_mappings(mappings: RDFLibMappings) -> Mappings:
+    """
+    Converts RDFLib mappings into the format used by SaGe.
+
+    Parameters
+    ----------
+    mappings: RDFLibMappings
+        The RDFLib mappings to convert.
+
+    Returns
+    -------
+    Mappings
+        The RDF mappings formated for SaGe.
+    """
     formated_mappings = dict()
     for variable, value in mappings.items():
         variable = format_term(variable)
@@ -94,32 +125,65 @@ def format_mappings(mappings: Dict[RDFTerm, RDFTerm]) -> Dict[str, str]:
     return formated_mappings
 
 
-def format_solution_mappings(
-    solution_mappings: List[Dict[RDFTerm, RDFTerm]]
-) -> List[Dict[str, str]]:
-    return [format_mappings(mappings) for mappings in solution_mappings]
+def format_solution_mappings(solutions: List[RDFLibMappings]) -> List[Mappings]:
+    """
+    Converts a list of RDFLib mappings into the format used by SaGe.
+
+    Parameters
+    ----------
+    solutions: List[RDFLibMappings]
+        A list of RDFLib mappings to convert.
+
+    Returns
+    -------
+    List[Mappings]
+        The list of RDF mappings formated for SaGe.
+    """
+    return [format_mappings(mappings) for mappings in solutions]
 
 
 def format_triple_pattern(
-    triple_pattern: TriplePattern, graph: Optional[str] = None
-) -> Dict[str, str]:
+    triple_pattern: RDFLibTriplePattern, graph: Optional[str] = None
+) -> TriplePattern:
+    """
+    Converts an RDFLib triple pattern into the format used by SaGe.
+
+    Parameters
+    ----------
+    triple_pattern: RDFLibTriplePattern
+        The RDFLib triple pattern to convert.
+    graph: None | str
+        The RDF Graph on which the triple is to be evaluated.
+
+    Returns
+    -------
+    TriplePattern
+        The triple pattern formated for SaGe.
+    """
     return {
         'subject': format_term(triple_pattern[0]),
         'predicate': format_term(triple_pattern[1]),
         'object': format_term(triple_pattern[2]),
-        'graph': graph
-    }
+        'graph': graph}
 
 
-def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> List[Dict[str, str]]:
-    """Performs data localization of a set of triple patterns.
+def localize_triples(
+    triples: List[TriplePattern], graphs: List[str]
+) -> List[TriplePattern]:
+    """
+    Performs data localization of a set of triple patterns.
 
-    Args:
-      * triples: Triple patterns to localize.
-      * graphs: List of RDF graphs URIs used for data localization.
+    Parameters
+    ----------
+    triples: List[TriplePattern]
+        Triple patterns to localize.
+    graphs: List[str]
+        List of RDF graphs URIs used for data localization.
 
-    Yields:
-      The localized triple patterns.
+    Returns
+    -------
+    List[TriplePattern]
+        The localized triple patterns.
     """
     localized_triples = list()
     for (s, p, o) in triples:
@@ -128,40 +192,33 @@ def localize_triples(triples: List[Dict[str, str]], graphs: List[str]) -> List[D
                 'subject': format_term(s),
                 'predicate': format_term(p),
                 'object': format_term(o),
-                'graph': graph
-            })
+                'graph': graph})
     return localized_triples
 
 
-def get_quads_from_update(node: dict, default_graph: str) -> List[Tuple[str, str, str, str]]:
-    """Get all quads from a SPARQL update operation (Delete or Insert).
+def get_quads_from_update(node: RDFLibOperator, default_graph: str) -> List[Tuple[str, str, str, str]]:
+    """
+    Get all quads from a SPARQL update operation (Delete or Insert).
 
-    Args:
-      * node: Node of the logical query execution plan.
-      * default_graph: URI of the default RDF graph.
+    Parameters
+    ----------
+    node: RDFLibOperator
+        Node of the logical query execution plan.
+    default_graph: str
+        URI of the default RDF graph.
 
-    Returns:
-      The list of all N-Quads found in the input node.
+    Returns
+    -------
+    List[Tuple[str, str, str, str]]
+        The list of all N-Quads found in the input node.
     """
     quads = list()
-    # first, gell all regular RDF triples, localized on the default RDF graph
+    # first, get all regular RDF triples, localized on the default RDF graph
     if node.triples is not None:
         quads += [(format_term(s), format_term(p), format_term(o), default_graph) for s, p, o in node.triples]
-    # then, add RDF quads from all GRAPH clauses
+    # then, adds RDF quads from all GRAPH clauses
     if node.quads is not None:
         for g, triples in node.quads.items():
             if len(triples) > 0:
                 quads += [(format_term(s), format_term(p), format_term(o), format_term(g)) for s, p, o in triples]
     return quads
-
-
-def fully_bounded(triple_pattern: TriplePattern) -> bool:
-    s, p, o = triple_pattern
-    if not isinstance(s, URIRef):
-        return False
-    elif not isinstance(p, URIRef):
-        return False
-    elif not (isinstance(o, URIRef) or isinstance(o, Literal)):
-        return False
-    else:
-        return True

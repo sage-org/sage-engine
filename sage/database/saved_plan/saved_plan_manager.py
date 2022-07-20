@@ -1,135 +1,56 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
 
-from sage.database.core.dataset import Dataset
-from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
+from sage.query_engine.types import SavedPlan
 
 
 class SavedPlanManager(ABC):
-    """A SavedPlanManager is an abstract class for storing saved SPARQL query execution plans"""
+    """
+    A SavedPlanManager is an abstract class for storing saved SPARQL query
+    execution plans.
+    """
 
     @abstractmethod
-    def get_plan(self, plan_id: str, dataset: Dataset, context: Dict[str, Any] = {}) -> PreemptableIterator:
-        """Get a saved plan by ID.
+    def get_plan(self, plan_id: str) -> SavedPlan:
+        """
+        Returns the saved physical plan corresponding to the given ID.
 
-        Args:
-          * plan_id: ID of the saved plan to retrieve.
-          * dataset: RDF dataset on which the query is executed.
-          * context: Information about the execution context of the query.
+        Parameters
+        ----------
+        plan_id: str
+            ID of the saved physical plan to retrieve.
 
-        Returns: The saved plan corresponding to the input ID.
+        Returns
+        -------
+        SavedPlan
+            The saved physical plan corresponding to the given ID.
         """
         pass
 
     @abstractmethod
-    def save_plan(self, plan: PreemptableIterator) -> str:
-        """Store a saved plan.
+    def save_plan(self, saved_plan: SavedPlan) -> str:
+        """
+        Stores a saved physical plan on the server.
 
-        Argument: Plan to save.
+        Parameters
+        ----------
+        saved_plan: SavedPlan
+            A saved physical plan to store.
 
-        Returns: The ID of the saved plan.
+        Returns
+        -------
+        str
+            The ID of the saved physical plan.
         """
         pass
 
     @abstractmethod
     def delete_plan(self, plan_id: str) -> None:
-        """Delete a saved plan by ID.
+        """
+        Deletes the saved physical plan corresponding to the given ID.
 
-        Argument: ID of the saved plan to delete.
+        Parameters
+        ----------
+        plan_id: str
+            ID of the saved physical plan to delete.
         """
         pass
-
-    @abstractmethod
-    def from_config(config: Dict[str, str]):
-        """Build a SavedPlanManager from a config dictionnary"""
-        pass
-
-    def open(self) -> None:
-        """Open the SavedPlanManager connection"""
-        pass
-
-    def close(self) -> None:
-        """Close the SavedPlanManager connection"""
-        pass
-
-    def __enter__(self):
-        """Implementation of the __enter__ method from the context manager spec"""
-        self.open()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        """Implementation of the __close__ method from the context manager spec"""
-        self.close()
-
-    def __del__(self):
-        """Destructor"""
-        self.close()
-
-
-# # statefull_manager.py
-# # Author: Thomas MINIER - MIT License 2017-2020
-# from abc import ABC, abstractmethod
-# from typing import Dict
-#
-# from sage.database.core.dataset import Dataset
-# from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-#
-#
-# class SavedPlanManager(ABC):
-#     """A SavedPlanManager is an abstract class for storing saved SPARQL query execution plans"""
-#
-#     @abstractmethod
-#     def get_plan(self, plan_id: str, dataset: Dataset) -> PreemptableIterator:
-#         """Get a saved plan by ID.
-#
-#         Args:
-#           * ID of the saved plan to retrieve.
-#           * RDF dataset on which the query is executed.
-#
-#         Returns: The saved plan corresponding to the input ID.
-#         """
-#         pass
-#
-#     @abstractmethod
-#     def save_plan(self, plan: PreemptableIterator) -> str:
-#         """Store a saved plan.
-#
-#         Argument: Plan to save.
-#
-#         Returns: The ID of the saved plan.
-#         """
-#         pass
-#
-#     @abstractmethod
-#     def delete_plan(self, plan_id: str) -> None:
-#         """Delete a saved plan by ID.
-#
-#         Argument: ID of the saved plan to delete.
-#         """
-#         pass
-#
-#     @abstractmethod
-#     def from_config(config: Dict[str, str]):
-#         """Build a SavedPlanManager from a config dictionnary"""
-#         pass
-#
-#     def open(self) -> None:
-#         """Open the SavedPlanManager connection"""
-#         pass
-#
-#     def close(self) -> None:
-#         """Close the SavedPlanManager connection"""
-#         pass
-#
-#     def __enter__(self):
-#         """Implementation of the __enter__ method from the context manager spec"""
-#         self.open()
-#         return self
-#
-#     def __exit__(self, type, value, traceback):
-#         """Implementation of the __close__ method from the context manager spec"""
-#         self.close()
-#
-#     def __del__(self):
-#         """Destructor"""
-#         self.close()

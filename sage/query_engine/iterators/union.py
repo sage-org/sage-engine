@@ -1,108 +1,197 @@
-# union.py
-# Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Optional, Set, Any
+from typing import Optional
 from random import random
 
-from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
+from sage.query_engine.types import QueryContext, Mappings
+from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator, BinaryPreemtableIterator
 from sage.query_engine.protobuf.iterators_pb2 import SavedBagUnionIterator
 
 
-class BagUnionIterator(PreemptableIterator):
-    """A BagUnionIterator performs a SPARQL UNION with bag semantics in a pipeline of iterators.
+class BagUnionIterator(BinaryPreemtableIterator):
+    """
+    A BagUnionIterator evaluates an UNION clause with a bag semantics in a
+    pipeline of iterators.
 
-    This operator sequentially produces all solutions from the left operand,
-    and then do the same for the right operand.
+    This operator sequentially produces all solutions from the left iterator,
+    and then do the same for the right iterator.
 
-    Args:
-      * left: left operand of the union.
-      * right: right operand of the union.
+    Parameters
+    ----------
+    left: PreemptableIterator
+        The left child of the iterator.
+    right: PreemptableIterator
+        The right child of the iterator.
     """
 
     def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
-        super(BagUnionIterator, self).__init__()
-        self._left = left
-        self._right = right
+        super(BagUnionIterator, self).__init__("union", left, right)
 
-    def __repr__(self):
-        return f"<BagUnionIterator {self._left} UNION {self._right}>"
-
-    def serialized_name(self) -> str:
-        """Get the name of the iterator, as used in the plan serialization protocol"""
-        return "union"
-
-    def explain(self, height: int = 0, step: int = 3) -> None:
-        """Print a description of the iterator"""
-        prefix = ''
-        if height > step:
-            prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
-        prefix += ('|' + ('-' * (step - 1)))
-        print(f'{prefix}BagUnionIterator (cost={self._cost}) (coverage={self._coverage})')
-        self._left.explain(height=(height + step), step=step)
-        self._right.explain(height=(height + step), step=step)
-
-    def variables(self, include_values: bool = False) -> Set[str]:
-        return self._left.variables(include_values=include_values).union(
-            self._right.variables(include_values=include_values)
-        )
-
-    def next_stage(self, mappings: Dict[str, str]):
-        """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
-        self._left.next_stage(mappings)
-        self._right.next_stage(mappings)
-
-    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
-        """Get the next item from the iterator, following the iterator protocol.
-
-        This function may contains `non interruptible` clauses which must
-        be atomically evaluated before preemption occurs.
-
-        Returns: A set of solution mappings, or `None` if none was produced during this call.
+    def next_stage(self, muc: Mappings) -> None:
         """
-        mappings = await self._left.next(context=context)
-        if mappings is not None:
-            return mappings
-        return await self._right.next(context=context)
+        Applies the current mappings to the next triple pattern in the pipeline
+        of iterators.
+
+        Parameters
+        ----------
+        muc : Mappings
+            Mappings {?v1: ..., ..., ?vk: ...} computed so far.
+
+        Returns
+        -------
+        None
+        """
+        self.left.next_stage(muc)
+        self.right.next_stage(muc)
+
+    async def next(self, context: QueryContext = {}) -> Optional[Mappings]:
+        """
+        Generates the next item from the iterator, following the iterator
+        protocol.
+
+        Parameters
+        ----------
+        context: QueryContext
+            Global variables specific to the execution of the query.
+
+        Returns
+        -------
+        None | Mappings
+            The next item produced by the iterator, or None if all items have
+            been produced.
+
+        Raises
+        ------
+        QuantumExhausted
+        """
+        mu = await self.left.next(context=context)
+        if mu is not None:
+            return mu
+        return await self.right.next(context=context)
+
+    def pop(self, context: QueryContext = {}) -> Optional[Mappings]:
+        """
+        Generates the next item from the iterator, following the iterator
+        protocol.
+
+        This method does not generate any scan on the database. It is used to
+        clear internal data structures such as the buffer of the TOPKIterator.
+
+        Parameters
+        ----------
+        context: QueryContext
+            Global variables specific to the execution of the query.
+
+        Returns
+        -------
+        None | Mappings
+            The next item produced by the iterator, or None if all internal
+            data structures are empty.
+        """
+        return None
 
     def save(self) -> SavedBagUnionIterator:
-        """Save and serialize the iterator as a Protobuf message"""
+        """
+        Saves and serializes the iterator as a Protobuf message.
+
+        Returns
+        -------
+        SavedBagUnionIterator
+            The state of the BagUnionIterator as a Protobuf message.
+        """
         saved_union = SavedBagUnionIterator()
-        # export left source
-        left_field = f'{self._left.serialized_name()}_left'
-        getattr(saved_union, left_field).CopyFrom(self._left.save())
-        # export right source
-        right_field = f'{self._right.serialized_name()}_right'
-        getattr(saved_union, right_field).CopyFrom(self._right.save())
+
+        left_field = f"{self.left.name}_left"
+        getattr(saved_union, left_field).CopyFrom(self.left.save())
+
+        right_field = f"{self.right.name}_right"
+        getattr(saved_union, right_field).CopyFrom(self.right.save())
+
         return saved_union
+
+    def explain(self, depth: int = 0) -> str:
+        """
+        Returns a textual representation of the pipeline of iterators.
+
+        Parameters
+        ----------
+        depth: int - (default = 0)
+            Indicates the current depth in the pipeline of iterators. It is
+            used to return a pretty printed representation.
+
+        Returns
+        -------
+        str
+            Textual representation of the pipeline of iterators.
+        """
+        prefix = ("| " * depth) + "|"
+        description = f"{prefix}\n{prefix}-BagUnionIterator <PV=({self.vars})>\n"
+        description += self.left.explain(depth=depth + 1)
+        description += self.right.explain(depth=depth + 1)
+        return description
+
+    def stringify(self, level: int = 1) -> str:
+        """
+        Transforms a pipeline of iterators into a SPARQL query.
+
+        Parameters
+        ----------
+        level: int - (default = 1)
+            Indicates the level of nesting of the group. It is used to pretty
+            print the SPARQL query.
+
+        Returns
+        -------
+        str
+            A SPARQL query.
+        """
+        prefix = " " * 2 * level
+        return ((
+            f"{prefix}{{\n{self.left.stringify(level=level + 1)}"
+            f"{prefix}}} UNION {{\n"
+            f"{self.right.stringify(level=level + 1)}{prefix}}}\n"))
 
 
 class RandomBagUnionIterator(BagUnionIterator):
-    """A RandomBagUnionIterator performs a SPARQL UNION with bag semantics in a pipeline of iterators.
+    """
+    A RandomBagUnionIterator evaluates an UNION clause with a bag semantics in a
+    pipeline of iterators.
 
-    This operator randomly reads from the left and right operands to produce solution mappings.
+    This operator randomly reads from the left and right operands to produce
+    solution mappings.
 
-    Args:
-      * left: left operand of the union.
-      * right: right operand of the union.
+    Parameters
+    ----------
+    left: PreemptableIterator
+        The left child of the iterator.
+    right: PreemptableIterator
+        The right child of the iterator.
     """
 
     def __init__(self, left: PreemptableIterator, right: PreemptableIterator):
         super(BagUnionIterator, self).__init__(left, right)
 
-    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
-        """Get the next item from the iterator, following the iterator protocol.
+    async def next(self, context: QueryContext = {}) -> Optional[Mappings]:
+        """
+        Generates the next item from the iterator, following the iterator
+        protocol.
 
-        This function may contains `non interruptible` clauses which must
-        be atomically evaluated before preemption occurs.
+        Parameters
+        ----------
+        context: QueryContext
+            Global variables specific to the execution of the query.
 
-        Returns: A set of solution mappings, or `None` if none was produced during this call.
+        Returns
+        -------
+        None | Mappings
+            The next item produced by the iterator, or None if all items have
+            been produced.
         """
         if random() < 0.5:
-            left = self._left
-            right = self._right
+            left = self.left
+            right = self.right
         else:
-            left = self._right
-            right = self._left
-        mappings = await left.next(context=context)
-        if mappings is not None:
-            return mappings
+            left = self.right
+            right = self.left
+        mu = await left.next(context=context)
+        if mu is not None:
+            return mu
         return await right.next(context=context)

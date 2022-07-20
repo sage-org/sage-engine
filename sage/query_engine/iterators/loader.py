@@ -1,11 +1,7 @@
-# loader.py
-# Author: Thomas MINIER - MIT License 2017-2020
 from datetime import datetime
-from typing import Union, Dict, Any
-from rdflib.plugins.sparql.parser import parseQuery
-from rdflib.plugins.sparql.algebra import translateQuery
 
-from sage.database.core.dataset import Dataset
+from sage.query_engine.types import QueryContext, SavedPlan
+from sage.query_engine.expression import Expression
 from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.nlj import IndexJoinIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
@@ -14,82 +10,91 @@ from sage.query_engine.iterators.scan import ScanIterator
 from sage.query_engine.iterators.union import BagUnionIterator
 from sage.query_engine.iterators.values import ValuesIterator
 from sage.query_engine.iterators.limit import LimitIterator
-from sage.query_engine.iterators.topk import TOPKIterator
-from sage.query_engine.iterators.topk_collab import TOPKCollabIterator
-from sage.query_engine.protobuf.iterators_pb2 import (RootTree,
-                                                      SavedBagUnionIterator,
-                                                      SavedFilterIterator,
-                                                      SavedIndexJoinIterator,
-                                                      SavedProjectionIterator,
-                                                      SavedScanIterator,
-                                                      SavedValuesIterator,
-                                                      SavedLimitIterator,
-                                                      SavedTOPKIterator,
-                                                      SavedTOPKCollabIterator)
+from sage.query_engine.iterators.topk.topk_server import TOPKServerIterator
+from sage.query_engine.iterators.topk.patial_topk import PartialTOPKIterator
+from sage.query_engine.iterators.topk.rank_filter import RankFilterIterator
+from sage.query_engine.iterators.topk.order_conditions import OrderConditions
+from sage.query_engine.protobuf.iterators_pb2 import (
+    RootTree,
+    SavedBagUnionIterator,
+    SavedFilterIterator,
+    SavedIndexJoinIterator,
+    SavedProjectionIterator,
+    SavedScanIterator,
+    SavedValuesIterator,
+    SavedLimitIterator,
+    SavedTOPKServerIterator,
+    SavedPartialTOPKIterator,
+    SavedRankFilterIterator)
 from sage.query_engine.protobuf.utils import protoTriple_to_dict
-
-SavedProtobufPlan = Union[RootTree, SavedBagUnionIterator, SavedFilterIterator, SavedIndexJoinIterator, SavedProjectionIterator, SavedScanIterator]
 
 
 def load(
-    saved_plan: SavedProtobufPlan, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedPlan, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a preemptable physical query execution plan from a saved state.
-
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
-
-    Returns:
-      The pipeline of iterator used to continue query execution.
     """
-    # unpack the plan from the serialized protobuf message
-    if isinstance(saved_plan, bytes):
+    Load a preemptable physical query execution plan from a saved state.
+
+    Parameters
+    ----------
+    saved_plan: SavedProtobufPlan
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
+
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
+    """
+    if isinstance(saved_plan, bytes):  # unpack the plan from the serialized protobuf message
         root = RootTree()
         root.ParseFromString(saved_plan)
-        sourceField = root.WhichOneof('source')
+        sourceField = root.WhichOneof("source")
         saved_plan = getattr(root, sourceField)
-    # load the plan based on the current node
     if type(saved_plan) is SavedFilterIterator:
-        return load_filter(saved_plan, dataset, context=context)
+        return load_filter(saved_plan, context=context)
     if type(saved_plan) is SavedProjectionIterator:
-        return load_projection(saved_plan, dataset, context=context)
+        return load_projection(saved_plan, context=context)
     elif type(saved_plan) is SavedScanIterator:
-        return load_scan(saved_plan, dataset, context=context)
+        return load_scan(saved_plan, context=context)
     elif type(saved_plan) is SavedIndexJoinIterator:
-        return load_nlj(saved_plan, dataset, context=context)
+        return load_nlj(saved_plan, context=context)
     elif type(saved_plan) is SavedBagUnionIterator:
-        return load_union(saved_plan, dataset, context=context)
+        return load_union(saved_plan, context=context)
     elif type(saved_plan) is SavedValuesIterator:
-        return load_values(saved_plan, dataset, context=context)
+        return load_values(saved_plan, context=context)
     elif type(saved_plan) is SavedLimitIterator:
-        return load_limit(saved_plan, dataset, context=context)
-    elif type(saved_plan) is SavedTOPKIterator:
-        return load_topk(saved_plan, dataset, context=context)
-    elif type(saved_plan) is SavedTOPKCollabIterator:
-        return load_topkCollab(saved_plan, dataset, context=context)
-    else:
-        raise Exception(f"Unknown iterator type '{type(saved_plan)}' when loading controls")
+        return load_limit(saved_plan, context=context)
+    elif type(saved_plan) is SavedTOPKServerIterator:
+        return load_topk_server(saved_plan, context=context)
+    elif type(saved_plan) is SavedPartialTOPKIterator:
+        return load_partial_topk(saved_plan, context=context)
+    elif type(saved_plan) is SavedRankFilterIterator:
+        return load_rank_filter(saved_plan, context=context)
+    raise Exception(f"Unknown iterator type '{type(saved_plan)}' when loading controls")
 
 
 def load_projection(
-    saved_plan: SavedProjectionIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedProjectionIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a ProjectionIterator from a protobuf serialization.
-
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
-
-    Returns:
-      The pipeline of iterator used to continue query execution.
     """
-    sourceField = saved_plan.WhichOneof('source')
-    source = load(getattr(saved_plan, sourceField), dataset, context=context)
+    Load a ProjectionIterator from a protobuf message.
+
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
+
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
+    """
+    sourceField = saved_plan.WhichOneof("source")
+    source = load(getattr(saved_plan, sourceField), context=context)
 
     values = saved_plan.values if len(saved_plan.values) > 0 else None
 
@@ -97,220 +102,252 @@ def load_projection(
 
 
 def load_filter(
-    saved_plan: SavedFilterIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedFilterIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a FilterIterator from a protobuf serialization.
-
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
-
-    Returns:
-      The pipeline of iterator used to continue query execution.
     """
-    sourceField = saved_plan.WhichOneof('source')
-    source = load(getattr(saved_plan, sourceField), dataset, context=context)
+    Load a FilterIterator from a protobuf message.
 
-    constrained_variables = list(saved_plan.variables)
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    query = f'SELECT * WHERE {{ ?s ?p ?o . FILTER({saved_plan.expression}) }}'
-    compiled_expr = parseQuery(query)
-    compiled_expr = translateQuery(compiled_expr).algebra.p.p.expr
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
+    """
+    sourceField = saved_plan.WhichOneof("source")
+    source = load(getattr(saved_plan, sourceField), context=context)
 
-    return FilterIterator(
-        source, saved_plan.expression, constrained_variables, compiled_expr)
+    expression = Expression.parse(saved_plan.expression)
+
+    return FilterIterator(source, expression)
 
 
 def load_scan(
-    saved_plan: SavedScanIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedScanIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a ScanIterator from a protobuf serialization.
+    """Load a ScanIterator from a protobuf message.
 
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    Returns:
-      The pipeline of iterator used to continue query execution.
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
     """
     pattern = protoTriple_to_dict(saved_plan.pattern)
-    connector = dataset.get_graph(pattern['graph'])
 
-    if saved_plan.timestamp is not None and saved_plan.timestamp != '':
+    as_of = None
+    if saved_plan.timestamp is not None and saved_plan.timestamp != "":
         as_of = datetime.fromisoformat(saved_plan.timestamp)
-    else:
-        as_of = None
 
-    current_mappings = None
+    muc = None
     if len(saved_plan.muc) > 0:
-        current_mappings = dict(saved_plan.muc)
+        muc = dict(saved_plan.muc)
 
     mu = None
     if len(saved_plan.mu) > 0:
         mu = dict(saved_plan.mu)
 
     return ScanIterator(
-        connector, pattern, current_mappings=current_mappings, mu=mu,
-        last_read=saved_plan.last_read, as_of=as_of)
+        pattern, muc=muc, mu=mu, last_read=saved_plan.last_read, as_of=as_of)
 
 
 def load_values(
-    saved_plan: SavedValuesIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedValuesIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a ValuesIterator from a protobuf serialization.
+    """Load a ValuesIterator from a protobuf message.
 
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    Returns:
-      The pipeline of iterator used to continue query execution.
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
     """
-    values = list()
-    for value in saved_plan.values:
-        values.append(dict(value.bindings))
+    items = list()
+    for item in saved_plan.values:
+        items.append(dict(item.bindings))
 
-    current_mappings = None
+    muc = None
     if len(saved_plan.muc) > 0:
-        current_mappings = dict(saved_plan.muc)
+        muc = dict(saved_plan.muc)
 
-    return ValuesIterator(
-        values, current_mappings=current_mappings, next_value=saved_plan.next_value)
+    return ValuesIterator(items, muc=muc, next_item=saved_plan.next_value)
 
 
 def load_nlj(
-    saved_plan: SavedIndexJoinIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedIndexJoinIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a IndexJoinIterator from a protobuf serialization.
+    """Load a IndexJoinIterator from a protobuf message.
 
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    Returns:
-      The pipeline of iterator used to continue query execution.
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
     """
-    leftField = saved_plan.WhichOneof('left')
-    left = load(getattr(saved_plan, leftField), dataset, context=context)
+    leftField = saved_plan.WhichOneof("left")
+    left = load(getattr(saved_plan, leftField), context=context)
 
-    rightField = saved_plan.WhichOneof('right')
-    right = load(getattr(saved_plan, rightField), dataset, context=context)
+    rightField = saved_plan.WhichOneof("right")
+    right = load(getattr(saved_plan, rightField), context=context)
 
-    current_mappings = None
+    muc = None
     if len(saved_plan.muc) > 0:
-        current_mappings = dict(saved_plan.muc)
+        muc = dict(saved_plan.muc)
 
-    return IndexJoinIterator(left, right, current_mappings=current_mappings)
+    return IndexJoinIterator(left, right, muc=muc)
 
 
 def load_union(
-    saved_plan: SavedBagUnionIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedBagUnionIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a BagUnionIterator from a protobuf serialization.
+    """Load a BagUnionIterator from a protobuf message.
 
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    Returns:
-      The pipeline of iterator used to continue query execution.
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
     """
-    leftField = saved_plan.WhichOneof('left')
-    left = load(getattr(saved_plan, leftField), dataset, context=context)
+    leftField = saved_plan.WhichOneof("left")
+    left = load(getattr(saved_plan, leftField), context=context)
 
-    rightField = saved_plan.WhichOneof('right')
-    right = load(getattr(saved_plan, rightField), dataset, context=context)
+    rightField = saved_plan.WhichOneof("right")
+    right = load(getattr(saved_plan, rightField), context=context)
 
     return BagUnionIterator(left, right)
 
 
 def load_limit(
-    saved_plan: SavedLimitIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+    saved_plan: SavedLimitIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a SavedLimitIterator from a protobuf serialization.
+    """Load a LimitIterator from a protobuf message.
 
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    Returns:
-      The pipeline of iterator used to continue query execution.
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
     """
-    sourceField = saved_plan.WhichOneof('source')
-    source = load(getattr(saved_plan, sourceField), dataset, context=context)
+    sourceField = saved_plan.WhichOneof("source")
+    source = load(getattr(saved_plan, sourceField), context=context)
 
-    return LimitIterator(
-        source, limit=saved_plan.limit, produced=saved_plan.produced)
+    return LimitIterator(source, limit=saved_plan.limit, produced=saved_plan.produced)
 
 
-def load_topk(
-    saved_plan: SavedTOPKIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+def load_topk_server(
+    saved_plan: SavedTOPKServerIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a SavedTOPKIterator from a protobuf serialization.
+    """Load a TOPKServerIterator from a protobuf message.
 
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
+    Parameters
+    ----------
+    saved_plan: SavedProjectionIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    Returns:
-      The pipeline of iterator used to continue query execution.
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
     """
-    sourceField = saved_plan.WhichOneof('source')
-    source = load(getattr(saved_plan, sourceField), dataset, context=context)
+    sourceField = saved_plan.WhichOneof("source")
+    source = load(getattr(saved_plan, sourceField), context=context)
 
-    query = f'SELECT * WHERE {{ ?s ?p ?o }} ORDER BY {saved_plan.expression}'
-    parsed_query = parseQuery(query)
-    compiled_order_conditions = translateQuery(parsed_query).algebra.p.p.expr
+    expression = OrderConditions.parse(saved_plan.expression)
 
     topk = list()
     for solution in saved_plan.topk:
         topk.append(dict(solution.bindings))
 
-    return TOPKIterator(
-        source, saved_plan.expression, compiled_order_conditions,
-        saved_plan.limit, topk=topk)
+    return TOPKServerIterator(source, expression, saved_plan.limit, topk=topk)
 
 
-def load_topkCollab(
-    saved_plan: SavedTOPKCollabIterator, dataset: Dataset,
-    context: Dict[str, Any] = {}
+def load_partial_topk(
+    saved_plan: SavedPartialTOPKIterator, context: QueryContext = {}
 ) -> PreemptableIterator:
-    """Load a SavedTOPKCollabIterator from a protobuf serialization.
+    """Load a PartialTOPKIterator from a protobuf message.
 
-    Args:
-      * saved_plan: Saved query execution plan.
-      * dataset: RDF dataset used to execute the plan.
-      * context: Information about the execution context of the query.
+    Parameters
+    ----------
+    saved_plan: SavedPartialTOPKIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
 
-    Returns:
-      The pipeline of iterator used to continue query execution.
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
     """
-    sourceField = saved_plan.WhichOneof('source')
-    source = load(getattr(saved_plan, sourceField), dataset, context=context)
+    sourceField = saved_plan.WhichOneof("source")
+    source = load(getattr(saved_plan, sourceField), context=context)
 
-    query = f'SELECT * WHERE {{ ?s ?p ?o }} ORDER BY {saved_plan.expression}'
-    parsed_query = parseQuery(query)
-    compiled_order_conditions = translateQuery(parsed_query).algebra.p.p.expr
+    expression = OrderConditions.parse(saved_plan.expression)
 
     threshold = None
     if len(saved_plan.threshold) > 0:
         threshold = dict(saved_plan.threshold)
 
-    return TOPKCollabIterator(
-        source, saved_plan.expression, compiled_order_conditions,
-        saved_plan.limit, threshold=threshold,
-        threshold_refresh_rate=saved_plan.threshold_refresh_rate)
+    return PartialTOPKIterator(
+        source, expression, saved_plan.limit, threshold=threshold)
+
+
+def load_rank_filter(
+    saved_plan: SavedRankFilterIterator, context: QueryContext = {}
+) -> PreemptableIterator:
+    """Load a RankFilterIterator from a protobuf message.
+
+    Parameters
+    ----------
+    saved_plan: SavedRankFilterIterator
+        Saved query execution plan.
+    context: QueryContext
+        Global variables specific to the execution of the query.
+
+    Returns
+    -------
+    PreemptableIterator
+        The pipeline of iterators used to continue the query execution.
+    """
+    sourceField = saved_plan.WhichOneof("source")
+    source = load(getattr(saved_plan, sourceField), context=context)
+
+    expression = OrderConditions.parse(saved_plan.expression)
+
+    return RankFilterIterator(source, expression, is_partial=saved_plan.is_partial)

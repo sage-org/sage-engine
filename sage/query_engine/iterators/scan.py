@@ -1,139 +1,317 @@
-# scan.py
-# Author: Thomas MINIER - MIT License 2017-2020
-from typing import Dict, Optional, Set, Any, Tuple
-from time import time
+from typing import Optional, Set, Tuple
 from datetime import datetime
+from time import time
 
-from sage.database.backends.db_connector import DatabaseConnector
+from sage.database.core.dataset import Dataset
 from sage.database.backends.db_iterator import DBIterator
+from sage.query_engine.types import QueryContext, Mappings, TriplePattern
 from sage.query_engine.exceptions import QuantumExhausted
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
-from sage.query_engine.iterators.utils import selection, vars_positions
-from sage.query_engine.protobuf.iterators_pb2 import SavedScanIterator, TriplePattern
+from sage.query_engine.iterators.utils import EmptyIterator
+from sage.query_engine.protobuf.iterators_pb2 import SavedScanIterator, SavedTriplePattern
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
-from sage.query_engine.iterators.utils import find_in_mappings
 
 
 class ScanIterator(PreemptableIterator):
-    """A ScanIterator evaluates a triple pattern over a RDF graph.
+    """
+    A ScanIterator evaluates a triple pattern over an RDF graph.
 
-    It can be used as the starting iterator in a pipeline of iterators.
+    This iterator generates all solutions that match a triple pattern.
 
-    Args:
-      * connector: The database connector that will be used to evaluate a triple pattern.
-      * pattern: The evaluated triple pattern.
-      * current_mappings: The current mappings when the scan is performed.
-      * mu: The last triple read when the preemption occured. This triple must be the next triple to return when the query is resumed.
-      * last_read: An offset ID used to resume the RandomScanIterator.
-      * as_of: Perform all reads against a consistent snapshot represented by a timestamp.
-      * read: Number of triples read from the instantiated triple pattern. Used to compute the coverage of the query.
-      * size: Cumulative cardinality of all the triple patterns once instantiated. Used to compute the refined-cost of the query.
-      * produced: Number of triples produced from all the triple patterns once instantiated. Used to compute the refined-cost of the query.
-      * stages: Number of times the triple pattern has been instantiated. Used to compute the refined-cost of the query.
+    Parameters
+    ----------
+    pattern: TriplePattern
+        The triple pattern to evaluate.
+    muc: None | Mappings - (default = None)
+        The current state of variables.
+    mu: None | Mappings - (default = None)
+        The last triple read when the preemption occured. Note that this triple
+        has not been produced by the iterator, and must be the next to be produce.
+    last_read: None | str - (default = None)
+        An offset ID used to resume the ScanIterator.
+    as_of: None | datetime - (default = None)
+        A timestamp used to read the database in a consistent snapshot (MVCC).
     """
 
     def __init__(
-        self, connector: DatabaseConnector,
-        pattern: Dict[str, str],
-        current_mappings: Optional[Dict[str, str]] = None,
-        mu: Optional[Dict[str, str]] = None,
-        last_read: Optional[str] = None,
+        self, pattern: TriplePattern, muc: Optional[Mappings] = None,
+        mu: Optional[Mappings] = None, last_read: Optional[str] = None,
         as_of: Optional[datetime] = None
     ):
-        super(ScanIterator, self).__init__()
-        self._connector = connector
+        super(ScanIterator, self).__init__("scan")
+        self._dataset = Dataset()
         self._pattern = pattern
-        self._mask = vars_positions(pattern['subject'], pattern['predicate'], pattern['object'])
-        self._source, self._cardinality = self.create_iterator(mappings=current_mappings, last_read=last_read, as_of=as_of)
-        self._current_mappings = current_mappings
+        self._muc = muc
         self._mu = mu
         self._last_read = last_read
         self._timestamp = as_of
+        self._source, self._card = self.__create_iterator__(muc, last_read=last_read)
 
-    def __repr__(self) -> str:
-        return f"<ScanIterator ({self._pattern['subject']} {self._pattern['predicate']} {self._pattern['object']})>"
+    @property
+    def vars(self) -> Set[str]:
+        variables = set()
+        if self.subject.startswith("?"):
+            variables.add(self.subject)
+        if self.predicate.startswith("?"):
+            variables.add(self.predicate)
+        if self.object.startswith("?"):
+            variables.add(self.object)
+        return variables
 
-    def serialized_name(self):
-        """Get the name of the iterator, as used in the plan serialization protocol"""
-        return "scan"
+    @property
+    def subject(self) -> str:
+        return self._pattern["subject"]
 
-    def explain(self, height: int = 0, step: int = 3) -> None:
-        """Print a description of the iterator"""
-        prefix = ''
-        if height > step:
-            prefix = ('|' + (' ' * (step - 1))) * (int(height / step) - 1)
-        prefix += ('|' + ('-' * (step - 1)))
-        subject = self._pattern['subject']
-        predicate = self._pattern['predicate']
-        object = self._pattern['object']
-        print(f'{prefix}ScanIterator <({subject} {predicate} {object})>')
+    @property
+    def predicate(self) -> str:
+        return self._pattern["predicate"]
 
-    def variables(self, include_values: bool = False) -> Set[str]:
-        return set([v for v in self._mask if v is not None])
+    @property
+    def object(self) -> str:
+        return self._pattern["object"]
 
-    def instantiate(self, mappings: Optional[Dict[str, str]] = None) -> Tuple[str, str, str]:
-        if mappings is None:
-            return (self._pattern['subject'], self._pattern['predicate'], self._pattern['object'])
-        return (
-            find_in_mappings(self._pattern['subject'], mappings),
-            find_in_mappings(self._pattern['predicate'], mappings),
-            find_in_mappings(self._pattern['object'], mappings))
+    @property
+    def graph(self) -> str:
+        return self._pattern["graph"]
 
-    def create_iterator(self, mappings: Optional[Dict[str, str]] = None, last_read: Optional[str] = None, as_of: Optional[datetime] = None) -> Tuple[DBIterator, int]:
-        (s, p, o) = self.instantiate(mappings=mappings)
-        return self._connector.search(s, p, o, last_read=last_read, as_of=as_of)
+    @property
+    def cardinality(self) -> int:
+        return self._card
 
-    def last_read(self) -> str:
+    @property
+    def timestamp(self) -> Optional[datetime]:
+        return self._timestamp
+
+    @property
+    def last_read(self) -> Optional[str]:
         return self._source.last_read()
 
-    def next_stage(self, mappings: Dict[str, str], context: Dict[str, Any] = {}):
-        """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
-        self._source, self._cardinality = self.create_iterator(mappings, as_of=self._timestamp)
-        self._current_mappings = mappings
-        self._mu = None
-
-    async def next(self, context: Dict[str, Any] = {}) -> Optional[Dict[str, str]]:
-        """Get the next item from the iterator, following the iterator protocol.
-
-        This function may contains `non interruptible` clauses which must
-        be atomically evaluated before preemption occurs.
-
-        Returns: A set of solution mappings, or `None` if none was produced during this call.
+    def __create_iterator__(
+        self, muc: Optional[Mappings], last_read: Optional[str] = None
+    ) -> Tuple[DBIterator, int]:
         """
-        while self._mu is None:
-            mappings = self._source.next()
-            if mappings is None:
-                return None
-            (subject, predicate, object, insert_t, delete_t) = mappings
-            if (insert_t is None) or (insert_t <= self._timestamp and self._timestamp < delete_t):
-                self._mu = selection((subject, predicate, object), self._mask)
-            execution_time = (time() - context.get('timestamp')) * 1000
-            if execution_time > context.get('quota'):
-                raise QuantumExhausted()
-        if self._current_mappings is not None:
-            mappings = {**self._current_mappings, **self._mu}
+        Creates an iterator on the database to evaluate a triple pattern,
+        according to the current state of variables.
+
+        Parameters
+        ----------
+        muc: None | Dict[str, str]
+            The current state of variables.
+        last_read: None | str
+            An offset ID used to start reading the database from the last read
+            triple.
+
+        Returns
+        -------
+        Tuple[DBIterator, int]
+            Returns an iterator on the database, and an estimate of the
+            cardinality of the triple pattern.
+        """
+        if not self._dataset.has_graph(self.graph):
+            return EmptyIterator(), 0
+        if muc is None:
+            (s, p, o) = (self.subject, self.predicate, self.object)
         else:
-            mappings = self._mu
+            (s, p, o) = (
+                muc[self.subject] if self.subject in muc else self.subject,
+                muc[self.predicate] if self.predicate in muc else self.predicate,
+                muc[self.object] if self.object in muc else self.object)
+        graph = self._dataset.get_graph(self.graph)
+        return graph.search(s, p, o, last_read=last_read, as_of=self.timestamp)
+
+    def __create_mappings__(self, triple: Tuple[str, str, str]) -> Mappings:
+        """
+        Transforms an RDF triple into a set of mappings according to the triple
+        pattern of the ScanIterator.
+
+        Parameters
+        ----------
+        triple: Tuple[str, str, str]
+            RDF triple to transform into a dictionary of mappings.
+
+        Returns
+        -------
+        Dict[str, str]
+            A set of mappings built from the given triple.
+
+        Example
+        -------
+        >>> triple = (":Ann", "foaf:knows", ":Bob")
+        >>> self.subject = ?s
+        >>> self.predicate = foaf:knows
+        >>> self.object = ?knows
+        >>> self.__create_mappings__(triple)
+            { "?s": ":Ann", "?knows": ":Bob" }
+        """
+        mu = dict()
+        if self.subject.startswith("?"):
+            mu[self.subject] = triple[0]
+        if self.predicate.startswith("?"):
+            mu[self.predicate] = triple[1]
+        if self.object.startswith("?"):
+            mu[self.object] = triple[2]
+        return mu
+
+    def next_stage(self, muc: Mappings) -> None:
+        """
+        Applies the current mappings to the next triple pattern in the pipeline
+        of iterators.
+
+        Parameters
+        ----------
+        muc : Dict[str, str]
+            Mappings {?v1: ..., ..., ?vk: ...} computed so far.
+
+        Returns
+        -------
+        None
+        """
+        self._muc = muc
         self._mu = None
-        return mappings
+        self._source, self._card = self.__create_iterator__(muc)
+
+    async def next(self, context: QueryContext = {}) -> Optional[Mappings]:
+        """
+        Generates the next item from the iterator, following the iterator
+        protocol.
+
+        In the current implementation, the ScanIterator is a main actor of
+        the preemption model. Before generating the next item, it ensures that
+        the quantum is not exhausted. If the quantum is exhausted, a
+        QuantumExhausted exception is raised.
+
+        Parameters
+        ----------
+        context: QueryContext
+            Global variables specific to the execution of the query.
+
+        Returns
+        -------
+        None | Dict[str, str]
+            The next item produced by the iterator, or None if all items have
+            been produced.
+
+        Raises
+        ------
+        QuantumExhausted
+        """
+        start_time = context.get("timestamp")
+        quota = context.setdefault("quota", self._dataset.quota)
+        while self._mu is None:
+            triple = self._source.next()
+            if triple is None:  # iterator is exhausted
+                return None
+            (subject, predicate, object, insert_t, delete_t) = triple
+            if (insert_t is None) or (insert_t <= self.timestamp and self.timestamp < delete_t):  # to complain with the MVCC protocol
+                self._mu = self.__create_mappings__((subject, predicate, object))
+            if ((time() - start_time) * 1000) > quota:  # quantum is exhausted
+                raise QuantumExhausted()
+        mu = self._mu
+        self._mu = None  # None to indicate that we have to retrieve a new triple
+        if self._muc is not None:
+            return {**self._muc, **mu}
+        return mu
+
+    def pop(self, context: QueryContext = {}) -> Optional[Mappings]:
+        """
+        Generates the next item from the iterator, following the iterator
+        protocol.
+
+        This method does not generate any scan on the database. It is used to
+        clear internal data structures such as the buffer of the TOPKIterator.
+
+        Parameters
+        ----------
+        context: QueryContext
+            Global variables specific to the execution of the query.
+
+        Returns
+        -------
+        None | Dict[str, str]
+            The next item produced by the iterator, or None if all internal
+            data structures are empty.
+        """
+        return None
 
     def save(self) -> SavedScanIterator:
-        """Save and serialize the iterator as a Protobuf message"""
+        """
+        Saves and serializes the iterator as a Protobuf message.
+
+        Returns
+        -------
+        SavedScanIterator
+            The state of the ScanIterator as a Protobuf message.
+        """
         saved_scan = SavedScanIterator()
-        triple = TriplePattern()
-        triple.subject = self._pattern['subject']
-        triple.predicate = self._pattern['predicate']
-        triple.object = self._pattern['object']
-        triple.graph = self._pattern['graph']
-        saved_scan.pattern.CopyFrom(triple)
-        if self._current_mappings is not None:
-            pyDict_to_protoDict(self._current_mappings, saved_scan.muc)
-        last_read = self.last_read()
-        if last_read is not None:
-            saved_scan.last_read = last_read
-        if self._timestamp is not None:
-            saved_scan.timestamp = self._timestamp.isoformat()
+
+        saved_triple_pattern = SavedTriplePattern()
+        saved_triple_pattern.subject = self.subject
+        saved_triple_pattern.predicate = self.predicate
+        saved_triple_pattern.object = self.object
+        saved_triple_pattern.graph = self.graph
+        saved_scan.pattern.CopyFrom(saved_triple_pattern)
+
+        saved_scan.cardinality = self.cardinality
+
+        if self.last_read is not None:
+            saved_scan.last_read = self.last_read
+
+        if self.timestamp is not None:
+            saved_scan.timestamp = self.timestamp.isoformat()
+
+        if self._muc is not None:
+            pyDict_to_protoDict(self._muc, saved_scan.muc)
+
         if self._mu is not None:
             pyDict_to_protoDict(self._mu, saved_scan.mu)
-        saved_scan.cardinality = self._cardinality
+
         return saved_scan
+
+    def explain(self, depth: int = 0) -> str:
+        """
+        Returns a textual representation of the pipeline of iterators.
+
+        Parameters
+        ----------
+        depth: int - (default = 0)
+            Indicates the current depth in the pipeline of iterators. It is
+            used to return a pretty printed representation.
+
+        Returns
+        -------
+        str
+            Textual representation of the pipeline of iterators.
+        """
+        prefix = ("| " * depth) + "|"
+        description = (
+            f"{prefix}\n{prefix}-ScanIterator <PV=({self.vars}), "
+            f"CARD=({self.cardinality}), S=({self.subject}), "
+            f"P=({self.predicate}), O=({self.object})>\n")
+        return description
+
+    def stringify(self, level: int = 1) -> str:
+        """
+        Transforms a pipeline of iterators into a SPARQL query.
+
+        Parameters
+        ----------
+        level: int - (default = 1)
+            Indicates the level of nesting of the group. It is used to pretty
+            print the SPARQL query.
+
+        Returns
+        -------
+        str
+            A SPARQL query.
+        """
+        prefix = " " * 2 * level
+        subject = self.subject
+        if subject.startswith("http"):
+            subject = f"<{subject}>"
+        predicate = self.predicate
+        if predicate.startswith("http"):
+            predicate = f"<{predicate}>"
+        object = self.object
+        if object.startswith("http"):
+            object = f"<{object}>"
+        return f"{prefix}{subject} {predicate} {object} .\n"

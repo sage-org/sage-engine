@@ -1,32 +1,35 @@
-# update_sequence.py
-# Author: Thomas MINIER - MIT License 2017-2020
 from typing import Dict, Optional
 
 from sage.query_engine.exceptions import DeleteInsertConflict
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 
 
-class UpdateSequenceOperator(PreemptableIterator):
-    """An UpdateSequenceOperator evaluates a "IF_EXISTS DELETE INSERT" query.
-    
-    It is used to provide serializability per solution group.
-    To do so, it sequentually evaluates a IfExistsOperator, then a DeleteOperator and finally an InsertOperator.
+class UpdateSequenceIterator(PreemptableIterator):
+    """
+    An UpdateSequenceOperator evaluates a "IF_EXISTS DELETE INSERT" query.
 
-    Args:
-      * if_exists_op: Operator used to evaluated the IF_EXISTS clause.
-      * delete_op: Operator used to evaluated the DELETE clause.
-      * insert_op: Operator used to evaluated the INSERT clause.
+    It is used to provide serializability per solution group.
+    To do so, it sequentually evaluates a IfExistsOperator, then a
+    DeleteOperator and finally an InsertOperator.
+
+    Parameters
+    ----------
+    if_exists_op: PreemptableIterator
+        Operator used to evaluated the IF_EXISTS clause.
+    delete_op: PreemptableIterator
+        Operator used to evaluated the DELETE clause.
+    insert_op: PreemptableIterator
+        Operator used to evaluated the INSERT clause.
     """
 
-    def __init__(self, if_exists_op: PreemptableIterator, delete_op: PreemptableIterator, insert_op: PreemptableIterator):
-        super(UpdateSequenceOperator, self).__init__()
+    def __init__(
+        self, if_exists_op: PreemptableIterator, delete_op: PreemptableIterator,
+        insert_op: PreemptableIterator
+    ) -> None:
+        super(UpdateSequenceIterator, self).__init__("update_sequence")
         self._if_exists_op = if_exists_op
         self._delete_op = delete_op
         self._insert_op = insert_op
-
-    def serialized_name(self) -> str:
-        """Get the name of the iterator, as used in the plan serialization protocol"""
-        return "update_sequence"
 
     def has_next(self) -> bool:
         """Return True if the iterator has more quads to process."""
@@ -42,7 +45,7 @@ class UpdateSequenceOperator(PreemptableIterator):
         It may also contains `non interruptible` clauses which must 
         be atomically evaluated before preemption occurs.
 
-        Returns: Always `None` 
+        Returns: Always `None`
 
         Throws:
           * `StopAsyncIteration` if the iterator has fnished query processing.
