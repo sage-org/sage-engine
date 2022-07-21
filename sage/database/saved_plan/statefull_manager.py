@@ -1,11 +1,12 @@
 from uuid import uuid4
 
+from sage.singleton import Singleton
 from sage.database.saved_plan.saved_plan_manager import SavedPlanManager
 from sage.database.saved_plan.utils import encode_saved_plan, decode_saved_plan
 from sage.query_engine.types import SavedPlan
 
 
-class StatefullManager(SavedPlanManager):
+class StatefullManager(SavedPlanManager, metaclass=Singleton):
     """
     A HashMapManager stores saved plans in main memory using a simple HashMap.
 

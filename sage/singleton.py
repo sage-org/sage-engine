@@ -1,4 +1,7 @@
-class Singleton(type):
+from abc import ABCMeta
+
+
+class Singleton(ABCMeta):
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
