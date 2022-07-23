@@ -31,19 +31,19 @@ class SagePostQuery(BaseModel):
     defaultGraph: str = Field(
         ..., description="The URI of the default RDF graph queried.")
     next: str = Field(
-        None, description=(
-            "(Optional) A next link used to resume query execution from "
-            "a saved state."))
+        None, description="(Optional) A next link used to resume query execution from a saved state.")
     quota: int = Field(
         None, description="The duration of a quantum.")
     forceOrder: bool = Field(
         False, description="True to fix the join order, False otherwise.")
     topkStrategy: str = Field(
-        "topk_server", description=(
-            "The strategy used to compute TOP-K queries. "
-            "It can be 'topk_server' or 'partial_topk'."))
+        "topk_server", description="The strategy used to compute TOP-K queries. It can be 'topk_server' or 'partial_topk'.")
     earlyPruning: bool = Field(
         False, description="True to enable early pruning, False otherwise.")
+    maxLimit: int = Field(
+        None, description="The maximum limit allowed for TOP-k queries.")
+    stateless: bool = Field(
+        None, desciption="False to store the saved plan on the server, False otherwise")
 
 
 def choose_void_format(mimetypes):
@@ -95,7 +95,7 @@ async def execute_query(
     Any exception that have occured during query execution.
     """
     try:
-        saved_plan_manager = SavedPlanManagerFactory.create()
+        saved_plan_manager = SavedPlanManagerFactory.create(context=context)
         if next_link is not None:
             saved_plan = saved_plan_manager.get_plan(next_link)
         else:
@@ -216,6 +216,10 @@ def run_app() -> FastAPI:
             context["topk_strategy"] = item.topkStrategy
         if item.earlyPruning is not None:
             context["early_pruning"] = item.earlyPruning
+        if item.maxLimit is not None:
+            context["max_limit"] = item.maxLimit
+        if item.stateless is not None:
+            context["stateless"] = item.stateless
         try:
             mimetypes = request.headers["accept"].split(",")
             server_url = urlunparse(request.url.components[0:3] + (None, None, None))

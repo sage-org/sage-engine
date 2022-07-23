@@ -1,7 +1,5 @@
 from typing import Optional, List
 
-from sage.database.core.dataset import Dataset
-from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.protobuf.iterators_pb2 import SavedTOPKServerIterator, SolutionMappings
 from sage.query_engine.protobuf.utils import pyDict_to_protoDict
 from sage.query_engine.types import QueryContext, Mappings
@@ -35,10 +33,6 @@ class TOPKServerIterator(TOPKIterator):
     ) -> None:
         super(TOPKServerIterator, self).__init__(
             "topk_server", source, expression, limit)
-        self._dataset = Dataset()
-        if limit > self._dataset.max_limit:
-            raise UnsupportedSPARQL(
-                f"TOP-k queries with k > {self._dataset.max_limit} are not supported...")
         self._topk = TOPKStruct(self._keys, limit=limit)
         for mappings in topk:
             self._topk.insert(mappings)

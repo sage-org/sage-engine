@@ -64,6 +64,7 @@ class PartialTOPKIterator(TOPKIterator):
         ------
         QuantumExhausted
         """
+        max_limit = context.setdefault("max_limit", self._dataset.max_limit)
         mu = await self.source.next(context=context)
         while mu is not None:
             # evaluates the ORDER BY conditions with the current mappings
@@ -72,7 +73,7 @@ class PartialTOPKIterator(TOPKIterator):
             # inserts the solution in the TOP-K
             self._topk.insert(mu)
             # if we have exceeded the server resources, the TOP-K is sent to the client
-            if len(self._topk) >= self._dataset.max_limit:
+            if len(self._topk) >= max_limit:
                 raise TOPKLimitReached()
             # updates the threshold for the RankFilterIterators to allow early pruning
             context["threshold"] = self._topk.threshold()

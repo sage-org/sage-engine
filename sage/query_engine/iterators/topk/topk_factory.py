@@ -1,4 +1,6 @@
+from sage.database.core.dataset import Dataset
 from sage.query_engine.types import QueryContext
+from sage.query_engine.exceptions import UnsupportedSPARQL
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.topk.topk import TOPKIterator
 from sage.query_engine.iterators.topk.topk_server import TOPKServerIterator
@@ -33,7 +35,11 @@ class TOPKFactory():
             A preemptable iterator to compute the TOP-K.
         """
         strategy = context.setdefault("topk_strategy", "topk_server")
+        max_limit = context.setdefault("max_limit", Dataset().max_limit)
         if strategy == "topk_server":
+            if limit > max_limit:
+                raise UnsupportedSPARQL(
+                    f"TOP-k queries with k > {max_limit} are not supported...")
             return TOPKServerIterator(source, expression, limit)
         elif strategy == "partial_topk":
             return PartialTOPKIterator(source, expression, limit)

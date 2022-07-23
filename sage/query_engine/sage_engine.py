@@ -98,13 +98,13 @@ class SageEngine():
         context["default_graph_uri"] = default_graph_uri
         context["snapshot"] = datetime.now()
 
-        loading_start = time()
+        resuming_start = time()
         if saved_plan is not None:
             plan = load(saved_plan, context=context)
         else:
             logical_plan = Parser.parse(query)
             plan = Optimizer.get_default().optimize(logical_plan, context=context)
-        loading_time = (time() - loading_start) * 1000
+        resuming_time = (time() - resuming_start) * 1000
 
         solutions = []
         query_done = False
@@ -118,14 +118,14 @@ class SageEngine():
         except DeleteInsertConflict as error:
             abort_reason = str(error)
 
-        export_start = time()
+        saving_start = time()
         if not query_done and abort_reason is None:
             saved_plan = RootTree()
             getattr(saved_plan, f"{plan.name}_source").CopyFrom(plan.save())
         else:
             saved_plan = None
-        export_time = (time() - export_start) * 1000
+        saving_time = (time() - saving_start) * 1000
 
-        stats = {"import": loading_time, "export": export_time}
+        stats = {"resuming_time": resuming_time, "saving_time": saving_time}
 
         return solutions, saved_plan, stats
