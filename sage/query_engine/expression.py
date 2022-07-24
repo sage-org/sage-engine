@@ -67,6 +67,13 @@ class Expression():
             return self.__variables__(expr.arg)
         elif expr.name == "UnaryNot":
             return self.__variables__(expr.expr)
+        elif expr.name == "Builtin_STRSTARTS":
+            variables = self.__variables__(expr.arg1)
+            return variables.union(self.__variables__(expr.arg2))
+        elif expr.name == "Builtin_STRSENDS":
+            return self.__variables__(expr.text)
+        elif expr.name == "Builtin_LANG":
+            return self.__variables__(expr.arg)
         raise UnsupportedSPARQL(f"Unsupported SPARQL expression: {expr.name}")
 
     def variables(self) -> Set[str]:
@@ -116,6 +123,16 @@ class Expression():
             return f"!({self.__stringify__(expr.expr)})"
         elif expr.name == "Builtin_CONCAT":
             return f"CONCAT({self.__stringify__(expr.arg)})"
+        elif expr.name == "Builtin_STRSTARTS":
+            arg1 = self.__stringify__(expr.arg1)
+            arg2 = self.__stringify__(expr.arg2)
+            return f"STRSTARTS({arg1}, {arg2})"
+        elif expr.name == "Builtin_STRSENDS":
+            arg1 = self.__stringify__(expr.text)
+            arg2 = self.__stringify__(expr.pattern)
+            return f"STRSTENDS({arg1}, {arg2})"
+        elif expr.name == "Builtin_LANG":
+            return f"LANG({self.__stringify__(expr.arg)})"
         raise UnsupportedSPARQL(f"Unsupported SPARQL expression: {expr.name}")
 
     def stringify(self) -> str:

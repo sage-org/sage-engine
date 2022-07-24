@@ -5,8 +5,7 @@ from sage.query_engine.types import SavedPlan
 
 class StatelessManager(SavedPlanManager):
     """
-    A StatelessManager is a class that encodes and decodes saved physical query
-    plans.
+    A StatelessManager is a class that encodes and decodes saved query plans.
     """
 
     def get_plan(self, plan_id: str) -> SavedPlan:
@@ -59,5 +58,11 @@ class StatelessManager(SavedPlanManager):
         ----------
         plan_id: str
             ID of the saved physical plan to delete.
+        """
+        pass
+
+    def close(self) -> None:
+        """
+        Free resources used to store saved plans.
         """
         pass

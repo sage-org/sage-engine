@@ -54,3 +54,10 @@ class SavedPlanManager(ABC):
             ID of the saved physical plan to delete.
         """
         pass
+
+    @abstractmethod
+    def close(self) -> None:
+        """
+        Free resources used to store saved plans.
+        """
+        pass

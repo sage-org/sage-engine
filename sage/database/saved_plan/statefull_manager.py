@@ -1,4 +1,5 @@
-from uuid import uuid4
+import tempfile
+import os
 
 from sage.singleton import Singleton
 from sage.database.saved_plan.saved_plan_manager import SavedPlanManager
@@ -8,13 +9,9 @@ from sage.query_engine.types import SavedPlan
 
 class StatefullManager(SavedPlanManager, metaclass=Singleton):
     """
-    A HashMapManager stores saved plans in main memory using a simple HashMap.
-
-    NOTE: This implementation does not work in a multiprocessing setup.
+    A StatefullManager stores saved plans on disk. Saved plans are stored on
+    disk so that the implementation works in a multiprocessing configuration.
     """
-
-    def __init__(self):
-        self._plans = dict()
 
     def get_plan(self, plan_id: str) -> SavedPlan:
         """
@@ -30,8 +27,10 @@ class StatefullManager(SavedPlanManager, metaclass=Singleton):
         SavedPlan
             The saved physical plan corresponding to the given ID.
         """
-        saved_plan = self._plans[plan_id]
-        return decode_saved_plan(saved_plan)
+        with open(plan_id, "r") as queryfile:
+            saved_plan = decode_saved_plan(queryfile.read())
+        os.remove(plan_id)
+        return saved_plan
 
     def save_plan(self, saved_plan: SavedPlan) -> str:
         """
@@ -47,9 +46,11 @@ class StatefullManager(SavedPlanManager, metaclass=Singleton):
         str
             The ID of the saved physical plan.
         """
-        plan_id = str(uuid4())
-        self._plans[plan_id] = encode_saved_plan(saved_plan)
-        return plan_id
+        tf_query = tempfile.NamedTemporaryFile(delete=False)
+        tf_query.write(encode_saved_plan(saved_plan).encode("utf-8"))
+        tf_query.flush()
+        tf_query.close()
+        return tf_query.name
 
     def delete_plan(self, plan_id: str) -> None:
         """
@@ -61,3 +62,9 @@ class StatefullManager(SavedPlanManager, metaclass=Singleton):
             ID of the saved physical plan to delete.
         """
         del self._plans[plan_id]
+
+    def close(self) -> None:
+        """
+        Free resources used to store saved plans.
+        """
+        pass
