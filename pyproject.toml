@@ -61,7 +61,7 @@ hbase = ["happybase"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
-pytest-asyncio = "^O.14"
+pytest-asyncio = "^0.14"
 requests = "^2.25"
 sphinx = "^2.3"
 sphinx_rtd_theme = "^0.4.3"
