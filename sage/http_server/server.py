@@ -11,6 +11,8 @@ from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlunparse
 from uuid import uuid4
 
+import re
+
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
@@ -77,6 +79,15 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
         context['quantum'] = graph.quota
         context['max_results'] = graph.max_results
 
+        ## little patch to force join order on bid variable
+        pattern = r'^#bid_variable\((\w+)\)'
+        match = re.search(pattern, query.splitlines()[0])
+        if match:
+            print(f"bid_variable: {match.group(1)}")
+            bid_variable = match.group(1)
+            context['bid_variable']=bid_variable
+
+
         # decode next_link or build query execution plan
         cardinalities = dict()
         start = time()
@@ -88,6 +99,7 @@ async def execute_query(query: str, default_graph_uri: str, next_link: Optional[
             plan = load(decode_saved_plan(saved_plan), dataset, context)
         else:
             plan, cardinalities = parse_query(query, dataset, default_graph_uri, context)
+
         logging.info(f'loading time: {(time() - start) * 1000}ms')
         loading_time = (time() - start) * 1000
 

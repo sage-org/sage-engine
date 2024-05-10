@@ -25,6 +25,7 @@ exclude = [ "tests" ]
 sage = "sage.cli.http_server:start_sage_server"
 sage-query = "sage.cli.commons:sage_query"
 sage-debug= "sage.cli.debug:sage_query_debug"
+sage-explain= "sage.cli.explain:explain"
 sage-grpc = "sage.cli.grpc_server:start_grpc_server"
 sage-postgres-init = "sage.cli.postgres:init_postgres"
 sage-postgres-index = "sage.cli.postgres:index_postgres"
@@ -38,9 +39,9 @@ sage-hbase-put = "sage.cli.hbase:put_hbase"
 [tool.poetry.dependencies]
 python = "^3.7"
 uvloop = "0.15.2"
-PyYAML = "5.4.1"
+PyYAML = "^6.0.1"
 rdflib = "5.0.0"
-rdflib-jsonld = "0.5.0"
+#rdflib-jsonld = "0.4.0"
 protobuf = "3.15.7"
 click = "7.1.2"
 fastapi = "0.63.0"
@@ -48,10 +49,10 @@ uvicorn = "0.13.4"
 grpcio = "^1.36"
 coloredlogs="15.0"
 pylru="^1.0"
+pybind11 = "2.2.4"
 # optional dependencies
-pybind11 = { version = "2.2.4", optional = true }
 hdt = { version = "2.3", optional = true }
-psycopg2-binary = { version = "2.8.6", optional = true }
+psycopg2-binary = { version = "2.9.9", optional = true }
 happybase = { version = "1.2.0", optional = true }
 
 [tool.poetry.extras]
@@ -61,7 +62,7 @@ hbase = ["happybase"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
-pytest-asyncio = "^O.14"
+pytest-asyncio = "^0.14"
 requests = "^2.25"
 sphinx = "^2.3"
 sphinx_rtd_theme = "^0.4.3"

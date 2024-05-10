@@ -14,6 +14,15 @@ from sage.query_engine.optimizer.utils import (equality_variables,
                                                get_vars)
 
 
+def create_sort_key(subject_priority):
+    """Creates a custom sort key function that prioritizes a specific subject."""
+    def custom_sort_key(item):
+        # Check if the subject matches the prioritized subject
+        is_priority = item['triple']['subject'] == subject_priority
+        # Return a tuple that uses the boolean value of is_priority and cardinality
+        return (not is_priority, item['cardinality'])
+    return custom_sort_key
+
 def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_graph: str, context: dict, as_of: Optional[datetime] = None) -> Tuple[PreemptableIterator, List[str], Dict[str, str]]:
     """Build a Left-linear join tree from a Basic Graph pattern.
 
@@ -33,6 +42,9 @@ def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_gr
     triples = []
     cardinalities = []
 
+    if 'bid_variable' in context:
+        print(f"join builder bid_variable: {context['bid_variable']}")
+
     # analyze each triple pattern in the BGP
     for triple in bgp:
         # select the graph used to evaluate the pattern
@@ -49,6 +61,12 @@ def build_left_join_tree(bgp: List[Dict[str, str]], dataset: Dataset, default_gr
 
     # sort triples by ascending cardinality
     triples = sorted(triples, key=lambda v: v['cardinality'])
+    #print(f"triples: {triples}")
+
+    if 'bid_variable' in context:
+        sort_key = create_sort_key(context['bid_variable'])
+        triples = sorted(triples, key=sort_key)
+        print(f"triples sorted with {context['bid_variable']}: {triples}")
 
     # start the pipeline with the Scan with the most selective pattern
     pattern = triples.pop(0)

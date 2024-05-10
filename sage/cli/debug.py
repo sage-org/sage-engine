@@ -93,7 +93,8 @@ def sage_query_debug(config_file, default_graph_uri, query, file, limit ):
     from time import time
     context['start_timestamp']=time()
     iterator,cards = parse_query(query, dataset, default_graph_uri,context)
-    loop = asyncio.get_event_loop()
+#    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
     loop.run_until_complete(execute(engine,iterator,limit))
     loop.close()
 

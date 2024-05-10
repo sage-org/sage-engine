@@ -18,6 +18,7 @@ from sage.query_engine.iterators.filter import FilterIterator
 from sage.query_engine.iterators.preemptable_iterator import PreemptableIterator
 from sage.query_engine.iterators.projection import ProjectionIterator
 from sage.query_engine.iterators.union import BagUnionIterator
+from sage.query_engine.iterators.left_join  import  LeftJoinIterator
 from sage.query_engine.optimizer.join_builder import build_left_join_tree
 from sage.query_engine.update.delete import DeleteOperator
 from sage.query_engine.update.if_exists import IfExistsOperator
@@ -255,6 +256,11 @@ def parse_query_node(node: dict, dataset: Dataset, current_graphs: List[str], co
         # track cardinalities of every triple pattern
         cardinalities += c
         return iterator
+    elif node.name == 'LeftJoin':
+        # only allow for joining BGPs from different GRAPH clauses
+        left = parse_query_node(node.p1, dataset, current_graphs, context, cardinalities, as_of=as_of)
+        right = parse_query_node(node.p2, dataset, current_graphs, context, cardinalities, as_of=as_of)
+        return LeftJoinIterator(left,right,context)
     else:
         raise UnsupportedSPARQL(f"Unsupported SPARQL feature: {node.name}")
 

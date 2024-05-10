@@ -64,6 +64,13 @@ class SerializableUpdate(PreemptableIterator):
         """
         return self._read_input.has_next()
 
+    def next_stage(self, mappings: Dict[str, str]):
+        """Propagate mappings to the bottom of the pipeline in order to compute nested loop joins"""
+        self._read_input.next_stage(mappings)
+#        self._delete_templates.next_stage(mappings)
+#        self._insert_templates.next_stage(mappings)
+
+
     async def next(self) -> None:
         """Execute the SPARQL INSERT/DELETE query.
 
