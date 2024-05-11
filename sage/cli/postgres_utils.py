@@ -50,6 +50,7 @@ def get_create_indexes_queries(graph_name, backend):
             f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_spo_index ON {graph_name} (subject,predicate,md5(object));",
             f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_osp_index ON {graph_name} (md5(object),subject,predicate);",
             f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_pos_index ON {graph_name} (predicate,md5(object),subject);"
+            f"CREATE UNIQUE INDEX IF NOT EXISTS {graph_name}_pso_index ON {graph_name} (predicate,subject,md5(object));"
         ]
     elif backend == "postgres-mvcc":
         return [

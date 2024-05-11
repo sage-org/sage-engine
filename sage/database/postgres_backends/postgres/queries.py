@@ -38,9 +38,10 @@ def get_start_query(subj: str, pred: str, obj: str, table_name: str) -> Tuple[st
                     AND predicate = %s
                     ORDER BY subject, predicate, md5(object)"""
         return query, (subj, pred)
-    elif kind == '?p?':
+    elif kind == '?p?': # PSO index for auction !!
+        print("PSO index !!")
         query += """WHERE predicate = %s
-                    ORDER BY predicate, md5(object), subject"""
+                    ORDER BY predicate,  subject, md5(object)"""
         return query, [pred]
     elif kind == '?po':
         query += """WHERE predicate = %s
