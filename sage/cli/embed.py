@@ -27,20 +27,7 @@ from sage.database.core.dataset import Dataset
 coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
-
-async def execute(iterator: PreemptableIterator, limit: int):
-    nb_solutions = 0
-    start_time = time()
-    while nb_solutions <= limit:
-        solution = await iterator.next()
-        if solution is None:
-            break
-        nb_solutions += 1
-        print(solution)
-    elapsed_time = time() - start_time
-    print(f'Number of solution mappings: {nb_solutions} - execution time: {elapsed_time}sec')
-
-async def execute_loop(query, default_graph_uri, dataset, saved_plan_manager):
+async def execute_loop(query, default_graph_uri, dataset, saved_plan_manager,limit,timeout):
     start_time = time()
     next_size=0
     nb_solutions = 0
@@ -49,7 +36,7 @@ async def execute_loop(query, default_graph_uri, dataset, saved_plan_manager):
     nb_solutions += len(bindings)
     next_size = sys.getsizeof(next_page)
     print("bindings",bindings)
-    while next_page is not None:
+    while next_page is not None and nb_solutions < limit and time() - start_time < timeout:
         bindings,next_page, stats= await execute_query(query,default_graph_uri,next_page,dataset,saved_plan_manager)
         print("bindings",bindings)
         nb_solutions += len(bindings)
@@ -73,7 +60,12 @@ async def execute_loop(query, default_graph_uri, dataset, saved_plan_manager):
     "-l", "--limit", type=click.INT, default=None,
     help="Maximum number of solutions bindings to fetch, similar to the SPARQL LIMIT modifier."
 )
-def sage_exec(config_file, default_graph_uri, query, file, limit):
+@click.option(
+    "-t", "--timeout", type=click.INT, default=None,
+    help="Stop execution after timeout in seconds."
+)
+
+def sage_exec(config_file, default_graph_uri, query, file, limit,timeout):
     """
         run a SPARQL query on an embedded Sage Server.
 
@@ -88,6 +80,9 @@ def sage_exec(config_file, default_graph_uri, query, file, limit):
 
     if limit is None:
         limit = inf
+
+    if timeout is None:
+        timeout = inf
 
     # load query from file if required
     if file is not None:
@@ -105,7 +100,7 @@ def sage_exec(config_file, default_graph_uri, query, file, limit):
 
     saved_plan_manager=StatelessManager()
 
-    asyncio.run(execute_loop(query, default_graph_uri, dataset, saved_plan_manager)) 
+    asyncio.run(execute_loop(query, default_graph_uri, dataset, saved_plan_manager,limit,timeout)) 
 
 if __name__ == '__main__':
     sage_exec()
