@@ -6,12 +6,16 @@ RUN apk add --no-cache git make gcc g++ bash postgresql-dev python3-dev musl-dev
 RUN apk add --no-cache libffi-dev
 
 # install poetry
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+#RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+# too recent
+#RUN curl -sSL https://install.python-poetry.org | python3 -
+# Need poetry compatible with python3.7
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.5.0 python3 -
 
 WORKDIR /opt/sage-engine/
 
 RUN pip install pybind11==2.2.4
-RUN source ~/.poetry/env
+#RUN source ~/.poetry/env
 
 COPY poetry.lock pyproject.toml ./
 # install grpcio first to be faster than a simple poetry install
@@ -23,7 +27,8 @@ RUN pip install grpcio
 # roll back
 RUN rm /usr/local/lib/python3.7/site-packages/_manylinux.py
 # generate the requirements.txt from poetry and then use pip to install
-RUN ~/.poetry/bin/poetry export -f requirements.txt -v > requirements.txt
+RUN /bin/bash
+RUN ~/.local/bin/poetry export -f requirements.txt -v > requirements.txt
 # install using poetry
 RUN pip install -r requirements.txt
 
@@ -31,6 +36,11 @@ COPY . /opt/sage-engine
 
 # now re run poetry for installing but without using the creation of virtualenv. no need we are in a container ><
 # thus no need to install dev dependencies it's a production container
-RUN ~/.poetry/bin/poetry config virtualenvs.create false && ~/.poetry/bin/poetry install --no-dev --extras "hdt postgres"
+# i don't know why poetry fails to install hdt, so i will install it manually
+RUN pip install hdt
 
-CMD [ "sage" ]
+RUN ~/.local/bin/poetry config virtualenvs.create false && ~/.local/bin/poetry install --no-dev --extras "hdt"
+
+# calling sage-exec to run a query in embed mode on sage.
+# sage-exec config.yaml http://example.org/watdiv -f opt.sparql
+#CMD [ "sage" ]

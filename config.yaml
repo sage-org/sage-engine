@@ -1,13 +1,37 @@
-name: SaGe server with PostgreSQL backend
-maintainer: Thomas Minier <thomas.minier@univ-nantes.fr>
-public_url: http://localhost:8000
-quota: 1000
+# The name of the server
+name: SaGe Example Server
+# Server maintainer(s)
+maintainer: Chuck Norris
+# The public URL used to access the server
+public_url: http://server-url.com
+# Path to a markdown file whose content will be displayed on the server's webpage
+long_description: config_examples/description.md
+# Time quantum used by the server
+quota: 75
+# (Optional) Maximum number of results fetched by HTTP request
 max_results: 2000
+# (Optional) Query selected by default in the "Query" section
+default_query:
+  grapg_name: dbpedia
+  name: Select everything
+  value: |
+    SELECT * WHERE {
+      ?s ?p ?o.
+    }
+# RDF Graphs hosted by the server
 graphs:
 -
-  name: my_dataset
-  uri: http://example.org/my_dataset
-  description: A dataset with serializable per row and no isolated reads
-  backend: sqlite
-  # Path to the SQLite database file (the file may not exist)
-  database: database
+  name: watdiv
+  uri: http://example.org/watdiv
+  description: The watdiv dataset
+  # Type of backend
+  backend: hdt-file
+  # Path to the HDT file
+  file: ./watdiv.10M.hdt
+  # Example queries that can be executed using this dataset
+  queries:
+    - name: "Every RDF triples"
+      value: |
+        SELECT * WHERE {
+          ?s ?p ?o.
+        }

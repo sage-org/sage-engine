@@ -1,0 +1,3 @@
+select * WHERE {
+  ?s <http://purl.org/stuff/rev#text> ?o
+}
