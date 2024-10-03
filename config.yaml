@@ -5,7 +5,7 @@ maintainer: Chuck Norris
 # The public URL used to access the server
 public_url: http://server-url.com
 # Path to a markdown file whose content will be displayed on the server's webpage
-long_description: config_examples/description.md
+#long_description: config_examples/description.md
 # Time quantum used by the server
 quota: 75
 # (Optional) Maximum number of results fetched by HTTP request

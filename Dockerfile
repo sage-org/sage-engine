@@ -38,9 +38,11 @@ COPY . /opt/sage-engine
 # thus no need to install dev dependencies it's a production container
 # i don't know why poetry fails to install hdt, so i will install it manually
 RUN pip install hdt
+RUN pip install requests
 
 RUN ~/.local/bin/poetry config virtualenvs.create false && ~/.local/bin/poetry install --no-dev --extras "hdt"
-
+RUN wget https://raw.githubusercontent.com/aucampia/rdflib/6f15c9aa9a96a4dcea46d43e9d4293bf12cc61de/rdflib/plugins/sparql/parserutils.py
+RUN cp parserutils.py /usr/local/lib/python3.7/site-packages/rdflib/plugins/sparql/parserutils.py
 # calling sage-exec to run a query in embed mode on sage.
 # sage-exec config.yaml http://example.org/watdiv -f opt.sparql
 #CMD [ "sage" ]
